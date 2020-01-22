@@ -1,0 +1,81 @@
+# Node.js with Bubble {#node}
+
+A more recent R package, called bubble which will will let you run node.js code from R, the package comes with an REPL and an R markdown engine. As it is still under heavy development the package is not yet available on CRAN, you can get it from Github using either the devtools or [remotes package](https://remotes.r-lib.org/) [@R-remotes].
+
+```r
+# install.packages("remotes")
+remotes::install_github("ColinFay/bubble")
+```
+
+## Basics {-}
+
+bubble is very similar to V8, it's also a reference class and the name of the methods are identical.
+
+```{r node-basics-load}
+library(bubble)
+
+n <- NodeSession$new()
+n$eval("2 + 2;")
+```
+
+You can also assign and get variables, just like with v8.
+
+```{r}
+n$assign(vehicles, cars[1:2, ])
+n$get(vehicles)
+```
+
+Bubble also comes with an REPL terminal (read-eval-print loop), which can be launched with `bubble::node_repl()`.
+
+## R Markdown Engine {-}
+
+Bubble comes with an R markdown engine so JavaScript code can be evaluated in node from an R markdown document such as this one. To do so we simply need to place `bubble::set_node_engine()` at the top of the document, subsequent `node` chunks will be evaluated in a node session.
+
+```{r}
+bubble::set_node_engine()
+```
+
+Once set we can run node code.
+
+```{node}
+console.log(2 + 3);
+```
+
+## Npm {-}
+
+Npm is to node.js what CRAN is to R; a repository of packages that can be conveniently installed. Such packages can be installed using another Reference class called `NPM`. While with V8 one needs to "browserify" npm packages in hope that they work, with bubble, since it interacts with node js directly, there is no need for to "browserify" packages and we can be assured that they work.
+
+Let us demonstrate with the [natural](https://github.com/NaturalNode/natural) package which provides general natural language facility. 
+
+```{r}
+# initialise and install
+npm <- Npm$new()$install("natural")
+```
+
+The above snippet initialises npm, which creates the pacakge.json file and a node_modules directory. The first is a DESCRIPTION file for node projects so to speak, the latter is a directory to hold dependencies installed.
+
+The packages can then be imported in the node session and interacted with.
+
+```{r}
+n$eval("const natural = require('natural')")
+n$eval("var tokenizer = new natural.WordTokenizer();")
+n$eval("tokenizer.tokenize('Using nodejs from R with npm.')")
+```
+
+## Use in Packages {-}
+
+To demonstrate how to use bubble in packages we shall build one to hold the functions we explored in the previous section. 
+Then again, if you are not familiar with package development skip this section.
+
+Create a package called "organic" using devtools, usethis, or the RStudio IDE. Then edit the DESCRIPTION file so that it imports the bubble package, since it is not yet on CRAN the Github dependency should be specified under `Remotes`.
+
+```
+Package: organic
+Title: Natural Language Facilities
+Imports:
+  bubble
+Remotes:
+  ColinFay/bubble
+```
+
+
