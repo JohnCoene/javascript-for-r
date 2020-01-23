@@ -14,7 +14,7 @@ It is highly recommended to use the freely available [RStudio IDE](https://rstud
 
 ### Package Development {-}
 
-Developing packages used to be notoriously difficult but things have greatly changed, namely thanks to the devtools and more recent [usethis](https://usethis.r-lib.org/) [@R-usethis] packages. The first is specifically designed to help creating packages; setting up tests, running checks, building and installing packages, etc. The second, usethis, more broadly helps setting up projecta, and automating repetitive tasks. Here, we only skim over the fundamentals, there is an entire book by Hadley Wickham called [R Packages](http://r-pkgs.had.co.nz/) solely dedicated to the topic.
+Developing packages used to be notoriously difficult but things have greatly changed, namely thanks to the devtools and more recent [usethis](https://usethis.r-lib.org/) [@R-usethis] packages. The first is specifically designed to help creating packages; setting up tests, running checks, building and installing packages, etc. The second, usethis, more broadly helps setting up projects, and automating repetitive tasks. Here, we only skim over the fundamentals, there is an entire book by Hadley Wickham called [R Packages](http://r-pkgs.had.co.nz/) solely dedicated to the topic.
 
 Start by installing the two packages from CRAN.
 
@@ -23,31 +23,31 @@ install.packages("devtools")
 install.packages("usethis")
 ```
 
-We'll create an admittedly ridiculous package to explain how it works. despite being useless, this package will introduce certain concepts of package development that are essential to understand for what is to come. The package will be named "test" and will provide a single function that will print a JavaScript file stored inside our package. Useless but bear with it.
+We'll create an admittedly ridiculous package to explain how it works. Despite being useless, this package will introduce certain concepts of package development that are essential to understand for what is to come. The package will be named "test" and will provide a single function that will print a JavaScript file stored inside our package. Useless but bear with it.
 
-Let's create the package, you can either do so using the RStudio IDE or with usethis. From the RStudio IDE go to `File > New Project > New Directory` then select "R package" and fill in the small form. But it could be argued that it's actually easier with usethis; type the code below in your R console to create a package named "test" in your current directory. If you run it from RStudio a new project window should open.
+Let's create the package, either do so using the RStudio IDE or with usethis. From the RStudio IDE go to `File > New Project > New Directory` then select "R package" and fill in the small form. But it could be argued that it's actually easier with usethis; type the code below in your R console to create a package named "test" in your current directory. If you run it from RStudio a new project window should open.
 
 ```r
 usethis::create_package("test")
 ```
 
-This creates an empty package. Let us add the JavaScript file that our yet-to-be-written R function will eventually print out. R packages follow strict guidelines so this file cannot be store anywhere we want; it must be stored in a directory called `inst` which stands for "installed files." Create a directory named "inst" and place a file called "javascript.js" within it.
+This creates an empty package. Let's add the JavaScript file that the yet-to-be-written R function will eventually print out. R packages must follow strict rules, this file cannot be placed anywhere we want; it must be stored in a directory called `inst` which stands for "installed files." Create the `inst` directory and place a file called `javascript.js` within it.
 
-We'll create the following, extremely simple JavaScript file that contains code which declares a variable `x`. 
+Let's create the following, extremely simple JavaScript file that contains code which declares a variable named `x`. 
 
 ```js
 // inst/javascript.js
 var x = 3;
 ```
 
-We cab actually create this file from R with:
+This can all be done from the R console as shown below.
 
 ```r
 dir.create("inst") # create directory
 writeLines("var x = 3;", con = "inst/javascript.js") # create file
 ```
 
-Your current directory should now look something like this.
+This should produce a directory looking something like:
 
 ```
 DESCRIPTION
@@ -57,23 +57,24 @@ inst/
 |-- javascript.js
 ```
 
-Now we need to create the R function that will read and print this file. Then again, R is strict, your R files must be placed in the R directory. Below we create the file from the R console.
+Onto creating the R function that will read and print this file. Then again, R is strict, R files must be placed in the `R` directory. Then again, this can be done from the console.
 
 
 ```r
 file.create("R/function.R")
 ```
 
-In the `function.R` file we just created we place a function that reads the `javascript.js` file and prints it to the R console along with a simple message. To read the file R comes with a `system.file` function which will return the path the file. Indeed as the package is to be installed on different one can never use absolute paths, it will depend on where the user of your package has it installed. If curious, run `.libPaths()` to find where it is.
+In the `function.R` file we just created we place a function that reads the `javascript.js` file and prints it to the R console. To read the file one needs to locate it, as packages are destined to be shared and installed on different machines one can never use absolute paths, where the `javascript.js` file is located will depend on where the user has installed the package. There R comes with a `system.file` function which will look for a file _relative to a package `inst` directory_ and return its full path.
 
 ```r
 # R/function.R
 print_file <- function(){
+  # look for javascript.js in the inst folder of the test package
   file <- system.file("javascript.js", package = "test")
 }
 ```
 
-We can now add two lines, one read the `file` and another to print it.
+With the file path one can read the contents  of the `file` and print it.
 
 ```r
 print_file <- function(){
@@ -83,7 +84,7 @@ print_file <- function(){
 }
 ```
 
-Let's add a pretty message, using the [cli](https://cli.r-lib.org/) [R-cli] package, before we print the file as it allows introducing another concept; using external libraries in our package. To use cli we can run:
+Let's add a pretty message, using the [cli](https://cli.r-lib.org/) [@R-cli] package, before we print the file as it allows introducing another concept; using external libraries in our package. To use cli we can run:
 
 ```r
 # install.packages("cli")
@@ -92,7 +93,7 @@ usethis::use_package("cli")
 ## ● Refer to functions with `cli::fun()`
 ```
 
-It does exactly what it printed. The `DESCRIPTION` file includes information about the package and, very importantly, dependencies. The package "test" we are creating now depends on cli. You should now see the following entry in the `DESCRIPTION` file.
+It does exactly what it printed. The `DESCRIPTION` file includes information about the package and, very importantly, dependencies. The package we are creating will depend on the cli package; the `DESCRIPTION` file essentially tells R to check whether it is installed on the machine, if not it installs it (packages are for sharing). You should now see the following entry in the `DESCRIPTION` file.
 
 ```r
 Imports: 
@@ -110,7 +111,7 @@ print_file <- function(){
 }
 ```
 
-It's not done just yet. Let's demonstrate why it is not, it allows introducing devtools. We can build our package with `devtools::install()`. After running it and typing `test::` in the console nothing appears. Odd. This is because we have not explicitly exported the `print_file` function. To do so we need another package called roxygen2 [R-roxygen2], it allows writing the documentation in the `.R` file rather than have to create separate file, a lifesaver. Using said documentation we can specify which function should be export with a "tag".
+It's not done just yet. Let's demonstrate why it is not, it allows introducing devtools. The "test" package can be installed with `devtools::install()`. Running `print_file` returns the error: `could not find function "print_file"`. Odd. This is because we have not explicitly exported the `print_file` function, by default functions and objects declared in `.R` files can only be used internally. To do so we need another package called roxygen2 [@R-roxygen2], it allows writing the documentation in the `.R` file rather than have to create separate file, a lifesaver. Using said documentation we can specify which function should be export with a "tag".
 
 Tags are preceded by `#' @`, there are plenty of them, we don't explore any other here.
 
@@ -138,6 +139,8 @@ Finally, the cyclical nature of building packages substitute `devtools::install(
 2. Run `devtools::document()`
 3. Run `devtools::load_all()`
 4. Repeat
+
+Note the package we built is good enough for your own machine but won't pass CRAN checks and will be hardly be usable by anyone other than you.
 
 ### JSON {-}
 
