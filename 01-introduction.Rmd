@@ -2,13 +2,298 @@
 
 # Introduction {#intro}
 
-In this chapter, after briefly going through prerequisites, we provide a rationale for integrating JavaScript with R which we support with examples, namely packages available on CRAN. Then, we list the various ways in which one might go about making both languages work together. Finally, we end with a review of concepts fundamental to fully understand the more advanced topics residing in later chapters.
+In this chapter, after briefly going through prerequisites, we provide a rationale for integrating JavaScript with R which we support with examples, namely packages available on CRAN. Then, we list the various ways in which one might go about making both languages work together. Finally, we end with a review of concepts fundamental to fully understand the more advanced topics residing in the forthcoming chapters.
 
 ## Prerequisites {-}
 
-The code contained in the following pages is approachable to readers with basic knowledge of R, although being familiar with [R6 classes](https://r6.r-lib.org/) [@R-R6], package development with [devtools](https://devtools.r-lib.org/) [@R-devtools], and [Shiny](https://shiny.rstudio.com/) [@R-shiny] is helpful. 
+The code contained in the following pages is approachable to readers with basic knowledge of R, although familiarity with package development using [devtools](https://devtools.r-lib.org/) [@R-devtools], as well as the [Shiny](https://shiny.rstudio.com/) [@R-shiny] framework is helpful. The reason for the former is that some of the ways one builds integrations with JavaScript naturally take the form of packages. The following section thus runs over the essentials of building a package to ensure everyone can keep up. As both Shiny and JavaScript run in the browser they make for axiomatic companions; we'll therefore use Shiny extensively.
 
-Only basic knowledge of JavaScript is required to understand and learn from the book as not only is JavaScript rather uncomplicated and its syntax similar to R's in places, we write surprisingly little of it. Understanding of JSON and HTML, however, is essential. In essence, if one has already used external JavaScript libraries in HTML or R markdown documents then one is well-equipped to tackle this book but in the event that you have not, we will go through a quick review of the basics of both JavaScript and JSON at the end of the chapter.
+Only basic knowledge of JavaScript is required to understand and learn from the book as not only is JavaScript rather uncomplicated and its syntax similar to R's in places, we write surprisingly little of it. Understanding of JSON and HTML, however, is essential. In essence, if one has already used external JavaScript libraries in HTML or R markdown documents then one is well-equipped to tackle this book but in the event that you have not, we will go through a quick review of the basics of both JavaScript and JSON.
+
+It is highly recommended to use the freely available [RStudio IDE](https://rstudio.com/products/rstudio/) to follow along, particularly if you are beginner in R.
+
+### Package Development {-}
+
+Developing packages used to be notoriously difficult but things have greatly changed, namely thanks to the devtools and more recent [usethis](https://usethis.r-lib.org/) [@R-usethis] packages. The first is specifically designed to help creating packages; setting up tests, running checks, building and installing packages, etc. The second, usethis, more broadly helps setting up projecta, and automating repetitive tasks. Here, we only skim over the fundamentals, there is an entire book by Hadley Wickham called [R Packages](http://r-pkgs.had.co.nz/) solely dedicated to the topic.
+
+Start by installing the two packages from CRAN.
+
+```r
+install.packages("devtools")
+install.packages("usethis")
+```
+
+We'll create an admittedly ridiculous package to explain how it works. despite being useless, this package will introduce certain concepts of package development that are essential to understand for what is to come. The package will be named "test" and will provide a single function that will print a JavaScript file stored inside our package. Useless but bear with it.
+
+Let's create the package, you can either do so using the RStudio IDE or with usethis. From the RStudio IDE go to `File > New Project > New Directory` then select "R package" and fill in the small form. But it could be argued that it's actually easier with usethis; type the code below in your R console to create a package named "test" in your current directory. If you run it from RStudio a new project window should open.
+
+```r
+usethis::create_package("test")
+```
+
+This creates an empty package. Let us add the JavaScript file that our yet-to-be-written R function will eventually print out. R packages follow strict guidelines so this file cannot be store anywhere we want; it must be stored in a directory called `inst` which stands for "installed files." Create a directory named "inst" and place a file called "javascript.js" within it.
+
+We'll create the following, extremely simple JavaScript file that contains code which declares a variable `x`. 
+
+```js
+// inst/javascript.js
+var x = 3;
+```
+
+We cab actually create this file from R with:
+
+```r
+dir.create("inst") # create directory
+writeLines("var x = 3;", con = "inst/javascript.js") # create file
+```
+
+Your current directory should now look something like this.
+
+```
+DESCRIPTION
+NAMESPACE
+R/
+inst/
+|-- javascript.js
+```
+
+Now we need to create the R function that will read and print this file. Then again, R is strict, your R files must be placed in the R directory. Below we create the file from the R console.
+
+
+```r
+file.create("R/function.R")
+```
+
+In the `function.R` file we just created we place a function that reads the `javascript.js` file and prints it to the R console along with a simple message. To read the file R comes with a `system.file` function which will return the path the file. Indeed as the package is to be installed on different one can never use absolute paths, it will depend on where the user of your package has it installed. If curious, run `.libPaths()` to find where it is.
+
+```r
+# R/function.R
+print_file <- function(){
+  file <- system.file("javascript.js", package = "test")
+}
+```
+
+We can now add two lines, one read the `file` and another to print it.
+
+```r
+print_file <- function(){
+  file <- system.file("javascript.js", package = "test")
+  content <- readLines(file)
+  print(content)
+}
+```
+
+Let's add a pretty message, using the [cli](https://cli.r-lib.org/) [R-cli] package, before we print the file as it allows introducing another concept; using external libraries in our package. To use cli we can run:
+
+```r
+# install.packages("cli")
+usethis::use_package("cli")
+## ✔ Adding 'cli' to Imports field in DESCRIPTION
+## ● Refer to functions with `cli::fun()`
+```
+
+It does exactly what it printed. The `DESCRIPTION` file includes information about the package and, very importantly, dependencies. The package "test" we are creating now depends on cli. You should now see the following entry in the `DESCRIPTION` file.
+
+```r
+Imports: 
+    cli
+```
+
+We can add cli to our function, note that we use the namespace (or package name) followed by a double colon, as was printed by the `usethis::use_package` function we ran earlier.
+
+```r
+print_file <- function(){
+  file <- system.file("javascript.js", package = "test")
+  cli::cli_alert_info("JavaScript code below.")
+  content <- readLines(file)
+  print(content)
+}
+```
+
+It's not done just yet. Let's demonstrate why it is not, it allows introducing devtools. We can build our package with `devtools::install()`. After running it and typing `test::` in the console nothing appears. Odd. This is because we have not explicitly exported the `print_file` function. To do so we need another package called roxygen2 [R-roxygen2], it allows writing the documentation in the `.R` file rather than have to create separate file, a lifesaver. Using said documentation we can specify which function should be export with a "tag".
+
+Tags are preceded by `#' @`, there are plenty of them, we don't explore any other here.
+
+```r
+#' @export
+print_file <- function(){
+  file <- system.file("javascript.js", package = "test")
+  cli::cli_alert_info("JavaScript code below.")
+  content <- readLines(file)
+  print(content)
+}
+```
+
+Now one can run `devtools::document()` to document the package based on the tag we added: this exports the function. Then we can run `devtools::install()` to build and install the package.
+
+```r
+test::print_file()
+## ℹ JavaScript code below.
+## [1] "var x = 3;"
+```
+
+Finally, the cyclical nature of building packages substitute `devtools::install()` with `devtools::load_all()`, the latter does not install the package and simply loads all the functions and objects of the package in the environment, this is much faster than installing it.
+
+1. Write some code
+2. Run `devtools::document()`
+3. Run `devtools::load_all()`
+4. Repeat
+
+### JSON {-}
+
+JSON (JavaScript Object Notation) is a very popular data _interchange_ format with which we will work extensively throughout this book, it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together it is essential that we have a data format that can be understood by both---JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the [jsonlite package](https://CRAN.R-project.org/package=jsonlite) [@R-jsonlite], in fact it is the serialiser used internally by all of the methods detailed in the previous section.
+
+JSON is to all intents and purposes the equivalent of lists in R; a flexible data format that can store pretty much anything. Below we create a nested list and convert it to JSON with the help of jsonlite, we set `pretty` to `TRUE` to add indentation for clearer printing. 
+
+```{r}
+# install.packages("jsonlite")
+library(jsonlite)
+
+lst <- list(
+  a = 1,
+  b = list(
+    c = c("A", "B")
+  ),
+  d = 1:5
+)
+
+toJSON(lst, pretty = TRUE)
+```
+
+Looking closely at the list and JSON output above one quickly sees the resemblance. Something seems odd though, the first value in the list (`a = 1`) was serialised; to an array (vector) of length one (`"a": [1]`) where would probably expect an integer instead. This is not a mistake, we often forget that there are no scalar types in R and that `a` is in fact a vector as we can observe below.
+
+```{r}
+x <- 1
+is.vector(x)
+```
+
+JavaScript, on the other hand, does have scalar types, more often than not we will want to convert our vectors of length one to scalar types rather than arrays of length one. To do so we need use the `auto_unbox` argument in `jsonlite::toJSON`, we'll do this most of the time we have to convert data to JSON.
+
+```{r}
+toJSON(lst, pretty = TRUE, auto_unbox = TRUE)
+```
+
+As demonstrated above the vector of length one was "unboxed" into an integer, with `auto_unbox` set to `TRUE` jsonlite will properly convert such vectors into their appropriate type; integer, numeric, boolean, etc. If JSON is more or less the equivalent of lists in R one might wonder how jsonlite handles data frames.
+
+```{r}
+# subset of built-in dataset
+df <- cars[1:2, ]
+
+toJSON(df, pretty = TRUE)
+```
+
+What jsonlite does internally is essentially turn the data.frame into a list _rowwise_ to produce a list for every row. This generally how rectangular data is represented in lists, for instance, `purrr::transpose` does the same. We can reproduce this with the snippet below, we remove row names and use apply to turn every row into a list.
+
+```{r}
+row.names(df) <- NULL
+df_list <- apply(df, 1, as.list)
+
+toJSON(df_list, pretty = TRUE, auto_unbox = TRUE)
+```
+
+Jsonlite of course also enables reading data from JSON into R with the function `fromJSON`.
+
+```{r}
+json <- toJSON(df) # convert to JSON
+fromJSON(json) # read from JSON
+```
+
+It's important to note that jsonlite did the conversion back to a data frame. Therefore the code below also returns a data frame even though the object we initially converted to JSON is a list.
+
+```{r}
+class(df_list)
+json <- toJSON(df_list)
+fromJSON(json)
+```
+
+Jsonlite provides many more options and functions that will let you tune JSON data in read to and written from R. Also, the jsonlite package does far more than what we detailed but at this juncture this is an adequate understanding of things.
+
+### JavaScript {-}
+
+The book is not meant to teach one JavaScript, only to show how graciously it can work with R; in that endeavour we aim at writing little JavaScript so the book remains approachable to a wide audience. Let us just go through the very basics to ensure we know enough to get started with the next chapter.
+
+In the event that you would want to try what we briefly explore here: the easiest way is to create an HTML file, write your code within a script tag and open the file in your web browser. The output can be observed in the console of the browser which can be opened with a right click and selecting "inspect" then going to the "console" tab.
+
+```html
+ <!–– index.html ––>
+<html>
+  <head>
+  </head>
+  <body>
+    <p id="content">Trying JavaScript!</p>
+  </body>
+  <script>
+    // place your JavaScript code here
+  </script>
+</html>
+```
+
+The first difference with R is that the end of every line should be marked with a semi-colon. JavaScript code will often work without but one should always include them to avoid issues. Below we use `console.log`, JavaScript equivalent of R's `print` function.
+
+```js
+console.log("hello JavaScript") // bad
+console.log("hello JavaScript"); // good
+```
+
+Another difference is that variables must be declared with keywords such as `var` or `const` to declare a constant.
+
+```js
+x = 1; // bad
+var x = 1; // good
+```
+
+One can declare a variable without assigning a value to it, to then do so later on. 
+
+```js
+// good
+var y; 
+y = [1,2,3];
+```
+
+In R like in JavaScript, variables can be accessed from the parent environment (often referred to as "context" in the latter). One immense difference though is that while it is seen as bad practice in R it is not in JavaScript where it comes very useful.
+
+```{r}
+# it works but don't do this
+x <- 123
+foo <- function(){
+  print(x)
+}
+foo()
+```
+
+The above R code can be re-written in JavaScript. Note the slight variation in the function declaration.
+
+```js
+// this is perfectly fine
+var x = 1;
+
+function foo(){
+  console.log(x); 
+}
+
+foo()
+```
+
+One concept which does not exist in R is that of the "DOM" which stands for Document Object Model. When a web page is loaded, the browser creates a Document Object Model of the page which can be accessed in JavaScript from the `document` object. This lets the developer programmatically manipulate the page itself so one can for instance, remove an element, change the text of an element, and plenty more.
+
+The JavaScript code below grabs the element where `id='content'` from the `document` with `getElementById` and replaces the text (`innerText`). 
+
+```html
+ <!–– index.html ––>
+<html>
+  <head>
+  </head>
+  <body>
+    <p id="content">Trying JavaScript!</p>
+  </body>
+  <script>
+    var cnt = document.getElementById("content");
+    cnt.innerText = "The text has changed";
+  </script>
+</html>
+```
+
+This of course only scratches the surface of JavaScript but provides ample understanding of the language to keep up with the next chapters.
 
 ## Rationale {-}
 
@@ -122,159 +407,3 @@ r2d3::r2d3(data = matrix(round(runif(16, 1, 10000)), ncol = 4, nrow = 4), script
 ```
 
 The packages bubble and V8 are intended for use of JavaScript for computations while r2d3, htmlwidgets, and reactR are designed to produce visual outputs (e.g.: graphs and tables), using JavaScript in Shiny can of course be used for the latter but is certainly not limited to that.
-
-## JSON {-}
-
-JSON (JavaScript Object Notation) is a very popular data _interchange_ format with which we will work extensively throughout this book, it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together it is essential that we have a data format that can be understood by both---JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the [jsonlite package](https://CRAN.R-project.org/package=jsonlite) [@R-jsonlite], in fact it is the serialiser used internally by all of the methods detailed in the previous section.
-
-JSON is to all intents and purposes the equivalent of lists in R; a flexible data format that can store pretty much anything. Below we create a nested list and convert it to JSON with the help of jsonlite, we set `pretty` to `TRUE` to add indentation for clearer printing. 
-
-```{r}
-# install.packages("jsonlite")
-library(jsonlite)
-
-lst <- list(
-  a = 1,
-  b = list(
-    c = c("A", "B")
-  ),
-  d = 1:5
-)
-
-toJSON(lst, pretty = TRUE)
-```
-
-Looking closely at the list and JSON output above one quickly sees the resemblance. Something seems odd though, the first value in the list (`a = 1`) was serialised; to an array (vector) of length one (`"a": [1]`) where would probably expect an integer instead. This is not a mistake, we often forget that there are no scalar types in R and that `a` is in fact a vector as we can observe below.
-
-```{r}
-x <- 1
-is.vector(x)
-```
-
-JavaScript, on the other hand, does have scalar types, more often than not we will want to convert our vectors of length one to scalar types rather than arrays of length one. To do so we need use the `auto_unbox` argument in `jsonlite::toJSON`, we'll do this most of the time we have to convert data to JSON.
-
-```{r}
-toJSON(lst, pretty = TRUE, auto_unbox = TRUE)
-```
-
-As demonstrated above the vector of length one was "unboxed" into an integer, with `auto_unbox` set to `TRUE` jsonlite will properly convert such vectors into their appropriate type; integer, numeric, boolean, etc. If JSON is more or less the equivalent of lists in R one might wonder how jsonlite handles data frames.
-
-```{r}
-# subset of built-in dataset
-df <- cars[1:2, ]
-
-toJSON(df, pretty = TRUE)
-```
-
-What jsonlite does internally is essentially turn the data.frame into a list _rowwise_ to produce a list for every row. This generally how rectangular data is represented in lists, for instance, `purrr::transpose` does the same. We can reproduce this with the snippet below, we remove row names and use apply to turn every row into a list.
-
-```{r}
-row.names(df) <- NULL
-df_list <- apply(df, 1, as.list)
-
-toJSON(df_list, pretty = TRUE, auto_unbox = TRUE)
-```
-
-Jsonlite of course also enables reading data from JSON into R with the function `fromJSON`.
-
-```{r}
-json <- toJSON(df) # convert to JSON
-fromJSON(json) # read from JSON
-```
-
-It's important to note that jsonlite did the conversion back to a data frame. Therefore the code below also returns a data frame even though the object we initially converted to JSON is a list.
-
-```{r}
-class(df_list)
-json <- toJSON(df_list)
-fromJSON(json)
-```
-
-Jsonlite provides many more options and functions that will let you tune JSON data in read to and written from R. Also, the jsonlite package does far more than what we detailed but at this juncture this is an adequate understanding of things.
-
-## JavaScript {-}
-
-The book is not meant to teach one JavaScript, only to show how graciously it can work with R; in that endeavour we aim at writing little JavaScript so the book remains approachable to a wide audience. Let us just go through the very basics to ensure we know enough to get started with the next chapter.
-
-In the event that you would want to try what we briefly explore here: the easiest way is to create an HTML file, write your code within a script tag and open the file in your web browser. The output can be observed in the console of the browser which can be opened with a right click and selecting "inspect" then going to the "console" tab.
-
-```html
- <!–– index.html ––>
-<html>
-  <head>
-  </head>
-  <body>
-    <p id="content">Trying JavaScript!</p>
-  </body>
-  <script>
-    // place your JavaScript code here
-  </script>
-</html>
-```
-
-The first difference with R is that the end of every line should be marked with a semi-colon. JavaScript code will often work without but one should always include them to avoid issues. Below we use `console.log`, JavaScript equivalent of R's `print` function.
-
-```js
-console.log("hello JavaScript") // bad
-console.log("hello JavaScript"); // good
-```
-
-Another difference is that variables must be declared with keywords such as `var` or `const` to declare a constant.
-
-```js
-x = 1; // bad
-var x = 1; // good
-```
-
-One can declare a variable without assigning a value to it, to then do so later on. 
-
-```js
-// good
-var y; 
-y = [1,2,3];
-```
-
-In R like in JavaScript, variables can be accessed from the parent environment (often referred to as "context" in the latter). One immense difference though is that while it is seen as bad practice in R it is not in JavaScript where it comes very useful.
-
-```{r}
-# it works but don't do this
-x <- 123
-foo <- function(){
-  print(x)
-}
-foo()
-```
-
-The above R code can be re-written in JavaScript. Note the slight variation in the function declaration.
-
-```js
-// this is perfectly fine
-var x = 1;
-
-function foo(){
-  console.log(x); 
-}
-
-foo()
-```
-
-One concept which does not exist in R is that of the "DOM" which stands for Document Object Model. When a web page is loaded, the browser creates a Document Object Model of the page which can be accessed in JavaScript from the `document` object. This lets the developer programmatically manipulate the page itself so one can for instance, remove a button, change the text of an element, and plenty more.
-
-The JavaScript code below grabs the element where `id=content` from the `document` with `getElementById`. 
-
-```html
- <!–– index.html ––>
-<html>
-  <head>
-  </head>
-  <body>
-    <p id="content">Trying JavaScript!</p>
-  </body>
-  <script>
-    var cnt = document.getElementById("content");
-    cnt.innerText = "The text has changed";
-  </script>
-</html>
-```
-
-This of course only scratched the surface of JavaScript but provides ample understanding of the language to go ahead with the rest of the book.

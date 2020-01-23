@@ -164,15 +164,12 @@
 \makeatother
 
 \frontmatter
-\usepackage{multicol}
-\newcommand{\btwocol}{\begin{multicols}{2}}
-\newcommand{\etwocol}{\end{multicols}}
 \usepackage[]{natbib}
 \bibliographystyle{apalike}
 
 \title{R and JavaScript}
 \author{John Coene}
-\date{2020-01-22}
+\date{2020-01-23}
 
 \begin{document}
 \maketitle
@@ -220,184 +217,180 @@ Frida Gomam is a famous lady. Police will always let her go.
 \hypertarget{intro}{%
 \chapter{Introduction}\label{intro}}
 
-In this chapter, after briefly going through prerequisites, we provide a rationale for integrating JavaScript with R which we support with examples, namely packages available on CRAN. Then, we list the various ways in which one might go about making both languages work together. Finally, we end with a review of concepts fundamental to fully understand the more advanced topics residing in later chapters.
+In this chapter, after briefly going through prerequisites, we provide a rationale for integrating JavaScript with R which we support with examples, namely packages available on CRAN. Then, we list the various ways in which one might go about making both languages work together. Finally, we end with a review of concepts fundamental to fully understand the more advanced topics residing in the forthcoming chapters.
 
 \hypertarget{prerequisites}{%
 \section*{Prerequisites}\label{prerequisites}}
 
 
-The code contained in the following pages is approachable to readers with basic knowledge of R, although being familiar with \href{https://r6.r-lib.org/}{R6 classes} \citep{R-R6}, package development with \href{https://devtools.r-lib.org/}{devtools} \citep{R-devtools}, and \href{https://shiny.rstudio.com/}{Shiny} \citep{R-shiny} is helpful.
+The code contained in the following pages is approachable to readers with basic knowledge of R, although familiarity with package development using \href{https://devtools.r-lib.org/}{devtools} \citep{R-devtools}, as well as the \href{https://shiny.rstudio.com/}{Shiny} \citep{R-shiny} framework is helpful. The reason for the former is that some of the ways one builds integrations with JavaScript naturally take the form of packages. The following section thus runs over the essentials of building a package to ensure everyone can keep up. As both Shiny and JavaScript run in the browser they make for axiomatic companions; we'll therefore use Shiny extensively.
 
-Only basic knowledge of JavaScript is required to understand and learn from the book as not only is JavaScript rather uncomplicated and its syntax similar to R's in places, we write surprisingly little of it. Understanding of JSON and HTML, however, is essential. In essence, if one has already used external JavaScript libraries in HTML or R markdown documents then one is well-equipped to tackle this book but in the event that you have not, we will go through a quick review of the basics of both JavaScript and JSON at the end of the chapter.
+Only basic knowledge of JavaScript is required to understand and learn from the book as not only is JavaScript rather uncomplicated and its syntax similar to R's in places, we write surprisingly little of it. Understanding of JSON and HTML, however, is essential. In essence, if one has already used external JavaScript libraries in HTML or R markdown documents then one is well-equipped to tackle this book but in the event that you have not, we will go through a quick review of the basics of both JavaScript and JSON.
 
-\hypertarget{rationale}{%
-\section*{Rationale}\label{rationale}}
+It is highly recommended to use the freely available \href{https://rstudio.com/products/rstudio/}{RStudio IDE} to follow along, particularly if you are beginner in R.
+
+\hypertarget{package-development}{%
+\subsection*{Package Development}\label{package-development}}
 
 
-Why merge JavaScript and R? They are two fundamentally different languages that each have their strengths and weaknesses, combining the two allows making the most of their consolidated advantages and circumvent their respective limitations to produce software altogether better for it.
+Developing packages used to be notoriously difficult but things have greatly changed namely thanks the devtools and more recent \href{https://usethis.r-lib.org/}{usethis} \citep{R-usethis} packages. The first is specifically designed to help you with creating packages; setting up tests, running checks, building and installing packages, etc. The second, usethis, more broadly helps setting up your project, and automate repetitive tasks. Here, we only skim over the fundamentals, if you want to read more about it look for Hadley Wickham's \href{http://r-pkgs.had.co.nz/}{R Packages} which is freely available on the web.
 
-A fair reason to use JavaScript might simply be that the thing one wants to achieve in R has already been realised in JavaScript. Why reinvent the wheel when the solution already exists and that it can be made accessible from R? The R package \href{https://github.com/ropensci/lawn}{lawn} \citep{R-lawn} by Ropensci integrates \href{http://turfjs.org/}{turf.js}, a brilliant library for geo-spatial analysis. JavaScript is not required to make those computations, it could be rewritten solely in R but that would be vastly more laborious than wrapping the JavaScript API in R.
+Start by installing the two packages from CRAN.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(lawn)}
-
-\KeywordTok{lawn_count}\NormalTok{(lawn_data}\OperatorTok{$}\NormalTok{polygons_count, lawn_data}\OperatorTok{$}\NormalTok{points_count, }\StringTok{"population"}\NormalTok{)}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"devtools"}\NormalTok{)}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"usethis"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+We'll create an admittedly ridiculous package to explain how it works. despite being useless, this package will introduce certain concepts of package development that are essential to understand for what is to come. The package will be named ``test'' and will provide a single function that will print a JavaScript file stored inside our package. Useless but bear with it.
+
+Let's create the package, you can either do so using the RStudio IDE or with usethis. From the RStudio IDE go to \texttt{File\ \textgreater{}\ New\ Project\ \textgreater{}\ New\ Directory} then select ``R package'' and fill in the small form. But it could be argued that it's actually easier with usethis; type the code below in your R console to create a package named ``test'' in your current directory. If you run it from RStudio a new project window should open.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{create_package}\NormalTok{(}\StringTok{"test"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+This creates an empty package. Let us add the JavaScript file that our yet-to-be-written R function will eventually print out. R packages follow strict guidelines so this file cannot be store anywhere we want; it must be stored in a directory called \texttt{inst} which stands for ``installed files.'' Create a directory named ``inst'' and place a file called ``javascript.js'' within it.
+
+We'll create the following, extremely simple JavaScript file that contains code which declares a variable \texttt{x}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// inst/javascript.js}
+\KeywordTok{var}\NormalTok{ x }\OperatorTok{=} \DecValTok{3}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+We cab actually create this file from R with:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dir.create}\NormalTok{(}\StringTok{"inst"}\NormalTok{) }\CommentTok{# create directory}
+\KeywordTok{writeLines}\NormalTok{(}\StringTok{"var x = 3;"}\NormalTok{, }\DataTypeTok{con =} \StringTok{"inst/javascript.js"}\NormalTok{) }\CommentTok{# create file}
+\end{Highlighting}
+\end{Shaded}
+
+Your current directory should now look something like this.
 
 \begin{verbatim}
-## <FeatureCollection>
-##   Bounding box: -112.1 46.6 -112.0 46.6
-##   No. features: 2
-##   No. points: 20
-##   Properties: 
-##     values count
-## 1 200, 600     2
-## 2              0
+DESCRIPTION
+NAMESPACE
+R/
+inst/
+|-- javascript.js
 \end{verbatim}
 
-Another great reason is that JavaScript can do things that R cannot, e.g.: run in the browser. Therefore one cannot natively create interactive visualisations with R. \href{https://plotly-r.com/}{Plotly} \citep{R-plotly} by Carson Sievert packages the \href{https://plot.ly/}{plotly JavaScript library} to let one create interactive visualisations solely from R code.
+Now we need to create the R function that will read and print this file. Then again, R is strict, your R files must be placed in the R directory. Below we create the file from the R console.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(plotly)}
-
-\KeywordTok{plot_ly}\NormalTok{(diamonds, }\DataTypeTok{x =} \OperatorTok{~}\NormalTok{cut, }\DataTypeTok{color =} \OperatorTok{~}\NormalTok{clarity)}
+\KeywordTok{file.create}\NormalTok{(}\StringTok{"R/function.R"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-2-1.png}
-
-Finally, JavaScript can work together with R to improve how we communicate insights. One of the many ways in which Shiny stands out is that it lets one create web applications solely from R code with no knowledge of HTML, CSS, or JavaScript but that does not mean they can't extend Shiny, quite the contrary. The \href{http://waiter.john-coene.com/}{waiter package} \citep{R-waiter} integrates a variety of JavaScript libraries to display loading screens in Shiny applications.
+In the \texttt{function.R} file we just created we place a function that reads the \texttt{javascript.js} file and prints it to the R console along with a simple message. To read the file R comes with a \texttt{system.file} function which will return the path the file. Indeed as the package is to be installed on different one can never use absolute paths, it will depend on where the user of your package has it installed. If curious, run \texttt{.libPaths()} to find where it is.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(shiny)}
-\KeywordTok{library}\NormalTok{(waiter)}
-
-\NormalTok{ui <-}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
-  \KeywordTok{use_waiter}\NormalTok{(), }\CommentTok{# include dependencies}
-  \KeywordTok{actionButton}\NormalTok{(}\StringTok{"show"}\NormalTok{, }\StringTok{"Show loading for 3 seconds"}\NormalTok{)}
-\NormalTok{)}
-
-\NormalTok{server <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output, session)\{}
-  \CommentTok{# create a waiter}
-\NormalTok{  w <-}\StringTok{ }\NormalTok{Waiter}\OperatorTok{$}\KeywordTok{new}\NormalTok{()}
-
-  \CommentTok{# on button click}
-  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{show, \{}
-\NormalTok{    w}\OperatorTok{$}\KeywordTok{show}\NormalTok{()}
-    \KeywordTok{Sys.sleep}\NormalTok{(}\DecValTok{3}\NormalTok{)}
-\NormalTok{    w}\OperatorTok{$}\KeywordTok{hide}\NormalTok{()}
-\NormalTok{  \})}
+\CommentTok{# R/function.R}
+\NormalTok{print_file <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{()\{}
+\NormalTok{  file <-}\StringTok{ }\KeywordTok{system.file}\NormalTok{(}\StringTok{"javascript.js"}\NormalTok{, }\DataTypeTok{package =} \StringTok{"test"}\NormalTok{)}
 \NormalTok{\}}
-
-\KeywordTok{shinyApp}\NormalTok{(ui, server)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{flushleft}\includegraphics[width=6.25in]{images/waiter} \end{flushleft}
-
-Hopefully this makes a couple of great reasons and alluring examples to entice you to persevere with this book.
-
-\hypertarget{methods}{%
-\section*{Methods}\label{methods}}
-
-
-Though perhaps not obvious at first, all of the packages used as examples in the previous section internally interface with JavaScript very differently. As we'll discover, there many ways in which one can blend JavaScript with R, generally the way to go about it is dictated by the nature of is to be achieved.
-
-Let's list the methods available to us to blend JavaScript with R before covering them each in-depth in their own respective chapter later in the book.
-
-\hypertarget{v8}{%
-\subsection*{V8}\label{v8}}
-
-
-\href{https://github.com/jeroen/v8}{V8} by Jeroen Ooms is an R interface to Google's JavaScript engine. It will let you run JavaScript code directly from R and get the result back, it even comes with an interactive console. This is the way the lawn package used in a previous example has internally calls turf.js.
+We can now add two lines, one read the \texttt{file} and another to print it.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(V8)}
-
-\NormalTok{ctx <-}\StringTok{ }\KeywordTok{v8}\NormalTok{()}
-
-\NormalTok{ctx}\OperatorTok{$}\KeywordTok{eval}\NormalTok{(}\StringTok{"2 + 2"}\NormalTok{) }\CommentTok{# this is evaluated in JavaScript!}
+\NormalTok{print_file <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{()\{}
+\NormalTok{  file <-}\StringTok{ }\KeywordTok{system.file}\NormalTok{(}\StringTok{"javascript.js"}\NormalTok{, }\DataTypeTok{package =} \StringTok{"test"}\NormalTok{)}
+\NormalTok{  content <-}\StringTok{ }\KeywordTok{readLines}\NormalTok{(file)}
+  \KeywordTok{print}\NormalTok{(content)}
+\NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## [1] "4"
-\end{verbatim}
-
-\hypertarget{htmlwidgets}{%
-\subsection*{htmlwidgets}\label{htmlwidgets}}
-
-
-\href{http://www.htmlwidgets.org/}{htmlwidgets} \citep{R-htmlwidgets} specialises in wrapping JavaScript libraries that generate visual outputs. This is what packages such as plotly, \href{https://rstudio.github.io/DT/}{DT} \citep{R-DT}, \href{http://jkunst.com/highcharter/}{highcharter} \citep{R-highcharter}, and many more use to provide interactive visualisation with R.
-
-It is by far the most popular integration out there, at the time of writing this it has been downloaded nearly 10 million times from CRAN. It will therefore be covered extensively in later chapters.
-
-\hypertarget{shiny}{%
-\subsection*{Shiny}\label{shiny}}
-
-
-The Shiny framework allows creating applications accessible from web browsers where JavaScript natively runs, it follows that JavaScript can run \emph{alongside} such applications. Often overlooked though, the two can also work \emph{hand-in-hand} as one can pass data from the R server to the JavaScript front-end and vice versa. Some form of that tends to be included in htmlwidgets so one can pick up server-side which point on a scatter plot was clicked for instance.
-
-\hypertarget{reactr}{%
-\subsection*{reactR}\label{reactr}}
-
-
-\href{https://react-r.github.io/reactR/}{ReactR} \citep{R-reactR} is an R package that emulates very well htmlwidgets but specifically for the \href{https://reactjs.org/}{React framework}. Unlike htmlwidgets it is not limited to visual outputs and also provides functions to build inputs, e.g.: a drop-down menu (like \texttt{shiny::selectInput}). The \href{https://glin.github.io/reactable/}{reactable package} \citep{R-reactable} uses reactR to enable building interactive tables solely from R code.
+Let's add a pretty message, using the \href{https://cli.r-lib.org/}{cli} {[}R-cli{]} package, before we print the file as it allows introducing another concept; using external libraries in our package. To use cli we can run:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{reactable}\OperatorTok{::}\KeywordTok{reactable}\NormalTok{(iris[}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{, ], }\DataTypeTok{showPagination =} \OtherTok{TRUE}\NormalTok{)}
+\CommentTok{# install.packages("cli")}
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use_package}\NormalTok{(}\StringTok{"cli"}\NormalTok{)}
+\CommentTok{## ✔ Adding 'cli' to Imports field in DESCRIPTION}
+\CommentTok{## ● Refer to functions with `cli::fun()`}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-4-1.png}
-
-Note that custom Shiny inputs can also be built, this is however not covered in this book for it is very well \href{https://shiny.rstudio.com/articles/building-inputs.html}{documented}.
-
-\hypertarget{bubble}{%
-\subsection*{bubble}\label{bubble}}
-
-
-\href{https://github.com/ColinFay/bubble}{bubble} \citep{R-bubble} by Colin Fay is a more recent R package, still under heady development but very promising: it lets one run \href{https://nodejs.org/en/}{node.js} code in R, comes with an interactive node REPL, the ability to install npm packages, and even an R markdown engine. It's similar to V8 in many ways.
+It does exactly what it printed. The \texttt{DESCRIPTION} file includes information about the package and, very importantly, dependencies. The package ``test'' we are creating now depends on cli. You should now see the following entry in the \texttt{DESCRIPTION} file.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(bubble)}
-
-\NormalTok{n <-}\StringTok{ }\NormalTok{NodeSession}\OperatorTok{$}\KeywordTok{new}\NormalTok{() }
-
-\NormalTok{n}\OperatorTok{$}\KeywordTok{eval}\NormalTok{(}\StringTok{"2 + 2"}\NormalTok{) }\CommentTok{# this is evaluated in node.js}
+\NormalTok{Imports}\OperatorTok{:}\StringTok{ }
+\StringTok{    }\NormalTok{cli}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## 4
-\end{verbatim}
-
-\hypertarget{r2d3}{%
-\subsection*{r2d3}\label{r2d3}}
-
-
-\href{https://rstudio.github.io/r2d3/}{r2d3} \citep{R-r2d3} by RStudio is an R package designed specifically to work with \href{https://d3js.org/}{d3.js}. It is similar to htmlwidgets but works rather differently.
+We can add cli to our function, note that we use the namespace (or package name) followed by a double colon, as was printed by the \texttt{usethis::use\_package} function we ran earlier.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# https://rstudio.github.io/r2d3/articles/gallery/chord/}
-\NormalTok{r2d3}\OperatorTok{::}\KeywordTok{r2d3}\NormalTok{(}\DataTypeTok{data =} \KeywordTok{matrix}\NormalTok{(}\KeywordTok{round}\NormalTok{(}\KeywordTok{runif}\NormalTok{(}\DecValTok{16}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{10000}\NormalTok{)), }\DataTypeTok{ncol =} \DecValTok{4}\NormalTok{, }\DataTypeTok{nrow =} \DecValTok{4}\NormalTok{), }\DataTypeTok{script =} \StringTok{"chord.js"}\NormalTok{)}
+\NormalTok{print_file <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{()\{}
+\NormalTok{  file <-}\StringTok{ }\KeywordTok{system.file}\NormalTok{(}\StringTok{"javascript.js"}\NormalTok{, }\DataTypeTok{package =} \StringTok{"test"}\NormalTok{)}
+\NormalTok{  cli}\OperatorTok{::}\KeywordTok{cli_alert_info}\NormalTok{(}\StringTok{"JavaScript code below."}\NormalTok{)}
+\NormalTok{  content <-}\StringTok{ }\KeywordTok{readLines}\NormalTok{(file)}
+  \KeywordTok{print}\NormalTok{(content)}
+\NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-6-1.png}
+It's not done just yet. Let's demonstrate why it is not, it allows introducing devtools. We can build our package with \texttt{devtools::install()}. After running it and typing \texttt{test::} in the console nothing appears. Odd. This is because we have not explicitly exported the \texttt{print\_file} function. To do so we need another package called roxygen2 {[}R-roxygen2{]}, it allows writing the documentation in the \texttt{.R} file rather than have to create separate file, a lifesaver. Using said documentation we can specify which function should be export with a ``tag''.
 
-The packages bubble and V8 are intended for use of JavaScript for computations while r2d3, htmlwidgets, and reactR are designed to produce visual outputs (e.g.: graphs and tables), using JavaScript in Shiny can of course be used for the latter but is certainly not limited to that.
+Tags are preceded by \texttt{\#\textquotesingle{}\ @}, there are plenty of them, we don't explore any other here.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#' @export}
+\NormalTok{print_file <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{()\{}
+\NormalTok{  file <-}\StringTok{ }\KeywordTok{system.file}\NormalTok{(}\StringTok{"javascript.js"}\NormalTok{, }\DataTypeTok{package =} \StringTok{"test"}\NormalTok{)}
+\NormalTok{  cli}\OperatorTok{::}\KeywordTok{cli_alert_info}\NormalTok{(}\StringTok{"JavaScript code below."}\NormalTok{)}
+\NormalTok{  content <-}\StringTok{ }\KeywordTok{readLines}\NormalTok{(file)}
+  \KeywordTok{print}\NormalTok{(content)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Now one can run \texttt{devtools::document()} to document the package based on the tag we added: this exports the function. Then we can run \texttt{devtools::install()} to build and install the package.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{test}\OperatorTok{::}\KeywordTok{print_file}\NormalTok{()}
+\CommentTok{## ℹ JavaScript code below.}
+\CommentTok{## [1] "var x = 3;"}
+\end{Highlighting}
+\end{Shaded}
+
+Finally, the cyclical nature of building packages substitute \texttt{devtools::install()} with \texttt{devtools::load\_all()}, the latter does not install the package and simply loads all the functions and objects of the package in the environment, this is much faster than installing it.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Write some code
+\item
+  Run \texttt{devtools::document()}
+\item
+  Run \texttt{devtools::load\_all()}
+\item
+  Repeat
+\end{enumerate}
 
 \hypertarget{json}{%
-\section*{JSON}\label{json}}
+\subsection*{JSON}\label{json}}
 
 
 JSON (JavaScript Object Notation) is a very popular data \emph{interchange} format with which we will work extensively throughout this book, it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together it is essential that we have a data format that can be understood by both---JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the \href{https://CRAN.R-project.org/package=jsonlite}{jsonlite package} \citep{R-jsonlite}, in fact it is the serialiser used internally by all of the methods detailed in the previous section.
@@ -553,7 +546,7 @@ It's important to note that jsonlite did the conversion back to a data frame. Th
 Jsonlite provides many more options and functions that will let you tune JSON data in read to and written from R. Also, the jsonlite package does far more than what we detailed but at this juncture this is an adequate understanding of things.
 
 \hypertarget{javascript}{%
-\section*{JavaScript}\label{javascript}}
+\subsection*{JavaScript}\label{javascript}}
 
 
 The book is not meant to teach one JavaScript, only to show how graciously it can work with R; in that endeavour we aim at writing little JavaScript so the book remains approachable to a wide audience. Let us just go through the very basics to ensure we know enough to get started with the next chapter.
@@ -636,9 +629,9 @@ The above R code can be re-written in JavaScript. Note the slight variation in t
 \end{Highlighting}
 \end{Shaded}
 
-One concept which does not exist in R is that of the ``DOM'' which stands for Document Object Model. When a web page is loaded, the browser creates a Document Object Model of the page which can be accessed in JavaScript from the \texttt{document} object. This lets the developer programmatically manipulate the page itself so one can for instance, remove a button, change the text of an element, and plenty more.
+One concept which does not exist in R is that of the ``DOM'' which stands for Document Object Model. When a web page is loaded, the browser creates a Document Object Model of the page which can be accessed in JavaScript from the \texttt{document} object. This lets the developer programmatically manipulate the page itself so one can for instance, remove an element, change the text of an element, and plenty more.
 
-The JavaScript code below grabs the element where \texttt{id=content} from the \texttt{document} with \texttt{getElementById}.
+The JavaScript code below grabs the element where \texttt{id=\textquotesingle{}content\textquotesingle{}} from the \texttt{document} with \texttt{getElementById} and replaces the text (\texttt{innerText}).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -657,7 +650,173 @@ The JavaScript code below grabs the element where \texttt{id=content} from the \
 \end{Highlighting}
 \end{Shaded}
 
-This of course only scratched the surface of JavaScript but provides ample understanding of the language to go ahead with the rest of the book.
+This of course only scratches the surface of JavaScript but provides ample understanding of the language to keep up with the next chapters.
+
+\hypertarget{rationale}{%
+\section*{Rationale}\label{rationale}}
+
+
+Why merge JavaScript and R? They are two fundamentally different languages that each have their strengths and weaknesses, combining the two allows making the most of their consolidated advantages and circumvent their respective limitations to produce software altogether better for it.
+
+A fair reason to use JavaScript might simply be that the thing one wants to achieve in R has already been realised in JavaScript. Why reinvent the wheel when the solution already exists and that it can be made accessible from R? The R package \href{https://github.com/ropensci/lawn}{lawn} \citep{R-lawn} by Ropensci integrates \href{http://turfjs.org/}{turf.js}, a brilliant library for geo-spatial analysis. JavaScript is not required to make those computations, it could be rewritten solely in R but that would be vastly more laborious than wrapping the JavaScript API in R.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(lawn)}
+
+\KeywordTok{lawn_count}\NormalTok{(lawn_data}\OperatorTok{$}\NormalTok{polygons_count, lawn_data}\OperatorTok{$}\NormalTok{points_count, }\StringTok{"population"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## <FeatureCollection>
+##   Bounding box: -112.1 46.6 -112.0 46.6
+##   No. features: 2
+##   No. points: 20
+##   Properties: 
+##     values count
+## 1 200, 600     2
+## 2              0
+\end{verbatim}
+
+Another great reason is that JavaScript can do things that R cannot, e.g.: run in the browser. Therefore one cannot natively create interactive visualisations with R. \href{https://plotly-r.com/}{Plotly} \citep{R-plotly} by Carson Sievert packages the \href{https://plot.ly/}{plotly JavaScript library} to let one create interactive visualisations solely from R code.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(plotly)}
+
+\KeywordTok{plot_ly}\NormalTok{(diamonds, }\DataTypeTok{x =} \OperatorTok{~}\NormalTok{cut, }\DataTypeTok{color =} \OperatorTok{~}\NormalTok{clarity)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-10-1.png}
+
+Finally, JavaScript can work together with R to improve how we communicate insights. One of the many ways in which Shiny stands out is that it lets one create web applications solely from R code with no knowledge of HTML, CSS, or JavaScript but that does not mean they can't extend Shiny, quite the contrary. The \href{http://waiter.john-coene.com/}{waiter package} \citep{R-waiter} integrates a variety of JavaScript libraries to display loading screens in Shiny applications.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(shiny)}
+\KeywordTok{library}\NormalTok{(waiter)}
+
+\NormalTok{ui <-}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+  \KeywordTok{use_waiter}\NormalTok{(), }\CommentTok{# include dependencies}
+  \KeywordTok{actionButton}\NormalTok{(}\StringTok{"show"}\NormalTok{, }\StringTok{"Show loading for 3 seconds"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output, session)\{}
+  \CommentTok{# create a waiter}
+\NormalTok{  w <-}\StringTok{ }\NormalTok{Waiter}\OperatorTok{$}\KeywordTok{new}\NormalTok{()}
+
+  \CommentTok{# on button click}
+  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{show, \{}
+\NormalTok{    w}\OperatorTok{$}\KeywordTok{show}\NormalTok{()}
+    \KeywordTok{Sys.sleep}\NormalTok{(}\DecValTok{3}\NormalTok{)}
+\NormalTok{    w}\OperatorTok{$}\KeywordTok{hide}\NormalTok{()}
+\NormalTok{  \})}
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{flushleft}\includegraphics[width=6.25in]{images/waiter} \end{flushleft}
+
+Hopefully this makes a couple of great reasons and alluring examples to entice you to persevere with this book.
+
+\hypertarget{methods}{%
+\section*{Methods}\label{methods}}
+
+
+Though perhaps not obvious at first, all of the packages used as examples in the previous section internally interface with JavaScript very differently. As we'll discover, there many ways in which one can blend JavaScript with R, generally the way to go about it is dictated by the nature of is to be achieved.
+
+Let's list the methods available to us to blend JavaScript with R before covering them each in-depth in their own respective chapter later in the book.
+
+\hypertarget{v8}{%
+\subsection*{V8}\label{v8}}
+
+
+\href{https://github.com/jeroen/v8}{V8} by Jeroen Ooms is an R interface to Google's JavaScript engine. It will let you run JavaScript code directly from R and get the result back, it even comes with an interactive console. This is the way the lawn package used in a previous example has internally calls turf.js.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(V8)}
+
+\NormalTok{ctx <-}\StringTok{ }\KeywordTok{v8}\NormalTok{()}
+
+\NormalTok{ctx}\OperatorTok{$}\KeywordTok{eval}\NormalTok{(}\StringTok{"2 + 2"}\NormalTok{) }\CommentTok{# this is evaluated in JavaScript!}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "4"
+\end{verbatim}
+
+\hypertarget{htmlwidgets}{%
+\subsection*{htmlwidgets}\label{htmlwidgets}}
+
+
+\href{http://www.htmlwidgets.org/}{htmlwidgets} \citep{R-htmlwidgets} specialises in wrapping JavaScript libraries that generate visual outputs. This is what packages such as plotly, \href{https://rstudio.github.io/DT/}{DT} \citep{R-DT}, \href{http://jkunst.com/highcharter/}{highcharter} \citep{R-highcharter}, and many more use to provide interactive visualisation with R.
+
+It is by far the most popular integration out there, at the time of writing this it has been downloaded nearly 10 million times from CRAN. It will therefore be covered extensively in later chapters.
+
+\hypertarget{shiny}{%
+\subsection*{Shiny}\label{shiny}}
+
+
+The Shiny framework allows creating applications accessible from web browsers where JavaScript natively runs, it follows that JavaScript can run \emph{alongside} such applications. Often overlooked though, the two can also work \emph{hand-in-hand} as one can pass data from the R server to the JavaScript front-end and vice versa. Some form of that tends to be included in htmlwidgets so one can pick up server-side which point on a scatter plot was clicked for instance.
+
+\hypertarget{reactr}{%
+\subsection*{reactR}\label{reactr}}
+
+
+\href{https://react-r.github.io/reactR/}{ReactR} \citep{R-reactR} is an R package that emulates very well htmlwidgets but specifically for the \href{https://reactjs.org/}{React framework}. Unlike htmlwidgets it is not limited to visual outputs and also provides functions to build inputs, e.g.: a drop-down menu (like \texttt{shiny::selectInput}). The \href{https://glin.github.io/reactable/}{reactable package} \citep{R-reactable} uses reactR to enable building interactive tables solely from R code.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reactable}\OperatorTok{::}\KeywordTok{reactable}\NormalTok{(iris[}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{, ], }\DataTypeTok{showPagination =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-12-1.png}
+
+Note that custom Shiny inputs can also be built, this is however not covered in this book for it is very well \href{https://shiny.rstudio.com/articles/building-inputs.html}{documented}.
+
+\hypertarget{bubble}{%
+\subsection*{bubble}\label{bubble}}
+
+
+\href{https://github.com/ColinFay/bubble}{bubble} \citep{R-bubble} by Colin Fay is a more recent R package, still under heady development but very promising: it lets one run \href{https://nodejs.org/en/}{node.js} code in R, comes with an interactive node REPL, the ability to install npm packages, and even an R markdown engine. It's similar to V8 in many ways.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(bubble)}
+
+\NormalTok{n <-}\StringTok{ }\NormalTok{NodeSession}\OperatorTok{$}\KeywordTok{new}\NormalTok{() }
+
+\NormalTok{n}\OperatorTok{$}\KeywordTok{eval}\NormalTok{(}\StringTok{"2 + 2"}\NormalTok{) }\CommentTok{# this is evaluated in node.js}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 4
+\end{verbatim}
+
+\hypertarget{r2d3}{%
+\subsection*{r2d3}\label{r2d3}}
+
+
+\href{https://rstudio.github.io/r2d3/}{r2d3} \citep{R-r2d3} by RStudio is an R package designed specifically to work with \href{https://d3js.org/}{d3.js}. It is similar to htmlwidgets but works rather differently.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# https://rstudio.github.io/r2d3/articles/gallery/chord/}
+\NormalTok{r2d3}\OperatorTok{::}\KeywordTok{r2d3}\NormalTok{(}\DataTypeTok{data =} \KeywordTok{matrix}\NormalTok{(}\KeywordTok{round}\NormalTok{(}\KeywordTok{runif}\NormalTok{(}\DecValTok{16}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{10000}\NormalTok{)), }\DataTypeTok{ncol =} \DecValTok{4}\NormalTok{, }\DataTypeTok{nrow =} \DecValTok{4}\NormalTok{), }\DataTypeTok{script =} \StringTok{"chord.js"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-14-1.png}
+
+The packages bubble and V8 are intended for use of JavaScript for computations while r2d3, htmlwidgets, and reactR are designed to produce visual outputs (e.g.: graphs and tables), using JavaScript in Shiny can of course be used for the latter but is certainly not limited to that.
 
 \hypertarget{the-v8-engine}{%
 \chapter{The V8 Engine}\label{the-v8-engine}}
@@ -707,7 +866,7 @@ Then install the R package from CRAN.
 \section*{Basics}\label{basics}}
 
 
-V8 provides a reference class, which pertains to object-oriented programming, hence it might look unconventional to many R users. It's nonetheless easy to grasp. If one wants to learn more about the R6's reference class system Hadley Wickham has a very good chapter on it in his \href{https://adv-r.hadley.nz/r6.html}{Advanced R} book.
+V8 provides a reference class via \href{https://github.com/r-lib/R6}{R6} \citep{R-R6}, which pertains to object-oriented programming, hence it might look unconventional to many R users. It's nonetheless easy to grasp. If one wants to learn more about the R6's reference class system Hadley Wickham has a very good chapter on it in his \href{https://adv-r.hadley.nz/r6.html}{Advanced R} book.
 
 Let's explore the basic functionalities of the package. First, load the library and use the function \texttt{v8} to instantiate a class.
 
@@ -806,7 +965,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Wed Jan 22 2020 21:56:51 GMT+0100 (CET)"
+## [1] "Thu Jan 23 2020 21:02:05 GMT+0100 (CET)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -816,7 +975,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Wed Jan 22 2020 21:56:51 GMT+0100 (CET)"
+## [1] "Thu Jan 23 2020 21:02:05 GMT+0100 (CET)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -917,8 +1076,6 @@ Then again we can make sure that the data.frame was turned into a rowwise JSON o
 
 Now we can define options for our search, we don't get into the details of fuse.js here as this is not the purpose of this book, you can read more about the options in the \href{https://fusejs.io/\#Examples}{examples section} of the site. We can mimic the format of the JSON options shown on the website with a simple list and assign that to our engine. If this confuses read the \href{intro.html\#json}{JSON section of the introduction}.
 
-\btwocol
-
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{// JavaScript}
@@ -928,8 +1085,6 @@ Now we can define options for our search, we don't get into the details of fuse.
 \OperatorTok{\}}
 \end{Highlighting}
 \end{Shaded}
-
-\etwocol
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1041,7 +1196,7 @@ Then use the library.
 
 In this section we detail how one should go about using V8 in an R package, if you are not familiar with package development you can skip ahead.
 
-Create a package however you usually do, using \href{https://usethis.r-lib.org/}{usethis} \citep{R-usethis}, devtools or the RStudio IDE interface. Below we create a package called ``ms'' that will hold functionalities we explored in the previous section on npm packages.
+Create a package however you usually do, using usethis, devtools or the RStudio IDE interface. Below we create a package called ``ms'' that will hold functionalities we explored in the previous section on npm packages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
