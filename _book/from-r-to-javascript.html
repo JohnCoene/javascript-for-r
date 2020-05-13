@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>3 Node.js with Bubble | R and JavaScript</title>
+  <title>5 From R to JavaScript | R and JavaScript</title>
   <meta name="description" content="Invite JavaScript into your Data Science workflow." />
   <meta name="generator" content="bookdown 0.14 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="3 Node.js with Bubble | R and JavaScript" />
+  <meta property="og:title" content="5 From R to JavaScript | R and JavaScript" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="yihui/bookdown-crc" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="3 Node.js with Bubble | R and JavaScript" />
+  <meta name="twitter:title" content="5 From R to JavaScript | R and JavaScript" />
   
   <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="the-v8-engine.html"/>
-<link rel="next" href="shiny-1.html"/>
+<link rel="prev" href="shiny-1.html"/>
+<link rel="next" href="references.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -214,73 +214,37 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="node" class="section level1" number="3">
-<h1 number="3"><span class="header-section-number">3</span> Node.js with Bubble</h1>
-<p>A more recent R package, called bubble which will will let you run node.js code from R, the package comes with an REPL and an R markdown engine. As it is still under heavy development the package is not yet available on CRAN, you can get it from Github using either the devtools or <a href="https://remotes.r-lib.org/">remotes package</a> <span class="citation">(Hester et al. <a href="references.html#ref-R-remotes" role="doc-biblioref">2020</a>)</span>.</p>
-<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="node.html#cb98-1"></a><span class="co"># install.packages(&quot;remotes&quot;)</span></span>
-<span id="cb98-2"><a href="node.html#cb98-2"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;ColinFay/bubble&quot;</span>)</span></code></pre></div>
-<div id="basics-1" class="section level2 unnumbered" number="">
-<h2 class="unnumbered" number="">Basics</h2>
-<p>bubble is very similar to V8, it’s also a reference class and the name of the methods are identical.</p>
-<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="node.html#cb99-1"></a><span class="kw">library</span>(bubble)</span>
-<span id="cb99-2"><a href="node.html#cb99-2"></a></span>
-<span id="cb99-3"><a href="node.html#cb99-3"></a>n &lt;-<span class="st"> </span>NodeSession<span class="op">$</span><span class="kw">new</span>()</span>
-<span id="cb99-4"><a href="node.html#cb99-4"></a>n<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;2 + 2;&quot;</span>)</span></code></pre></div>
-<pre><code>## 4</code></pre>
-<p>You can also assign and get variables, just like with v8.</p>
-<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="node.html#cb101-1"></a>n<span class="op">$</span><span class="kw">assign</span>(vehicles, cars[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ])</span>
-<span id="cb101-2"><a href="node.html#cb101-2"></a>n<span class="op">$</span><span class="kw">get</span>(vehicles)</span></code></pre></div>
-<pre><code>##   speed dist
-## 1     4    2
-## 2     4   10</code></pre>
-<p>Bubble also comes with an REPL terminal (read-eval-print loop), which can be launched with <code>bubble::node_repl()</code>.</p>
-</div>
-<div id="r-markdown-engine" class="section level2 unnumbered" number="">
-<h2 class="unnumbered" number="">R Markdown Engine</h2>
-<p>Bubble comes with an R markdown engine so JavaScript code can be evaluated in node from an R markdown document such as this one. To do so we simply need to place <code>bubble::set_node_engine()</code> at the top of the document, subsequent <code>node</code> chunks will be evaluated in a node session.</p>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="node.html#cb103-1"></a>bubble<span class="op">::</span><span class="kw">set_node_engine</span>()</span></code></pre></div>
-<p>Once set we can run node code.</p>
-<div class="sourceCode" id="cb104"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb104-1"><a href="node.html#cb104-1"></a><span class="va">console</span>.<span class="at">log</span>(<span class="dv">2</span> <span class="op">+</span> <span class="dv">3</span>)<span class="op">;</span></span></code></pre></div>
-<pre><code>## 5
-## undefined</code></pre>
-</div>
-<div id="npm" class="section level2 unnumbered" number="">
-<h2 class="unnumbered" number="">Npm</h2>
-<p>Npm is to node.js what CRAN is to R; a repository of packages that can be conveniently installed. Such packages can be installed using another Reference class called <code>NPM</code>. While with V8 one needs to “browserify” npm packages in hope that they work, with bubble, since it interacts with node js directly, there is no need for to “browserify” packages and we can be assured that they work.</p>
-<p>Let us demonstrate with the <a href="https://github.com/NaturalNode/natural">natural</a> package which provides general natural language facility.</p>
-<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="node.html#cb106-1"></a><span class="co"># initialise and install</span></span>
-<span id="cb106-2"><a href="node.html#cb106-2"></a>npm &lt;-<span class="st"> </span>Npm<span class="op">$</span><span class="kw">new</span>()<span class="op">$</span><span class="kw">install</span>(<span class="st">&quot;natural&quot;</span>)</span></code></pre></div>
-<pre><code>## ❯ Add `node_modules` to .gitignore</code></pre>
-<p>The above snippet initialises npm, which creates the pacakge.json file and a node_modules directory. The first is a DESCRIPTION file for node projects so to speak, the latter is a directory to hold dependencies installed.</p>
-<p>The packages can then be imported in the node session and interacted with.</p>
-<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="node.html#cb108-1"></a>n<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;const natural = require(&#39;natural&#39;)&quot;</span>)</span></code></pre></div>
-<pre><code>## undefined</code></pre>
-<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="node.html#cb110-1"></a>n<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;var tokenizer = new natural.WordTokenizer();&quot;</span>)</span></code></pre></div>
-<pre><code>## undefined</code></pre>
-<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="node.html#cb112-1"></a>n<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;tokenizer.tokenize(&#39;Using nodejs from R with npm.&#39;)&quot;</span>)</span></code></pre></div>
-<pre><code>## [ &#39;Using&#39;, &#39;nodejs&#39;, &#39;from&#39;, &#39;R&#39;, &#39;with&#39;, &#39;npm&#39; ]</code></pre>
-</div>
-<div id="use-in-packages-1" class="section level2 unnumbered" number="">
-<h2 class="unnumbered" number="">Use in Packages</h2>
-<p>To demonstrate how to use bubble in packages we shall build one to hold the functions we explored in the previous section.
-Then again, if you are not familiar with package development skip this section.</p>
-<p>Create a package called “organic” using devtools, usethis, or the RStudio IDE. Then edit the DESCRIPTION file so that it imports the bubble package, since it is not yet on CRAN the Github dependency should be specified under <code>Remotes</code>.</p>
-<pre><code>Package: organic
-Title: Natural Language Facilities
-Imports:
-  bubble
-Remotes:
-  ColinFay/bubble</code></pre>
+<div id="from-r-to-javascript" class="section level1" number="5">
+<h1 number="5"><span class="header-section-number">5</span> From R to JavaScript</h1>
+<p>The first thing we shall attempt to do is send data from the R server to the JavaScript client.</p>
+<p>We’ll build upon the extremely basic application we have put together in the previous section.</p>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="from-r-to-javascript.html#cb121-1"></a><span class="co"># app.R</span></span>
+<span id="cb121-2"><a href="from-r-to-javascript.html#cb121-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb121-3"><a href="from-r-to-javascript.html#cb121-3"></a></span>
+<span id="cb121-4"><a href="from-r-to-javascript.html#cb121-4"></a><span class="co"># serve the files</span></span>
+<span id="cb121-5"><a href="from-r-to-javascript.html#cb121-5"></a><span class="kw">addResourcePath</span>(<span class="dt">prefix =</span> <span class="st">&quot;files&quot;</span>, <span class="dt">directoryPath =</span> <span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb121-6"><a href="from-r-to-javascript.html#cb121-6"></a></span>
+<span id="cb121-7"><a href="from-r-to-javascript.html#cb121-7"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb121-8"><a href="from-r-to-javascript.html#cb121-8"></a>  <span class="kw">textInput</span>(<span class="st">&quot;text&quot;</span>)</span>
+<span id="cb121-9"><a href="from-r-to-javascript.html#cb121-9"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;alert&quot;</span>, <span class="st">&quot;Show an alert!&quot;</span>)</span>
+<span id="cb121-10"><a href="from-r-to-javascript.html#cb121-10"></a>)</span>
+<span id="cb121-11"><a href="from-r-to-javascript.html#cb121-11"></a></span>
+<span id="cb121-12"><a href="from-r-to-javascript.html#cb121-12"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb121-13"><a href="from-r-to-javascript.html#cb121-13"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>alert, {</span>
+<span id="cb121-14"><a href="from-r-to-javascript.html#cb121-14"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;show_alert&quot;</span>, <span class="kw">list</span>(<span class="dt">text =</span> input<span class="op">$</span>text))</span>
+<span id="cb121-15"><a href="from-r-to-javascript.html#cb121-15"></a>  })</span>
+<span id="cb121-16"><a href="from-r-to-javascript.html#cb121-16"></a>}</span>
+<span id="cb121-17"><a href="from-r-to-javascript.html#cb121-17"></a></span>
+<span id="cb121-18"><a href="from-r-to-javascript.html#cb121-18"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 
-</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="the-v8-engine.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="shiny-1.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="shiny-1.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -312,7 +276,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/03-Node.Rmd",
+"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/04-Shiny.Rmd",
 "text": "Edit"
 },
 "history": {
