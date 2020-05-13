@@ -1,16 +1,16 @@
 # Shiny
 
-Shiny is by far most popular the web framework for the R programming language. In this chapter, after brushing up on the basics of Shiny, we explore how to not just include JavaScript in our applications but truly blend it with our R back-end.
+Shiny is by far most popular the web framework for the R programming language. In this chapter, after brushing up on the necessary to include JavaScript in our applications, we explore how to blend the JavaScript language with our R back-end.
 
-Then again, the aim is not to write a lot of convoluted JavaScript, on the contrary it is to write as little as possible and demonstrate to the reader that it is often just enough to change the entire user interface and user experience of a shiny application. Making shiny work with JavaScript essentially can be broken down into two operations: 1) passing data from the R server to the JavaScript client and 2) the other way around, from the client to the R server.
+Then again, the aim is not to write a lot of convoluted JavaScript, on the contrary, it is to write as little as possible and demonstrate to the reader that it is often enough to greatly change the user experience of shiny applications. Making shiny work with JavaScript can essentially be broken down into two operations: 1) passing data from the R server to the JavaScript client and 2) the other way around, from the client to the R server.
 
-One interesting system that was hinted at previously is that of the client-server model. Shiny developers are already well aware of the latter since, to build a shiny application, one needs to write a "server" function. However, few know about that of the "client," or consider it when building applications. With regard to such web applications the clients are web browsers and the server is essentially your shiny application. A somewhat interesting aspect inherent to that model is the fact that your application will have a single server (deployed on [shinyapps.io](https://www.shinyapps.io/) or elsewhere) but multiple clients, all the users viewing and interacting with your application. This understanding may give compelling reasons to use JavaScript; while your R code will run on your server, JavaScript will run on the clients (web browsers).
+One interesting system that was hinted at previously is that of the client-server model. Shiny developers are already well aware of the latter since, to build a shiny application, one needs to write a "server" function. However, few know about that of the "client," or consider it when building applications. With regard to such web applications the clients are web browsers and the server is essentially your shiny application. A somewhat interesting aspect inherent to that model is the fact that your application will have a single server (deployed on [shinyapps.io](https://www.shinyapps.io/) or elsewhere) but multiple clients: all the users viewing and interacting with your application. This understanding may give compelling reasons to use JavaScript; while R code will run on a single server, JavaScript will be distributed across clients (web browsers).
 
 ## Assets
 
-Before we introduce JavaScript into our applications we need to know how to do so. First, we need to source our JavaScript files in our shiny application. Second, in order for the application to source those files it needs to be able to access them, one cannot just create a JavaScript file and have magically appear in the app; shiny needs to know where to look for static files.
+Before we introduce JavaScript into our applications we need to know how to do so. First, we need to source our JavaScript files in our shiny application. Second, in order for the application to source those files it needs to be able to access them, one cannot just create a JavaScript file and have it magically appear in the app.
 
-Let us tackle those two issues in reverse order: where should one place JavaScript files when writing an application? They should sit in a separate directory placed at the root of the app (next to `app.R`). If you are using the RStudio IDE and are used to writing applications then click the "Run" button know that RStudio uses the function `shiny::runApp` in the background, this function looks for such files in the `www` directory and makes them available at the same URL. If you are building your applications outside of RStudio, you should either also use `shiny::runApp` or specify the directory and use the function `shiny::shinyApp`. Note that this only applies locally, shiny server (community and pro) as well as [shinyapps.io](https://www.shinyapps.io/) use the same defaults.
+Let us tackle those two issues in reverse order: where should one place JavaScript files when writing an application? They should sit in a separate directory placed at the root of the app (next to `app.R`). If you are using the RStudio IDE and are used to writing applications then click the "Run" button know that RStudio uses the function `shiny::runApp` in the background, this function looks for such files in the `www` directory and makes them available at the same URL. If you are building your applications outside of RStudio, you should either also use `shiny::runApp` or specify the directory which then allows simply using `shiny::shinyApp`. Note that this only applies locally, shiny server (community and pro) as well as [shinyapps.io](https://www.shinyapps.io/) use the same defaults as the RStudio IDE.
 
 In order to ensure the code in this book can run regardless of the reader's machine and IDE, the asset directory is always specified. This is probably advised to steer clear of the potential headaches as, unlike the default, it'll work regardless of the environment. If you are using [golem](https://thinkr-open.github.io/golem/) [@R-golem] to develop your application then you should not worry about this, golem specifies the directory internally.
 
@@ -44,11 +44,11 @@ shinyApp(ui, server)
 
 If you then run the application and open it at the `/files/script.js` path (e.g.:127.0.0.1:3000/files/script.js) you should see the content of our JavaScript file (`var x = 3;`), commenting the `addResourcePath` line will have a "Not Found" error displayed on the page instead.
 
-```{block, type='important'}
+```{block, class='important'}
 All files in your asset directory will be served online and accessible to anyone: do not place sensitive files in it.
 ```
 
-Though one may create multiple such directory and correspondingly use `addResourcePath` to specify multiple paths and prefixes, developers will generally specify a single one, "assets," which contains multiple subdirectories, one for each type of static asset file, namely images, CSS, and JavaScript to obtain a directory that looks something like.
+Though one may create multiple such directory and correspondingly use `addResourcePath` to specify multiple paths and prefixes, developers will generally specify a single one, named "assets" or "static," which contains multiple subdirectories, one for each type of static asset file to obtain a directory that looks something like the tree below.
 
 ```
 assets/
@@ -60,7 +60,7 @@ assets/
      └── pic.png
 ```
 
-This made the JavaScript file we created accessible by the clients but we still have to source this file in our `ui`. Were this HTML one would have to use the `script` to `src` the file in the `head` of the page.
+At this stage we have made the JavaScript file we created accessible by the clients but we still have to source this file in our `ui`. Were one creating a static HTML page one would use the `script` to `src` the file in the `head` of the page.
 
 ```html
 <html>
@@ -74,7 +74,7 @@ This made the JavaScript file we created accessible by the clients but we still 
 </html>
 ```
 
-In shiny we write the ui in R and not in HTML (though it is possible). Just like the rest of the UI, the functions are named exactly as the HTML tags so it's pretty straightforward, the html page above would look something like the shiny `ui` below. 
+In shiny we generally write the ui in R and not in HTML. Given the resemblance between the names of HTML tags and shiny UI functions it's pretty straightforward, the html page above would look something like the shiny `ui` below. 
 
 ```r
 library(shiny)
