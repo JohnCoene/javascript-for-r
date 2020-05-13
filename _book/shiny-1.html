@@ -217,7 +217,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="shiny-1" class="section level1" number="4">
 <h1 number="4"><span class="header-section-number">4</span> Shiny</h1>
 <p>Shiny is by far most popular the web framework for the R programming language. In this chapter, after brushing up on the basics of Shiny, we explore how to not just include JavaScript in our applications but truly blend it with our R back-end.</p>
-<p>Then again, the aim is not to write a lot of convoluted JavaScript, on the contrary it is to write as little as possible and demonstrate to the reader that it is often just enough to change the entire user interface and user experience of a shiny application. Making shiny work with JavaScript essentially can be broken down into two operations: 1) passing data from the R server to the JavaScript client and the other way around, from the client to the R server.</p>
+<p>Then again, the aim is not to write a lot of convoluted JavaScript, on the contrary it is to write as little as possible and demonstrate to the reader that it is often just enough to change the entire user interface and user experience of a shiny application. Making shiny work with JavaScript essentially can be broken down into two operations: 1) passing data from the R server to the JavaScript client and 2) the other way around, from the client to the R server.</p>
 <p>One interesting system that was hinted at previously is that of the client-server model. Shiny developers are already well aware of the latter since, to build a shiny application, one needs to write a “server” function. However, few know about that of the “client,” or consider it when building applications. With regard to such web applications the clients are web browsers and the server is essentially your shiny application. A somewhat interesting aspect inherent to that model is the fact that your application will have a single server (deployed on <a href="https://www.shinyapps.io/">shinyapps.io</a> or elsewhere) but multiple clients, all the users viewing and interacting with your application. This understanding may give compelling reasons to use JavaScript; while your R code will run on your server, JavaScript will run on the clients (web browsers).</p>
 <div id="assets" class="section level2" number="4.1">
 <h2 number="4.1"><span class="header-section-number">4.1</span> Assets</h2>
@@ -226,23 +226,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>In order to ensure the code in this book can run regardless of the reader’s machine and IDE, the asset directory is always specified. This is probably advised to steer clear of the potential headaches as, unlike the default, it’ll work regardless of the environment. If you are using <a href="https://thinkr-open.github.io/golem/">golem</a> <span class="citation">(Guyader et al. <a href="references.html#ref-R-golem" role="doc-biblioref">2020</a>)</span> to develop your application then you should not worry about this, golem specifies the directory internally.</p>
 <p>Below we build a basic shiny application, however, before we define the ui and server we use the <code>shiny::addResourcePath</code> function to specify a directory of static files that will be served by the server and thus accessible by the client. This function takes two arguments, first the <code>prefix</code>, which is essentially the path (URL) at which the assets will be available, second the path to the directory of static assets.</p>
 <p>We thus create the directory and a JavaScript file called <code>script.js</code> within it.</p>
-<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="shiny-1.html#cb115-1"></a><span class="co"># run from root of app (where app.R is located)</span></span>
-<span id="cb115-2"><a href="shiny-1.html#cb115-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;assets&quot;</span>)</span>
-<span id="cb115-3"><a href="shiny-1.html#cb115-3"></a><span class="kw">writeLines</span>(<span class="st">&quot;var x = 3;&quot;</span>, <span class="dt">con =</span> <span class="st">&quot;assets/script.js&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="shiny-1.html#cb113-1"></a><span class="co"># run from root of app (where app.R is located)</span></span>
+<span id="cb113-2"><a href="shiny-1.html#cb113-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb113-3"><a href="shiny-1.html#cb113-3"></a><span class="kw">writeLines</span>(<span class="st">&quot;var x = 3;&quot;</span>, <span class="dt">con =</span> <span class="st">&quot;assets/script.js&quot;</span>)</span></code></pre></div>
 <p>We can now use the <code>shiny::addResourcePath</code> to point to this directory. Generally developers use the same name for the directory of static assets and prefix so as to avoid confusion, below we name them differently in order for the reader to clearly distinguish which is which.</p>
-<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="shiny-1.html#cb116-1"></a><span class="co"># app.R</span></span>
-<span id="cb116-2"><a href="shiny-1.html#cb116-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb116-3"><a href="shiny-1.html#cb116-3"></a></span>
-<span id="cb116-4"><a href="shiny-1.html#cb116-4"></a><span class="co"># serve the files</span></span>
-<span id="cb116-5"><a href="shiny-1.html#cb116-5"></a><span class="kw">addResourcePath</span>(<span class="dt">prefix =</span> <span class="st">&quot;files&quot;</span>, <span class="dt">directoryPath =</span> <span class="st">&quot;assets&quot;</span>)</span>
-<span id="cb116-6"><a href="shiny-1.html#cb116-6"></a></span>
-<span id="cb116-7"><a href="shiny-1.html#cb116-7"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb116-8"><a href="shiny-1.html#cb116-8"></a>  <span class="kw">h1</span>(<span class="st">&quot;R and JavaScript&quot;</span>)</span>
-<span id="cb116-9"><a href="shiny-1.html#cb116-9"></a>)</span>
-<span id="cb116-10"><a href="shiny-1.html#cb116-10"></a></span>
-<span id="cb116-11"><a href="shiny-1.html#cb116-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){}</span>
-<span id="cb116-12"><a href="shiny-1.html#cb116-12"></a></span>
-<span id="cb116-13"><a href="shiny-1.html#cb116-13"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="shiny-1.html#cb114-1"></a><span class="co"># app.R</span></span>
+<span id="cb114-2"><a href="shiny-1.html#cb114-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb114-3"><a href="shiny-1.html#cb114-3"></a></span>
+<span id="cb114-4"><a href="shiny-1.html#cb114-4"></a><span class="co"># serve the files</span></span>
+<span id="cb114-5"><a href="shiny-1.html#cb114-5"></a><span class="kw">addResourcePath</span>(<span class="dt">prefix =</span> <span class="st">&quot;files&quot;</span>, <span class="dt">directoryPath =</span> <span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb114-6"><a href="shiny-1.html#cb114-6"></a></span>
+<span id="cb114-7"><a href="shiny-1.html#cb114-7"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb114-8"><a href="shiny-1.html#cb114-8"></a>  <span class="kw">h1</span>(<span class="st">&quot;R and JavaScript&quot;</span>)</span>
+<span id="cb114-9"><a href="shiny-1.html#cb114-9"></a>)</span>
+<span id="cb114-10"><a href="shiny-1.html#cb114-10"></a></span>
+<span id="cb114-11"><a href="shiny-1.html#cb114-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){}</span>
+<span id="cb114-12"><a href="shiny-1.html#cb114-12"></a></span>
+<span id="cb114-13"><a href="shiny-1.html#cb114-13"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>If you then run the application and open it at the <code>/files/script.js</code> path (e.g.:127.0.0.1:3000/files/script.js) you should see the content of our JavaScript file (<code>var x = 3;</code>), commenting the <code>addResourcePath</code> line will have a “Not Found” error displayed on the page instead.</p>
 <div class="important">
 <p>
@@ -258,64 +258,64 @@ All files in your asset directory will be served online and accessible to anyone
 └── img/
      └── pic.png</code></pre>
 <p>This made the JavaScript file we created accessible by the clients but we still have to source this file in our <code>ui</code>. Were this HTML one would have to use the <code>script</code> to <code>src</code> the file in the <code>head</code> of the page.</p>
-<div class="sourceCode" id="cb118"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb118-1"><a href="shiny-1.html#cb118-1"></a><span class="kw">&lt;html&gt;</span></span>
-<span id="cb118-2"><a href="shiny-1.html#cb118-2"></a>  <span class="kw">&lt;head&gt;</span></span>
-<span id="cb118-3"><a href="shiny-1.html#cb118-3"></a>    <span class="er">&lt;</span>!–– source the JavaScript file ––&gt;</span>
-<span id="cb118-4"><a href="shiny-1.html#cb118-4"></a>    <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;path/to/script.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb118-5"><a href="shiny-1.html#cb118-5"></a>  <span class="kw">&lt;/head&gt;</span></span>
-<span id="cb118-6"><a href="shiny-1.html#cb118-6"></a>  <span class="kw">&lt;body&gt;</span></span>
-<span id="cb118-7"><a href="shiny-1.html#cb118-7"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb118-8"><a href="shiny-1.html#cb118-8"></a>  <span class="kw">&lt;/body&gt;</span></span>
-<span id="cb118-9"><a href="shiny-1.html#cb118-9"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb116"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb116-1"><a href="shiny-1.html#cb116-1"></a><span class="kw">&lt;html&gt;</span></span>
+<span id="cb116-2"><a href="shiny-1.html#cb116-2"></a>  <span class="kw">&lt;head&gt;</span></span>
+<span id="cb116-3"><a href="shiny-1.html#cb116-3"></a>    <span class="er">&lt;</span>!–– source the JavaScript file ––&gt;</span>
+<span id="cb116-4"><a href="shiny-1.html#cb116-4"></a>    <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;path/to/script.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb116-5"><a href="shiny-1.html#cb116-5"></a>  <span class="kw">&lt;/head&gt;</span></span>
+<span id="cb116-6"><a href="shiny-1.html#cb116-6"></a>  <span class="kw">&lt;body&gt;</span></span>
+<span id="cb116-7"><a href="shiny-1.html#cb116-7"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb116-8"><a href="shiny-1.html#cb116-8"></a>  <span class="kw">&lt;/body&gt;</span></span>
+<span id="cb116-9"><a href="shiny-1.html#cb116-9"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
 <p>In shiny we write the ui in R and not in HTML (though it is possible). Just like the rest of the UI, the functions are named exactly as the HTML tags so it’s pretty straightforward, the html page above would look something like the shiny <code>ui</code> below.</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="shiny-1.html#cb119-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb119-2"><a href="shiny-1.html#cb119-2"></a></span>
-<span id="cb119-3"><a href="shiny-1.html#cb119-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb119-4"><a href="shiny-1.html#cb119-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb119-5"><a href="shiny-1.html#cb119-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;path/to/script.js&quot;</span>)</span>
-<span id="cb119-6"><a href="shiny-1.html#cb119-6"></a>  ),</span>
-<span id="cb119-7"><a href="shiny-1.html#cb119-7"></a>  <span class="kw">p</span>(<span class="dt">id =</span> <span class="st">&quot;content&quot;</span>, <span class="st">&quot;Trying JavaScript!&quot;</span>)</span>
-<span id="cb119-8"><a href="shiny-1.html#cb119-8"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="shiny-1.html#cb117-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb117-2"><a href="shiny-1.html#cb117-2"></a></span>
+<span id="cb117-3"><a href="shiny-1.html#cb117-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb117-4"><a href="shiny-1.html#cb117-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb117-5"><a href="shiny-1.html#cb117-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;path/to/script.js&quot;</span>)</span>
+<span id="cb117-6"><a href="shiny-1.html#cb117-6"></a>  ),</span>
+<span id="cb117-7"><a href="shiny-1.html#cb117-7"></a>  <span class="kw">p</span>(<span class="dt">id =</span> <span class="st">&quot;content&quot;</span>, <span class="st">&quot;Trying JavaScript!&quot;</span>)</span>
+<span id="cb117-8"><a href="shiny-1.html#cb117-8"></a>)</span></code></pre></div>
 <p>Note that we use the <code>tags</code> object which comes with shiny and includes HTML tags that are not exported as standalone functions. For instance, you can create a <code>&lt;div&gt;</code> in shiny with the <code>div</code> function but <code>tags$div</code> will also work. This can now be applied to the shiny application, the <code>path/to/script.js</code> should be changed to <code>files/script.js</code> where <code>files</code> is the prefix we defined in <code>addResourcePath</code>.</p>
-<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="shiny-1.html#cb120-1"></a><span class="co"># app.R</span></span>
-<span id="cb120-2"><a href="shiny-1.html#cb120-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb120-3"><a href="shiny-1.html#cb120-3"></a></span>
-<span id="cb120-4"><a href="shiny-1.html#cb120-4"></a><span class="co"># serve the files</span></span>
-<span id="cb120-5"><a href="shiny-1.html#cb120-5"></a><span class="kw">addResourcePath</span>(<span class="dt">prefix =</span> <span class="st">&quot;files&quot;</span>, <span class="dt">directoryPath =</span> <span class="st">&quot;assets&quot;</span>)</span>
-<span id="cb120-6"><a href="shiny-1.html#cb120-6"></a></span>
-<span id="cb120-7"><a href="shiny-1.html#cb120-7"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb120-8"><a href="shiny-1.html#cb120-8"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb120-9"><a href="shiny-1.html#cb120-9"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;files/script.js&quot;</span>)</span>
-<span id="cb120-10"><a href="shiny-1.html#cb120-10"></a>  ),</span>
-<span id="cb120-11"><a href="shiny-1.html#cb120-11"></a>  <span class="kw">h1</span>(<span class="st">&quot;R and JavaScript&quot;</span>)</span>
-<span id="cb120-12"><a href="shiny-1.html#cb120-12"></a>)</span>
-<span id="cb120-13"><a href="shiny-1.html#cb120-13"></a></span>
-<span id="cb120-14"><a href="shiny-1.html#cb120-14"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){}</span>
-<span id="cb120-15"><a href="shiny-1.html#cb120-15"></a></span>
-<span id="cb120-16"><a href="shiny-1.html#cb120-16"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="shiny-1.html#cb118-1"></a><span class="co"># app.R</span></span>
+<span id="cb118-2"><a href="shiny-1.html#cb118-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb118-3"><a href="shiny-1.html#cb118-3"></a></span>
+<span id="cb118-4"><a href="shiny-1.html#cb118-4"></a><span class="co"># serve the files</span></span>
+<span id="cb118-5"><a href="shiny-1.html#cb118-5"></a><span class="kw">addResourcePath</span>(<span class="dt">prefix =</span> <span class="st">&quot;files&quot;</span>, <span class="dt">directoryPath =</span> <span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb118-6"><a href="shiny-1.html#cb118-6"></a></span>
+<span id="cb118-7"><a href="shiny-1.html#cb118-7"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb118-8"><a href="shiny-1.html#cb118-8"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb118-9"><a href="shiny-1.html#cb118-9"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;files/script.js&quot;</span>)</span>
+<span id="cb118-10"><a href="shiny-1.html#cb118-10"></a>  ),</span>
+<span id="cb118-11"><a href="shiny-1.html#cb118-11"></a>  <span class="kw">h1</span>(<span class="st">&quot;R and JavaScript&quot;</span>)</span>
+<span id="cb118-12"><a href="shiny-1.html#cb118-12"></a>)</span>
+<span id="cb118-13"><a href="shiny-1.html#cb118-13"></a></span>
+<span id="cb118-14"><a href="shiny-1.html#cb118-14"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){}</span>
+<span id="cb118-15"><a href="shiny-1.html#cb118-15"></a></span>
+<span id="cb118-16"><a href="shiny-1.html#cb118-16"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="from-r-to-javascript" class="section level2" number="4.2">
 <h2 number="4.2"><span class="header-section-number">4.2</span> From R to JavaScript</h2>
 <p>The first thing we shall attempt to do is send data from the R server to the JavaScript client.</p>
 <p>We’ll build upon the extremely basic application we have put together in the previous section.</p>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="shiny-1.html#cb121-1"></a><span class="co"># app.R</span></span>
-<span id="cb121-2"><a href="shiny-1.html#cb121-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb121-3"><a href="shiny-1.html#cb121-3"></a></span>
-<span id="cb121-4"><a href="shiny-1.html#cb121-4"></a><span class="co"># serve the files</span></span>
-<span id="cb121-5"><a href="shiny-1.html#cb121-5"></a><span class="kw">addResourcePath</span>(<span class="dt">prefix =</span> <span class="st">&quot;files&quot;</span>, <span class="dt">directoryPath =</span> <span class="st">&quot;assets&quot;</span>)</span>
-<span id="cb121-6"><a href="shiny-1.html#cb121-6"></a></span>
-<span id="cb121-7"><a href="shiny-1.html#cb121-7"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb121-8"><a href="shiny-1.html#cb121-8"></a>  <span class="kw">textInput</span>(<span class="st">&quot;text&quot;</span>)</span>
-<span id="cb121-9"><a href="shiny-1.html#cb121-9"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;alert&quot;</span>, <span class="st">&quot;Show an alert!&quot;</span>)</span>
-<span id="cb121-10"><a href="shiny-1.html#cb121-10"></a>)</span>
-<span id="cb121-11"><a href="shiny-1.html#cb121-11"></a></span>
-<span id="cb121-12"><a href="shiny-1.html#cb121-12"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb121-13"><a href="shiny-1.html#cb121-13"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>alert, {</span>
-<span id="cb121-14"><a href="shiny-1.html#cb121-14"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;show_alert&quot;</span>, <span class="kw">list</span>(<span class="dt">text =</span> input<span class="op">$</span>text))</span>
-<span id="cb121-15"><a href="shiny-1.html#cb121-15"></a>  })</span>
-<span id="cb121-16"><a href="shiny-1.html#cb121-16"></a>}</span>
-<span id="cb121-17"><a href="shiny-1.html#cb121-17"></a></span>
-<span id="cb121-18"><a href="shiny-1.html#cb121-18"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="shiny-1.html#cb119-1"></a><span class="co"># app.R</span></span>
+<span id="cb119-2"><a href="shiny-1.html#cb119-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb119-3"><a href="shiny-1.html#cb119-3"></a></span>
+<span id="cb119-4"><a href="shiny-1.html#cb119-4"></a><span class="co"># serve the files</span></span>
+<span id="cb119-5"><a href="shiny-1.html#cb119-5"></a><span class="kw">addResourcePath</span>(<span class="dt">prefix =</span> <span class="st">&quot;files&quot;</span>, <span class="dt">directoryPath =</span> <span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb119-6"><a href="shiny-1.html#cb119-6"></a></span>
+<span id="cb119-7"><a href="shiny-1.html#cb119-7"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb119-8"><a href="shiny-1.html#cb119-8"></a>  <span class="kw">textInput</span>(<span class="st">&quot;text&quot;</span>)</span>
+<span id="cb119-9"><a href="shiny-1.html#cb119-9"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;alert&quot;</span>, <span class="st">&quot;Show an alert!&quot;</span>)</span>
+<span id="cb119-10"><a href="shiny-1.html#cb119-10"></a>)</span>
+<span id="cb119-11"><a href="shiny-1.html#cb119-11"></a></span>
+<span id="cb119-12"><a href="shiny-1.html#cb119-12"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb119-13"><a href="shiny-1.html#cb119-13"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>alert, {</span>
+<span id="cb119-14"><a href="shiny-1.html#cb119-14"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;show_alert&quot;</span>, <span class="kw">list</span>(<span class="dt">text =</span> input<span class="op">$</span>text))</span>
+<span id="cb119-15"><a href="shiny-1.html#cb119-15"></a>  })</span>
+<span id="cb119-16"><a href="shiny-1.html#cb119-16"></a>}</span>
+<span id="cb119-17"><a href="shiny-1.html#cb119-17"></a></span>
+<span id="cb119-18"><a href="shiny-1.html#cb119-18"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 
 </div>
 </div>
