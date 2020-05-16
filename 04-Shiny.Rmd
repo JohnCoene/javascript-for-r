@@ -1,16 +1,18 @@
 # Shiny
 
-Shiny is by far most popular the web framework for the R programming language. In this chapter, after brushing up on the necessary to include JavaScript in our applications, we explore how to blend the JavaScript language with our R back-end.
+Shiny is by far most popular, if not the only, web framework for the R programming language. In this chapter, after brushing up on the necessary to include JavaScript in our applications, we explore how to blend the JavaScript language with our R back-end.
 
 Then again, the aim is not to write a lot of convoluted JavaScript, on the contrary, it is to write as little as possible and demonstrate to the reader that it is often enough to greatly change the user experience of shiny applications. Making shiny work with JavaScript can essentially be broken down into two operations: 1) passing data from the R server to the JavaScript client and 2) the other way around, from the client to the R server.
 
-One interesting system that was hinted at previously is that of the client-server model. Shiny developers are already well aware of the latter since, to build a shiny application, one needs to write a "server" function. However, few know about that of the "client," or consider it when building applications. With regard to such web applications the clients are web browsers and the server is essentially your shiny application. A somewhat interesting aspect inherent to that model is the fact that your application will have a single server (deployed on [shinyapps.io](https://www.shinyapps.io/) or elsewhere) but multiple clients: all the users viewing and interacting with your application. This understanding may give compelling reasons to use JavaScript; while R code will run on a single server, JavaScript will be distributed across clients (web browsers).
+## Static Files {-}
 
-## Assets
+Let's first tackle how one introduces JavaScript in a shiny application; the file(s) need to be served and sourced in the application.
 
-Before we introduce JavaScript into our applications we need to know how to do so. First, we need to source our JavaScript files in our shiny application. Second, in order for the application to source those files it needs to be able to access them, one cannot just create a JavaScript file and have it magically appear in the app.
+```{block, class='note'}
+Static files generally include images, CSS (`.css`), and JavaScript (`.js`).
+```
 
-Let us tackle those two issues in reverse order: where should one place JavaScript files when writing an application? They should sit in a separate directory placed at the root of the app (next to `app.R`). If you are using the RStudio IDE and are used to writing applications then click the "Run" button know that RStudio uses the function `shiny::runApp` in the background, this function looks for such files in the `www` directory and makes them available at the same URL. If you are building your applications outside of RStudio, you should either also use `shiny::runApp` or specify the directory which then allows simply using `shiny::shinyApp`. Note that this only applies locally, shiny server (community and pro) as well as [shinyapps.io](https://www.shinyapps.io/) use the same defaults as the RStudio IDE.
+There are numerous ways to run a shiny application locally; the two most used ones are probably `shinyApp` and `runApp`. If you are using the RStudio IDE use the convenient "Run" button, know that RStudio uses the function `shiny::runApp` in the background, this function looks for said static files in the `www` directory and makes them available at the same path (`/www`). If you are building your applications outside of RStudio, you should either also use `shiny::runApp` or specify the directory which then allows simply using `shiny::shinyApp`. Note that this only applies locally, shiny server (community and pro) as well as [shinyapps.io](https://www.shinyapps.io/) use the same defaults as the RStudio IDE.
 
 In order to ensure the code in this book can run regardless of the reader's machine and IDE, the asset directory is always specified. This is probably advised to steer clear of the potential headaches as, unlike the default, it'll work regardless of the environment. If you are using [golem](https://thinkr-open.github.io/golem/) [@R-golem] to develop your application then you should not worry about this, golem specifies the directory internally.
 
@@ -108,7 +110,7 @@ server <- function(input, output){}
 shinyApp(ui, server)
 ```
 
-## From R to JavaScript
+## From R to JavaScript {-}
 
 The first thing we shall attempt to do is send data from the R server to the JavaScript client.   
 
@@ -134,3 +136,5 @@ server <- function(input, output){
 
 shinyApp(ui, server)
 ```
+
+## In Packages {-}

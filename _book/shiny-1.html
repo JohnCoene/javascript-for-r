@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-05-13" />
+<meta name="date" content="2020-05-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -190,8 +190,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="4" data-path="shiny-1.html"><a href="shiny-1.html"><i class="fa fa-check"></i><b>4</b> Shiny</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="shiny-1.html"><a href="shiny-1.html#assets"><i class="fa fa-check"></i><b>4.1</b> Assets</a></li>
-<li class="chapter" data-level="4.2" data-path="shiny-1.html"><a href="shiny-1.html#from-r-to-javascript"><i class="fa fa-check"></i><b>4.2</b> From R to JavaScript</a></li>
+<li class="chapter" data-level="" data-path="shiny-1.html"><a href="shiny-1.html#static-files"><i class="fa fa-check"></i>Static Files</a></li>
+<li class="chapter" data-level="" data-path="shiny-1.html"><a href="shiny-1.html#from-r-to-javascript"><i class="fa fa-check"></i>From R to JavaScript</a></li>
+<li class="chapter" data-level="" data-path="shiny-1.html"><a href="shiny-1.html#in-packages"><i class="fa fa-check"></i>In Packages</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -216,13 +217,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="shiny-1" class="section level1" number="4">
 <h1 number="4"><span class="header-section-number">4</span> Shiny</h1>
-<p>Shiny is by far most popular the web framework for the R programming language. In this chapter, after brushing up on the necessary to include JavaScript in our applications, we explore how to blend the JavaScript language with our R back-end.</p>
+<p>Shiny is by far most popular, if not the only, web framework for the R programming language. In this chapter, after brushing up on the necessary to include JavaScript in our applications, we explore how to blend the JavaScript language with our R back-end.</p>
 <p>Then again, the aim is not to write a lot of convoluted JavaScript, on the contrary, it is to write as little as possible and demonstrate to the reader that it is often enough to greatly change the user experience of shiny applications. Making shiny work with JavaScript can essentially be broken down into two operations: 1) passing data from the R server to the JavaScript client and 2) the other way around, from the client to the R server.</p>
-<p>One interesting system that was hinted at previously is that of the client-server model. Shiny developers are already well aware of the latter since, to build a shiny application, one needs to write a “server” function. However, few know about that of the “client,” or consider it when building applications. With regard to such web applications the clients are web browsers and the server is essentially your shiny application. A somewhat interesting aspect inherent to that model is the fact that your application will have a single server (deployed on <a href="https://www.shinyapps.io/">shinyapps.io</a> or elsewhere) but multiple clients: all the users viewing and interacting with your application. This understanding may give compelling reasons to use JavaScript; while R code will run on a single server, JavaScript will be distributed across clients (web browsers).</p>
-<div id="assets" class="section level2" number="4.1">
-<h2 number="4.1"><span class="header-section-number">4.1</span> Assets</h2>
-<p>Before we introduce JavaScript into our applications we need to know how to do so. First, we need to source our JavaScript files in our shiny application. Second, in order for the application to source those files it needs to be able to access them, one cannot just create a JavaScript file and have it magically appear in the app.</p>
-<p>Let us tackle those two issues in reverse order: where should one place JavaScript files when writing an application? They should sit in a separate directory placed at the root of the app (next to <code>app.R</code>). If you are using the RStudio IDE and are used to writing applications then click the “Run” button know that RStudio uses the function <code>shiny::runApp</code> in the background, this function looks for such files in the <code>www</code> directory and makes them available at the same URL. If you are building your applications outside of RStudio, you should either also use <code>shiny::runApp</code> or specify the directory which then allows simply using <code>shiny::shinyApp</code>. Note that this only applies locally, shiny server (community and pro) as well as <a href="https://www.shinyapps.io/">shinyapps.io</a> use the same defaults as the RStudio IDE.</p>
+<div id="static-files" class="section level2 unnumbered" number="">
+<h2 class="unnumbered" number="">Static Files</h2>
+<p>Let’s first tackle how one introduces JavaScript in a shiny application; the file(s) need to be served and sourced in the application.</p>
+<p>Static files generally include images, CSS (<code>.css</code>), and JavaScript (<code>.js</code>).</p>
+<p>There are numerous ways to run a shiny application locally; the two most used ones are probably <code>shinyApp</code> and <code>runApp</code>. If you are using the RStudio IDE use the convenient “Run” button, know that RStudio uses the function <code>shiny::runApp</code> in the background, this function looks for said static files in the <code>www</code> directory and makes them available at the same path (<code>/www</code>). If you are building your applications outside of RStudio, you should either also use <code>shiny::runApp</code> or specify the directory which then allows simply using <code>shiny::shinyApp</code>. Note that this only applies locally, shiny server (community and pro) as well as <a href="https://www.shinyapps.io/">shinyapps.io</a> use the same defaults as the RStudio IDE.</p>
 <p>In order to ensure the code in this book can run regardless of the reader’s machine and IDE, the asset directory is always specified. This is probably advised to steer clear of the potential headaches as, unlike the default, it’ll work regardless of the environment. If you are using <a href="https://thinkr-open.github.io/golem/">golem</a> <span class="citation">(Guyader et al. <a href="references.html#ref-R-golem" role="doc-biblioref">2020</a>)</span> to develop your application then you should not worry about this, golem specifies the directory internally.</p>
 <p>Below we build a basic shiny application, however, before we define the ui and server we use the <code>shiny::addResourcePath</code> function to specify a directory of static files that will be served by the server and thus accessible by the client. This function takes two arguments, first the <code>prefix</code>, which is essentially the path (URL) at which the assets will be available, second the path to the directory of static assets.</p>
 <p>We thus create the directory and a JavaScript file called <code>script.js</code> within it.</p>
@@ -245,7 +246,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb114-13"><a href="shiny-1.html#cb114-13"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>If you then run the application and open it at the <code>/files/script.js</code> path (e.g.:127.0.0.1:3000/files/script.js) you should see the content of our JavaScript file (<code>var x = 3;</code>), commenting the <code>addResourcePath</code> line will have a “Not Found” error displayed on the page instead.</p>
 <p>All files in your asset directory will be served online and accessible to anyone: do not place sensitive files in it.</p>
-<p>Though one may create multiple such directory and correspondingly use <code>addResourcePath</code> to specify multiple paths and prefixes, developers will generally specify a single one, “assets,” which contains multiple subdirectories, one for each type of static asset file, namely images, CSS, and JavaScript to obtain a directory that looks something like.</p>
+<p>Though one may create multiple such directory and correspondingly use <code>addResourcePath</code> to specify multiple paths and prefixes, developers will generally specify a single one, named “assets” or “static,” which contains multiple subdirectories, one for each type of static asset file to obtain a directory that looks something like the tree below.</p>
 <pre><code>assets/
 ├── js/
 │    └── script.js
@@ -253,7 +254,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 │    └── style.css
 └── img/
      └── pic.png</code></pre>
-<p>This made the JavaScript file we created accessible by the clients but we still have to source this file in our <code>ui</code>. Were this HTML one would have to use the <code>script</code> to <code>src</code> the file in the <code>head</code> of the page.</p>
+<p>At this stage we have made the JavaScript file we created accessible by the clients but we still have to source this file in our <code>ui</code>. Were one creating a static HTML page one would use the <code>script</code> to <code>src</code> the file in the <code>head</code> of the page.</p>
 <div class="sourceCode" id="cb116"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb116-1"><a href="shiny-1.html#cb116-1"></a><span class="kw">&lt;html&gt;</span></span>
 <span id="cb116-2"><a href="shiny-1.html#cb116-2"></a>  <span class="kw">&lt;head&gt;</span></span>
 <span id="cb116-3"><a href="shiny-1.html#cb116-3"></a>    <span class="er">&lt;</span>!–– source the JavaScript file ––&gt;</span>
@@ -263,7 +264,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb116-7"><a href="shiny-1.html#cb116-7"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
 <span id="cb116-8"><a href="shiny-1.html#cb116-8"></a>  <span class="kw">&lt;/body&gt;</span></span>
 <span id="cb116-9"><a href="shiny-1.html#cb116-9"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
-<p>In shiny we write the ui in R and not in HTML (though it is possible). Just like the rest of the UI, the functions are named exactly as the HTML tags so it’s pretty straightforward, the html page above would look something like the shiny <code>ui</code> below.</p>
+<p>In shiny we generally write the ui in R and not in HTML. Given the resemblance between the names of HTML tags and shiny UI functions it’s pretty straightforward, the html page above would look something like the shiny <code>ui</code> below.</p>
 <div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="shiny-1.html#cb117-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb117-2"><a href="shiny-1.html#cb117-2"></a></span>
 <span id="cb117-3"><a href="shiny-1.html#cb117-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
@@ -290,8 +291,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb118-15"><a href="shiny-1.html#cb118-15"></a></span>
 <span id="cb118-16"><a href="shiny-1.html#cb118-16"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
-<div id="from-r-to-javascript" class="section level2" number="4.2">
-<h2 number="4.2"><span class="header-section-number">4.2</span> From R to JavaScript</h2>
+<div id="from-r-to-javascript" class="section level2 unnumbered" number="">
+<h2 class="unnumbered" number="">From R to JavaScript</h2>
 <p>The first thing we shall attempt to do is send data from the R server to the JavaScript client.</p>
 <p>We’ll build upon the extremely basic application we have put together in the previous section.</p>
 <div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="shiny-1.html#cb119-1"></a><span class="co"># app.R</span></span>
@@ -312,6 +313,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb119-16"><a href="shiny-1.html#cb119-16"></a>}</span>
 <span id="cb119-17"><a href="shiny-1.html#cb119-17"></a></span>
 <span id="cb119-18"><a href="shiny-1.html#cb119-18"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+</div>
+<div id="in-packages" class="section level2 unnumbered" number="">
+<h2 class="unnumbered" number="">In Packages</h2>
 
 </div>
 </div>
