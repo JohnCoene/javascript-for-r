@@ -6,24 +6,20 @@ Then again, the aim is not to write a lot of convoluted JavaScript, on the contr
 
 ## Static Files {-}
 
-Let's first tackle how one introduces JavaScript in a shiny application; the file(s) need to be served and sourced in the application.
+In order to introduce JavaScript to shiny applications one must understand static files and how they work with the framework. Static files are files that are downloaded by the clients (web browsers) as-is and generally include images, CSS (`.css`), and JavaScript (`.js`).
 
-```{block, class='note'}
-Static files generally include images, CSS (`.css`), and JavaScript (`.js`).
-```
+There are numerous ways to run a shiny application locally; the two most used ones are probably `shinyApp` and `runApp`. The RStudio IDE comes with a convenient "Run" button when writing a shiny application, which when clicked know actually uses the function `shiny::runApp` in the background, this function looks for said static files in the `www` directory and makes them available at the same path (`/www`). If you are building your applications outside of RStudio, you should either also use `shiny::runApp` or specify the directory which then allows simply using `shiny::shinyApp`. Note that this only applies locally, shiny server (community and pro) as well as [shinyapps.io](https://www.shinyapps.io/) use the same defaults as the RStudio IDE.
 
-There are numerous ways to run a shiny application locally; the two most used ones are probably `shinyApp` and `runApp`. If you are using the RStudio IDE use the convenient "Run" button, know that RStudio uses the function `shiny::runApp` in the background, this function looks for said static files in the `www` directory and makes them available at the same path (`/www`). If you are building your applications outside of RStudio, you should either also use `shiny::runApp` or specify the directory which then allows simply using `shiny::shinyApp`. Note that this only applies locally, shiny server (community and pro) as well as [shinyapps.io](https://www.shinyapps.io/) use the same defaults as the RStudio IDE.
+In order to ensure the code in this book can run regardless of the reader's machine or editor, the asset directory is always specified. This is probably advised to steer clear of the potential headaches as, unlike the default, it'll work regardless of the environment. If you are using [golem](https://thinkr-open.github.io/golem/) [@R-golem] to develop your application then you should not worry about this as it specifies the directory internally.
 
-In order to ensure the code in this book can run regardless of the reader's machine and IDE, the asset directory is always specified. This is probably advised to steer clear of the potential headaches as, unlike the default, it'll work regardless of the environment. If you are using [golem](https://thinkr-open.github.io/golem/) [@R-golem] to develop your application then you should not worry about this, golem specifies the directory internally.
+Below we build a basic shiny application, however, before we define the ui and server we use the `shiny::addResourcePath` function to specify the location of the directory of static files that will be served by the server and thus accessible by the client. This function takes two arguments, first the `prefix`, which is the path (URL) at which the assets will be available, second the path to the directory of static assets.
 
-Below we build a basic shiny application, however, before we define the ui and server we use the `shiny::addResourcePath` function to specify a directory of static files that will be served by the server and thus accessible by the client. This function takes two arguments, first the `prefix`, which is essentially the path (URL) at which the assets will be available, second the path to the directory of static assets.
-
-We thus create the directory and a JavaScript file called `script.js` within it.
+We thus create the "assets" directory and a JavaScript file called `script.js` within it.
 
 ```r
 # run from root of app (where app.R is located)
 dir.create("assets")
-writeLines("var x = 3;", con = "assets/script.js")
+writeLines("console.log('Hello JS!')", con = "assets/script.js")
 ```
 
 We can now use the `shiny::addResourcePath` to point to this directory. Generally developers use the same name for the directory of static assets and prefix so as to avoid confusion, below we name them differently in order for the reader to clearly distinguish which is which.
@@ -44,13 +40,13 @@ server <- function(input, output){}
 shinyApp(ui, server)
 ```
 
-If you then run the application and open it at the `/files/script.js` path (e.g.:127.0.0.1:3000/files/script.js) you should see the content of our JavaScript file (`var x = 3;`), commenting the `addResourcePath` line will have a "Not Found" error displayed on the page instead.
+If you then run the application and open it at the `/files/script.js` path (e.g.:127.0.0.1:3000/files/script.js) you should see the content of our JavaScript file (`console.log('Hello JS!')`), commenting the `addResourcePath` line will have a "Not Found" error displayed on the page instead.
 
 ```{block, class='important'}
 All files in your asset directory will be served online and accessible to anyone: do not place sensitive files in it.
 ```
 
-Though one may create multiple such directory and correspondingly use `addResourcePath` to specify multiple paths and prefixes, developers will generally specify a single one, named "assets" or "static," which contains multiple subdirectories, one for each type of static asset file to obtain a directory that looks something like the tree below.
+Though one may create multiple such directory and correspondingly use `addResourcePath` to specify multiple paths and prefixes, one will generally specify a single one, named "assets" or "static," which contains multiple subdirectories, one for each type of static asset file to obtain a directory that looks something like the tree below.
 
 ```
 assets/
