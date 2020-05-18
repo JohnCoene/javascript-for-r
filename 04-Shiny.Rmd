@@ -2,7 +2,7 @@
 
 Shiny is by far most popular, if not the only, web framework for the R programming language. In this chapter, after brushing up on the necessary to include JavaScript in our applications, we explore how to blend the JavaScript language with our R back-end.
 
-Then again, the aim is not to write a lot of convoluted JavaScript, on the contrary, it is to write as little as possible and demonstrate to the reader that it is often enough to greatly change the user experience of shiny applications. Making shiny work with JavaScript can essentially be broken down into two operations: 1) passing data from the R server to the JavaScript client and 2) the other way around, from the client to the R server.
+Then again, the aim is not to write a lot of convoluted JavaScript, on the contrary, it is to write as little as possible and demonstrate to the reader that it is often enough to greatly improve the user experience of shiny applications. Making shiny work with JavaScript can essentially be broken down into two operations: 1) passing data from the R server to the JavaScript client and 2) the other way around, from the client to the R server.
 
 ## Static Files {-}
 
@@ -19,7 +19,7 @@ We thus create the "assets" directory and a JavaScript file called `script.js` w
 ```r
 # run from root of app (where app.R is located)
 dir.create("assets")
-writeLines("console.log('Hello JS!')", con = "assets/script.js")
+writeLines("console.log('Hello JS!');", con = "assets/script.js")
 ```
 
 We can now use the `shiny::addResourcePath` to point to this directory. Generally developers use the same name for the directory of static assets and prefix so as to avoid confusion, below we name them differently in order for the reader to clearly distinguish which is which.
@@ -106,11 +106,17 @@ server <- function(input, output){}
 shinyApp(ui, server)
 ```
 
+From the browser, inspecting page (right click > inspect) one should see "Hello JS!" in the console which means our application correctly ran the code in our JavaScript file.
+
 ## From R to JavaScript {-}
 
-The first thing we shall attempt to do is send data from the R server to the JavaScript client.   
+The first thing we shall attempt to do is send data from the R server to the JavaScript client.    
 
-We'll build upon the extremely basic application we have put together in the previous section.
+We'll build upon the extremely basic application we have put together in the previous section. The idea is simply to allow the user to display an alert by the press of a button. Though one can do so without the use of R code as both can be handled client-side (pressing the button and opening an alert both take place in the browser), here we will rely on Shiny's built-in `actionButton`. This means that the information goes 
+
+1. from the client (press of a button) 
+2. to the server (R sends data to client) 
+3. and then back to the client (display alert).
 
 ```r
 # app.R
