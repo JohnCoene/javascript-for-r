@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-05-22" />
+<meta name="date" content="2020-05-23" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -194,6 +194,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="shiny-1.html"><a href="shiny-1.html#integration"><i class="fa fa-check"></i>Integration</a></li>
 <li class="chapter" data-level="" data-path="shiny-1.html"><a href="shiny-1.html#from-r-to-javascript"><i class="fa fa-check"></i>From R to JavaScript</a></li>
 <li class="chapter" data-level="" data-path="shiny-1.html"><a href="shiny-1.html#javascript-to-r"><i class="fa fa-check"></i>JavaScript to R</a></li>
+<li class="chapter" data-level="" data-path="shiny-1.html"><a href="shiny-1.html#external-library"><i class="fa fa-check"></i>External Library</a></li>
 <li class="chapter" data-level="" data-path="shiny-1.html"><a href="shiny-1.html#in-packages"><i class="fa fa-check"></i>In Packages</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
@@ -296,7 +297,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="integration" class="section level2 unnumbered" number="">
 <h2 class="unnumbered" number="">Integration</h2>
 <p>The follow sections will walk you through an example in which one first starts with a basic hello-world-like JavaScript example and ends up with a fully-fledged R package that brings new functionalities to shiny by integrating a third party library.</p>
-<p>We first build an application that passes a message from the R server to the JavaScript client to display said message as an vanilla JavaScript alert (pop-up), then have a callback function to know whether the user has clicked ‘OK’ server-side. Finally we replicate that but with an external library and wrap the whole project into a fully functional package.</p>
+<p>We first build an application that passes a message from the R server to the client to display said message as a vanilla JavaScript alert (pop-up), then send back to the R server whether the user has clicked “OK” on the alert. Finally we replicate that but with an external library and wrap the whole project into a fully functional package.</p>
 <p>First, let’s write a barebone shiny application which includes the JavaScript code which opens an alert.</p>
 <div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="shiny-1.html#cb119-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb119-2"><a href="shiny-1.html#cb119-2"></a></span>
@@ -322,46 +323,122 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 class="unnumbered" number="">From R to JavaScript</h2>
 <p>Now that we have a simple alert displayed in the application we can tie with our R server; the alert should display a message sent by the R server, this would enable us to, for instance, easily have the alert display a message taken from a database or a user input. As might be expected there are two functions required to do so, an R function and its JavaScript complementary: one to send the data from the server and another to catch said data from the client.</p>
 <p>Let us start by writing the R code to send the data, thankfully very little is required of the developer. One can send data from the R server to the client from the <code>session</code> object using the <code>sendCustomMessage</code> method. The method takes two arguments, first an identifier (where to send the data to), second the actual data to send to JavaScript.</p>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="shiny-1.html#cb121-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb121-2"><a href="shiny-1.html#cb121-2"></a></span>
-<span id="cb121-3"><a href="shiny-1.html#cb121-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb121-4"><a href="shiny-1.html#cb121-4"></a>  tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb121-5"><a href="shiny-1.html#cb121-5"></a>    <span class="st">&quot;alert(&#39;Hello from JavaScript&#39;);&quot;</span></span>
-<span id="cb121-6"><a href="shiny-1.html#cb121-6"></a>  ),</span>
-<span id="cb121-7"><a href="shiny-1.html#cb121-7"></a>  <span class="kw">h1</span>(<span class="st">&quot;Hello&quot;</span>)</span>
-<span id="cb121-8"><a href="shiny-1.html#cb121-8"></a>)</span>
-<span id="cb121-9"><a href="shiny-1.html#cb121-9"></a></span>
-<span id="cb121-10"><a href="shiny-1.html#cb121-10"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb121-11"><a href="shiny-1.html#cb121-11"></a>  <span class="co"># set the identifier to send-alert</span></span>
-<span id="cb121-12"><a href="shiny-1.html#cb121-12"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Hi there!&quot;</span>)</span>
-<span id="cb121-13"><a href="shiny-1.html#cb121-13"></a>}</span>
-<span id="cb121-14"><a href="shiny-1.html#cb121-14"></a></span>
-<span id="cb121-15"><a href="shiny-1.html#cb121-15"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="shiny-1.html#cb121-1"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb121-2"><a href="shiny-1.html#cb121-2"></a>  <span class="co"># set the identifier to send-alert</span></span>
+<span id="cb121-3"><a href="shiny-1.html#cb121-3"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Hi there!&quot;</span>)</span>
+<span id="cb121-4"><a href="shiny-1.html#cb121-4"></a>}</span></code></pre></div>
 <p>This effectively sends our message to the JavaScript client but we are yet to use that message JavaScript-side so the application still displays the same alert on load. We can add a “handler” for the identifier we defined (<code>send-alert</code>) which will so something with the message we sent from the server. This is done with the <code>addCustomMessageHandler</code> method from the <code>Shiny</code> object where the first argument is the identifier and the second is the function that handles the message, generally a function that takes a single argument: the data sent from the server.</p>
-<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="shiny-1.html#cb122-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb122-2"><a href="shiny-1.html#cb122-2"></a></span>
-<span id="cb122-3"><a href="shiny-1.html#cb122-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb122-4"><a href="shiny-1.html#cb122-4"></a>  tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb122-5"><a href="shiny-1.html#cb122-5"></a>    <span class="st">&quot;Shiny.addCustomMessageHandler(type = &#39;send-alert&#39;, function(message) {</span></span>
-<span id="cb122-6"><a href="shiny-1.html#cb122-6"></a><span class="st">      alert(message);</span></span>
-<span id="cb122-7"><a href="shiny-1.html#cb122-7"></a><span class="st">    });&quot;</span></span>
-<span id="cb122-8"><a href="shiny-1.html#cb122-8"></a>  ),</span>
-<span id="cb122-9"><a href="shiny-1.html#cb122-9"></a>  <span class="kw">h1</span>(<span class="st">&quot;Hello&quot;</span>)</span>
-<span id="cb122-10"><a href="shiny-1.html#cb122-10"></a>)</span>
-<span id="cb122-11"><a href="shiny-1.html#cb122-11"></a></span>
-<span id="cb122-12"><a href="shiny-1.html#cb122-12"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb122-13"><a href="shiny-1.html#cb122-13"></a>  <span class="co"># set the identifier to send-alert</span></span>
-<span id="cb122-14"><a href="shiny-1.html#cb122-14"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Hi there!&quot;</span>)</span>
-<span id="cb122-15"><a href="shiny-1.html#cb122-15"></a>}</span>
-<span id="cb122-16"><a href="shiny-1.html#cb122-16"></a></span>
-<span id="cb122-17"><a href="shiny-1.html#cb122-17"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="shiny-1.html#cb122-1"></a>tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb122-2"><a href="shiny-1.html#cb122-2"></a>  <span class="st">&quot;Shiny.addCustomMessageHandler(type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb122-3"><a href="shiny-1.html#cb122-3"></a><span class="st">    alert(message);</span></span>
+<span id="cb122-4"><a href="shiny-1.html#cb122-4"></a><span class="st">  });&quot;</span></span>
+<span id="cb122-5"><a href="shiny-1.html#cb122-5"></a>)</span></code></pre></div>
 <div class="figure">
 <img src="images/alert-shiny.png" alt="" />
 <p class="caption">Alert sent from shiny server</p>
 </div>
+<p>This enables you to pass a message that is taken from a database for instance, or as shown below from a user input.</p>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="shiny-1.html#cb123-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb123-2"><a href="shiny-1.html#cb123-2"></a></span>
+<span id="cb123-3"><a href="shiny-1.html#cb123-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb123-4"><a href="shiny-1.html#cb123-4"></a>  tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb123-5"><a href="shiny-1.html#cb123-5"></a>    <span class="st">&quot;Shiny.addCustomMessageHandler(type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb123-6"><a href="shiny-1.html#cb123-6"></a><span class="st">      alert(message);</span></span>
+<span id="cb123-7"><a href="shiny-1.html#cb123-7"></a><span class="st">    });&quot;</span></span>
+<span id="cb123-8"><a href="shiny-1.html#cb123-8"></a>  ),</span>
+<span id="cb123-9"><a href="shiny-1.html#cb123-9"></a>  <span class="kw">h1</span>(<span class="st">&quot;Hello&quot;</span>),</span>
+<span id="cb123-10"><a href="shiny-1.html#cb123-10"></a>  <span class="kw">textInput</span>(<span class="st">&quot;text&quot;</span>, <span class="st">&quot;Text to show in alert&quot;</span>),</span>
+<span id="cb123-11"><a href="shiny-1.html#cb123-11"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;submit&quot;</span>, <span class="st">&quot;Show alert&quot;</span>)</span>
+<span id="cb123-12"><a href="shiny-1.html#cb123-12"></a>)</span>
+<span id="cb123-13"><a href="shiny-1.html#cb123-13"></a></span>
+<span id="cb123-14"><a href="shiny-1.html#cb123-14"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb123-15"><a href="shiny-1.html#cb123-15"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>submit, {</span>
+<span id="cb123-16"><a href="shiny-1.html#cb123-16"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> input<span class="op">$</span>text)</span>
+<span id="cb123-17"><a href="shiny-1.html#cb123-17"></a>  })</span>
+<span id="cb123-18"><a href="shiny-1.html#cb123-18"></a>}</span>
+<span id="cb123-19"><a href="shiny-1.html#cb123-19"></a></span>
+<span id="cb123-20"><a href="shiny-1.html#cb123-20"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>In the application above, notice the path that our message follows: it goes from the client to the server which sends it back to the client. This might be considered suboptimal by some as it is not necessary (in this example at least) to use the server as intermediary. Though there is some truth to this the above will work perfectly fine and—our aim here is to make JavaScript work with R not alongside it.</p>
 </div>
 <div id="javascript-to-r" class="section level2 unnumbered" number="">
 <h2 class="unnumbered" number="">JavaScript to R</h2>
+<p>Imagine if you will that instead of displaying a somewhat anodyne alert it was one that actually mattered where the user is warned that clicking “OK” will execute an irreversible action like the deletion of a record. In order to implement this the server would need to “know” whether the user has clicked said “OK” button. Doing means passing data from the client to the server.</p>
+<p>This can be done by defining a new <em>simplified</em> shiny input. While one can define a fully-fledged shiny input that can be registered, updated, etc. there is also a simplified version of the latter which allows sending reactive input value to the server where it can be picked up with the usual <code>input$id</code>. This can be done with the <code>setInputValue</code> method which takes the id of the input and the value to give it.</p>
+<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="shiny-1.html#cb124-1"></a>tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb124-2"><a href="shiny-1.html#cb124-2"></a>  <span class="st">&quot;Shiny.addCustomMessageHandler(type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb124-3"><a href="shiny-1.html#cb124-3"></a><span class="st">    alert(message);</span></span>
+<span id="cb124-4"><a href="shiny-1.html#cb124-4"></a><span class="st">    Shiny.setInputValue(&#39;delete_alert&#39;, true);</span></span>
+<span id="cb124-5"><a href="shiny-1.html#cb124-5"></a><span class="st">  });&quot;</span></span>
+<span id="cb124-6"><a href="shiny-1.html#cb124-6"></a>)</span></code></pre></div>
+<p>As mentioned earlier <code>alert</code> blocks code execution, therefore the input will not be fired before the button “OK” is pressed. The server can now listen to <code>input$delete_alert</code> which is by default <code>NULL</code> and set to <code>TRUE</code> when the user has pressed “OK.”</p>
+<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="shiny-1.html#cb125-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb125-2"><a href="shiny-1.html#cb125-2"></a></span>
+<span id="cb125-3"><a href="shiny-1.html#cb125-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb125-4"><a href="shiny-1.html#cb125-4"></a>  tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb125-5"><a href="shiny-1.html#cb125-5"></a>    <span class="st">&quot;Shiny.addCustomMessageHandler(type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb125-6"><a href="shiny-1.html#cb125-6"></a><span class="st">      alert(message);</span></span>
+<span id="cb125-7"><a href="shiny-1.html#cb125-7"></a><span class="st">      Shiny.setInputValue(&#39;delete_alert&#39;, true);</span></span>
+<span id="cb125-8"><a href="shiny-1.html#cb125-8"></a><span class="st">    });&quot;</span></span>
+<span id="cb125-9"><a href="shiny-1.html#cb125-9"></a>  ),</span>
+<span id="cb125-10"><a href="shiny-1.html#cb125-10"></a>  <span class="kw">h1</span>(<span class="st">&quot;Hello&quot;</span>)</span>
+<span id="cb125-11"><a href="shiny-1.html#cb125-11"></a>)</span>
+<span id="cb125-12"><a href="shiny-1.html#cb125-12"></a></span>
+<span id="cb125-13"><a href="shiny-1.html#cb125-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb125-14"><a href="shiny-1.html#cb125-14"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Deleting a record!&quot;</span>)</span>
+<span id="cb125-15"><a href="shiny-1.html#cb125-15"></a></span>
+<span id="cb125-16"><a href="shiny-1.html#cb125-16"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>delete_alert, {</span>
+<span id="cb125-17"><a href="shiny-1.html#cb125-17"></a>    <span class="co"># print TRUE when button is clicked</span></span>
+<span id="cb125-18"><a href="shiny-1.html#cb125-18"></a>    <span class="kw">print</span>(input<span class="op">$</span>delete_alert) </span>
+<span id="cb125-19"><a href="shiny-1.html#cb125-19"></a>  })</span>
+<span id="cb125-20"><a href="shiny-1.html#cb125-20"></a>}</span>
+<span id="cb125-21"><a href="shiny-1.html#cb125-21"></a></span>
+<span id="cb125-22"><a href="shiny-1.html#cb125-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+</div>
+<div id="external-library" class="section level2 unnumbered" number="">
+<h2 class="unnumbered" number="">External Library</h2>
+<p>Thus far this chapter has covered both ways data travels between JavaScript and R in Shiny. However, the alert displayed in the previous sections are rather hideous but, though it demonstrates how both languages can work together within shiny, comes short of illustrating how one makes use of external libraries.</p>
+<p>Let us introduce an external in our library, <a href="https://github.com/StephanWagner/jBox">jBox</a> which allows displaying modals (pop-ups), very similar to the vanilla JavaScript alert but much better looking and has additional functionalities.</p>
+<p>The very first thing to do is to import jBox in our project, we could download the files and use them as described in the previous static files section or use the convenient CDNs detailed in the <a href="https://stephanwagner.me/jBox/get_started">get-started documentation</a> of jBox. The “j” in jBox stands for jQuery which is already a dependency of shiny itself, there is therefore no need to import it.</p>
+<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="shiny-1.html#cb126-1"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb126-2"><a href="shiny-1.html#cb126-2"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb126-3"><a href="shiny-1.html#cb126-3"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb126-4"><a href="shiny-1.html#cb126-4"></a>      <span class="dt">src=</span><span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
+<span id="cb126-5"><a href="shiny-1.html#cb126-5"></a>    ),</span>
+<span id="cb126-6"><a href="shiny-1.html#cb126-6"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
+<span id="cb126-7"><a href="shiny-1.html#cb126-7"></a>      <span class="dt">rel=</span><span class="st">&quot;stylesheet&quot;</span>,</span>
+<span id="cb126-8"><a href="shiny-1.html#cb126-8"></a>      <span class="dt">href=</span><span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
+<span id="cb126-9"><a href="shiny-1.html#cb126-9"></a>    ),</span>
+<span id="cb126-10"><a href="shiny-1.html#cb126-10"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb126-11"><a href="shiny-1.html#cb126-11"></a><span class="st">      // TO DO: code jBox</span></span>
+<span id="cb126-12"><a href="shiny-1.html#cb126-12"></a><span class="st">    });&quot;</span>)</span>
+<span id="cb126-13"><a href="shiny-1.html#cb126-13"></a>  )</span>
+<span id="cb126-14"><a href="shiny-1.html#cb126-14"></a>)</span></code></pre></div>
+<p>The jBox library comes with numerous features to display tooltips, modals, notices, and more, which would make for too long a chapter; only notices shall be covered here.</p>
+<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="shiny-1.html#cb127-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb127-2"><a href="shiny-1.html#cb127-2"></a></span>
+<span id="cb127-3"><a href="shiny-1.html#cb127-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb127-4"><a href="shiny-1.html#cb127-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb127-5"><a href="shiny-1.html#cb127-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb127-6"><a href="shiny-1.html#cb127-6"></a>      <span class="dt">src=</span><span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
+<span id="cb127-7"><a href="shiny-1.html#cb127-7"></a>    ),</span>
+<span id="cb127-8"><a href="shiny-1.html#cb127-8"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
+<span id="cb127-9"><a href="shiny-1.html#cb127-9"></a>      <span class="dt">rel=</span><span class="st">&quot;stylesheet&quot;</span>,</span>
+<span id="cb127-10"><a href="shiny-1.html#cb127-10"></a>      <span class="dt">href=</span><span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
+<span id="cb127-11"><a href="shiny-1.html#cb127-11"></a>    ),</span>
+<span id="cb127-12"><a href="shiny-1.html#cb127-12"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb127-13"><a href="shiny-1.html#cb127-13"></a><span class="st">      new jBox(&#39;Notice&#39;, {</span></span>
+<span id="cb127-14"><a href="shiny-1.html#cb127-14"></a><span class="st">        content: message,</span></span>
+<span id="cb127-15"><a href="shiny-1.html#cb127-15"></a><span class="st">        color: &#39;blue&#39;</span></span>
+<span id="cb127-16"><a href="shiny-1.html#cb127-16"></a><span class="st">      });</span></span>
+<span id="cb127-17"><a href="shiny-1.html#cb127-17"></a><span class="st">    });&quot;</span>)</span>
+<span id="cb127-18"><a href="shiny-1.html#cb127-18"></a>  )</span>
+<span id="cb127-19"><a href="shiny-1.html#cb127-19"></a>)</span>
+<span id="cb127-20"><a href="shiny-1.html#cb127-20"></a></span>
+<span id="cb127-21"><a href="shiny-1.html#cb127-21"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb127-22"><a href="shiny-1.html#cb127-22"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Deleting a record!&quot;</span>)</span>
+<span id="cb127-23"><a href="shiny-1.html#cb127-23"></a>}</span>
+<span id="cb127-24"><a href="shiny-1.html#cb127-24"></a></span>
+<span id="cb127-25"><a href="shiny-1.html#cb127-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="in-packages" class="section level2 unnumbered" number="">
 <h2 class="unnumbered" number="">In Packages</h2>
