@@ -493,4 +493,48 @@ shinyApp(ui, server)
 
 ## As a Package {-}
 
+_If confused by any of the following please visit the [package development section](package-development) in the first chapter of this book._
+
+Packages are a fundamental part of R and allow conveniently sharing code and we ought to take advantage of that for the functionality we have been building throughout this chapter. The work done so far is probably fitting for a single application but one should not have to reproduce all of that every time one wants to use jBox in a shiny application: we ought to wrap these functionalities into a handy package that we can use and reuse at will. Moreover, this will benefit from all the other advantages that R packages bring to code such as documentation, and tests.
+
+Before delving into the essence of building the package let us think through what it should include. The application using jBox gives some indication as to what the package will look like: two functions, one directory. Indeed users of the package should be able to reproduce what is executed in the application, namely import dependencies (including the message handler) as well as send data to the JavaScript front-end. Finally, we shall provide, with the package, a static directory of dependencies to avoid relying on the CDNs as this ensures reproducibility (code hosted online by third-party might change and break the package).
+
+Let's start by creating an R package, here we name it "jbox," after the JavaScript of the same name, partly because the author lacks creativity: feel free to name it however you want.
+
+```r
+usethis::create_package("jbox")
+```
+
+### Dependencies
+
+The very first thing that is required are the dependencies, let's create a directory of static assets, download the jBox files. We create the directory "inst" as per the R package convention and within it create another to hold our assets. 
+
+```r
+# create directories
+dir.create("inst/assets", recursive = TRUE)
+```
+
+The jBox files can be downloaded from the CDN and placed within the directory that was created above.
+
+```r
+# URLs of CDNs
+js_dep <- "https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js"
+css_dep <- "https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css"
+
+# download
+download.file(js_dep, destfile = "./inst/assets/jBox.all.min.js")
+download.file(css_dep, destfile = "./inst/assets/jBox.all.min.css")
+```
+
+This done one should obtain a directory that looks similar to the tree below (some files and folders omitted for brevity).
+
+```bash
+DESCRIPTION
+R/
+inst/
+├── assets/
+│    ├── jBox.all.min.js
+│    └── jBox.all.min.css
+```
+
 
