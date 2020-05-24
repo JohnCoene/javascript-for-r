@@ -1,8 +1,12 @@
+# (PART) Development with Shiny {-}
+
 # Shiny
 
 Shiny is by far most popular, if not the only, web framework for the R programming language. In this chapter, after brushing up on the necessary to include JavaScript in shiny applications, we explore how to blend the JavaScript language with our R server and front-end.
 
 Then again, the aim is not to write a lot of convoluted JavaScript, on the contrary, it is to write as little as possible and demonstrate to the reader that it is often enough to greatly improve the user experience of shiny applications. Making shiny work with JavaScript can essentially be broken down into two operations: 1) passing data from the R server to the JavaScript client and 2) the other way around, from the client to the R server.
+
+In this chapter every section builds upon the previous, only skip those if you truly feel confident you understand it fully or you will quickly get confused.
 
 ## Static Files {-}
 
@@ -149,7 +153,7 @@ deleteEverythingOnlyIfUserOK();
 
 ## From R to JavaScript {-}
 
-Now that we have a simple alert displayed in the application we can tie with our R server; the alert should display a message sent by the R server, this would enable us to, for instance, easily have the alert display a message taken from a database or a user input. As might be expected there are two functions required to do so, an R function and its JavaScript complementary: one to send the data from the server and another to catch said data from the client. 
+Now that we have a simple alert displayed in the application we can tie it with our R server; the alert should display a message sent by the R server, this would enable, for instance, displaying a message taken from a database or a user input. As might be expected there are two functions required to do so, an R function and its JavaScript complementary: one to send the data from the server and another to catch said data from the client and display the alert. 
 
 Let us start by writing the R code to send the data, thankfully very little is required of the developer. One can send data from the R server to the client from the `session` object using the `sendCustomMessage` method. The method takes two arguments, first an identifier (where to send the data to), second the actual data to send to JavaScript.  
 
@@ -172,7 +176,7 @@ tags$script(
 
 ![Alert sent from shiny server](images/alert-shiny.png)
 
-This enables you to pass a message that is taken from a database for instance, or as shown below from a user input.
+This enables you to pass a message that is taken from a database for instance, or as shown below from a user input, to the alert.
 
 ```r
 library(shiny)
@@ -197,24 +201,28 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-In the application above, notice the path that our message follows: it goes from the client to the server which sends it back to the client. This might be considered suboptimal by some as it is not necessary (in this example at least) to use the server as intermediary. Though there is some truth to this the above will work perfectly fine and---our aim here is to make JavaScript work with R not alongside it.
+In the application above, notice the path that our message follows: it goes from the client to the server which sends it back to the client. This might be considered suboptimal by some as it is not necessary to use the server as intermediary (in this example at least). Though there is some truth to this the above will work perfectly fine---and our aim here is to make JavaScript work with R---not alongside it.
 
-## JavaScript to R {-}
+## From JavaScript to R {-}
 
-Imagine if you will that instead of displaying a somewhat anodyne alert it was one that actually mattered where the user is warned that clicking "OK" will execute an irreversible action like the deletion of a record. In order to implement this the server would need to "know" whether the user has clicked said "OK" button. Doing means passing data from the client to the server.
+Imagine if you will that instead of displaying a somewhat anodyne alert it was one that actually mattered where the user is warned that clicking "OK" will execute an irreversible action like the deletion of a record. In order to implement this the server would need to "know" whether the user has clicked said "OK" button. To do so one needs to pass data from the client to the server.
 
-This can be done by defining a new _simplified_ shiny input. While one can define a fully-fledged shiny input that can be registered, updated, etc. there is also a simplified version of the latter which allows sending reactive input value to the server where it can be picked up with the usual `input$id`. This can be done with the `setInputValue` method which takes the id of the input and the value to give it.
+This can be done by defining a new _simplified_ shiny input. While one can define a fully-fledged shiny input that can be registered, updated, etc. there is also a simplified version of the latter which allows sending reactive input value to the server where it can be used just like any other inputs (`input$id`). The value of the input can be defined using the `setInputValue` method which takes the id of the input and the value to give it.
 
 ```r
 tags$script(
   "Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
+    
+    // show alert
     alert(message);
+
+    // set to true when clicked OK
     Shiny.setInputValue('delete_alert', true);
   });"
 )
 ```
 
-As mentioned earlier `alert` blocks code execution, therefore the input will not be fired before the button "OK" is pressed. The server can now listen to `input$delete_alert` which is by default `NULL` and set to `TRUE` when the user has pressed "OK."
+As mentioned earlier `alert` blocks code execution, therefore the input value will not be defined before the button "OK" is pressed. The server can now access the `input$delete_alert` input which is by default `NULL` and set to `TRUE` when the user has pressed "OK," as done in the application below which prints the input to the console when the button is clicked.
 
 ```r
 library(shiny)
@@ -243,11 +251,19 @@ shinyApp(ui, server)
 
 ## External Library {-}
 
-Thus far this chapter has covered both ways data travels between JavaScript and R in Shiny. However, the alert displayed in the previous sections are rather hideous but, though it demonstrates how both languages can work together within shiny, comes short of illustrating how one makes use of external libraries.
+Thus far this chapter has covered both ways data travels between JavaScript and R in Shiny. However, the alerts displayed in the previous sections are rather hideous and, though demonstrates how both languages can work together within shiny, comes short of illustrating how to make use of external libraries, which is something frequently performed.
 
-Let us introduce an external in our library, [jBox](https://github.com/StephanWagner/jBox) which allows displaying modals (pop-ups), very similar to the vanilla JavaScript alert but much better looking and has additional functionalities.
+Let's exploit an external library to improve upon the work done so far: [jBox](https://github.com/StephanWagner/jBox) allows displaying modals (pop-ups), very similar to the vanilla JavaScript alerts, but much better looking and with additional functionalities.
 
-The very first thing to do is to import jBox in our project, we could download the files and use them as described in the previous static files section or use the convenient CDNs detailed in the [get-started documentation](https://stephanwagner.me/jBox/get_started) of jBox. The "j" in jBox stands for jQuery which is already a dependency of shiny itself, there is therefore no need to import it.
+The very first thing to do is to import jBox in our project, we could download the files and use them as described in the previous static files section but it comes with very convenient CDNs detailed in the [get-started page of the documentation](https://stephanwagner.me/jBox/get_started). 
+
+```html
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js"></script>
+<link href="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css" rel="stylesheet">
+```
+
+Note that the "j" in jBox stands for jQuery which is already a dependency of shiny itself, there is therefore no need to import it, on the contrary one should not in order to avoid clashes. We can adapt the ui of the shiny application built up to this point to import the dependencies, keeping the handler, to obtain the code below.
 
 ```r
 ui <- fluidPage(
@@ -266,7 +282,16 @@ ui <- fluidPage(
 )
 ```
 
-The jBox library comes with numerous features to display tooltips, modals, notices, and more, which would make for too long a chapter; only notices shall be covered here.
+The jBox library comes with numerous features to display tooltips, modals, notices, and more, which would make for too long a chapter; only notices shall be covered here. Further down the [get-started document](https://stephanwagner.me/jBox/get_started#notices) lies an example of a jBox notice.
+
+```js
+new jBox('Notice', {
+  content: 'Hurray! A notice!',
+  color: 'blue'
+});
+```
+
+Let us copy that in the placeholder of the shiny ui already put together.
 
 ```r
 library(shiny)
@@ -282,7 +307,7 @@ ui <- fluidPage(
     ),
     tags$script("Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
       new jBox('Notice', {
-        content: message,
+        content: 'Hurray! A notice!',
         color: 'blue'
       });
     });")
@@ -296,4 +321,176 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-## In Packages {-}
+![First jBox Notice](images/notice-1.png)
+
+With some minor changes the application can display the message passed, one only needs to replace 'Hurray! A notice!' with the `message` variable.
+
+```r
+tags$script("Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
+  new jBox('Notice', {
+    content: message,
+    color: 'blue'
+  });
+});")
+```
+
+This though only allows passing a single variable, the message, to JavaScript but jBox has many more options.
+
+## Serialisation {-}
+
+Let's delve deeper into the communication between the server and the front-end to understand how we can further customise the notice displayed, e.g.: change the colour.
+
+```js
+{
+  content: 'Hurray! A notice!',
+  color: 'blue'
+}
+```
+
+Notice that the jBox notice takes a JSON object containing the options that define said notice to display, including but not limited to the message. The most straightforward way to make all those options accessible to the server is to construct that list of options server-side before sending it to the the front-end. For instance the JSON of options displayed above would look like the R list below.
+
+```r
+list(
+  content = 'Hurray! A notice!',
+  color = 'blue'
+)
+```
+
+Therefore one could construct this list server-side and use it in jBox straight away, without any further processing from the client. Doing so means we can simplify the JavaScript to `new jBox('Notice', message);` rather than use `message` within the JSON.
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  tags$head(
+    tags$script(
+      src="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js"
+    ),
+    tags$link(
+      rel="stylesheet",
+      href="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css"
+    ),
+    tags$script("Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
+      // use notice send from the server
+      new jBox('Notice', message);
+    });")
+  )
+)
+
+server <- function(input, output, session){
+
+  # define notice options
+  notice = list(
+    content = 'Hello from the server',
+    color = 'black'
+  )
+
+  # send the notice
+  session$sendCustomMessage(type = "send-alert", message = notice)
+}
+
+shinyApp(ui, server)
+```
+
+![Customised jBox Notice](images/notice-2.png)
+
+This sets a solid basis to further integrate other functionalities of jBox or any other JavaScript library one finds useful in Shiny.
+
+## Events & Callbacks {-}
+
+In the example of the vanilla JavaScript alert one could simply place a line of code after the `alert()` function in order to "tell" the server whether the button on the alert had been clicked. This was feasible because `alert` stops the execution of code, this is however rather uncommon in JavaScript. What is far more used are events or callback functions which are triggered upon an action is performed by the user (like the click of a button) or when other interesting things happen in the code (when something errors). [jBox provides numerous such events](https://stephanwagner.me/jBox/options#events): callback functions can be used when a modal is closed or when it is created for instance.
+
+The concept of callback function is not totally foreign to R albeit rarely used. Shiny comes with such functions, e.g.: `shiny::onStop`. This allows having a function be triggered when the application exits (useful to close database connections for instance).
+
+```r
+server <- function(input, output){
+  shiny::onStop(
+    # callback function fired when app is closed
+    function(){
+      cat("App has been closed")
+    } for instance
+  )
+}
+```
+
+In jBox, these callback functions are included in the JSON of options, below the `onClose` event is fired when the notice is closed.
+
+```js
+{
+  content: 'Alert!',
+  onClose: function(){
+    // Fired when closed 
+    console.log('Alert is closed');
+  }
+}
+```
+
+This raises one issue, one cannot truly serialise an object of type function (there are exceptions later in the book). The callback function must therefore be appended to the object of options in JavaScript.
+
+```r
+tags$script("Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
+  // append callback
+  message.onClose = function(){
+    Shiny.setInputValue('alert_close', true);
+  }
+  new jBox('Notice', message);
+});")
+```
+
+Placing a function inside a JSON object is common in JavaScript, in contrast with R where, though it works is rarely if ever done. The above JavaScript code to append the callback function could look something like the snippet below in R.
+
+```{r}
+message <- list(content = "hello")
+message$onClose <- function(x){
+  x + 1
+}
+
+message$onClose(2)
+```
+
+That done it can be incorporated into the application built thus far. Something interesting could be done server-side but for the sake of this example we merely print the value of the input to the R console.
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  tags$head(
+    tags$script(
+      src="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js"
+    ),
+    tags$link(
+      rel="stylesheet",
+      href="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css"
+    ),
+    tags$script("Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
+      message.onClose = function(){
+        Shiny.setInputValue('alert_close', true);
+      }
+      new jBox('Notice', message);
+    });")
+  )
+)
+
+server <- function(input, output, session){
+
+  # define notice options
+  notice = list(
+    content = 'Hello from the server',
+    color = 'black'
+  )
+
+  # send the notice
+  session$sendCustomMessage(type = "send-alert", message = notice)
+
+  # print the output of the alert_close event (when fired)
+  observeEvent(input$alert_close, {
+    print(input$alert_close)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+## As a Package {-}
+
+
