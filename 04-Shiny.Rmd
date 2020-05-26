@@ -269,11 +269,11 @@ Note that the "j" in jBox stands for jQuery which is already a dependency of shi
 ui <- fluidPage(
   tags$head(
     tags$script(
-      src="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js"
+      src = "https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js"
     ),
     tags$link(
-      rel="stylesheet",
-      href="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css"
+      rel = "stylesheet",
+      href = "https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css"
     ),
     tags$script("Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
       // TO DO: code jBox
@@ -299,11 +299,11 @@ library(shiny)
 ui <- fluidPage(
   tags$head(
     tags$script(
-      src="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js"
+      src = "https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js"
     ),
     tags$link(
-      rel="stylesheet",
-      href="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css"
+      rel = "stylesheet",
+      href = "https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css"
     ),
     tags$script("Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
       new jBox('Notice', {
@@ -364,11 +364,11 @@ library(shiny)
 ui <- fluidPage(
   tags$head(
     tags$script(
-      src="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js"
+      src = "https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js"
     ),
     tags$link(
-      rel="stylesheet",
-      href="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css"
+      rel = "stylesheet",
+      href = "https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css"
     ),
     tags$script("Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
       // use notice send from the server
@@ -463,11 +463,11 @@ library(shiny)
 ui <- fluidPage(
   tags$head(
     tags$script(
-      src="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js"
+      src = "https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js"
     ),
     tags$link(
-      rel="stylesheet",
-      href="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css"
+      rel = "stylesheet",
+      href = "https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css"
     ),
     tags$script("Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
       message.onClose = function(){
@@ -523,7 +523,7 @@ The very first thing that is required are the dependencies without which nothing
 dir.create("inst/assets", recursive = TRUE)
 ```
 
-The jBox files can be downloaded from the CDN and placed within the directory that was created above.
+The jBox files can be downloaded from the CDN and placed within the directory that was created above. Moreover, we also create an empty JavaScript file that will eventually contain the custom JavaScript code that "connects" R to JavaScript. 
 
 ```r
 # URLs of CDNs
@@ -533,6 +533,7 @@ css_dep <- "https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.
 # download
 download.file(js_dep, destfile = "./inst/assets/jBox.all.min.js")
 download.file(css_dep, destfile = "./inst/assets/jBox.all.min.css")
+file.create("./inst/assets/custom.js")
 ```
 
 This done one should obtain a directory that looks similar to the tree below (some files and folders omitted for brevity).
@@ -546,15 +547,20 @@ inst/
 │    └── jBox.all.min.css
 ```
 
-Next one needs to have those files served, the user of the package could be asked to use `shiny::addResourcePath` but it's very inelegant, this should be built-in the package so the user does not have to worry or even know this happens. When building a package the developer has the option to allow function to run when the package is loaded or attached, this pertains to package namespaces one can read more about it in [Hadley Wickham's book on R packages in the namespace chapter](http://r-pkgs.had.co.nz/namespace.html). The difference between the two can be complicated, in this case it's probably best to run the function when the packag eis loaded using `onLoad` which Hadley Wickham describe in his book as: 
-
-> Loading will load code, data and any DLLs; register S3 and S4 methods; and run the .onLoad() function. After loading, the package is available in memory, but because it’s not in the search path, you won’t be able to access its components without using ::. Confusingly, :: will also load a package automatically if it isn’t already loaded. It’s rare to load a package explicitly, but you can do so with requireNamespace() or loadNamespace().
+Next, one needs to have those files served, the user of the package could be asked to use `shiny::addResourcePath` but it's very inelegant, this should be built-in the package so the user does not even have to know this happening in the background. When building a package the developer has the option to allow function to run when the package is loaded or attached, Hadley Wickham writes about it extensively in the namespace chapter in his [book on R packages](http://r-pkgs.had.co.nz/namespace.html). By convention, these functions are placed in a `zzz.R` file.
 
 ```r
 file.create("./R/zzz.R")
 ```
 
+The difference between loading and attaching a package can be subtle, in this case it's probably best to run the function when the package is loaded using `onLoad` which the R Packages book describes as:
+
+> Loading will load code, data and any DLLs; register S3 and S4 methods; and run the .onLoad() function. After loading, the package is available in memory, but because it’s not in the search path, you won’t be able to access its components without using ::. Confusingly, :: will also load a package automatically if it isn’t already loaded. It’s rare to load a package explicitly, but you can do so with requireNamespace() or loadNamespace().
+
+The `addResourcePath` function should thus be placed within the `.onLoad` function, this way the files are served by shiny when the package is loaded. Note the few changes below, we refer to the path using `system.file` (detailed in the [Package Development](#package-development)) and change the the prefix to `jbox-assets` to avoid the url serving our static files to clash with others.
+
 ```r
+# R/zzz.R
 .onLoad <- function(libname, pkgname) {
   shiny::addResourcePath(
     "jbox-assets",
@@ -562,3 +568,51 @@ file.create("./R/zzz.R")
   )
 }
 ```
+
+This serves the file and allows not having to explicitly using `addResourcePath` but the package nonetheless needs to feature a function to let the user import them into their application.
+
+```r
+#' Import Dependencies
+#' @export
+usejBox <- function(){
+  shiny::tags$head(
+    shiny::tags$script(src = "jbox-assets/jBox.all.min.js"),
+    shiny::tags$link(rel = "stylesheet", href = "jbox-assets/jBox.all.min.css"),
+    shiny::tags$script(src = "jbox-assets/custom.js")
+  )
+}
+```
+
+Users of the package can place the function defined above in the UI of their application to import the dependencies.
+
+### R Code
+
+Not much changes from what was written before, however, it poses interesting questions with regard to the interface we want to provide users. From the user's perspective the core of the package is the function that actually sends an alert to the clients, here created in `R/core.R`.
+
+```r
+#' Create an Alert
+#' @export
+send_alert <- function(content = "alert", color = "blue", session){
+  # define notice options
+  notice = list(content = content, color = "black")
+
+  # send the notice
+  session$sendCustomMessage(type = "send-alert", message = notice)
+}
+```
+
+One could leave it at the function above, it could be sufficient in providing a functional R package. However one could improve somewhat on it, currently, the function requires the `session` object, which confuses many, most R developers, including I, have little understanding of it. This can be mitigated by providing a default using `shiny::getDefaultReactiveDomain` which, notwithstanding its grandiose name, simply returns the shiny `session`.
+
+```r
+#' Create an Alert
+#' @export
+send_alert <- function(content = "alert", color = "blue", session = shiny::getDefaultReactiveDomain()){
+  # define notice options
+  notice = list(content = content, color = "black")
+
+  # send the notice
+  session$sendCustomMessage(type = "send-alert", message = notice)
+}
+```
+
+
