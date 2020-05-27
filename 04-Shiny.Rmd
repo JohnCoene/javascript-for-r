@@ -6,7 +6,7 @@ Shiny is by far most popular, if not the only, web framework for the R programmi
 
 Then again, the aim is not to write a lot of convoluted JavaScript, on the contrary, it is to write as little as possible and demonstrate to the reader that it is often enough to greatly improve the user experience of shiny applications. Making shiny work with JavaScript can essentially be broken down into two operations: 1) passing data from the R server to the JavaScript client and 2) the other way around, from the client to the R server.
 
-In this chapter every section builds upon the previous, only skip those if you truly feel confident you understand it fully or you will quickly get confused.
+In this chapter every section builds upon the previous, only skip those if you truly feel confident you understand it fully or you will get confused.
 
 ## Static Files {-}
 
@@ -123,7 +123,7 @@ From the browser, inspecting page (right click > inspect > console tab) one shou
 
 The following sections will walk you through an example in which one first starts with a basic hello-world-like JavaScript example running in shiny and ends with a fully-fledged R package that brings new functionalities to shiny by integrating a third party library.
 
-We first build an application that passes a message from the R server to the client to display said message as a vanilla JavaScript alert (pop-up), then send back to the R server whether the user has clicked "OK" on the alert. Finally we replicate that but with an external library and wrap the whole project into a fully functional package.
+We first build an application that passes a message from the R server to the client to display said message as a vanilla JavaScript alert (pop-up), then send back to the R server whether the user has clicked "OK" on the alert. Finally we replicate that but with an external library and wrap the whole project into a fully functional package. This package will look similar to others that provide JavaScript integrations with shiny such as shinyjs [@R-shinyjs] or waiter [@R-waiter].
 
 First, let's write a barebone shiny application which includes the JavaScript code which opens an alert.
 
@@ -502,9 +502,9 @@ shinyApp(ui, server)
 
 _If confused by any of the following please visit the [package development section](package-development) in the first chapter._
 
-Packages are a fundamental part of R and allow conveniently sharing code. The work done so far is probably fitting for a single application but one should not have to reproduce all of that every time one wants to use jBox in a shiny application: we ought to wrap these functionalities into a handy package that can be used reused and shared with others. Moreover, this will benefit from all the other advantages that R packages bring to code such as documentation, and tests.
+Packages are a fundamental part of R and allow conveniently sharing and reusing code. The work done so far is probably fitting for a single application but one should not have to reproduce all of that every time one wants to use jBox in a shiny application: we ought to wrap these functionalities into a handy package that can be used, reused and shared with others. Moreover, this will benefit from all the other advantages that R packages bring to code such as documentation, reproducibility, and tests.
 
-Before we delve into building the package let us think through what it should include. The application using jBox gives some indication as to what the package will look like. Users of the package should be able to reproduce what is executed in the application, namely import dependencies (including the message handler) as well as send data to the JavaScript front-end. Finally, we shall provide, with the package, a static directory of dependencies to avoid relying on the CDNs as this ensures reproducibility (code hosted online by third-party might change and break the package). Concretely, the package will export a `useJbox` function to be placed in the shiny ui to import the dependencies (essentially replacing the `tags$*`) and a function to send create the alert from the server.
+Before we delve into building the package let us think through what it should include. The application using jBox gives some indication as to what the package will look like. Users of the package should be able to reproduce what is executed in the application, namely import dependencies (including the message handler) as well as send data to the JavaScript front-end. Finally, we shall provide, with the package, a static directory of dependencies to avoid relying on the CDNs as this ensures reproducibility (code hosted online by third-party might change and break the package). Concretely, the package will export a `useJbox` function to be placed in the shiny ui to import the dependencies (essentially replacing the `tags$*`) and a function to send the alert from the server to the client.
 
 Let's start by creating an R package, here we name it "jbox," after the JavaScript of the same name, partly because the author lacks creativity: feel free to name it however you want.
 
@@ -533,6 +533,8 @@ css_dep <- "https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.
 # download
 download.file(js_dep, destfile = "./inst/assets/jBox.all.min.js")
 download.file(css_dep, destfile = "./inst/assets/jBox.all.min.css")
+
+# create file to eventually hold custom JavaScript
 file.create("./inst/assets/custom.js")
 ```
 
@@ -547,7 +549,7 @@ inst/
 │    └── jBox.all.min.css
 ```
 
-Next, one needs to have those files served, the user of the package could be asked to use `shiny::addResourcePath` but it's very inelegant, this should be built-in the package so the user does not even have to know this happening in the background. When building a package the developer has the option to allow function to run when the package is loaded or attached, Hadley Wickham writes about it extensively in the namespace chapter in his [book on R packages](http://r-pkgs.had.co.nz/namespace.html). By convention, these functions are placed in a `zzz.R` file.
+Next, one needs to have those files served, the user of the package could be asked to use `shiny::addResourcePath` but it's very inelegant, this should be built-in the package so the user does not even have to know this happening in the background. Therefore, we ought to ensure the static files are served when the user uses the package. Packages can optionally run functions when it is loaded or attached, Hadley Wickham writes about it extensively in the namespace chapter of his [book on R packages](http://r-pkgs.had.co.nz/namespace.html). By convention, these functions are placed in a `zzz.R` file.
 
 ```r
 file.create("./R/zzz.R")
@@ -557,7 +559,7 @@ The difference between loading and attaching a package can be subtle, in this ca
 
 > Loading will load code, data and any DLLs; register S3 and S4 methods; and run the .onLoad() function. After loading, the package is available in memory, but because it’s not in the search path, you won’t be able to access its components without using ::. Confusingly, :: will also load a package automatically if it isn’t already loaded. It’s rare to load a package explicitly, but you can do so with requireNamespace() or loadNamespace().
 
-The `addResourcePath` function should thus be placed within the `.onLoad` function, this way the files are served by shiny when the package is loaded. Note the few changes below, we refer to the path using `system.file` (detailed in the [Package Development](#package-development)) and change the the prefix to `jbox-assets` to avoid the url serving our static files to clash with others.
+The `addResourcePath` function should thus be placed within the `.onLoad` function, this way the files are served by shiny when the package is loaded. Note the few changes below, we refer to the path using `system.file` (detailed in the [Package Development section](#package-development)) and change the the prefix to `jbox-assets` to avoid the url serving our static files to clash with others.
 
 ```r
 # R/zzz.R
@@ -569,7 +571,7 @@ The `addResourcePath` function should thus be placed within the `.onLoad` functi
 }
 ```
 
-This serves the file and allows not having to explicitly using `addResourcePath` but the package nonetheless needs to feature a function to let the user import them into their application.
+This serves the file and allows not having to explicitly use `addResourcePath` but the package nonetheless needs to feature a function to let the user import them into their application.
 
 ```r
 #' Import Dependencies
@@ -601,7 +603,7 @@ send_alert <- function(content = "alert", color = "blue", session){
 }
 ```
 
-One could leave it at the function above, it could be sufficient in providing a functional R package. However one could improve somewhat on it, currently, the function requires the `session` object, which confuses many, most R developers, including I, have little understanding of it. This can be mitigated by providing a default using `shiny::getDefaultReactiveDomain` which, notwithstanding its grandiose name, simply returns the shiny `session`.
+One could leave it at the function above, it could be sufficient in providing a functional R package. However one could improve somewhat on it, currently, the function requires the `session` object, which confuses many, most R developers, including I, have little understanding of it. This can be mitigated by providing a default using `shiny::getDefaultReactiveDomain` which, notwithstanding its grandiose name, simply returns the shiny `session`. This means that function has be run from a shiny server function but that is no limitation in this case.
 
 ```r
 #' Create an Alert
@@ -614,5 +616,117 @@ send_alert <- function(content = "alert", color = "blue", session = shiny::getDe
   session$sendCustomMessage(type = "send-alert", message = notice)
 }
 ```
+
+This covers most of the R code that needs to be written, though we will come back to it shortly on as we uncover an interesting caveat.
+
+### JavaScript Code
+
+Onto the JavaScript code, the `custom.js` to host said code is already created but remains empty. Simply using the code that was written previously will do the job for now.
+
+```js
+// custom.js
+Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
+  message.onClose = function(){
+    Shiny.setInputValue('alert_close', true);
+  }
+  new jBox('Notice', message);
+});
+```
+
+### Shortcoming
+
+At this stage one has a fully functional package: document, load the functions, and it can be used.
+
+```r
+devtools::document()
+devtools::load_all()
+
+library(shiny)
+
+ui <- fluidPage(
+  usejBox(),
+  verbatimTextOutput("callback")
+)
+
+server <- function(input, output){
+  send_alert("Hello from the server!")
+
+  output$callback <- renderPrint({
+    paste("Is the alert closed: ", input$alert_close)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+However, while the above will work for a single alert it will run into issues when creating more than one alert as multiple alerts will set a value for a single input (`input$alert_close`). This is can be remedied to.
+
+### Input
+
+The package needs to provide the user a way to distinguish between alerts in order to be able to observe the correct inputs server-side. 
+A simple solution consists in asking the user to provide an identifier (`id`). This identifier must be passed to the JavaScript client so the function can dynamically set the input value for that identifier, therefore it is included in the `message`, below we do so in such a way that the original JSON of options remains unchanged.
+
+```r
+#' Create an Alert
+#' @export
+send_alert <- function(id, content = "alert", color = "blue", session = shiny::getDefaultReactiveDomain()){
+  # define notice options
+  notice = list(content = content, color = "black")
+
+  # add id
+  message <- list(id = id, notice = notice)
+
+  # send the notice
+  session$sendCustomMessage(type = "send-alert", message = message)
+}
+```
+
+Now one can adapt the JavaScript code to make use of the identifier. One needs to include said identifier in the name of the input the value of which is set, below we concatenate before the original input name. This is not forced upon the developer but is a convention, packages like DT and plotly approach the issue the same way: `id + name_of_input`. The event is thus now appended to `message.notice`, which is also used when creating the jBox alert.
+
+```js
+// custom.js
+Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
+  message.notice.onClose = function(){
+    console.log("close");
+    Shiny.setInputValue(message.id + '_alert_close', true);
+  }
+  new jBox('Notice', message.notice);
+});
+```
+
+### Wrapping up
+
+Building and installing the package will now provide the user an interface demonstrated below.
+
+```r
+library(jbox)
+library(shiny)
+
+ui <- fluidPage(
+  usejBox(),
+  verbatimTextOutput("callback")
+)
+
+server <- function(input, output){
+  send_alert("myid", "Hello from the server!")
+
+  output$callback <- renderPrint({
+    paste("Is the alert closed: ", input$myid_alert_close)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+It must be noted that though the package will be fully functional it will not pass any checks as documentation is poor and the DESCRIPTION incomplete. The API provided to the user is probably subpar in places, namely with the use of the id, which, unless the user needs to observe the respective input, is not necessary: forcing the user to provide it is not great design, consider making this optional.
+
+## Exercises
+
+If one wants to create such packages or make extensive use of such integrations with Shiny, it is greatly encouraged to explore it further, namely by improving the API constructed and extending the functionalities (jBox comes with much more than just alerts), even integrate a JavaScript of your choice. At the time of writing this there is not package providing integration with jBox, if that is not of interest to the reader below are some other great libraries that are yet to be packaged in R and would greatly benefit the R community:
+
+- [micromodal.js](https://github.com/Ghosh/micromodal) - tiny, dependency-free javascript library for creating accessible modal dialogs
+- [hotkeys](https://github.com/jaywcjlove/hotkeys) - Capturing keyboard inputs
+- [handtrack.js](https://github.com/victordibia/handtrack.js) - realtime hand detection
+- [Rsup-progress](https://github.com/skt-t1-byungi/rsup-progress) - simple progress bars
 
 
