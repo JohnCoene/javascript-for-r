@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>R and JavaScript</title>
+  <title>HTML widgets | R and JavaScript</title>
   <meta name="description" content="Invite JavaScript into your Data Science workflow." />
   <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="R and JavaScript" />
+  <meta property="og:title" content="HTML widgets | R and JavaScript" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="yihui/bookdown-crc" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="R and JavaScript" />
+  <meta name="twitter:title" content="HTML widgets | R and JavaScript" />
   
   <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-<link rel="next" href="intro.html"/>
+<link rel="prev" href="shiny-1.html"/>
+<link rel="next" href="references.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -235,31 +235,106 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">R and JavaScript</h1>
-<p class="author"><em>John Coene</em></p>
-<p class="date"><em>2020-05-31</em></p>
+<div id="html-widgets" class="section level1 unnumbered" number="">
+<h1>HTML widgets</h1>
+<p>In this chapter we cover the integration of JavaScript with R using the htmlwidgets package, which focuses on libraries that produce a visual output. It is primarily used for data visualisation but is not limited to it.</p>
+<p>As in previous chapters we mainly learn by example and build multiple widgets. We first go through some basic principles that must be understood before we actually start writing code, we then write a simple widget that allows animating text, then move on to others to progressively include more data and features, finally we build up on the previous chapter to improve how HTML widgets work with shiny.</p>
+<div id="how-it-worksish" class="section level2 unnumbered" number="">
+<h2>How it works~ish</h2>
+<p>Imagine there is no such package as HTML widgets to help create interactive visualisations from R: how would one attempt to go about it?</p>
+<p>An interactive visualisation using JavaScript will require an html document, therefore it would probably have to be created first. Secondly, the visualisation that is yet to be created likely relies on external libraries, these would need to be imported in the document. The document should also include an html element (e.g.: <code>&lt;div&gt;</code>) to host said visualisation. Then data would have to be serialised in R and embedded into the document where it should be read by JavaScript code that uses it to create the visualisation. Finally all should be managed to work seamlessly across R markdown, shiny, and other settings.</p>
+<p>Thankfully the HTML widgets package is there to handle most of this. Nonetheless, it is important to understand that these operations are undertaken (to so degree) by HTML widgets as it greatly helps use the package.</p>
+<p>Must remember when building HTML widgets:</p>
+<ul>
+<li>Import dependencies</li>
+<li>Create an html element to hold visualisation</li>
+<li>Serialise R data to JSON</li>
+<li>Handle JSON data to produce visualisation</li>
+</ul>
 </div>
-<div id="preface" class="section level1 unnumbered" number="">
-<h1>Preface</h1>
-<p>The R programming language has seen the integration of many programming languages; C, C++, Python, to name a few, can be seamlessly embedded into R so one can easily call code written in other languages from the R console. Little known to many, R works just as well with JavaScript—this book delves into the various ways both languages can work together.</p>
-<p>The ultimate aim of this work is to put the reader at ease with inviting JavaScript in their data science workflow. In that respect the book is not teaching one JavaScript but rather we show how little JavaScript can greatly support and enhance R code. Therefore focus is on integrating external JavaScript libraries and no prior knowledge of JavaScript is required.</p>
-<div id="disclaimer" class="section level2 unnumbered" number="">
-<h2>Disclaimer</h2>
-<p>This book is currently a work in progress.</p>
+<div id="scaffold" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Scaffold</h2>
+<p>With some understanding, albeit limited, of how HTML widgets work one is ready to “scaffold” a widget and explore how it works. The way one sets up such a package is stunningly simple. Below we create a package named “playground” as this will only be used to tour HTML widgets.</p>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="html-widgets.html#cb158-1"></a><span class="kw">create_package</span>(<span class="st">&quot;playground&quot;</span>)</span></code></pre></div>
+<p>Then, from the root of the package created, we scaffold widget which we call “play”.</p>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="html-widgets.html#cb159-1"></a>htmlwidgets<span class="op">::</span><span class="kw">scaffoldWidget</span>(<span class="st">&quot;play&quot;</span>)</span></code></pre></div>
+<p>This function puts together the minimalistic structure necessary to implement an HTML widget and opens <code>play.R</code>, <code>play.js</code> and <code>play.yaml</code>, named after our widget, these files form the core an htmlwidgets package. The R file contains core functions of the R API, namely the <code>play</code> function which creates the widget itself, and the <code>render*</code> and <code>*output</code> functions to handle the widget in the shiny server and UI respectively. The <code>.js</code> file contains JavaScript functions that actually generate the visual output.</p>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="html-widgets.html#cb160-1"></a>devtools<span class="op">::</span><span class="kw">document</span>()</span>
+<span id="cb160-2"><a href="html-widgets.html#cb160-2"></a>devtools<span class="op">::</span><span class="kw">load_all</span>()</span></code></pre></div>
+<p>I might be hard to believe, but at this stage one already has a fully functioning widget ready to use after documenting, and building the package. Indeed, the <code>play.R</code> file that that was created contains a function named “play” ẁhich takes, amongst other arguments, a message.</p>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="html-widgets.html#cb161-1"></a><span class="kw">play</span>(<span class="dt">message =</span> <span class="st">&quot;This is a widget!&quot;</span>)</span></code></pre></div>
+<div class="figure">
+<img src="images/playground-1.png" alt="" />
+<p class="caption">First HTML widget</p>
+</div>
+<p>Notice that the message is displayed in the RStudio “Viewer,” which indicates that it is indeed an HTML being displayed, the <img src="images/open-in-browser.png" /> button located in the top right of the “Viewer” will open the message in your default browser. This will prove very useful to look under the hood of the widgets for debugging.</p>
+</div>
+<div id="deconstruct-retrace" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Deconstruct &amp; Retrace</h2>
+<p>With a plain HTML widget package one can start exploring how it works. Let’s start by retracing the path taken by the message written in R to its seemingly magical appearance in the RStudio viewer. The <code>play</code> function previously used, takes the <code>message</code>, wraps it into a list which is then used in <code>htmlwidgets::createWidget</code>. Essentially, the <code>createWidget</code>, which actually creates the widget, serialises the list to a JSON object so it can be used in JavaScript.</p>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="html-widgets.html#cb162-1"></a><span class="co"># forward options using x</span></span>
+<span id="cb162-2"><a href="html-widgets.html#cb162-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb162-3"><a href="html-widgets.html#cb162-3"></a>  <span class="dt">message =</span> message</span>
+<span id="cb162-4"><a href="html-widgets.html#cb162-4"></a>)</span></code></pre></div>
+<p>Wrapping a string in a list might seem unnecessary but one will of course add variables when building a more complex widget, starting with a list makes to add them later on.</p>
+<p>The source code of the widget can be accessed from RStudio by opening the visualisation in your browser using the <img src="images/open-in-browser.png" /> button located in the top right of the “Viewer,” and in the browser right clicking and selecting “View page source.”</p>
+<div class="figure">
+<img src="images/playground-source.png" alt="" />
+<p class="caption">Part of the HTML generated by <code>play</code> function</p>
+</div>
+<p>The first thing this shows is the element (<code>div</code>) created by the htmlwidgets package to hold the message, as well as the JSON object, also created by the htmlwidgets package, which contains, amongst other things, the <code>x</code> variable from the <code>play</code> function.</p>
+<div class="sourceCode" id="cb163"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb163-1"><a href="html-widgets.html#cb163-1"></a><span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&quot;htmlwidget-c21cca0e76e520b46fc7&quot;</span><span class="ot"> style=</span><span class="st">&quot;width:960px;height:500px;&quot;</span><span class="ot"> class=</span><span class="st">&quot;play html-widget&quot;</span><span class="kw">&gt;&lt;/div&gt;</span></span></code></pre></div>
+<p>The <code>div</code> created bears a randomly generated <code>id</code> which one can define when creating the widget using <code>elementId</code> argument.</p>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="html-widgets.html#cb164-1"></a><span class="kw">play</span>(<span class="st">&quot;This is another widget&quot;</span>, <span class="dt">elementId =</span> <span class="st">&quot;myViz&quot;</span>)</span></code></pre></div>
+<p>This produces an HTML element with the specified <code>elementId</code> as HTML <code>id</code>.</p>
+<div class="sourceCode" id="cb165"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb165-1"><a href="html-widgets.html#cb165-1"></a><span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&quot;myViz&quot;</span><span class="ot"> style=</span><span class="st">&quot;width:960px;height:500px;&quot;</span><span class="ot"> class=</span><span class="st">&quot;play html-widget&quot;</span><span class="kw">&gt;&lt;/div&gt;</span></span></code></pre></div>
+<p>You will also notice that this affect the <code>script</code> tag, the <code>data-for</code> attribute of which is should also read “myViz,” it tells the script which widget the JSON it contains is to be used for.</p>
+<script type="application/json" data-for="myViz">{"x":{"message":"This is a widget!"},"evals":[],"jsHooks":[]}</script>
+<p>This use of id may be not obvious at first, but one needs to be able to handle multiple widgets in a single R markdown document or shiny application, distinguishing between which widget relies on which data, which needs resizing, etc.</p>
+<div class="figure">
+<img src="images/playground-deps.png" alt="" />
+<p class="caption">Header imports</p>
+</div>
+<p>This imports the <code>htmlwidgets.js</code> library as well as <code>play.js</code>, were the visualisation depending on external libraries they would appear alongside those. Peaking inside the <code>play.js</code> file located at <code>inst/htmlwidgets/play.js</code> reveals the code below.</p>
+<div class="sourceCode" id="cb166"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb166-1"><a href="html-widgets.html#cb166-1"></a><span class="co">// play.js</span></span>
+<span id="cb166-2"><a href="html-widgets.html#cb166-2"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
+<span id="cb166-3"><a href="html-widgets.html#cb166-3"></a></span>
+<span id="cb166-4"><a href="html-widgets.html#cb166-4"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;play&#39;</span><span class="op">,</span></span>
+<span id="cb166-5"><a href="html-widgets.html#cb166-5"></a></span>
+<span id="cb166-6"><a href="html-widgets.html#cb166-6"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
+<span id="cb166-7"><a href="html-widgets.html#cb166-7"></a></span>
+<span id="cb166-8"><a href="html-widgets.html#cb166-8"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb166-9"><a href="html-widgets.html#cb166-9"></a></span>
+<span id="cb166-10"><a href="html-widgets.html#cb166-10"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
+<span id="cb166-11"><a href="html-widgets.html#cb166-11"></a></span>
+<span id="cb166-12"><a href="html-widgets.html#cb166-12"></a>    <span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb166-13"><a href="html-widgets.html#cb166-13"></a></span>
+<span id="cb166-14"><a href="html-widgets.html#cb166-14"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb166-15"><a href="html-widgets.html#cb166-15"></a></span>
+<span id="cb166-16"><a href="html-widgets.html#cb166-16"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to render the widget, e.g.</span></span>
+<span id="cb166-17"><a href="html-widgets.html#cb166-17"></a>        <span class="va">el</span>.<span class="at">innerText</span> <span class="op">=</span> <span class="va">x</span>.<span class="at">message</span><span class="op">;</span></span>
+<span id="cb166-18"><a href="html-widgets.html#cb166-18"></a></span>
+<span id="cb166-19"><a href="html-widgets.html#cb166-19"></a>      <span class="op">},</span></span>
+<span id="cb166-20"><a href="html-widgets.html#cb166-20"></a></span>
+<span id="cb166-21"><a href="html-widgets.html#cb166-21"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb166-22"><a href="html-widgets.html#cb166-22"></a></span>
+<span id="cb166-23"><a href="html-widgets.html#cb166-23"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to re-render the widget with a new size</span></span>
+<span id="cb166-24"><a href="html-widgets.html#cb166-24"></a></span>
+<span id="cb166-25"><a href="html-widgets.html#cb166-25"></a>      <span class="op">}</span></span>
+<span id="cb166-26"><a href="html-widgets.html#cb166-26"></a></span>
+<span id="cb166-27"><a href="html-widgets.html#cb166-27"></a>    <span class="op">};</span></span>
+<span id="cb166-28"><a href="html-widgets.html#cb166-28"></a>  <span class="op">}</span></span>
+<span id="cb166-29"><a href="html-widgets.html#cb166-29"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 
 </div>
 </div>
-
-
-
             </section>
 
           </div>
         </div>
       </div>
-
-<a href="intro.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="shiny-1.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -290,7 +365,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/index.Rmd",
+"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/05-htmlwidgets.Rmd",
 "text": "Edit"
 },
 "history": {

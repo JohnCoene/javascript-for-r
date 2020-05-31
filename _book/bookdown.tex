@@ -169,7 +169,7 @@
 
 \title{R and JavaScript}
 \author{John Coene}
-\date{2020-05-27}
+\date{2020-05-31}
 
 \begin{document}
 \maketitle
@@ -204,14 +204,18 @@ without whom I should have finished this book two years earlier
 
 The R programming language has seen the integration of many programming languages; C, C++, Python, to name a few, can be seamlessly embedded into R so one can easily call code written in other languages from the R console. Little known to many, R works just as well with JavaScript---this book delves into the various ways both languages can work together.
 
-The ultimate aim of this work is to put the reader at ease with inviting JavaScript in their data science workflow. In that respect the book is not teaching one JavaScript but rather we show how little JavaScript can greatly support and enhance our work in R. Therefore no prior knowledge of JavaScript is required.
+The ultimate aim of this work is to put the reader at ease with inviting JavaScript in their data science workflow. In that respect the book is not teaching one JavaScript but rather we show how little JavaScript can greatly support and enhance R code. Therefore focus is on integrating external JavaScript libraries and no prior knowledge of JavaScript is required.
 
 \hypertarget{disclaimer}{%
-\section{Disclaimer}\label{disclaimer}}
+\section*{Disclaimer}\label{disclaimer}}
+
 
 This book is currently a work in progress.
 
 \mainmatter
+
+\hypertarget{part-basics-roadmap}{%
+\part{Basics \& Roadmap}\label{part-basics-roadmap}}
 
 \hypertarget{intro}{%
 \chapter{Introduction}\label{intro}}
@@ -989,7 +993,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Wed May 27 2020 22:00:45 GMT+0200 (CEST)"
+## [1] "Sun May 31 2020 22:12:24 GMT+0200 (CEST)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -999,7 +1003,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Wed May 27 2020 22:00:45 GMT+0200 (CEST)"
+## [1] "Sun May 31 2020 22:12:24 GMT+0200 (CEST)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -1974,7 +1978,7 @@ One solution is to append the callback function to the object of options JavaScr
 \end{Highlighting}
 \end{Shaded}
 
-Placing a function inside a JSON object is common in JavaScript, in contrast with R where though it works is rarely if ever done. The above JavaScript code to append the callback function (above) could look something like the snippet below in R.
+Placing a function inside a JSON object is common in JavaScript, in contrast with R where though it works is rarely if ever done (outside of reference class/R6). The above JavaScript code to append the callback function could look something like the snippet below in R.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2296,8 +2300,8 @@ Building and installing the package will now provide the user an interface demon
 
 It must be noted that though the package will be fully functional it will not pass any checks as documentation is poor and the DESCRIPTION incomplete. The API provided to the user is probably subpar in places, namely with the use of the id, which, unless the user needs to observe the respective input, is not necessary: forcing the user to provide it is not great design, consider making this optional.
 
-\hypertarget{exercise}{%
-\section{Exercise}\label{exercise}}
+\hypertarget{exercises}{%
+\section{Exercises}\label{exercises}}
 
 If one wants to create such packages or make extensive use of such integrations with Shiny, it is greatly encouraged to explore it further, namely by improving the API constructed and extending the functionalities (jBox comes with much more than just alerts), even integrate a JavaScript of your choice. At the time of writing this there is not package providing integration with jBox, if that is not of interest to the reader below are some other great libraries that are yet to be packaged in R and would greatly benefit the R community:
 
@@ -2312,6 +2316,180 @@ If one wants to create such packages or make extensive use of such integrations 
 \item
   \href{https://github.com/skt-t1-byungi/rsup-progress}{Rsup-progress} - simple progress bars
 \end{itemize}
+
+\hypertarget{part-data-visualisation}{%
+\part{Data Visualisation}\label{part-data-visualisation}}
+
+\hypertarget{html-widgets}{%
+\chapter*{HTML widgets}\label{html-widgets}}
+
+
+In this chapter we cover the integration of JavaScript with R using the htmlwidgets package, which focuses on libraries that produce a visual output. It is primarily used for data visualisation but is not limited to it.
+
+As in previous chapters we mainly learn by example and build multiple widgets. We first go through some basic principles that must be understood before we actually start writing code, we then write a simple widget that allows animating text, then move on to others to progressively include more data and features, finally we build up on the previous chapter to improve how HTML widgets work with shiny.
+
+\hypertarget{how-it-worksish}{%
+\section*{How it works\textasciitilde ish}\label{how-it-worksish}}
+
+
+Imagine there is no such package as HTML widgets to help create interactive visualisations from R: how would one attempt to go about it?
+
+An interactive visualisation using JavaScript will require an html document, therefore it would probably have to be created first. Secondly, the visualisation that is yet to be created likely relies on external libraries, these would need to be imported in the document. The document should also include an html element (e.g.: \texttt{\textless{}div\textgreater{}}) to host said visualisation. Then data would have to be serialised in R and embedded into the document where it should be read by JavaScript code that uses it to create the visualisation. Finally all should be managed to work seamlessly across R markdown, shiny, and other settings.
+
+Thankfully the HTML widgets package is there to handle most of this. Nonetheless, it is important to understand that these operations are undertaken (to so degree) by HTML widgets as it greatly helps use the package.
+
+Must remember when building HTML widgets:
+
+\begin{itemize}
+\tightlist
+\item
+  Import dependencies
+\item
+  Create an html element to hold visualisation
+\item
+  Serialise R data to JSON
+\item
+  Handle JSON data to produce visualisation
+\end{itemize}
+
+\hypertarget{scaffold}{%
+\section{Scaffold}\label{scaffold}}
+
+With some understanding, albeit limited, of how HTML widgets work one is ready to ``scaffold'' a widget and explore how it works. The way one sets up such a package is stunningly simple. Below we create a package named ``playground'' as this will only be used to tour HTML widgets.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{create\_package}\NormalTok{(}\StringTok{"playground"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Then, from the root of the package created, we scaffold widget which we call ``play''.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{htmlwidgets}\OperatorTok{::}\KeywordTok{scaffoldWidget}\NormalTok{(}\StringTok{"play"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+This function puts together the minimalistic structure necessary to implement an HTML widget and opens \texttt{play.R}, \texttt{play.js} and \texttt{play.yaml}, named after our widget, these files form the core an htmlwidgets package. The R file contains core functions of the R API, namely the \texttt{play} function which creates the widget itself, and the \texttt{render*} and \texttt{*output} functions to handle the widget in the shiny server and UI respectively. The \texttt{.js} file contains JavaScript functions that actually generate the visual output.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{devtools}\OperatorTok{::}\KeywordTok{document}\NormalTok{()}
+\NormalTok{devtools}\OperatorTok{::}\KeywordTok{load\_all}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+I might be hard to believe, but at this stage one already has a fully functioning widget ready to use after documenting, and building the package. Indeed, the \texttt{play.R} file that that was created contains a function named ``play'' ẁhich takes, amongst other arguments, a message.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{play}\NormalTok{(}\DataTypeTok{message =} \StringTok{"This is a widget!"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/playground-1.png}
+\caption{First HTML widget}
+\end{figure}
+
+Notice that the message is displayed in the RStudio ``Viewer,'' which indicates that it is indeed an HTML being displayed, the \includegraphics{images/open-in-browser.png} button located in the top right of the ``Viewer'' will open the message in your default browser. This will prove very useful to look under the hood of the widgets for debugging.
+
+\hypertarget{deconstruct-retrace}{%
+\section{Deconstruct \& Retrace}\label{deconstruct-retrace}}
+
+With a plain HTML widget package one can start exploring how it works. Let's start by retracing the path taken by the message written in R to its seemingly magical appearance in the RStudio viewer. The \texttt{play} function previously used, takes the \texttt{message}, wraps it into a list which is then used in \texttt{htmlwidgets::createWidget}. Essentially, the \texttt{createWidget}, which actually creates the widget, serialises the list to a JSON object so it can be used in JavaScript.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# forward options using x}
+\NormalTok{x =}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+  \DataTypeTok{message =}\NormalTok{ message}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Wrapping a string in a list might seem unnecessary but one will of course add variables when building a more complex widget, starting with a list makes to add them later on.
+
+The source code of the widget can be accessed from RStudio by opening the visualisation in your browser using the \includegraphics{images/open-in-browser.png} button located in the top right of the ``Viewer,'' and in the browser right clicking and selecting ``View page source.''
+
+\begin{figure}
+\centering
+\includegraphics{images/playground-source.png}
+\caption{Part of the HTML generated by \texttt{play} function}
+\end{figure}
+
+The first thing this shows is the element (\texttt{div}) created by the htmlwidgets package to hold the message, as well as the JSON object, also created by the htmlwidgets package, which contains, amongst other things, the \texttt{x} variable from the \texttt{play} function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{<div}\OtherTok{ id=}\StringTok{"htmlwidget{-}c21cca0e76e520b46fc7"}\OtherTok{ style=}\StringTok{"width:960px;height:500px;"}\OtherTok{ class=}\StringTok{"play html{-}widget"}\KeywordTok{></div>}
+\end{Highlighting}
+\end{Shaded}
+
+The \texttt{div} created bears a randomly generated \texttt{id} which one can define when creating the widget using \texttt{elementId} argument.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{play}\NormalTok{(}\StringTok{"This is another widget"}\NormalTok{, }\DataTypeTok{elementId =} \StringTok{"myViz"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+This produces an HTML element with the specified \texttt{elementId} as HTML \texttt{id}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{<div}\OtherTok{ id=}\StringTok{"myViz"}\OtherTok{ style=}\StringTok{"width:960px;height:500px;"}\OtherTok{ class=}\StringTok{"play html{-}widget"}\KeywordTok{></div>}
+\end{Highlighting}
+\end{Shaded}
+
+You will also notice that this affect the \texttt{script} tag, the \texttt{data-for} attribute of which is should also read ``myViz,'' it tells the script which widget the JSON it contains is to be used for.
+
+This use of id may be not obvious at first, but one needs to be able to handle multiple widgets in a single R markdown document or shiny application, distinguishing between which widget relies on which data, which needs resizing, etc.
+
+\begin{figure}
+\centering
+\includegraphics{images/playground-deps.png}
+\caption{Header imports}
+\end{figure}
+
+This imports the \texttt{htmlwidgets.js} library as well as \texttt{play.js}, were the visualisation depending on external libraries they would appear alongside those. Peaking inside the \texttt{play.js} file located at \texttt{inst/htmlwidgets/play.js} reveals the code below.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// play.js}
+\VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{widget}\NormalTok{(}\OperatorTok{\{}
+
+  \DataTypeTok{name}\OperatorTok{:} \StringTok{\textquotesingle{}play\textquotesingle{}}\OperatorTok{,}
+
+  \DataTypeTok{type}\OperatorTok{:} \StringTok{\textquotesingle{}output\textquotesingle{}}\OperatorTok{,}
+
+  \DataTypeTok{factory}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
+
+    \CommentTok{// }\AlertTok{TODO}\CommentTok{: define shared variables for this instance}
+
+    \ControlFlowTok{return} \OperatorTok{\{}
+
+      \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+
+        \CommentTok{// }\AlertTok{TODO}\CommentTok{: code to render the widget, e.g.}
+        \VariableTok{el}\NormalTok{.}\AttributeTok{innerText} \OperatorTok{=} \VariableTok{x}\NormalTok{.}\AttributeTok{message}\OperatorTok{;}
+
+      \OperatorTok{\},}
+
+      \DataTypeTok{resize}\OperatorTok{:} \KeywordTok{function}\NormalTok{(width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
+
+        \CommentTok{// }\AlertTok{TODO}\CommentTok{: code to re{-}render the widget with a new size}
+
+      \OperatorTok{\}}
+
+    \OperatorTok{\};}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
 
   \bibliography{book.bib,packages.bib}
 
