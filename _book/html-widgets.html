@@ -216,6 +216,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="html-widgets.html"><a href="html-widgets.html#how-it-worksish"><i class="fa fa-check"></i>How it works~ish</a></li>
 <li class="chapter" data-level="" data-path="html-widgets.html"><a href="html-widgets.html#scaffold"><i class="fa fa-check"></i>Scaffold</a></li>
 <li class="chapter" data-level="" data-path="html-widgets.html"><a href="html-widgets.html#deconstruct-retrace"><i class="fa fa-check"></i>Deconstruct &amp; Retrace</a></li>
+<li class="chapter" data-level="" data-path="html-widgets.html"><a href="html-widgets.html#typed"><i class="fa fa-check"></i>Typed</a>
+<ul>
+<li class="chapter" data-level="" data-path="html-widgets.html"><a href="html-widgets.html#dependency"><i class="fa fa-check"></i>Dependency</a></li>
+<li class="chapter" data-level="" data-path="html-widgets.html"><a href="html-widgets.html#javascript-1"><i class="fa fa-check"></i>JavaScript</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 </ul>
@@ -255,14 +260,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="scaffold" class="section level2 unnumbered" number="">
 <h2>Scaffold</h2>
 <p>With some understanding, albeit limited, of such widgets work internally one is ready to “scaffold” one and explore how it works. The way one sets up such a package is stunningly simple. Below we create a package named “playground” which will be used to explore functionalities of htmlwidgets. Though one could probably create widgets outside of an R package, it would not only serve to make things more complicated.</p>
-<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="html-widgets.html#cb158-1"></a><span class="kw">create_package</span>(<span class="st">&quot;playground&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="html-widgets.html#cb160-1"></a><span class="kw">create_package</span>(<span class="st">&quot;playground&quot;</span>)</span></code></pre></div>
 <p>Then, from the root of the package created, we scaffold widget which we call “play”.</p>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="html-widgets.html#cb159-1"></a>htmlwidgets<span class="op">::</span><span class="kw">scaffoldWidget</span>(<span class="st">&quot;play&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="html-widgets.html#cb161-1"></a>htmlwidgets<span class="op">::</span><span class="kw">scaffoldWidget</span>(<span class="st">&quot;play&quot;</span>)</span></code></pre></div>
 <p>This function puts together the minimalistic structure necessary to implement an HTML widget and opens <code>play.R</code>, <code>play.js</code> and <code>play.yaml</code> in the RStudio IDE or the default text editor. These files are named after the widget and form the core a widget. The R file contains core functions of the R API, namely the <code>play</code> function which creates the widget itself, and the <code>render*</code> and <code>*output</code> functions that handle the widget in the shiny server and UI respectively. The <code>.js</code> file contains JavaScript functions that actually generate the visual output.</p>
-<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="html-widgets.html#cb160-1"></a>devtools<span class="op">::</span><span class="kw">document</span>()</span>
-<span id="cb160-2"><a href="html-widgets.html#cb160-2"></a>devtools<span class="op">::</span><span class="kw">load_all</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="html-widgets.html#cb162-1"></a>devtools<span class="op">::</span><span class="kw">document</span>()</span>
+<span id="cb162-2"><a href="html-widgets.html#cb162-2"></a>devtools<span class="op">::</span><span class="kw">load_all</span>()</span></code></pre></div>
 <p>It might be hard to believe, but at this stage one already has a fully functioning widget ready to use after documenting, and building the package. Indeed, the <code>play.R</code> file that that was created contains a function named “play” ẁhich takes, amongst other arguments, a message.</p>
-<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="html-widgets.html#cb161-1"></a><span class="kw">play</span>(<span class="dt">message =</span> <span class="st">&quot;This is a widget!&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="html-widgets.html#cb163-1"></a><span class="kw">play</span>(<span class="dt">message =</span> <span class="st">&quot;This is a widget!&quot;</span>)</span></code></pre></div>
 <div class="figure">
 <img src="images/playground-1.png" alt="" />
 <p class="caption">First HTML widget</p>
@@ -272,10 +277,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="deconstruct-retrace" class="section level2 unnumbered" number="">
 <h2>Deconstruct &amp; Retrace</h2>
 <p>With an out-of-the-box HTML widget package one can start exploring the internals to understand how it works. Let’s start by retracing the path taken by the message written in R to its seemingly magical appearance in HTML. The <code>play</code> function previously used, takes the <code>message</code> wraps it into a list which is then used in <code>htmlwidgets::createWidget</code>.</p>
-<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="html-widgets.html#cb162-1"></a><span class="co"># forward options using x</span></span>
-<span id="cb162-2"><a href="html-widgets.html#cb162-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb162-3"><a href="html-widgets.html#cb162-3"></a>  <span class="dt">message =</span> message</span>
-<span id="cb162-4"><a href="html-widgets.html#cb162-4"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="html-widgets.html#cb164-1"></a><span class="co"># forward options using x</span></span>
+<span id="cb164-2"><a href="html-widgets.html#cb164-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb164-3"><a href="html-widgets.html#cb164-3"></a>  <span class="dt">message =</span> message</span>
+<span id="cb164-4"><a href="html-widgets.html#cb164-4"></a>)</span></code></pre></div>
 <p>Wrapping a string in a list might seem unnecessary but one will eventually add variables when building a more complex widget, starting with a list makes it easier to add them later on.</p>
 <p>The source code of the created (and rendered) output can be accessed in different ways:</p>
 <ul>
@@ -287,96 +292,240 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p class="caption">Part of the HTML generated by <code>play</code> function</p>
 </div>
 <p>The first thing the source code reveals is the element (<code>div</code>) created by the htmlwidgets package to hold the message, as well as the JSON object which contains, amongst other things, the <code>x</code> variable used in the <code>play</code> function.</p>
-<div class="sourceCode" id="cb163"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb163-1"><a href="html-widgets.html#cb163-1"></a><span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&quot;htmlwidget-c21cca0e76e520b46fc7&quot;</span><span class="ot"> style=</span><span class="st">&quot;width:960px;height:500px;&quot;</span><span class="ot"> class=</span><span class="st">&quot;play html-widget&quot;</span><span class="kw">&gt;&lt;/div&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb165"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb165-1"><a href="html-widgets.html#cb165-1"></a><span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&quot;htmlwidget-c21cca0e76e520b46fc7&quot;</span><span class="ot"> style=</span><span class="st">&quot;width:960px;height:500px;&quot;</span><span class="ot"> class=</span><span class="st">&quot;play html-widget&quot;</span><span class="kw">&gt;&lt;/div&gt;</span></span></code></pre></div>
 <p>The <code>div</code> created bears a randomly generated <code>id</code> which one can define when creating the widget using the <code>elementId</code> argument.</p>
-<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="html-widgets.html#cb164-1"></a><span class="kw">play</span>(<span class="st">&quot;This is another widget&quot;</span>, <span class="dt">elementId =</span> <span class="st">&quot;myViz&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="html-widgets.html#cb166-1"></a><span class="kw">play</span>(<span class="st">&quot;This is another widget&quot;</span>, <span class="dt">elementId =</span> <span class="st">&quot;myViz&quot;</span>)</span></code></pre></div>
 <p>This produces an HTML element with the specified <code>elementId</code> as HTML <code>id</code> in the <code>div</code>.</p>
-<div class="sourceCode" id="cb165"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb165-1"><a href="html-widgets.html#cb165-1"></a><span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&quot;myViz&quot;</span><span class="ot"> style=</span><span class="st">&quot;width:960px;height:500px;&quot;</span><span class="ot"> class=</span><span class="st">&quot;play html-widget&quot;</span><span class="kw">&gt;&lt;/div&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb167"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb167-1"><a href="html-widgets.html#cb167-1"></a><span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&quot;myViz&quot;</span><span class="ot"> style=</span><span class="st">&quot;width:960px;height:500px;&quot;</span><span class="ot"> class=</span><span class="st">&quot;play html-widget&quot;</span><span class="kw">&gt;&lt;/div&gt;</span></span></code></pre></div>
 <p>You will also notice that this affect the <code>script</code> tag below, the <code>data-for</code> attribute of which is also set to “myViz,” this tells the script which widget the JSON it contains is to be used for.</p>
-<div class="sourceCode" id="cb166"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb166-1"><a href="html-widgets.html#cb166-1"></a><span class="kw">&lt;script</span><span class="ot"> type=</span><span class="st">&quot;application/json&quot;</span><span class="ot"> data-for=</span><span class="st">&quot;myViz&quot;</span><span class="kw">&gt;</span><span class="op">{</span><span class="st">&quot;x&quot;</span><span class="op">:{</span><span class="st">&quot;message&quot;</span><span class="op">:</span><span class="st">&quot;This is a widget!&quot;</span><span class="op">},</span><span class="st">&quot;evals&quot;</span><span class="op">:</span>[]<span class="op">,</span><span class="st">&quot;jsHooks&quot;</span><span class="op">:</span>[]<span class="op">}</span><span class="kw">&lt;/script&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb168"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb168-1"><a href="html-widgets.html#cb168-1"></a><span class="kw">&lt;script</span><span class="ot"> type=</span><span class="st">&quot;application/json&quot;</span><span class="ot"> data-for=</span><span class="st">&quot;myViz&quot;</span><span class="kw">&gt;</span><span class="op">{</span><span class="st">&quot;x&quot;</span><span class="op">:{</span><span class="st">&quot;message&quot;</span><span class="op">:</span><span class="st">&quot;This is a widget!&quot;</span><span class="op">},</span><span class="st">&quot;evals&quot;</span><span class="op">:</span>[]<span class="op">,</span><span class="st">&quot;jsHooks&quot;</span><span class="op">:</span>[]<span class="op">}</span><span class="kw">&lt;/script&gt;</span></span></code></pre></div>
 <p>This use of id may be not obvious at first, but one needs to be able to handle multiple widgets in a single R markdown document or shiny application, distinguishing between them and their respective data inputs is thus crucial. Inspecting the output also shows the dependencies imported, these are placed within the <code>head</code> HTML tags at the top of the page.</p>
 <div class="figure">
 <img src="images/playground-deps.png" alt="" />
 <p class="caption">Header imports</p>
 </div>
 <p>This effectively imports the <code>htmlwidgets.js</code> library as well as the <code>play.js</code> file, and were the visualisation depending on external libraries they would appear alongside those. Peaking inside the <code>play.js</code> file located at <code>inst/htmlwidgets/play.js</code> reveals the code below.</p>
-<div class="sourceCode" id="cb167"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb167-1"><a href="html-widgets.html#cb167-1"></a><span class="co">// play.js</span></span>
-<span id="cb167-2"><a href="html-widgets.html#cb167-2"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
-<span id="cb167-3"><a href="html-widgets.html#cb167-3"></a></span>
-<span id="cb167-4"><a href="html-widgets.html#cb167-4"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;play&#39;</span><span class="op">,</span></span>
-<span id="cb167-5"><a href="html-widgets.html#cb167-5"></a></span>
-<span id="cb167-6"><a href="html-widgets.html#cb167-6"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
-<span id="cb167-7"><a href="html-widgets.html#cb167-7"></a></span>
-<span id="cb167-8"><a href="html-widgets.html#cb167-8"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
-<span id="cb167-9"><a href="html-widgets.html#cb167-9"></a></span>
-<span id="cb167-10"><a href="html-widgets.html#cb167-10"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
-<span id="cb167-11"><a href="html-widgets.html#cb167-11"></a></span>
-<span id="cb167-12"><a href="html-widgets.html#cb167-12"></a>    <span class="cf">return</span> <span class="op">{</span></span>
-<span id="cb167-13"><a href="html-widgets.html#cb167-13"></a></span>
-<span id="cb167-14"><a href="html-widgets.html#cb167-14"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb167-15"><a href="html-widgets.html#cb167-15"></a></span>
-<span id="cb167-16"><a href="html-widgets.html#cb167-16"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to render the widget, e.g.</span></span>
-<span id="cb167-17"><a href="html-widgets.html#cb167-17"></a>        <span class="va">el</span>.<span class="at">innerText</span> <span class="op">=</span> <span class="va">x</span>.<span class="at">message</span><span class="op">;</span></span>
-<span id="cb167-18"><a href="html-widgets.html#cb167-18"></a></span>
-<span id="cb167-19"><a href="html-widgets.html#cb167-19"></a>      <span class="op">},</span></span>
-<span id="cb167-20"><a href="html-widgets.html#cb167-20"></a></span>
-<span id="cb167-21"><a href="html-widgets.html#cb167-21"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
-<span id="cb167-22"><a href="html-widgets.html#cb167-22"></a></span>
-<span id="cb167-23"><a href="html-widgets.html#cb167-23"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to re-render the widget with a new size</span></span>
-<span id="cb167-24"><a href="html-widgets.html#cb167-24"></a></span>
-<span id="cb167-25"><a href="html-widgets.html#cb167-25"></a>      <span class="op">}</span></span>
-<span id="cb167-26"><a href="html-widgets.html#cb167-26"></a></span>
-<span id="cb167-27"><a href="html-widgets.html#cb167-27"></a>    <span class="op">};</span></span>
-<span id="cb167-28"><a href="html-widgets.html#cb167-28"></a>  <span class="op">}</span></span>
-<span id="cb167-29"><a href="html-widgets.html#cb167-29"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb169"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb169-1"><a href="html-widgets.html#cb169-1"></a><span class="co">// play.js</span></span>
+<span id="cb169-2"><a href="html-widgets.html#cb169-2"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
+<span id="cb169-3"><a href="html-widgets.html#cb169-3"></a></span>
+<span id="cb169-4"><a href="html-widgets.html#cb169-4"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;play&#39;</span><span class="op">,</span></span>
+<span id="cb169-5"><a href="html-widgets.html#cb169-5"></a></span>
+<span id="cb169-6"><a href="html-widgets.html#cb169-6"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
+<span id="cb169-7"><a href="html-widgets.html#cb169-7"></a></span>
+<span id="cb169-8"><a href="html-widgets.html#cb169-8"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb169-9"><a href="html-widgets.html#cb169-9"></a></span>
+<span id="cb169-10"><a href="html-widgets.html#cb169-10"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
+<span id="cb169-11"><a href="html-widgets.html#cb169-11"></a></span>
+<span id="cb169-12"><a href="html-widgets.html#cb169-12"></a>    <span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb169-13"><a href="html-widgets.html#cb169-13"></a></span>
+<span id="cb169-14"><a href="html-widgets.html#cb169-14"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb169-15"><a href="html-widgets.html#cb169-15"></a></span>
+<span id="cb169-16"><a href="html-widgets.html#cb169-16"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to render the widget, e.g.</span></span>
+<span id="cb169-17"><a href="html-widgets.html#cb169-17"></a>        <span class="va">el</span>.<span class="at">innerText</span> <span class="op">=</span> <span class="va">x</span>.<span class="at">message</span><span class="op">;</span></span>
+<span id="cb169-18"><a href="html-widgets.html#cb169-18"></a></span>
+<span id="cb169-19"><a href="html-widgets.html#cb169-19"></a>      <span class="op">},</span></span>
+<span id="cb169-20"><a href="html-widgets.html#cb169-20"></a></span>
+<span id="cb169-21"><a href="html-widgets.html#cb169-21"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb169-22"><a href="html-widgets.html#cb169-22"></a></span>
+<span id="cb169-23"><a href="html-widgets.html#cb169-23"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to re-render the widget with a new size</span></span>
+<span id="cb169-24"><a href="html-widgets.html#cb169-24"></a></span>
+<span id="cb169-25"><a href="html-widgets.html#cb169-25"></a>      <span class="op">}</span></span>
+<span id="cb169-26"><a href="html-widgets.html#cb169-26"></a></span>
+<span id="cb169-27"><a href="html-widgets.html#cb169-27"></a>    <span class="op">};</span></span>
+<span id="cb169-28"><a href="html-widgets.html#cb169-28"></a>  <span class="op">}</span></span>
+<span id="cb169-29"><a href="html-widgets.html#cb169-29"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 <p>However convoluted this may appear at first do not let that intimate you. The <code>factory</code> function returns two functions, one of which, <code>resize</code>, is currently empty, let’s therefore look at the other first: <code>renderValue</code>. The function takes an object <code>x</code> from which is takes a message that it uses as text (<code>innerText</code>) for object <code>el</code>. The object <code>x</code> passed to this function is actually the list of the same name that was build in the R function <code>play</code>! While in R one would access the <code>message</code> in list <code>x</code> with <code>x$message</code> in JavaScript to access the <code>message</code> in the JSON <code>x</code> one writes <code>x.message</code>, only changing the dollar sign to a dot. Let’s show this perhaps more clearly by printing the content of <code>x</code>.</p>
-<div class="sourceCode" id="cb168"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb168-1"><a href="html-widgets.html#cb168-1"></a><span class="va">console</span>.<span class="at">log</span>(x)<span class="op">;</span></span>
-<span id="cb168-2"><a href="html-widgets.html#cb168-2"></a><span class="va">el</span>.<span class="at">innerText</span> <span class="op">=</span> <span class="va">x</span>.<span class="at">message</span><span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb170"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb170-1"><a href="html-widgets.html#cb170-1"></a><span class="va">console</span>.<span class="at">log</span>(x)<span class="op">;</span></span>
+<span id="cb170-2"><a href="html-widgets.html#cb170-2"></a><span class="va">el</span>.<span class="at">innerText</span> <span class="op">=</span> <span class="va">x</span>.<span class="at">message</span><span class="op">;</span></span></code></pre></div>
 <p>We place <code>console.log</code> to print the content of <code>x</code> in the console, reload the package functions with <code>devtools::load_all</code> and use the function <code>play</code> again then explore the console from the browser.</p>
 <div class="figure">
 <img src="images/playground-console-x.png" alt="" />
 <p class="caption">Console tab output</p>
 </div>
 <p>This displays the JSON object containing the message which eerily resembles the list created in R (<code>x = list(message = "This is a widget!")</code>). What one should take away from this is that data that needs to be communicated from R to the JavaScript function should be placed in the R list <code>x</code>.</p>
-<p>Before we move on to other things one should also grasp a better understanding of the <code>el</code> object. In the widget previously created</p>
-<div class="sourceCode" id="cb169"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb169-1"><a href="html-widgets.html#cb169-1"></a><span class="va">console</span>.<span class="at">log</span>(x)<span class="op">;</span></span>
-<span id="cb169-2"><a href="html-widgets.html#cb169-2"></a><span class="va">console</span>.<span class="at">log</span>(el)<span class="op">;</span></span>
-<span id="cb169-3"><a href="html-widgets.html#cb169-3"></a><span class="va">el</span>.<span class="at">innerText</span> <span class="op">=</span> <span class="va">x</span>.<span class="at">message</span><span class="op">;</span></span></code></pre></div>
-<p>To explore this further, and in a more interactive context re-run the code below to create a widget, open it in the browser (<img src="images/open-in-browser.png" />) right-click to select “Inspect.”</p>
+<p>Before we move on to other things one should also grasp a better understanding of the <code>el</code> object, which can also be logged.</p>
+<div class="sourceCode" id="cb171"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb171-1"><a href="html-widgets.html#cb171-1"></a><span class="va">console</span>.<span class="at">log</span>(x)<span class="op">;</span></span>
+<span id="cb171-2"><a href="html-widgets.html#cb171-2"></a><span class="va">console</span>.<span class="at">log</span>(el)<span class="op">;</span></span>
+<span id="cb171-3"><a href="html-widgets.html#cb171-3"></a><span class="va">el</span>.<span class="at">innerText</span> <span class="op">=</span> <span class="va">x</span>.<span class="at">message</span><span class="op">;</span></span></code></pre></div>
 <div class="figure">
 <img src="images/playground-console-el.png" alt="" />
 <p class="caption">Console tab output</p>
 </div>
-<p>This displays the HTML element created by htmlwidgets and meant to hold the visualisation, or in this case, the message. If you are familiar with JavaScript, this is the element that would be returned by <code>document.getElementById</code>. In attempt to become more at ease with this setup let us change something at have play with the widget.</p>
-<p>Out-of-the-box htmlwidgets uses <code>innerText</code>, which does very much what it says on the tin, it places takes inside an element. JavaScript comes with another function akin to <code>innerText</code>, <code>innerHTML</code>, while the former only allows inserting text the former lets one insert any HTML.</p>
-<div class="sourceCode" id="cb170"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb170-1"><a href="html-widgets.html#cb170-1"></a><span class="va">el</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="va">x</span>.<span class="at">message</span><span class="op">;</span></span></code></pre></div>
+<p>This displays the HTML element created by htmlwidgets and meant to hold the visualisation, or in this case, the message. If you are familiar with JavaScript, this is the element that would be returned by <code>document.getElementById</code>. This object allows manipulating the element in pretty much any way imaginable, change its position, its colour, its size, or, in this case, used to insert some text in it. What’s more one can access attributes of the object just like a JSON array. Therefore one can log the <code>id</code> of the element.</p>
+<div class="sourceCode" id="cb172"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb172-1"><a href="html-widgets.html#cb172-1"></a><span class="co">// print the id of the element</span></span>
+<span id="cb172-2"><a href="html-widgets.html#cb172-2"></a><span class="va">console</span>.<span class="at">log</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
+<span id="cb172-3"><a href="html-widgets.html#cb172-3"></a><span class="va">el</span>.<span class="at">innerText</span> <span class="op">=</span> <span class="va">x</span>.<span class="at">message</span><span class="op">;</span></span></code></pre></div>
+<p>Making the modifications above and reloading the package, one can create a widget given a specific id and see it displayed in the console, e.g.: <code>play("hello", elementId = "see-you-in-the-console")</code>.</p>
+<p>In attempt to become more at ease with this setup let us change something and play with the widget. Out-of-the-box htmlwidgets uses <code>innerText</code>, which does very much what it says on the tin, it places takes inside an element. JavaScript comes with another function akin to <code>innerText</code>, <code>innerHTML</code>, while the former only allows inserting text the former lets one insert any HTML.</p>
+<div class="sourceCode" id="cb173"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb173-1"><a href="html-widgets.html#cb173-1"></a><span class="va">el</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="va">x</span>.<span class="at">message</span><span class="op">;</span></span></code></pre></div>
 <p>After changing the <code>play.js</code> file as above, and re-loading the package, one can use arbitrary HTML as messages.</p>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="html-widgets.html#cb171-1"></a><span class="kw">play</span>(<span class="st">&quot;&lt;h1&gt;Using HTML!&lt;/h1&gt;&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="html-widgets.html#cb174-1"></a><span class="kw">play</span>(<span class="st">&quot;&lt;h1&gt;Using HTML!&lt;/h1&gt;&quot;</span>)</span></code></pre></div>
 <div class="figure">
 <img src="images/playground-h1.png" alt="" />
 <p class="caption">Widget output</p>
 </div>
 <p>That makes for a great improvement which opens the door to many possibilities. However, the interface this provides is unintuitive. Albeit similar, R users are more familiar with shiny and htmltools <span class="citation">(RStudio and Inc. <a href="#ref-R-htmltools" role="doc-biblioref">2019</a>)</span> tags than HTML tags, e.g.: <code>&lt;h1&gt;&lt;/h1&gt;</code> translates to <code>h1()</code> in R. The package should allow users to use those instead of forcing them to collapse HTML content in a string. Fortunately, there is a very easy way to obtain the HTML from those functions: convert it to a character string.</p>
-<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="html-widgets.html#cb172-1"></a>html &lt;-<span class="st"> </span>shiny<span class="op">::</span><span class="kw">h1</span>(<span class="st">&quot;HTML tag&quot;</span>)</span>
-<span id="cb172-2"><a href="html-widgets.html#cb172-2"></a></span>
-<span id="cb172-3"><a href="html-widgets.html#cb172-3"></a><span class="kw">class</span>(html)</span></code></pre></div>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="html-widgets.html#cb175-1"></a>html &lt;-<span class="st"> </span>shiny<span class="op">::</span><span class="kw">h1</span>(<span class="st">&quot;HTML tag&quot;</span>)</span>
+<span id="cb175-2"><a href="html-widgets.html#cb175-2"></a></span>
+<span id="cb175-3"><a href="html-widgets.html#cb175-3"></a><span class="kw">class</span>(html)</span></code></pre></div>
 <pre><code>## [1] &quot;shiny.tag&quot;</code></pre>
-<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="html-widgets.html#cb174-1"></a><span class="co"># returns string</span></span>
-<span id="cb174-2"><a href="html-widgets.html#cb174-2"></a><span class="kw">as.character</span>(shiny<span class="op">::</span><span class="kw">h1</span>(<span class="st">&quot;HTML tag&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="html-widgets.html#cb177-1"></a><span class="co"># returns string</span></span>
+<span id="cb177-2"><a href="html-widgets.html#cb177-2"></a><span class="kw">as.character</span>(shiny<span class="op">::</span><span class="kw">h1</span>(<span class="st">&quot;HTML tag&quot;</span>))</span></code></pre></div>
 <pre><code>## [1] &quot;&lt;h1&gt;HTML tag&lt;/h1&gt;&quot;</code></pre>
 <p>Implementing this in the <code>play</code> function will look like this.</p>
-<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="html-widgets.html#cb176-1"></a><span class="co"># forward options using x</span></span>
-<span id="cb176-2"><a href="html-widgets.html#cb176-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb176-3"><a href="html-widgets.html#cb176-3"></a>  <span class="dt">message =</span> <span class="kw">as.character</span>(message)</span>
-<span id="cb176-4"><a href="html-widgets.html#cb176-4"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="html-widgets.html#cb179-1"></a><span class="co"># forward options using x</span></span>
+<span id="cb179-2"><a href="html-widgets.html#cb179-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb179-3"><a href="html-widgets.html#cb179-3"></a>  <span class="dt">message =</span> <span class="kw">as.character</span>(message)</span>
+<span id="cb179-4"><a href="html-widgets.html#cb179-4"></a>)</span></code></pre></div>
 <p>Reloading the package with <code>devtools::load_all</code> lets one use shiny tags as the message.</p>
-<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="html-widgets.html#cb177-1"></a><span class="kw">play</span>(shiny<span class="op">::</span><span class="kw">h2</span>(<span class="st">&quot;Chocolate is a colour&quot;</span>, <span class="dt">style =</span> <span class="st">&quot;color:chocolate;&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="html-widgets.html#cb180-1"></a><span class="kw">play</span>(shiny<span class="op">::</span><span class="kw">h2</span>(<span class="st">&quot;Chocolate is a colour&quot;</span>, <span class="dt">style =</span> <span class="st">&quot;color:chocolate;&quot;</span>))</span></code></pre></div>
 <div class="figure">
 <img src="images/playground-color.png" alt="" />
 <p class="caption">Using shiny tags</p>
 </div>
-<p>This hopefully provides some understanding of how htmlwidgets work internally and thereby helps building such packages. This section covered much of what happens under the hood, at the exception of the use of JavaScript dependencies, this will be tackled in the following section.</p>
+<p>This hopefully provides some understanding of how htmlwidgets work internally and thereby helps building such packages. This section covered much of what happens under the hood, at the exception of the use of JavaScript dependencies, this will be tackled in the following section where we build another, more interesting widget, which uses an external dependency.</p>
+</div>
+<div id="typed" class="section level2 unnumbered" number="">
+<h2>Typed</h2>
+<p>In this section we build a package called <code>typed</code>, which wraps the JavaScript library of the same name, <a href="https://github.com/mattboldt/typed.js/">typed.js</a> that mimics text being typed. This builds upon many things we explored in the playground package.</p>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="html-widgets.html#cb181-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;typed&quot;</span>)</span>
+<span id="cb181-2"><a href="html-widgets.html#cb181-2"></a>htmlwidgets<span class="op">::</span><span class="kw">scaffoldWidget</span>(<span class="st">&quot;typed&quot;</span>)</span></code></pre></div>
+<div id="dependency" class="section level3 unnumbered" number="">
+<h3>Dependency</h3>
+<p>Once the package created and the widget scaffold laid down we need to add the JavaScript dependency, without which nothing can move forward. The documentation in the README of typed.js states that it can be imported like so.</p>
+<div class="sourceCode" id="cb182"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb182-1"><a href="html-widgets.html#cb182-1"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;https://cdn.jsdelivr.net/npm/typed.js@2.0.11&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span></code></pre></div>
+<p>First, we will download the dependency, which consists of a single JavaScript file, instead of using the CDN as this ultimately makes the package more robust. Below we place the dependency in a “typed” directory within the “htmlwidgets” folder.</p>
+<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="html-widgets.html#cb183-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;./inst/htmlwidgets/typed&quot;</span>)</span>
+<span id="cb183-2"><a href="html-widgets.html#cb183-2"></a>cdn &lt;-<span class="st"> &quot;https://cdn.jsdelivr.net/npm/typed.js@2.0.11&quot;</span></span>
+<span id="cb183-3"><a href="html-widgets.html#cb183-3"></a><span class="kw">download.file</span>(cdn, <span class="st">&quot;./inst/htmlwidgets/typed/typed.min.js&quot;</span>)</span></code></pre></div>
+<p>This produces a directory that looks like this:</p>
+<pre><code>.
+├── DESCRIPTION
+├── NAMESPACE
+├── R
+│   └── typed.R
+└── inst
+    └── htmlwidgets
+        ├── typed
+        │   └── typed.min.js
+        ├── typed.js
+        └── typed.yaml</code></pre>
+<p>in htmlwidgets dependencies are specified in the <code>.yml</code> file located at <code>inst/htmlwidgets</code> which at first contains a commented template.</p>
+<div class="sourceCode" id="cb185"><pre class="sourceCode yml"><code class="sourceCode yaml"><span id="cb185-1"><a href="html-widgets.html#cb185-1"></a><span class="co"># (uncomment to add a dependency)</span></span>
+<span id="cb185-2"><a href="html-widgets.html#cb185-2"></a><span class="co"># dependencies:</span></span>
+<span id="cb185-3"><a href="html-widgets.html#cb185-3"></a><span class="co">#  - name:</span></span>
+<span id="cb185-4"><a href="html-widgets.html#cb185-4"></a><span class="co">#    version:</span></span>
+<span id="cb185-5"><a href="html-widgets.html#cb185-5"></a><span class="co">#    src:</span></span>
+<span id="cb185-6"><a href="html-widgets.html#cb185-6"></a><span class="co">#    script:</span></span>
+<span id="cb185-7"><a href="html-widgets.html#cb185-7"></a><span class="co">#    stylesheet:</span></span></code></pre></div>
+<p>Let’s first uncomment those lines as instructed at the top of the file and fill it in.</p>
+<div class="sourceCode" id="cb186"><pre class="sourceCode yml"><code class="sourceCode yaml"><span id="cb186-1"><a href="html-widgets.html#cb186-1"></a><span class="fu">dependencies</span><span class="kw">:</span></span>
+<span id="cb186-2"><a href="html-widgets.html#cb186-2"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> typed.js</span></span>
+<span id="cb186-3"><a href="html-widgets.html#cb186-3"></a><span class="at">    </span><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="fl">2.0.11</span></span>
+<span id="cb186-4"><a href="html-widgets.html#cb186-4"></a><span class="at">    </span><span class="fu">src</span><span class="kw">:</span><span class="at"> htmlwidgets/typed</span></span>
+<span id="cb186-5"><a href="html-widgets.html#cb186-5"></a><span class="at">    </span><span class="fu">script</span><span class="kw">:</span><span class="at"> typed.min.js</span></span></code></pre></div>
+<p>We remove the <code>stylesheet</code> entry as this package does not require any CSS files. The <code>src</code> specifies the path to the directory containing the scripts and stylesheets. This is akin to using the <code>system.file</code> function to return the full path to a file or directory within the package.</p>
+<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="html-widgets.html#cb187-1"></a>devtools<span class="op">::</span><span class="kw">load_all</span>()</span>
+<span id="cb187-2"><a href="html-widgets.html#cb187-2"></a><span class="kw">system.file</span>(<span class="st">&quot;htmlwidgets/typed&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;typed&quot;</span>)                                         </span>
+<span id="cb187-3"><a href="html-widgets.html#cb187-3"></a><span class="co">#&gt; &quot;/home/me/packages/typed/inst/htmlwidgets/typed&quot;</span></span></code></pre></div>
+<p>We should verify that this is correct by using the one R function the package features and check the source code of the output to verify that the typed.js is indeed imported. We thus run <code>typed("test")</code>, open the output in the browser (<img src="images/open-in-browser.png" />) and look at the source code of the page (right click and select “View page source”). At the top of the page one should see <code>typed.min.js</code> imported, click the link to ensure it correctly points to the dependency.</p>
+<div class="sourceCode" id="cb188"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb188-1"><a href="html-widgets.html#cb188-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
+<span id="cb188-2"><a href="html-widgets.html#cb188-2"></a><span class="kw">&lt;html&gt;</span></span>
+<span id="cb188-3"><a href="html-widgets.html#cb188-3"></a><span class="kw">&lt;head&gt;</span></span>
+<span id="cb188-4"><a href="html-widgets.html#cb188-4"></a><span class="kw">&lt;meta</span><span class="ot"> charset=</span><span class="st">&quot;utf-8&quot;</span><span class="kw">/&gt;</span></span>
+<span id="cb188-5"><a href="html-widgets.html#cb188-5"></a><span class="kw">&lt;style&gt;</span>body{<span class="kw">background-color</span>:<span class="cn">white</span><span class="op">;</span>}<span class="kw">&lt;/style&gt;</span></span>
+<span id="cb188-6"><a href="html-widgets.html#cb188-6"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;lib/htmlwidgets-1.5.1/htmlwidgets.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb188-7"><a href="html-widgets.html#cb188-7"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;lib/typed.js-2.0.11/typed.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb188-8"><a href="html-widgets.html#cb188-8"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;lib/typed-binding-0.0.0.9000/typed.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb188-9"><a href="html-widgets.html#cb188-9"></a>...</span></code></pre></div>
+</div>
+<div id="javascript-1" class="section level3 unnumbered" number="">
+<h3>JavaScript</h3>
+<p>On its <a href="https://mattboldt.com/demos/typed-js/">official website</a>, typed.js gives the following example. The JavaScript function <code>Typed</code> takes two arguments, first the selector, the element to hold the output, second a JSON of options to specify what is being typed and a myriad of other things.</p>
+<div class="sourceCode" id="cb189"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb189-1"><a href="html-widgets.html#cb189-1"></a><span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;.element&#39;</span><span class="op">,</span> <span class="op">{</span></span>
+<span id="cb189-2"><a href="html-widgets.html#cb189-2"></a>  <span class="dt">strings</span><span class="op">:</span> [<span class="st">&quot;First sentence.&quot;</span><span class="op">,</span> <span class="st">&quot;Second sentence.&quot;</span>]<span class="op">,</span></span>
+<span id="cb189-3"><a href="html-widgets.html#cb189-3"></a>  <span class="dt">typeSpeed</span><span class="op">:</span> <span class="dv">30</span></span>
+<span id="cb189-4"><a href="html-widgets.html#cb189-4"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<p>Let’s incorporate it in our package by replacing the content of the <code>renderValue</code> in <code>typed.js</code> with the above.</p>
+<div class="sourceCode" id="cb190"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb190-1"><a href="html-widgets.html#cb190-1"></a>...</span>
+<span id="cb190-2"><a href="html-widgets.html#cb190-2"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb190-3"><a href="html-widgets.html#cb190-3"></a></span>
+<span id="cb190-4"><a href="html-widgets.html#cb190-4"></a>  <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;.element&#39;</span><span class="op">,</span> <span class="op">{</span></span>
+<span id="cb190-5"><a href="html-widgets.html#cb190-5"></a>    <span class="dt">strings</span><span class="op">:</span> [<span class="st">&quot;First sentence.&quot;</span><span class="op">,</span> <span class="st">&quot;Second sentence.&quot;</span>]<span class="op">,</span></span>
+<span id="cb190-6"><a href="html-widgets.html#cb190-6"></a>    <span class="dt">typeSpeed</span><span class="op">:</span> <span class="dv">30</span></span>
+<span id="cb190-7"><a href="html-widgets.html#cb190-7"></a>  <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb190-8"><a href="html-widgets.html#cb190-8"></a></span>
+<span id="cb190-9"><a href="html-widgets.html#cb190-9"></a><span class="op">}</span></span>
+<span id="cb190-10"><a href="html-widgets.html#cb190-10"></a>...</span></code></pre></div>
+<p>One could be tempted to run <code>devtools::load_all</code> but this will not work, namely because the function uses a selector that is will not return any object; it needs to be applied to the div created by the widget. As hinted at in the playground, the selector of the element created is accessible from the <code>el</code> object. As a matter of fact, we did log in the browser console the id of the created div taken from <code>el.id</code>. Therefore concatenating the pound sign and the element id produces the select to said element. (<code>.class</code>, <code>#id</code>)</p>
+<div class="sourceCode" id="cb191"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb191-1"><a href="html-widgets.html#cb191-1"></a><span class="co">// typed.js</span></span>
+<span id="cb191-2"><a href="html-widgets.html#cb191-2"></a>...</span>
+<span id="cb191-3"><a href="html-widgets.html#cb191-3"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb191-4"><a href="html-widgets.html#cb191-4"></a></span>
+<span id="cb191-5"><a href="html-widgets.html#cb191-5"></a>  <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;#&#39;</span> <span class="op">+</span> <span class="va">el</span>.<span class="at">id</span><span class="op">,</span> <span class="op">{</span></span>
+<span id="cb191-6"><a href="html-widgets.html#cb191-6"></a>    <span class="dt">strings</span><span class="op">:</span> [<span class="st">&quot;First sentence.&quot;</span><span class="op">,</span> <span class="st">&quot;Second sentence.&quot;</span>]<span class="op">,</span></span>
+<span id="cb191-7"><a href="html-widgets.html#cb191-7"></a>    <span class="dt">typeSpeed</span><span class="op">:</span> <span class="dv">30</span></span>
+<span id="cb191-8"><a href="html-widgets.html#cb191-8"></a>  <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb191-9"><a href="html-widgets.html#cb191-9"></a></span>
+<span id="cb191-10"><a href="html-widgets.html#cb191-10"></a><span class="op">}</span></span>
+<span id="cb191-11"><a href="html-widgets.html#cb191-11"></a>...</span></code></pre></div>
+<p>This should therefore work, run <code>devtools::load_all</code> followed by <code>typed("whatever")</code> and the JavaScript animated text will appear! It’s not of any use just yet as the options, included the text being typed is predefined: the package is currently not making any use the of the inputs passed from R. Below change the default strings to <code>x.message</code>.</p>
+<div class="sourceCode" id="cb192"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb192-1"><a href="html-widgets.html#cb192-1"></a><span class="co">// typed.js</span></span>
+<span id="cb192-2"><a href="html-widgets.html#cb192-2"></a>...</span>
+<span id="cb192-3"><a href="html-widgets.html#cb192-3"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb192-4"><a href="html-widgets.html#cb192-4"></a></span>
+<span id="cb192-5"><a href="html-widgets.html#cb192-5"></a>  <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;#&#39;</span> <span class="op">+</span> <span class="va">el</span>.<span class="at">id</span><span class="op">,</span> <span class="op">{</span></span>
+<span id="cb192-6"><a href="html-widgets.html#cb192-6"></a>    <span class="dt">strings</span><span class="op">:</span> <span class="va">x</span>.<span class="at">message</span><span class="op">,</span></span>
+<span id="cb192-7"><a href="html-widgets.html#cb192-7"></a>    <span class="dt">typeSpeed</span><span class="op">:</span> <span class="dv">30</span></span>
+<span id="cb192-8"><a href="html-widgets.html#cb192-8"></a>  <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb192-9"><a href="html-widgets.html#cb192-9"></a></span>
+<span id="cb192-10"><a href="html-widgets.html#cb192-10"></a><span class="op">}</span></span>
+<span id="cb192-11"><a href="html-widgets.html#cb192-11"></a>...</span></code></pre></div>
+<p>This, however, will cause issues as the <code>strings</code> options expects and array (a vector) and not a single string.</p>
+<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="html-widgets.html#cb193-1"></a><span class="kw">typed</span>(<span class="st">&quot;does not work&quot;</span>) <span class="co"># length =  1</span></span>
+<span id="cb193-2"><a href="html-widgets.html#cb193-2"></a><span class="kw">typed</span>(<span class="kw">c</span>(<span class="st">&quot;This&quot;</span>, <span class="st">&quot;will&quot;</span>, <span class="st">&quot;work&quot;</span>)) <span class="co"># length &gt; 1</span></span></code></pre></div>
+<p>One solution is to force the input into a list.</p>
+<div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb194-1"><a href="html-widgets.html#cb194-1"></a><span class="co"># typed.R</span></span>
+<span id="cb194-2"><a href="html-widgets.html#cb194-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb194-3"><a href="html-widgets.html#cb194-3"></a>  <span class="dt">message =</span> <span class="kw">as.list</span>(message)</span>
+<span id="cb194-4"><a href="html-widgets.html#cb194-4"></a>)</span></code></pre></div>
+<p>At this juncture the package works but there is a salient issue with the way we are handling options. Why build a list in R to reconstruct it in JavaScript manually? Since the data is serialised to JSON and that typed.js expects a JSON of options it is actually much cleaner to construct an R list that mirrors the JSON array and then use this in JavaScript.</p>
+<p>For instance, renaming the <code>message</code> to <code>strings</code> effectively does this.</p>
+<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="html-widgets.html#cb195-1"></a><span class="co"># typed.R</span></span>
+<span id="cb195-2"><a href="html-widgets.html#cb195-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb195-3"><a href="html-widgets.html#cb195-3"></a>  <span class="dt">strings =</span> <span class="kw">as.list</span>(message)</span>
+<span id="cb195-4"><a href="html-widgets.html#cb195-4"></a>)</span></code></pre></div>
+<p>This allows greatly simplifying the code JavaScript side, makes it much easier to add other options down the line, and will be much easier to maintain, debug, and understand.</p>
+<div class="sourceCode" id="cb196"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb196-1"><a href="html-widgets.html#cb196-1"></a><span class="co">// typed.js</span></span>
+<span id="cb196-2"><a href="html-widgets.html#cb196-2"></a>...</span>
+<span id="cb196-3"><a href="html-widgets.html#cb196-3"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb196-4"><a href="html-widgets.html#cb196-4"></a></span>
+<span id="cb196-5"><a href="html-widgets.html#cb196-5"></a>  <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;#&#39;</span> <span class="op">+</span> <span class="va">el</span>.<span class="at">id</span><span class="op">,</span> x)<span class="op">;</span></span>
+<span id="cb196-6"><a href="html-widgets.html#cb196-6"></a></span>
+<span id="cb196-7"><a href="html-widgets.html#cb196-7"></a><span class="op">}</span></span>
+<span id="cb196-8"><a href="html-widgets.html#cb196-8"></a>...</span></code></pre></div>
+<p>One can now add more options from the R code without having to alter any of the JavaScript. Let us demonstrate with the <code>loop</code> option.</p>
+<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="html-widgets.html#cb197-1"></a>typed &lt;-<span class="st"> </span><span class="cf">function</span>(message, <span class="dt">loop =</span> <span class="ot">FALSE</span>, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
+<span id="cb197-2"><a href="html-widgets.html#cb197-2"></a></span>
+<span id="cb197-3"><a href="html-widgets.html#cb197-3"></a>  <span class="co"># forward options using x</span></span>
+<span id="cb197-4"><a href="html-widgets.html#cb197-4"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb197-5"><a href="html-widgets.html#cb197-5"></a>    <span class="dt">loop =</span> loop,</span>
+<span id="cb197-6"><a href="html-widgets.html#cb197-6"></a>    <span class="dt">message =</span> message</span>
+<span id="cb197-7"><a href="html-widgets.html#cb197-7"></a>  )</span>
+<span id="cb197-8"><a href="html-widgets.html#cb197-8"></a></span>
+<span id="cb197-9"><a href="html-widgets.html#cb197-9"></a>  <span class="co"># create widget</span></span>
+<span id="cb197-10"><a href="html-widgets.html#cb197-10"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
+<span id="cb197-11"><a href="html-widgets.html#cb197-11"></a>    <span class="dt">name =</span> <span class="st">&#39;typed&#39;</span>,</span>
+<span id="cb197-12"><a href="html-widgets.html#cb197-12"></a>    x,</span>
+<span id="cb197-13"><a href="html-widgets.html#cb197-13"></a>    <span class="dt">width =</span> width,</span>
+<span id="cb197-14"><a href="html-widgets.html#cb197-14"></a>    <span class="dt">height =</span> height,</span>
+<span id="cb197-15"><a href="html-widgets.html#cb197-15"></a>    <span class="dt">package =</span> <span class="st">&#39;typed&#39;</span>,</span>
+<span id="cb197-16"><a href="html-widgets.html#cb197-16"></a>    <span class="dt">elementId =</span> elementId</span>
+<span id="cb197-17"><a href="html-widgets.html#cb197-17"></a>  )</span>
+<span id="cb197-18"><a href="html-widgets.html#cb197-18"></a>}</span></code></pre></div>
+<p>The full list of which is available in the <a href="https://github.com/mattboldt/typed.js/#customization">documentation of typed.js</a>.</p>
 
+</div>
 </div>
 </div>
 <h3>References</h3>

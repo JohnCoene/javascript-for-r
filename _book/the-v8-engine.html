@@ -216,6 +216,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="html-widgets.html"><a href="html-widgets.html#how-it-worksish"><i class="fa fa-check"></i>How it works~ish</a></li>
 <li class="chapter" data-level="" data-path="html-widgets.html"><a href="html-widgets.html#scaffold"><i class="fa fa-check"></i>Scaffold</a></li>
 <li class="chapter" data-level="" data-path="html-widgets.html"><a href="html-widgets.html#deconstruct-retrace"><i class="fa fa-check"></i>Deconstruct &amp; Retrace</a></li>
+<li class="chapter" data-level="" data-path="html-widgets.html"><a href="html-widgets.html#typed"><i class="fa fa-check"></i>Typed</a>
+<ul>
+<li class="chapter" data-level="" data-path="html-widgets.html"><a href="html-widgets.html#dependency"><i class="fa fa-check"></i>Dependency</a></li>
+<li class="chapter" data-level="" data-path="html-widgets.html"><a href="html-widgets.html#javascript-1"><i class="fa fa-check"></i>JavaScript</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 </ul>
@@ -294,9 +299,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## ]</code></pre>
 <p>However the cyclical loop of 1) creating a variable in JavaScript to 2) run a function on the aforementioned object 3) get the results back in R, can be tedious. So V8 also allows calling JavaScript functions on R objects directly with the <code>call</code> method and obtain the results back in R.</p>
 <div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="the-v8-engine.html#cb67-1"></a>engine<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;new Date();&quot;</span>) <span class="co"># using eval</span></span></code></pre></div>
-<pre><code>## [1] &quot;Mon Jun 01 2020 13:58:00 GMT+0200 (CEST)&quot;</code></pre>
+<pre><code>## [1] &quot;Mon Jun 01 2020 22:23:56 GMT+0200 (CEST)&quot;</code></pre>
 <div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="the-v8-engine.html#cb69-1"></a>engine<span class="op">$</span><span class="kw">call</span>(<span class="st">&quot;Date&quot;</span>, <span class="kw">Sys.Date</span>()) <span class="co"># using call</span></span></code></pre></div>
-<pre><code>## [1] &quot;Mon Jun 01 2020 13:58:00 GMT+0200 (CEST)&quot;</code></pre>
+<pre><code>## [1] &quot;Mon Jun 01 2020 22:23:56 GMT+0200 (CEST)&quot;</code></pre>
 <p>Finally, one can run code interactively rather than as strings by calling the console from the engine with <code>engine$console()</code> you can then exit the console by typing <code>exit</code> or hitting the <kbd>ESC</kbd> key.</p>
 </div>
 <div id="external-libraries" class="section level2 unnumbered" number="">
@@ -420,12 +425,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb95-2"><a href="the-v8-engine.html#cb95-2"></a><span class="kw">|</span> <span class="ex">zzz.R</span></span>
 <span id="cb95-3"><a href="the-v8-engine.html#cb95-3"></a><span class="ex">inst/</span></span>
 <span id="cb95-4"><a href="the-v8-engine.html#cb95-4"></a><span class="kw">|</span> <span class="ex">--</span> ms.js</span></code></pre></div>
-<p>Now the dependency can be sourced in the <code>.onLoad</code> function. We can access the files in the <code>inst</code> directory with the <code>system.file</code> function. When using the <code>.onLoad</code> function it is goo practice to clean up with <code>.onUnload</code>.</p>
+<p>Now the dependency can be sourced in the <code>.onLoad</code> function. We can access the files in the <code>inst</code> directory with the <code>system.file</code> function. When using the <code>.onLoad</code> function it is good practice to clean up with <code>.onUnload</code>.</p>
 <div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="the-v8-engine.html#cb96-1"></a><span class="co"># zzz.R</span></span>
 <span id="cb96-2"><a href="the-v8-engine.html#cb96-2"></a>ms &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
 <span id="cb96-3"><a href="the-v8-engine.html#cb96-3"></a></span>
 <span id="cb96-4"><a href="the-v8-engine.html#cb96-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
-<span id="cb96-5"><a href="the-v8-engine.html#cb96-5"></a>  ms &lt;&lt;-<span class="st"> </span><span class="kw">v8</span>()</span>
+<span id="cb96-5"><a href="the-v8-engine.html#cb96-5"></a>  ms &lt;&lt;-<span class="st"> </span>V8<span class="op">::</span><span class="kw">v8</span>()</span>
 <span id="cb96-6"><a href="the-v8-engine.html#cb96-6"></a></span>
 <span id="cb96-7"><a href="the-v8-engine.html#cb96-7"></a>  dep &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ms.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;ms&quot;</span>)</span>
 <span id="cb96-8"><a href="the-v8-engine.html#cb96-8"></a>  ms<span class="op">$</span><span class="kw">source</span>(dep)</span>
@@ -445,7 +450,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb97-8"><a href="the-v8-engine.html#cb97-8"></a>to_ms &lt;-<span class="st"> </span><span class="cf">function</span>(string){</span>
 <span id="cb97-9"><a href="the-v8-engine.html#cb97-9"></a>  ms<span class="op">$</span><span class="kw">call</span>(<span class="st">&quot;ms&quot;</span>, string)</span>
 <span id="cb97-10"><a href="the-v8-engine.html#cb97-10"></a>}</span></code></pre></div>
-<p>After running <code>devtools::document()</code> and <code>devtools::load_all()</code> the call <code>to_ms("2 days")</code> will return <code>172800000</code>.</p>
+<p>After running <code>devtools::document()</code> and <code>devtools::load_all()</code> the call <code>to_ms("2 days")</code> will return <code>172800000</code>. Finally,, remember to add V8 as dependency.</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="the-v8-engine.html#cb98-1"></a>usethis<span class="op">::</span><span class="kw">use_package</span>(<span class="st">&quot;V8&quot;</span>)</span></code></pre></div>
 
 </div>
 </div>
