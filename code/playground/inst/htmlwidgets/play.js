@@ -13,7 +13,9 @@ HTMLWidgets.widget({
       renderValue: function(x) {
 
         // TODO: code to render the widget, e.g.
-        el.innerText = x.message;
+        console.log(x);
+        console.log(el.id);
+        el.innerHTML = x.message;
 
       },
 

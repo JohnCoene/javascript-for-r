@@ -9,7 +9,7 @@ play <- function(message, width = NULL, height = NULL, elementId = NULL) {
 
   # forward options using x
   x = list(
-    message = message
+    message = as.character(message)
   )
 
   # create widget

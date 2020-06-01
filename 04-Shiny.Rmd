@@ -512,7 +512,7 @@ Let's start by creating an R package, here we name it "jbox," after the JavaScri
 usethis::create_package("jbox")
 ```
 
-### Dependencies
+### Dependencies {-}
 
 _If confused by any of the following please visit the [static files section](#static-files) of this chapter._
 
@@ -587,7 +587,7 @@ usejBox <- function(){
 
 Users of the package can place the function defined above in the UI of their application to import the dependencies.
 
-### R Code
+### R Code {-}
 
 Not much changes from what was written before, however, it poses interesting questions with regard to the interface we want to provide users. From the user's perspective the core of the package is the function that actually sends an alert to the clients, here created in `R/core.R`.
 
@@ -619,7 +619,7 @@ send_alert <- function(content = "alert", color = "blue", session = shiny::getDe
 
 This covers most of the R code that needs to be written, though we will come back to it shortly on as we uncover an interesting caveat.
 
-### JavaScript Code
+### JavaScript Code {-}
 
 Onto the JavaScript code, the `custom.js` to host said code is already created but remains empty. Simply using the code that was written previously will do the job for now.
 
@@ -633,7 +633,7 @@ Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
 });
 ```
 
-### Shortcoming
+### Shortcoming {-}
 
 At this stage one has a fully functional package: document, load the functions, and it can be used.
 
@@ -661,7 +661,7 @@ shinyApp(ui, server)
 
 However, while the above will work for a single alert it will run into issues when creating more than one alert as multiple alerts will set a value for a single input (`input$alert_close`). This is can be remedied to.
 
-### Input
+### Input {-}
 
 The package needs to provide the user a way to distinguish between alerts in order to be able to observe the correct inputs server-side. 
 A simple solution consists in asking the user to provide an identifier (`id`). This identifier must be passed to the JavaScript client so the function can dynamically set the input value for that identifier, therefore it is included in the `message`, below we do so in such a way that the original JSON of options remains unchanged.
@@ -694,7 +694,7 @@ Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
 });
 ```
 
-### Wrapping up
+### Wrapping up {-}
 
 Building and installing the package will now provide the user an interface demonstrated below.
 
@@ -720,7 +720,7 @@ shinyApp(ui, server)
 
 It must be noted that though the package will be fully functional it will not pass any checks as documentation is poor and the DESCRIPTION incomplete. The API provided to the user is probably subpar in places, namely with the use of the id, which, unless the user needs to observe the respective input, is not necessary: forcing the user to provide it is not great design, consider making this optional.
 
-## Exercises
+## Exercises {-}
 
 If one wants to create such packages or make extensive use of such integrations with Shiny, it is greatly encouraged to explore it further, namely by improving the API constructed and extending the functionalities (jBox comes with much more than just alerts), even integrate a JavaScript of your choice. At the time of writing this there is not package providing integration with jBox, if that is not of interest to the reader below are some other great libraries that are yet to be packaged in R and would greatly benefit the R community:
 
