@@ -1,0 +1,1 @@
+global.ms = require('ms');
