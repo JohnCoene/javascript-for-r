@@ -222,6 +222,77 @@ This book is currently a work in progress.
 
 In this chapter, after briefly going through prerequisites, we provide a rationale for integrating JavaScript with R which we support with examples, namely packages already available on CRAN. Then, we list the various ways in which one might go about making both languages work together. Finally, we end with a review of concepts fundamental to fully understand the more advanced topics residing in the forthcoming chapters.
 
+\hypertarget{rationale}{%
+\section*{Rationale}\label{rationale}}
+
+
+Why merge JavaScript and R? They are two fundamentally different languages that each have their strengths and weaknesses, combining the two allows making the most of their consolidated advantages and circumvent their respective limitations to produce software altogether better for it.
+
+A fair reason to use JavaScript might simply be that the thing one wants to achieve in R has already been realised in JavaScript. Why reinvent the wheel when the solution already exists and that it can be made accessible from R? The R package \href{https://github.com/ropensci/lawn}{lawn} \citep{R-lawn} by Ropensci integrates \href{http://turfjs.org/}{turf.js}, a brilliant library for geo-spatial analysis. JavaScript is not required to make those computations, it could be rewritten solely in R but that would be vastly more laborious than wrapping the JavaScript API in R.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(lawn)}
+
+\KeywordTok{lawn\_count}\NormalTok{(lawn\_data}\OperatorTok{$}\NormalTok{polygons\_count, lawn\_data}\OperatorTok{$}\NormalTok{points\_count, }\StringTok{"population"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## <FeatureCollection>
+##   Bounding box: -112.1 46.6 -112.0 46.6
+##   No. features: 2
+##   No. points: 20
+##   Properties: 
+##     values count
+## 1 200, 600     2
+## 2              0
+\end{verbatim}
+
+Another great reason is that JavaScript can do things that R cannot, e.g.: run in the browser. Therefore one cannot natively create interactive visualisations with R. \href{https://plotly-r.com/}{Plotly} \citep{R-plotly} by Carson Sievert packages the \href{https://plot.ly/}{plotly JavaScript library} to let one create interactive visualisations solely from R code.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(plotly)}
+
+\KeywordTok{plot\_ly}\NormalTok{(diamonds, }\DataTypeTok{x =} \OperatorTok{\textasciitilde{}}\NormalTok{cut, }\DataTypeTok{color =} \OperatorTok{\textasciitilde{}}\NormalTok{clarity)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-2-1.png}
+
+Finally, JavaScript can work together with R to improve how we communicate insights. One of the many ways in which Shiny stands out is that it lets one create web applications solely from R code with no knowledge of HTML, CSS, or JavaScript but that does not mean they can't extend Shiny, quite the contrary. The \href{http://waiter.john-coene.com/}{waiter package} \citep{R-waiter} integrates a variety of JavaScript libraries to display loading screens in Shiny applications.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(shiny)}
+\KeywordTok{library}\NormalTok{(waiter)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+  \KeywordTok{use\_waiter}\NormalTok{(), }\CommentTok{\# include dependencies}
+  \KeywordTok{actionButton}\NormalTok{(}\StringTok{"show"}\NormalTok{, }\StringTok{"Show loading for 3 seconds"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output, session)\{}
+  \CommentTok{\# create a waiter}
+\NormalTok{  w <{-}}\StringTok{ }\NormalTok{Waiter}\OperatorTok{$}\KeywordTok{new}\NormalTok{()}
+
+  \CommentTok{\# on button click}
+  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{show, \{}
+\NormalTok{    w}\OperatorTok{$}\KeywordTok{show}\NormalTok{()}
+    \KeywordTok{Sys.sleep}\NormalTok{(}\DecValTok{3}\NormalTok{)}
+\NormalTok{    w}\OperatorTok{$}\KeywordTok{hide}\NormalTok{()}
+\NormalTok{  \})}
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{flushleft}\includegraphics[width=6.25in]{images/waiter} \end{flushleft}
+
+Hopefully this makes a couple of great reasons and alluring examples to entice you to persevere with this book.
+
 \hypertarget{prerequisites}{%
 \section*{Prerequisites}\label{prerequisites}}
 
@@ -669,77 +740,6 @@ The JavaScript code below grabs the element where \texttt{id=\textquotesingle{}c
 
 This of course only scratches the surface of JavaScript but provides ample understanding of the language to keep up with the next chapters. Also, a somewhat interesting fact that will prove useful later in the book: the RStudio IDE is actually is a browser, therefore, in the IDE, one can right-click and ``inspect element'' to rendered source code.
 
-\hypertarget{rationale}{%
-\section*{Rationale}\label{rationale}}
-
-
-Why merge JavaScript and R? They are two fundamentally different languages that each have their strengths and weaknesses, combining the two allows making the most of their consolidated advantages and circumvent their respective limitations to produce software altogether better for it.
-
-A fair reason to use JavaScript might simply be that the thing one wants to achieve in R has already been realised in JavaScript. Why reinvent the wheel when the solution already exists and that it can be made accessible from R? The R package \href{https://github.com/ropensci/lawn}{lawn} \citep{R-lawn} by Ropensci integrates \href{http://turfjs.org/}{turf.js}, a brilliant library for geo-spatial analysis. JavaScript is not required to make those computations, it could be rewritten solely in R but that would be vastly more laborious than wrapping the JavaScript API in R.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(lawn)}
-
-\KeywordTok{lawn\_count}\NormalTok{(lawn\_data}\OperatorTok{$}\NormalTok{polygons\_count, lawn\_data}\OperatorTok{$}\NormalTok{points\_count, }\StringTok{"population"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## <FeatureCollection>
-##   Bounding box: -112.1 46.6 -112.0 46.6
-##   No. features: 2
-##   No. points: 20
-##   Properties: 
-##     values count
-## 1 200, 600     2
-## 2              0
-\end{verbatim}
-
-Another great reason is that JavaScript can do things that R cannot, e.g.: run in the browser. Therefore one cannot natively create interactive visualisations with R. \href{https://plotly-r.com/}{Plotly} \citep{R-plotly} by Carson Sievert packages the \href{https://plot.ly/}{plotly JavaScript library} to let one create interactive visualisations solely from R code.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(plotly)}
-
-\KeywordTok{plot\_ly}\NormalTok{(diamonds, }\DataTypeTok{x =} \OperatorTok{\textasciitilde{}}\NormalTok{cut, }\DataTypeTok{color =} \OperatorTok{\textasciitilde{}}\NormalTok{clarity)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-10-1.png}
-
-Finally, JavaScript can work together with R to improve how we communicate insights. One of the many ways in which Shiny stands out is that it lets one create web applications solely from R code with no knowledge of HTML, CSS, or JavaScript but that does not mean they can't extend Shiny, quite the contrary. The \href{http://waiter.john-coene.com/}{waiter package} \citep{R-waiter} integrates a variety of JavaScript libraries to display loading screens in Shiny applications.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(shiny)}
-\KeywordTok{library}\NormalTok{(waiter)}
-
-\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
-  \KeywordTok{use\_waiter}\NormalTok{(), }\CommentTok{\# include dependencies}
-  \KeywordTok{actionButton}\NormalTok{(}\StringTok{"show"}\NormalTok{, }\StringTok{"Show loading for 3 seconds"}\NormalTok{)}
-\NormalTok{)}
-
-\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output, session)\{}
-  \CommentTok{\# create a waiter}
-\NormalTok{  w <{-}}\StringTok{ }\NormalTok{Waiter}\OperatorTok{$}\KeywordTok{new}\NormalTok{()}
-
-  \CommentTok{\# on button click}
-  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{show, \{}
-\NormalTok{    w}\OperatorTok{$}\KeywordTok{show}\NormalTok{()}
-    \KeywordTok{Sys.sleep}\NormalTok{(}\DecValTok{3}\NormalTok{)}
-\NormalTok{    w}\OperatorTok{$}\KeywordTok{hide}\NormalTok{()}
-\NormalTok{  \})}
-\NormalTok{\}}
-
-\KeywordTok{shinyApp}\NormalTok{(ui, server)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{flushleft}\includegraphics[width=6.25in]{images/waiter} \end{flushleft}
-
-Hopefully this makes a couple of great reasons and alluring examples to entice you to persevere with this book.
-
 \hypertarget{methods}{%
 \section*{Methods}\label{methods}}
 
@@ -993,7 +993,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Tue Jun 02 2020 21:50:40 GMT+0200 (CEST)"
+## [1] "Tue Jun 02 2020 22:02:32 GMT+0200 (CEST)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1003,7 +1003,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Tue Jun 02 2020 21:50:40 GMT+0200 (CEST)"
+## [1] "Tue Jun 02 2020 22:02:32 GMT+0200 (CEST)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -2958,7 +2958,7 @@ One solution is to force the input into a list.
 \end{Highlighting}
 \end{Shaded}
 
-At this juncture the package works but there is a salient issue with the way it handles options. Why build a list in R to reconstruct it in JavaScript manually. Since the options are serialised in R to JSON and that typed.js expects a JSON of options it is actually much cleaner to construct an R list that mirrors the JSON array and then use this in JavaScript.
+At this juncture the package works but there is a salient issue with the way it handles options. Why build a list in R to reconstruct it in JavaScript manually. Since the options are serialised in R to JSON and that typed.js expects a JSON of options it is actually cleaner and more convenient to construct an R list that mirrors the JSON array so one can use is as-is in JavaScript.
 
 In fact, renaming the \texttt{message} to \texttt{strings} effectively does this.
 
@@ -3031,7 +3031,8 @@ The full list of which is available in the \href{https://github.com/mattboldt/ty
 It might be unclear how to implement the last point, this is something we'll explore in the following section.
 
 \hypertarget{gio}{%
-\section{Gio}\label{gio}}
+\section*{Gio}\label{gio}}
+
 
   \bibliography{book.bib,packages.bib}
 
