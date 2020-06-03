@@ -152,7 +152,7 @@ Then, from the root of the package created, we scaffold a widget which we call "
 htmlwidgets::scaffoldWidget("play")
 ```
 
-This function puts together the minimalistic structure necessary to implement an HTML widget and opens `play.R`, `play.js` and `play.yaml` in the RStudio IDE or the default text editor. These files are named after the widget and will form the core of our package. The R file contains core functions of the R API, namely the `play` function which creates the widget itself, and the `render*` and `*output` functions that handle the widget in the shiny server and UI respectively. The `.js` file contains JavaScript functions that actually generate the visual output. 
+This function puts together the minimalistic structure necessary to implement an HTML widget and opens `play.R`, `play.js` and `play.yaml` in the RStudio IDE or the default text editor. These files are named after the widget and will form the core of the package. The R file contains core functions of the R API, namely the `play` function which creates the widget itself, and the `render*` and `*output` functions that handle the widget in the shiny server and UI respectively. The `.js` file contains JavaScript functions that actually generate the visual output. 
 
 ```r
 devtools::document()
@@ -193,7 +193,7 @@ Below is a part of the `<body>` of the output of `play("This is a widget!")` obt
 <script type="application/json" data-for="htmlwidget-c21cca0e76e520b46fc7">{"x":{"message":"This is a widget!"},"evals":[],"jsHooks":[]}</script>
 ```
 
-One thing the source code of the rendered output reveals is the element (`div`) created by the htmlwidgets package to hold the message (it has the class name of our widget, `play`), as well as, below it, in the `<script>` tag, the JSON object which includes the `x` variable used in the `play` function. The `div` created bears a randomly generated `id` which one can define when creating the widget using the `elementId` argument.
+One thing the source code of the rendered output reveals is the element (`div`) created by the htmlwidgets package to hold the message (the class name is identical to that of the widget, `play`), as well as, below it, in the `<script>` tag, the JSON object which includes the `x` variable used in the `play` function. The `div` created bears a randomly generated `id` which one can define when creating the widget using the `elementId` argument.
 
 ```r
 # specify the id
@@ -453,7 +453,7 @@ var typed = new Typed('.element', {
 });
 ```
 
-Let's place it in our package by replacing the content of the `renderValue` in `typed.js` with the above.
+Let's place it in the package by replacing the content of the `renderValue` in `typed.js` with the above.
 
 ```js
 ...
@@ -585,8 +585,140 @@ The full list of which is available in the [documentation of typed.js](https://g
 
 It might be unclear how to implement the last point, this is something we'll explore in the following section.
 
-## Second Widget - Gio.js {-}
+## Gio.js {-}
 
 With a first widget built one can jump onto another one: [gio.js](https://giojs.org/), a library to draw arcs between countries on a 3 dimensional globe. This will include many more functionalities such packages can comprise.
 
 ![Example of Gio.js visualisation](images/gio-example.png)
+
+Then again, the first order of business when looking to integrate a library is to look at the documentation to understand what is should be reproduced in R.
+
+```html
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <!-- Import libraries -->
+  <script src="three.min.js"></script>
+  <script src="gio.min.js"></script>
+</head>
+
+<body>
+  <!-- div to hold visualisation -->
+  <div id="globe" style="width: 200px; height: 200px"></div>
+
+  <!-- Script to create visualsiation -->
+  <script>
+    var container = document.getElementById("globe");
+    var controller = new GIO.Controller(container);
+    controller.addData(data);
+    controller.init();
+  </script>
+</body>
+
+</html>
+```
+
+Gio.js has itself a dependency, [three.js](https://threejs.org/), which needs to be imported before gio.js, other than that not much differs from libraries previously explored in this chapter.
+
+```r
+usethis::create_package("gio")
+htmlwidgets::scaffoldWidget("gio")
+```
+
+### Dependencies {-}
+
+Handling the dependencies does differ much, we only need to download two libraries instead of one.
+
+```r
+# create directories for JS dependencies
+dir.create("./inst/htmlwidgets/three", recursive = TRUE)
+dir.create("./inst/htmlwidgets/gio", recursive = TRUE)
+
+# download JS dependencies
+three <- "https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"
+gio <- "https://raw.githubusercontent.com/syt123450/giojs/master/build/gio.min.js"
+
+download.file(three, "./inst/htmlwidgets/three/three.min.js")
+download.file(gio, "./inst/htmlwidgets/gio/gio.min.js")
+```
+
+This should produce the following working directory.
+
+```
+.
+├── DESCRIPTION
+├── NAMESPACE
+├── R
+│   └── gio.R
+└── inst
+    └── htmlwidgets
+        ├── gio
+        │   └── gio.min.js
+        ├── gio.js
+        ├── gio.yaml
+        └── three
+            └── three.min.js
+```
+
+The libraries have been downloaded but the `gio.yml` file is yet to be edited. The order in which the libraries are listed matters; just as in HTML three.js needs to precede gio.js as the former depends on the latter and not vice versa.
+
+```yml
+dependencies:
+  - name: three
+    version: 110
+    src: htmlwidgets/three
+    script: three.min.js
+  - name: gio
+    version: 2.0
+    src: htmlwidgets/gio
+    script: gio.min.js
+```
+
+### JavaScript {-}
+
+Let's copy the JavaScript code from the [Get Started section of gio.js](https://giojs.org/index.html) in the `gio.js` file's `renderValue` function. At this point the data format is not known so we comment the line which adds data to the visualisation.
+
+```js
+...
+renderValue: function(x) {
+
+  var container = document.getElementById("globe");
+  var controller = new GIO.Controller(container);
+  //controller.addData(data);
+  controller.init();
+
+}
+...
+```
+
+One can document and load the package build it likely will not work as the code above attempts to place the visualisation in a `div` with `id = "globe"`. As for the previously written widget, this needs to be changed to `el.id` so the visualisation can correctly render in the HTML element generated by the widget.
+
+```js
+...
+renderValue: function(x) {
+
+  var container = document.getElementById(el.id);
+  var controller = new GIO.Controller(container);
+  //controller.addData(data);
+  controller.init();
+
+}
+...
+```
+
+At this stage the widget should generate a visualisation.
+
+```r
+devtools::document()
+devtools::load_all()
+gio(message = "This required but not used")
+```
+
+![Output without data](images/gio-init.png)
+
+Not too shabby!
+
+### Adding Data {-}
+
+
