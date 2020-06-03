@@ -10,7 +10,7 @@ typed <- function(message, loop = FALSE, width = NULL, height = NULL, elementId 
   # forward options using x
   x = list(
     loop = loop,
-    message = as.list(message)
+    strings = as.list(message)
   )
 
   # create widget
@@ -22,6 +22,10 @@ typed <- function(message, loop = FALSE, width = NULL, height = NULL, elementId 
     package = 'typed',
     elementId = elementId
   )
+}
+
+typed_html <- function(...){
+  htmltools::tags$span(...)
 }
 
 #' Shiny bindings for typed

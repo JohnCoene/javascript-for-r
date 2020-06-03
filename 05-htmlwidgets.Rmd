@@ -2,11 +2,11 @@
 
 # HTML widgets
 
-In this chapter we cover the integration of JavaScript with R using the htmlwidgets package, which focuses on libraries that produce a visual output. It is primarily used for data visualisation but is not limited to it.
+In this chapter we cover the integration of JavaScript with R using the htmlwidgets package, which focuses on libraries that produce a visual output, it is often used for data visualisation but is not limited to it.
 
-As in previous chapters we mainly learn by example and build multiple widgets. We first go through some basic principles that must be understood before we actually start writing code, we then write a simple widget that allows animating text, then move on to others to progressively include more data and features, finally we build up on the previous chapter to improve how HTML widgets work with shiny.
+As in previous chapters we mainly learn by example, building multiple widgets of increasing complexity as we progress through the chapter. Before writing the first widget, we explore JavaScript libraries that make great candidates for htmlwidgets and attempt to understand how they work to grasp what is expected from the developer in order to integrate them with R. Finally, we build up on the previous chapter to improve how HTML widgets work with shiny.
 
-## Prospects {-}
+## Candidate Libraries {-}
 
 Before going down the rabbit hole it is good to take a look at the types of libraries one will work with. As htmlwidgets' main client are JavaScript visualisation libraries let us take a look at some such popular libraries and briefly look at how they work and what they have in common. This will greatly help conceptualise what one is trying to achieve in this chapter.
 
@@ -123,7 +123,7 @@ We again observe a very similar structure as with previous libraries. The librar
 
 Hopefully this reveals the repeating structure such libraries tend to follow and also hints at should be reproduced, to some extent at least, using R.
 
-## How it works~ish {-}
+## How it works {-}
 
 Imagine there is no such package as HTML widgets to help create interactive visualisations from R: how would one attempt to go about it?
 
@@ -138,7 +138,7 @@ Must remember when building HTML widgets:
 - Serialise R data to JSON
 - Handle JSON data to produce visualisation
 
-## Scaffold {-}
+## The Scaffold {-}
 
 With some vague understanding of how such widgets work internally one is ready to "scaffold" one with the aim of rummaging through its components to grasp a greater understanding of how such interactive outputs are actually produced. The way one sets up such a package is stunningly simple. Below we create a package named "playground" which will be used to mess around and explore. Though one could probably create widgets outside of an R package, it would only make things more complicated.
 
@@ -169,7 +169,7 @@ play(message = "This is a widget!")
 
 This displays the message in the RStudio "Viewer," or the your default browser which indicates that the function does indeed create an HTML output. One can use the the ![](images/open-in-browser.png) button located in the top right of the RStudio "Viewer" to open the message in web browser which can prove very useful to look under the hood of the widgets for debugging.
 
-## Output {-}
+## The Output {-}
 
 With an out-of-the-box HTML widget package one can start exploring the internals to understand how it works. Let's start by retracing the path taken by the message written in R to its seemingly magical appearance in HTML. The `play` function previously used, takes the `message` wraps it into a list which is then used in `htmlwidgets::createWidget`.
 
@@ -329,7 +329,7 @@ play(shiny::h2("Chocolate is a colour", style = "color:chocolate;"))
 
 This hopefully provides some understanding of how htmlwidgets work internally and thereby helps building such packages. To recapitulate, an HTML document is created in which div is placed and given a certain id, this id is also used in a script tag that contains JSON data passed from R so that a JavaScript function we define can read that data in and use it to generate a visual output in a div. However, as much as this section covered, the topic of JavaScript dependencies was not touched, this is approached in the following section where we build another, more interesting widget, which uses an external dependency.
 
-## Typed {-}
+## Typed.js {-}
 
 In this section we build a package called `typed`, which wraps the JavaScript library of the same name, [typed.js](https://github.com/mattboldt/typed.js/) that mimics text being typed. This builds upon many things we explored in the playground package.
 
@@ -337,6 +337,34 @@ In this section we build a package called `typed`, which wraps the JavaScript li
 usethis::create_package("typed")
 htmlwidgets::scaffoldWidget("typed")
 ```
+
+As done with candidate libraries, let's take a look at documentation of [typed.js](https://github.com/mattboldt/typed.js/) to see how typed.js works.
+
+```html
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <!-- Import library -->
+  <script src="typed.js"></script>
+</head>
+
+<body>
+  <!-- div to hold visualisation -->
+  <div class="element"></div>
+
+  <!-- Script to create visualsiation -->
+  <script>
+    var typed = new Typed('.element', {
+      strings: ['First sentence.', 'And a second sentence.']
+    });
+  </script>
+</body>
+
+</html>
+```
+
+The code above is not very different from what was observed in other libraries: the library is imported, there is a `<div>` where the output will be generated, and a script which also takes a selector and a JSON of options.
 
 ### Dependency {-}
 
@@ -520,7 +548,7 @@ typed <- function(message, loop = FALSE, width = NULL, height = NULL, elementId 
   # forward options using x
   x = list(
     loop = loop,
-    message = message
+    strings = as.list(message)
   )
 
   # create widget
@@ -535,7 +563,19 @@ typed <- function(message, loop = FALSE, width = NULL, height = NULL, elementId 
 }
 ```
 
-### Exercise {-}
+### HTML Element {-}
+
+As pointed out multiple times, the widget is generated in a `<div>`, which is works fine for most visualisation libraries. But we saw that chart.js requires placing it in a `<canvas>`, so one needs the ability to change that. It could be interesting to apply this to typed.js too as within a `<div>` it cannot be placed inline, using a `<span>`, however, this would work.
+
+This can be changed by placing a function named `nameOfWidget_html` which looked up by htmlwidgets and used if found. This function takes the three-dot construct `...` and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets needs be able to pass arguments, such as the all too critical `id`.
+
+```r
+typed_html <- function(...){
+  htmltools::tags$span(...)
+}
+```
+
+### Exercises {-}
 
 The full list of which is available in the [documentation of typed.js](https://github.com/mattboldt/typed.js/#customization). There are multiple ways to complete this package with regard to the options that are made available R-side and the API one wants to provide users of the package.
 
@@ -545,4 +585,8 @@ The full list of which is available in the [documentation of typed.js](https://g
 
 It might be unclear how to implement the last point, this is something we'll explore in the following section.
 
-## Gio {-}
+## Second Widget - Gio.js {-}
+
+With a first widget built one can jump onto another one: [gio.js](https://giojs.org/), a library to draw arcs between countries on a 3 dimensional globe. This will include many more functionalities such packages can comprise.
+
+![Example of Gio.js visualisation](images/gio-example.png)
