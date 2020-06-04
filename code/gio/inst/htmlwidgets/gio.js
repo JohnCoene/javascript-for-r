@@ -14,7 +14,7 @@ HTMLWidgets.widget({
 
         var container = document.getElementById(el.id);
         var controller = new GIO.Controller(container);
-        // controller.addData(data);
+        controller.addData(x.data);
         controller.init();
 
       },

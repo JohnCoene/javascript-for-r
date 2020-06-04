@@ -37,7 +37,7 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
-  pdftitle={R and JavaScript},
+  pdftitle={JavaScript for R},
   pdfauthor={John Coene},
   colorlinks=true,
   linkcolor=Maroon,
@@ -167,9 +167,9 @@
 \usepackage[]{natbib}
 \bibliographystyle{apalike}
 
-\title{R and JavaScript}
+\title{JavaScript for R}
 \author{John Coene}
-\date{2020-06-02}
+\date{2020-06-04}
 
 \begin{document}
 \maketitle
@@ -993,7 +993,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Tue Jun 02 2020 22:02:32 GMT+0200 (CEST)"
+## [1] "Thu Jun 04 2020 21:02:48 GMT+0200 (CEST)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1003,7 +1003,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Tue Jun 02 2020 22:02:32 GMT+0200 (CEST)"
+## [1] "Thu Jun 04 2020 21:02:48 GMT+0200 (CEST)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -2343,12 +2343,12 @@ If one wants to create such packages or make extensive use of such integrations 
 \hypertarget{html-widgets}{%
 \chapter{HTML widgets}\label{html-widgets}}
 
-In this chapter we cover the integration of JavaScript with R using the htmlwidgets package, which focuses on libraries that produce a visual output. It is primarily used for data visualisation but is not limited to it.
+In this chapter we cover the integration of JavaScript with R using the htmlwidgets package, which focuses on libraries that produce a visual output, it is often used for data visualisation but is not limited to it.
 
-As in previous chapters we mainly learn by example and build multiple widgets. We first go through some basic principles that must be understood before we actually start writing code, we then write a simple widget that allows animating text, then move on to others to progressively include more data and features, finally we build up on the previous chapter to improve how HTML widgets work with shiny.
+As in previous chapters we mainly learn by example, building multiple widgets of increasing complexity as we progress through the chapter. Before writing the first widget, we explore JavaScript libraries that make great candidates for htmlwidgets and attempt to understand how they work to grasp what is expected from the developer in order to integrate them with R. Finally, we build up on the previous chapter to improve how HTML widgets work with shiny.
 
-\hypertarget{prospects}{%
-\section*{Prospects}\label{prospects}}
+\hypertarget{candidate-libraries}{%
+\section*{Candidate Libraries}\label{candidate-libraries}}
 
 
 Before going down the rabbit hole it is good to take a look at the types of libraries one will work with. As htmlwidgets' main client are JavaScript visualisation libraries let us take a look at some such popular libraries and briefly look at how they work and what they have in common. This will greatly help conceptualise what one is trying to achieve in this chapter.
@@ -2478,8 +2478,8 @@ We again observe a very similar structure as with previous libraries. The librar
 
 Hopefully this reveals the repeating structure such libraries tend to follow and also hints at should be reproduced, to some extent at least, using R.
 
-\hypertarget{how-it-worksish}{%
-\section*{How it works\textasciitilde ish}\label{how-it-worksish}}
+\hypertarget{how-it-works}{%
+\section*{How it works}\label{how-it-works}}
 
 
 Imagine there is no such package as HTML widgets to help create interactive visualisations from R: how would one attempt to go about it?
@@ -2502,8 +2502,8 @@ Must remember when building HTML widgets:
   Handle JSON data to produce visualisation
 \end{itemize}
 
-\hypertarget{scaffold}{%
-\section*{Scaffold}\label{scaffold}}
+\hypertarget{the-scaffold}{%
+\section*{The Scaffold}\label{the-scaffold}}
 
 
 With some vague understanding of how such widgets work internally one is ready to ``scaffold'' one with the aim of rummaging through its components to grasp a greater understanding of how such interactive outputs are actually produced. The way one sets up such a package is stunningly simple. Below we create a package named ``playground'' which will be used to mess around and explore. Though one could probably create widgets outside of an R package, it would only make things more complicated.
@@ -2522,7 +2522,7 @@ Then, from the root of the package created, we scaffold a widget which we call `
 \end{Highlighting}
 \end{Shaded}
 
-This function puts together the minimalistic structure necessary to implement an HTML widget and opens \texttt{play.R}, \texttt{play.js} and \texttt{play.yaml} in the RStudio IDE or the default text editor. These files are named after the widget and will form the core of our package. The R file contains core functions of the R API, namely the \texttt{play} function which creates the widget itself, and the \texttt{render*} and \texttt{*output} functions that handle the widget in the shiny server and UI respectively. The \texttt{.js} file contains JavaScript functions that actually generate the visual output.
+This function puts together the minimalistic structure necessary to implement an HTML widget and opens \texttt{play.R}, \texttt{play.js} and \texttt{play.yaml} in the RStudio IDE or the default text editor. These files are named after the widget and will form the core of the package. The R file contains core functions of the R API, namely the \texttt{play} function which creates the widget itself, and the \texttt{render*} and \texttt{*output} functions that handle the widget in the shiny server and UI respectively. The \texttt{.js} file contains JavaScript functions that actually generate the visual output.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2547,8 +2547,8 @@ It might be hard to believe, but at this stage one already has a fully functioni
 
 This displays the message in the RStudio ``Viewer,'' or the your default browser which indicates that the function does indeed create an HTML output. One can use the the \includegraphics{images/open-in-browser.png} button located in the top right of the RStudio ``Viewer'' to open the message in web browser which can prove very useful to look under the hood of the widgets for debugging.
 
-\hypertarget{output}{%
-\section*{Output}\label{output}}
+\hypertarget{the-output}{%
+\section*{The Output}\label{the-output}}
 
 
 With an out-of-the-box HTML widget package one can start exploring the internals to understand how it works. Let's start by retracing the path taken by the message written in R to its seemingly magical appearance in HTML. The \texttt{play} function previously used, takes the \texttt{message} wraps it into a list which is then used in \texttt{htmlwidgets::createWidget}.
@@ -2577,7 +2577,7 @@ Below is a part of the \texttt{\textless{}body\textgreater{}} of the output of \
 \end{Highlighting}
 \end{Shaded}
 
-One thing the source code of the rendered output reveals is the element (\texttt{div}) created by the htmlwidgets package to hold the message (it has the class name of our widget, \texttt{play}), as well as, below it, in the \texttt{\textless{}script\textgreater{}} tag, the JSON object which includes the \texttt{x} variable used in the \texttt{play} function. The \texttt{div} created bears a randomly generated \texttt{id} which one can define when creating the widget using the \texttt{elementId} argument.
+One thing the source code of the rendered output reveals is the element (\texttt{div}) created by the htmlwidgets package to hold the message (the class name is identical to that of the widget, \texttt{play}), as well as, below it, in the \texttt{\textless{}script\textgreater{}} tag, the JSON object which includes the \texttt{x} variable used in the \texttt{play} function. The \texttt{div} created bears a randomly generated \texttt{id} which one can define when creating the widget using the \texttt{elementId} argument.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2767,8 +2767,8 @@ Reloading the package with \texttt{devtools::load\_all} lets one use shiny tags 
 
 This hopefully provides some understanding of how htmlwidgets work internally and thereby helps building such packages. To recapitulate, an HTML document is created in which div is placed and given a certain id, this id is also used in a script tag that contains JSON data passed from R so that a JavaScript function we define can read that data in and use it to generate a visual output in a div. However, as much as this section covered, the topic of JavaScript dependencies was not touched, this is approached in the following section where we build another, more interesting widget, which uses an external dependency.
 
-\hypertarget{typed}{%
-\section*{Typed}\label{typed}}
+\hypertarget{typed.js}{%
+\section*{Typed.js}\label{typed.js}}
 
 
 In this section we build a package called \texttt{typed}, which wraps the JavaScript library of the same name, \href{https://github.com/mattboldt/typed.js/}{typed.js} that mimics text being typed. This builds upon many things we explored in the playground package.
@@ -2779,6 +2779,36 @@ In this section we build a package called \texttt{typed}, which wraps the JavaSc
 \NormalTok{htmlwidgets}\OperatorTok{::}\KeywordTok{scaffoldWidget}\NormalTok{(}\StringTok{"typed"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+As done with candidate libraries, let's take a look at documentation of \href{https://github.com/mattboldt/typed.js/}{typed.js} to see how typed.js works.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DataTypeTok{<!DOCTYPE }\NormalTok{html}\DataTypeTok{>}
+\KeywordTok{<html}\OtherTok{ xmlns=}\StringTok{"http://www.w3.org/1999/xhtml"}\OtherTok{ lang=}\StringTok{""}\OtherTok{ xml:lang=}\StringTok{""}\KeywordTok{>}
+
+\KeywordTok{<head>}
+  \CommentTok{<!{-}{-} Import library {-}{-}>}
+  \KeywordTok{<script}\OtherTok{ src=}\StringTok{"typed.js"}\KeywordTok{></script>}
+\KeywordTok{</head>}
+
+\KeywordTok{<body>}
+  \CommentTok{<!{-}{-} div to hold visualisation {-}{-}>}
+  \KeywordTok{<div}\OtherTok{ class=}\StringTok{"element"}\KeywordTok{></div>}
+
+  \CommentTok{<!{-}{-} Script to create visualsiation {-}{-}>}
+  \KeywordTok{<script>}
+    \KeywordTok{var}\NormalTok{ typed }\OperatorTok{=} \KeywordTok{new} \AttributeTok{Typed}\NormalTok{(}\StringTok{\textquotesingle{}.element\textquotesingle{}}\OperatorTok{,} \OperatorTok{\{}
+      \DataTypeTok{strings}\OperatorTok{:}\NormalTok{ [}\StringTok{\textquotesingle{}First sentence.\textquotesingle{}}\OperatorTok{,} \StringTok{\textquotesingle{}And a second sentence.\textquotesingle{}}\NormalTok{]}
+    \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+  \KeywordTok{</script>}
+\KeywordTok{</body>}
+
+\KeywordTok{</html>}
+\end{Highlighting}
+\end{Shaded}
+
+The code above is not very different from what was observed in other libraries: the library is imported, there is a \texttt{\textless{}div\textgreater{}} where the output will be generated, and a script which also takes a selector and a JSON of options.
 
 \hypertarget{dependency}{%
 \subsection*{Dependency}\label{dependency}}
@@ -2885,7 +2915,7 @@ On its \href{https://mattboldt.com/demos/typed-js/}{official website}, typed.js 
 \end{Highlighting}
 \end{Shaded}
 
-Let's place it in our package by replacing the content of the \texttt{renderValue} in \texttt{typed.js} with the above.
+Let's place it in the package by replacing the content of the \texttt{renderValue} in \texttt{typed.js} with the above.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2995,7 +3025,7 @@ One can now add more options from the R code without having to alter any of the 
   \CommentTok{\# forward options using x}
 \NormalTok{  x =}\StringTok{ }\KeywordTok{list}\NormalTok{(}
     \DataTypeTok{loop =}\NormalTok{ loop,}
-    \DataTypeTok{message =}\NormalTok{ message}
+    \DataTypeTok{strings =} \KeywordTok{as.list}\NormalTok{(message)}
 \NormalTok{  )}
 
   \CommentTok{\# create widget}
@@ -3011,8 +3041,24 @@ One can now add more options from the R code without having to alter any of the 
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{exercise}{%
-\subsection*{Exercise}\label{exercise}}
+\hypertarget{html-element}{%
+\subsection*{HTML Element}\label{html-element}}
+
+
+As pointed out multiple times, the widget is generated in a \texttt{\textless{}div\textgreater{}}, which is works fine for most visualisation libraries. But we saw that chart.js requires placing it in a \texttt{\textless{}canvas\textgreater{}}, so one needs the ability to change that. It could be interesting to apply this to typed.js too as within a \texttt{\textless{}div\textgreater{}} it cannot be placed inline, using a \texttt{\textless{}span\textgreater{}}, however, this would work.
+
+This can be changed by placing a function named \texttt{nameOfWidget\_html} which looked up by htmlwidgets and used if found. This function takes the three-dot construct \texttt{...} and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets needs be able to pass arguments, such as the all too critical \texttt{id}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{typed\_html <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(...)\{}
+\NormalTok{  htmltools}\OperatorTok{::}\NormalTok{tags}\OperatorTok{$}\KeywordTok{span}\NormalTok{(...)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{exercises-1}{%
+\subsection*{Exercises}\label{exercises-1}}
 
 
 The full list of which is available in the \href{https://github.com/mattboldt/typed.js/\#customization}{documentation of typed.js}. There are multiple ways to complete this package with regard to the options that are made available R-side and the API one wants to provide users of the package.
@@ -3030,9 +3076,422 @@ The full list of which is available in the \href{https://github.com/mattboldt/ty
 
 It might be unclear how to implement the last point, this is something we'll explore in the following section.
 
-\hypertarget{gio}{%
-\section*{Gio}\label{gio}}
+\hypertarget{gio.js}{%
+\section*{Gio.js}\label{gio.js}}
 
+
+With a first widget built one can jump onto another one: \href{https://giojs.org/}{gio.js}, a library to draw arcs between countries on a 3 dimensional globe. This will include many more functionalities such packages can comprise.
+
+\begin{figure}
+\centering
+\includegraphics{images/gio-example.png}
+\caption{Example of Gio.js visualisation}
+\end{figure}
+
+Then again, the first order of business when looking to integrate a library is to look at the documentation to understand what is should be reproduced in R.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DataTypeTok{<!DOCTYPE }\NormalTok{html}\DataTypeTok{>}
+\KeywordTok{<html}\OtherTok{ xmlns=}\StringTok{"http://www.w3.org/1999/xhtml"}\OtherTok{ lang=}\StringTok{""}\OtherTok{ xml:lang=}\StringTok{""}\KeywordTok{>}
+
+\KeywordTok{<head>}
+  \CommentTok{<!{-}{-} Import libraries {-}{-}>}
+  \KeywordTok{<script}\OtherTok{ src=}\StringTok{"three.min.js"}\KeywordTok{></script>}
+  \KeywordTok{<script}\OtherTok{ src=}\StringTok{"gio.min.js"}\KeywordTok{></script>}
+\KeywordTok{</head>}
+
+\KeywordTok{<body>}
+  \CommentTok{<!{-}{-} div to hold visualisation {-}{-}>}
+  \KeywordTok{<div}\OtherTok{ id=}\StringTok{"globe"}\OtherTok{ style=}\StringTok{"width: 200px; height: 200px"}\KeywordTok{></div>}
+
+  \CommentTok{<!{-}{-} Script to create visualsiation {-}{-}>}
+  \KeywordTok{<script>}
+    \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\StringTok{"globe"}\NormalTok{)}\OperatorTok{;}
+    \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+    \VariableTok{controller}\NormalTok{.}\AttributeTok{addData}\NormalTok{(data)}\OperatorTok{;}
+    \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
+  \KeywordTok{</script>}
+\KeywordTok{</body>}
+
+\KeywordTok{</html>}
+\end{Highlighting}
+\end{Shaded}
+
+Gio.js has itself a dependency, \href{https://threejs.org/}{three.js}, which needs to be imported before gio.js, other than that not much differs from libraries previously explored in this chapter.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{create\_package}\NormalTok{(}\StringTok{"gio"}\NormalTok{)}
+\NormalTok{htmlwidgets}\OperatorTok{::}\KeywordTok{scaffoldWidget}\NormalTok{(}\StringTok{"gio"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{dependencies-1}{%
+\subsection*{Dependencies}\label{dependencies-1}}
+
+
+Handling the dependencies does differ much, we only need to download two libraries instead of one.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# create directories for JS dependencies}
+\KeywordTok{dir.create}\NormalTok{(}\StringTok{"./inst/htmlwidgets/three"}\NormalTok{, }\DataTypeTok{recursive =} \OtherTok{TRUE}\NormalTok{)}
+\KeywordTok{dir.create}\NormalTok{(}\StringTok{"./inst/htmlwidgets/gio"}\NormalTok{, }\DataTypeTok{recursive =} \OtherTok{TRUE}\NormalTok{)}
+
+\CommentTok{\# download JS dependencies}
+\NormalTok{three <{-}}\StringTok{ "https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"}
+\NormalTok{gio <{-}}\StringTok{ "https://raw.githubusercontent.com/syt123450/giojs/master/build/gio.min.js"}
+
+\KeywordTok{download.file}\NormalTok{(three, }\StringTok{"./inst/htmlwidgets/three/three.min.js"}\NormalTok{)}
+\KeywordTok{download.file}\NormalTok{(gio, }\StringTok{"./inst/htmlwidgets/gio/gio.min.js"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+This should produce the following working directory.
+
+\begin{verbatim}
+.
+├── DESCRIPTION
+├── NAMESPACE
+├── R
+│   └── gio.R
+└── inst
+    └── htmlwidgets
+        ├── gio
+        │   └── gio.min.js
+        ├── gio.js
+        ├── gio.yaml
+        └── three
+            └── three.min.js
+\end{verbatim}
+
+The libraries have been downloaded but the \texttt{gio.yml} file is yet to be edited. The order in which the libraries are listed matters; just as in HTML three.js needs to precede gio.js as the former depends on the latter and not vice versa.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{dependencies}\KeywordTok{:}
+\AttributeTok{  }\KeywordTok{{-}}\AttributeTok{ }\FunctionTok{name}\KeywordTok{:}\AttributeTok{ three}
+\AttributeTok{    }\FunctionTok{version}\KeywordTok{:}\AttributeTok{ }\DecValTok{110}
+\AttributeTok{    }\FunctionTok{src}\KeywordTok{:}\AttributeTok{ htmlwidgets/three}
+\AttributeTok{    }\FunctionTok{script}\KeywordTok{:}\AttributeTok{ three.min.js}
+\AttributeTok{  }\KeywordTok{{-}}\AttributeTok{ }\FunctionTok{name}\KeywordTok{:}\AttributeTok{ gio}
+\AttributeTok{    }\FunctionTok{version}\KeywordTok{:}\AttributeTok{ }\FloatTok{2.0}
+\AttributeTok{    }\FunctionTok{src}\KeywordTok{:}\AttributeTok{ htmlwidgets/gio}
+\AttributeTok{    }\FunctionTok{script}\KeywordTok{:}\AttributeTok{ gio.min.js}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{javascript-2}{%
+\subsection*{JavaScript}\label{javascript-2}}
+
+
+Let's copy the JavaScript code from the \href{https://giojs.org/index.html}{Get Started section of gio.js} in the \texttt{gio.js} file's \texttt{renderValue} function. At this point the data format is not known so we comment the line which adds data to the visualisation.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{...}
+\NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+
+  \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\StringTok{"globe"}\NormalTok{)}\OperatorTok{;}
+  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+  \CommentTok{//controller.addData(data);}
+  \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
+
+\OperatorTok{\}}
+\NormalTok{...}
+\end{Highlighting}
+\end{Shaded}
+
+One can document and load the package build it likely will not work as the code above attempts to place the visualisation in a \texttt{div} with \texttt{id\ =\ "globe"}. As for the previously written widget, this needs to be changed to \texttt{el.id} so the visualisation can correctly render in the HTML element generated by the widget.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{...}
+\NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+
+  \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
+  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+  \CommentTok{//controller.addData(data);}
+  \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
+
+\OperatorTok{\}}
+\NormalTok{...}
+\end{Highlighting}
+\end{Shaded}
+
+At this stage the widget should generate a visualisation.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{devtools}\OperatorTok{::}\KeywordTok{document}\NormalTok{()}
+\NormalTok{devtools}\OperatorTok{::}\KeywordTok{load\_all}\NormalTok{()}
+\KeywordTok{gio}\NormalTok{(}\DataTypeTok{message =} \StringTok{"This required but not used"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/gio-init.png}
+\caption{Output without data}
+\end{figure}
+
+Not too shabby!
+
+\hypertarget{working-with-data}{%
+\subsection*{Working with Data}\label{working-with-data}}
+
+
+An interesting start, now onto adding data. Let's take a look at the \href{https://giojs.org/html/docs/dataAdd.html}{documentation} to see what data the library expects.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\OtherTok{[}
+  \FunctionTok{\{}
+    \DataTypeTok{"e"}\FunctionTok{:} \StringTok{"CN"}\FunctionTok{,}
+    \DataTypeTok{"i"}\FunctionTok{:} \StringTok{"US"}\FunctionTok{,}
+    \DataTypeTok{"v"}\FunctionTok{:} \DecValTok{3300000}
+  \FunctionTok{\}}\OtherTok{,}
+  \FunctionTok{\{}
+    \DataTypeTok{"e"}\FunctionTok{:} \StringTok{"CN"}\FunctionTok{,}
+    \DataTypeTok{"i"}\FunctionTok{:} \StringTok{"RU"}\FunctionTok{,}
+    \DataTypeTok{"v"}\FunctionTok{:} \DecValTok{10000}
+  \FunctionTok{\}}
+\OtherTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+The JSON data should constitutes of arrays that denote arcs to draw on the globe where each arc is defined by an exporting country (\texttt{e}), an importing country (\texttt{i}), and is given a value (\texttt{v}). The importing and exporting country, the source and target of the arc, are indicated by ISO alpha-2 country codes. We can read this JSON into R.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# data.frame to test}
+\NormalTok{arcs <{-}}\StringTok{ }\NormalTok{jsonlite}\OperatorTok{::}\KeywordTok{fromJSON}\NormalTok{(}
+  \StringTok{\textquotesingle{}[}
+\StringTok{    \{}
+\StringTok{      "e": "CN",}
+\StringTok{      "i": "US",}
+\StringTok{      "v": 3300000}
+\StringTok{    \},}
+\StringTok{    \{}
+\StringTok{      "e": "CN",}
+\StringTok{      "i": "RU",}
+\StringTok{      "v": 10000}
+\StringTok{    \}}
+\StringTok{  ]\textquotesingle{}}
+\NormalTok{)}
+
+\KeywordTok{print}\NormalTok{(arcs)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    e  i       v
+## 1 CN US 3300000
+## 2 CN RU   10000
+\end{verbatim}
+
+Jsonlite automagically converts the JSON into a data frame where each row is an arc, which is great as R users tend to prefer rectangular data over lists: this probably what the package should use as input too. Let us make some changes to the \texttt{gio} function so it takes data as input.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gio <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, }\DataTypeTok{width =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{height =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{elementId =} \OtherTok{NULL}\NormalTok{) \{}
+
+  \CommentTok{\# forward options using x}
+\NormalTok{  x =}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{data =}\NormalTok{ data}
+\NormalTok{  )}
+
+  \CommentTok{\# create widget}
+\NormalTok{  htmlwidgets}\OperatorTok{::}\KeywordTok{createWidget}\NormalTok{(}
+    \DataTypeTok{name =} \StringTok{\textquotesingle{}gio\textquotesingle{}}\NormalTok{,}
+\NormalTok{    x,}
+    \DataTypeTok{width =}\NormalTok{ width,}
+    \DataTypeTok{height =}\NormalTok{ height,}
+    \DataTypeTok{package =} \StringTok{\textquotesingle{}gio\textquotesingle{}}\NormalTok{,}
+    \DataTypeTok{elementId =}\NormalTok{ elementId}
+\NormalTok{  )}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Then tiny changes to \texttt{play.js} where we uncomment the line that line previously commented and use \texttt{x.data} passed from R.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{...}
+\NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+
+  \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
+  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+  \VariableTok{controller}\NormalTok{.}\AttributeTok{addData}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;} \CommentTok{// uncomment \& use x.data}
+  \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
+
+\OperatorTok{\}}
+\NormalTok{...}
+\end{Highlighting}
+\end{Shaded}
+
+We can now use the function with the data to plot arcs!
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{devtools}\OperatorTok{::}\KeywordTok{document}\NormalTok{()}
+\NormalTok{devtools}\OperatorTok{::}\KeywordTok{load\_all}\NormalTok{()}
+\KeywordTok{gio}\NormalTok{(arcs)}
+\end{Highlighting}
+\end{Shaded}
+
+Unfortunately, this breaks everything and we are presented with a blank screen. Using \texttt{console.log} or looking at the source code the rendered widget reveals the problem: the data isn't actually in the correct format!
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}\DataTypeTok{"x"}\FunctionTok{:\{}\DataTypeTok{"data"}\FunctionTok{:\{}\DataTypeTok{"e"}\FunctionTok{:}\OtherTok{[}\StringTok{"CN"}\OtherTok{,}\StringTok{"CN"}\OtherTok{]}\FunctionTok{,}\DataTypeTok{"i"}\FunctionTok{:}\OtherTok{[}\StringTok{"US"}\OtherTok{,}\StringTok{"RU"}\OtherTok{]}\FunctionTok{,}\DataTypeTok{"v"}\FunctionTok{:}\OtherTok{[}\DecValTok{3300000}\OtherTok{,}\DecValTok{10000}\OtherTok{]}\FunctionTok{\}\},}\DataTypeTok{"evals"}\FunctionTok{:}\OtherTok{[]}\FunctionTok{,}\DataTypeTok{"jsHooks"}\FunctionTok{:}\OtherTok{[]}\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Htmlwidgets actually serialised the data frame column-wise (long) and not row-wise (wide).
+
+\hypertarget{transforming-data}{%
+\subsection*{Transforming Data}\label{transforming-data}}
+
+
+There are multiple ways to fix the issue at hand.
+
+\hypertarget{in-javascript}{%
+\subsubsection*{In JavaScript}\label{in-javascript}}
+
+
+One can use JavaScript to transform the data, leaving everything as-is R side to further handle the data JavaScript side. The HTMLwidget JavaScript library (already imported by default) exports an object which provides a method, \texttt{dataframeToD3}, to transform the data from long to wide.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{...}
+\NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+
+  \CommentTok{// long to wide}
+  \VariableTok{x}\NormalTok{.}\AttributeTok{data} \OperatorTok{=} \VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{dataframeToD3}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;}
+
+  \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
+  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+  \VariableTok{controller}\NormalTok{.}\AttributeTok{addData}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;} 
+  \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
+
+\OperatorTok{\}}
+\NormalTok{...}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{in-r}{%
+\subsubsection*{In R}\label{in-r}}
+
+
+Instead of serialising the data a certain way then correct in JavaScript as demonstrated previously, one can also modify, or even replace, htmlwidgets' default serialiser. Speaking of which, below is the default serializer.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{function}\NormalTok{ (x, ..., }\DataTypeTok{dataframe =} \StringTok{"columns"}\NormalTok{, }\DataTypeTok{null =} \StringTok{"null"}\NormalTok{, }\DataTypeTok{na =} \StringTok{"null"}\NormalTok{, }
+    \DataTypeTok{auto\_unbox =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{digits =} \KeywordTok{getOption}\NormalTok{(}\StringTok{"shiny.json.digits"}\NormalTok{, }
+        \DecValTok{16}\NormalTok{), }\DataTypeTok{use\_signif =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{force =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{POSIXt =} \StringTok{"ISO8601"}\NormalTok{, }
+    \DataTypeTok{UTC =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{rownames =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{keep\_vec\_names =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{strict\_atomic =} \OtherTok{TRUE}\NormalTok{) }
+\NormalTok{\{}
+    \ControlFlowTok{if}\NormalTok{ (strict\_atomic) }
+\NormalTok{        x <{-}}\StringTok{ }\KeywordTok{I}\NormalTok{(x)}
+\NormalTok{    jsonlite}\OperatorTok{::}\KeywordTok{toJSON}\NormalTok{(x, }\DataTypeTok{dataframe =}\NormalTok{ dataframe, }\DataTypeTok{null =}\NormalTok{ null, }\DataTypeTok{na =}\NormalTok{ na, }
+        \DataTypeTok{auto\_unbox =}\NormalTok{ auto\_unbox, }\DataTypeTok{digits =}\NormalTok{ digits, }\DataTypeTok{use\_signif =}\NormalTok{ use\_signif, }
+        \DataTypeTok{force =}\NormalTok{ force, }\DataTypeTok{POSIXt =}\NormalTok{ POSIXt, }\DataTypeTok{UTC =}\NormalTok{ UTC, }\DataTypeTok{rownames =}\NormalTok{ rownames, }
+        \DataTypeTok{keep\_vec\_names =}\NormalTok{ keep\_vec\_names, }\DataTypeTok{json\_verbatim =} \OtherTok{TRUE}\NormalTok{, }
+\NormalTok{        ...)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The problem we face is caused by the \texttt{dataframe} argument which is set to \texttt{columns} whereas we need it set to \texttt{rows}. This can be done by passing the arguments to the serialiser is a list as \texttt{TOJSON\_ARGS} attribute of the object \texttt{x} that is serialised. We could thus change the \texttt{gio} function to reflect the aforementioned change.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gio <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, }\DataTypeTok{width =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{height =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{elementId =} \OtherTok{NULL}\NormalTok{) \{}
+
+  \CommentTok{\# forward options using x}
+\NormalTok{  x =}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{data =}\NormalTok{ data}
+\NormalTok{  )}
+
+  \CommentTok{\# serialise data.frames to wide (not long as default)}
+  \KeywordTok{attr}\NormalTok{(x, }\StringTok{\textquotesingle{}TOJSON\_ARGS\textquotesingle{}}\NormalTok{) <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{dataframe =} \StringTok{"rows"}\NormalTok{)}
+
+  \CommentTok{\# create widget}
+\NormalTok{  htmlwidgets}\OperatorTok{::}\KeywordTok{createWidget}\NormalTok{(}
+    \DataTypeTok{name =} \StringTok{\textquotesingle{}gio\textquotesingle{}}\NormalTok{,}
+\NormalTok{    x,}
+    \DataTypeTok{width =}\NormalTok{ width,}
+    \DataTypeTok{height =}\NormalTok{ height,}
+    \DataTypeTok{package =} \StringTok{\textquotesingle{}gio\textquotesingle{}}\NormalTok{,}
+    \DataTypeTok{elementId =}\NormalTok{ elementId}
+\NormalTok{  )}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The above may seem confusing at first as one rarely encounters the \texttt{attr} replacement function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{attr}\NormalTok{(cars, }\StringTok{"hello"}\NormalTok{) <{-}}\StringTok{ "attributes"} \CommentTok{\# set }
+\KeywordTok{attr}\NormalTok{(cars, }\StringTok{"hello"}\NormalTok{) }\CommentTok{\# get }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "attributes"
+\end{verbatim}
+
+Otherwise one can completely override the serializer, also by setting an attribute, \texttt{TOJSON\_FUNC}, to the function which should be used to serialise the data. Below the serialiser is changed to using jsonify \citep{R-jsonify} which by default serialises data frames to wide, unlike htmlwidgets' serialiser, thereby also fixing the issue.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gio <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, }\DataTypeTok{width =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{height =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{elementId =} \OtherTok{NULL}\NormalTok{) \{}
+
+  \CommentTok{\# forward options using x}
+\NormalTok{  x =}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{data =}\NormalTok{ data}
+\NormalTok{  )}
+
+  \CommentTok{\# replace serialiser}
+  \KeywordTok{attr}\NormalTok{(x, }\StringTok{\textquotesingle{}TOJSON\_FUNC\textquotesingle{}}\NormalTok{) <{-}}\StringTok{ }\NormalTok{gio\_serialiser}
+
+  \CommentTok{\# create widget}
+\NormalTok{  htmlwidgets}\OperatorTok{::}\KeywordTok{createWidget}\NormalTok{(}
+    \DataTypeTok{name =} \StringTok{\textquotesingle{}gio\textquotesingle{}}\NormalTok{,}
+\NormalTok{    x,}
+    \DataTypeTok{width =}\NormalTok{ width,}
+    \DataTypeTok{height =}\NormalTok{ height,}
+    \DataTypeTok{package =} \StringTok{\textquotesingle{}gio\textquotesingle{}}\NormalTok{,}
+    \DataTypeTok{elementId =}\NormalTok{ elementId}
+\NormalTok{  )}
+\NormalTok{\}}
+
+\NormalTok{gio\_serialiser <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x)\{}
+\NormalTok{  jsonify}\OperatorTok{::}\KeywordTok{to\_json}\NormalTok{(x, }\DataTypeTok{unbox =} \OtherTok{TRUE}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Alternatively, one can also leave all serialisers unchanged and instead format the data in R prior to the serialisation, changing the dataframe to a row-wise list.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# forward options using x}
+\NormalTok{x =}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+  \DataTypeTok{data =} \KeywordTok{apply}\NormalTok{(data, }\DecValTok{1}\NormalTok{, as.list)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{pros-cons}{%
+\subsubsection{Pros \& Cons}\label{pros-cons}}
+
+There are pros and cons to each methods. The preferable method is probably to change the arguments that cause issue, this is the method used in the remaining of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Transforming the data in JavaScript has one drawback, \texttt{HTMLWidgets.dataframeToD3} cannot be applied to the entire \texttt{x} object but the subsets that hold the data frame which tends to lead to clunky code as one uses said function in various places and has to add if statements to make sure data is present, etc. This will become more evident as we progress.
 
   \bibliography{book.bib,packages.bib}
 

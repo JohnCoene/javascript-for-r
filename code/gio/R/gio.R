@@ -5,12 +5,14 @@
 #' @import htmlwidgets
 #'
 #' @export
-gio <- function(message, width = NULL, height = NULL, elementId = NULL) {
+gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
 
   # forward options using x
   x = list(
-    message = message
+    data = data
   )
+
+  attr(x, 'TOJSON_ARGS') <- list(dataframe = "rows")
 
   # create widget
   htmlwidgets::createWidget(
