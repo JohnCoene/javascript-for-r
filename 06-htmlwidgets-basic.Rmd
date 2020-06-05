@@ -1,0 +1,255 @@
+# A Realistic Widget
+
+In this section we build a package called `typed`, which wraps the JavaScript library of the same name, [typed.js](https://github.com/mattboldt/typed.js/) that mimics text being typed. This builds upon many things we explored in the playground package.
+
+```r
+usethis::create_package("typed")
+htmlwidgets::scaffoldWidget("typed")
+```
+
+As done with candidate libraries, let's take a look at documentation of [typed.js](https://github.com/mattboldt/typed.js/) to see how typed.js works.
+
+```html
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <!-- Import library -->
+  <script src="typed.js"></script>
+</head>
+
+<body>
+  <!-- div to hold visualisation -->
+  <div class="element"></div>
+
+  <!-- Script to create visualsiation -->
+  <script>
+    var typed = new Typed('.element', {
+      strings: ['First sentence.', 'And a second sentence.']
+    });
+  </script>
+</body>
+
+</html>
+```
+
+The code above is not very different from what was observed in other libraries: the library is imported, there is a `<div>` where the output will be generated, and a script which also takes a selector and a JSON of options.
+
+## Dependency {-}
+
+Once the package created and the widget scaffold laid down we need to add the JavaScript dependency without which nothing can move forward. The [documentation in the README of typed.js](https://github.com/mattboldt/typed.js) states that it can be imported like so.
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
+```
+
+First, we will download the dependency, which consists of a single JavaScript file, instead of using the CDN as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Below we place the dependency in a "typed" directory within the "htmlwidgets" folder.
+
+```r
+dir.create("./inst/htmlwidgets/typed")
+cdn <- "https://cdn.jsdelivr.net/npm/typed.js@2.0.11"
+download.file(cdn, "./inst/htmlwidgets/typed/typed.min.js")
+```
+
+This produces a directory that looks like this:
+
+```
+.
+├── DESCRIPTION
+├── NAMESPACE
+├── R
+│   └── typed.R
+└── inst
+    └── htmlwidgets
+        ├── typed
+        │   └── typed.min.js
+        ├── typed.js
+        └── typed.yaml
+```
+
+In htmlwidgets packages dependencies are specified in the `.yml` file located at `inst/htmlwidgets` which at first contains a commented template.
+
+```yml
+# (uncomment to add a dependency)
+# dependencies:
+#  - name:
+#    version:
+#    src:
+#    script:
+#    stylesheet:
+```
+
+Let's uncomment those lines as instructed at the top of the file and fill it in.
+
+```yml
+dependencies:
+  - name: typed.js
+    version: 2.0.11
+    src: htmlwidgets/typed
+    script: typed.min.js
+```
+
+We remove the `stylesheet` entry as this package does not require any CSS files. The `src` specifies the path to the directory containing the scripts and stylesheets. This is akin to using the `system.file` function to return the full path to a file or directory within the package.
+
+```r
+devtools::load_all()
+system.file("htmlwidgets/typed", package = "typed")                                         
+#> "/home/me/packages/typed/inst/htmlwidgets/typed"
+```
+
+We should verify that this is correct by using the one R function the package features and check the source code of the output to verify that the typed.js is indeed imported. We thus run `typed("test")`, open the output in the browser (![](images/open-in-browser.png)) and look at the source code of the page (right click and select "View page source"). At the top of the page one should see `typed.min.js` imported, click the link to ensure it correctly points to the dependency.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+<script src="lib/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<script src="lib/typed.js-2.0.11/typed.min.js"></script>
+<script src="lib/typed-binding-0.0.0.9000/typed.js"></script>
+...
+```
+
+## JavaScript {-}
+
+On its [official website](https://mattboldt.com/demos/typed-js/), typed.js gives the following example. The JavaScript function `Typed` takes two arguments, first the selector, the element to hold the output, second a JSON of options to specify what is being typed and a myriad of other things. 
+
+```js
+var typed = new Typed('.element', {
+  strings: ["First sentence.", "Second sentence."],
+  typeSpeed: 30
+});
+```
+
+Let's place it in the package by replacing the content of the `renderValue` in `typed.js` with the above.
+
+```js
+...
+renderValue: function(x) {
+
+  var typed = new Typed('.element', {
+    strings: ["First sentence.", "Second sentence."],
+    typeSpeed: 30
+  });
+
+}
+...
+```
+
+One could be tempted to run `devtools::load_all` but this will not work, namely because the function uses a selector that is will not return any object; it needs to be applied to the div created by the widget not `.element`. As hinted at in the playground, the selector of the element created is accessible from the `el` object. As a matter of fact, we did log in the browser console the id of the created div taken from `el.id`. Therefore concatenating the pound sign and the element id produces the select to said element. (`.class`, `#id`)
+
+```js
+// typed.js
+...
+renderValue: function(x) {
+
+  var typed = new Typed('#' + el.id, {
+    strings: ["First sentence.", "Second sentence."],
+    typeSpeed: 30
+  });
+
+}
+...
+```
+
+This should now work, run `devtools::load_all` followed by `typed("whatever")` and the JavaScript animated text will appear! It's not of any use just yet as the options, included the text being typed is predefined: the package is currently not making any use the of the inputs passed from R. Below change the default strings to `x.message`.
+
+```js
+// typed.js
+...
+renderValue: function(x) {
+
+  var typed = new Typed('#' + el.id, {
+    strings: x.message,
+    typeSpeed: 30
+  });
+
+}
+...
+```
+
+This, however, will cause issues as the `strings` options expects and array (vector) and not a single string. This is something often forgotten when working with R, there is no scalar values, in R a scalar is vector of length 1.
+
+```r
+typed("does not work") # length =  1
+typed(c("This", "will", "work")) # length > 1
+```
+
+One solution is to force the input into a list.
+
+```r
+# typed.R
+x = list(
+  message = as.list(message)
+)
+```
+
+At this juncture the package works but there is a salient issue with the way it handles options. Why build a list in R to reconstruct it in JavaScript manually. Since the options are serialised in R to JSON and that typed.js expects a JSON of options it is actually cleaner and more convenient to construct an R list that mirrors the JSON array so one can use is as-is in JavaScript.
+
+In fact, renaming the `message` to `strings` effectively does this.
+
+```r
+# typed.R
+x = list(
+  strings = as.list(message)
+)
+```
+
+This allows greatly simplifying the code JavaScript side, making it much easier to add other options down the line, maintain, debug, and read.
+
+```js
+// typed.js
+...
+renderValue: function(x) {
+
+  var typed = new Typed('#' + el.id, x);
+
+}
+...
+```
+
+One can now add more options from the R code without having to alter any of the JavaScript. Let us demonstrate with the `loop` option.
+
+```r
+typed <- function(message, loop = FALSE, width = NULL, height = NULL, elementId = NULL) {
+
+  # forward options using x
+  x = list(
+    loop = loop,
+    strings = as.list(message)
+  )
+
+  # create widget
+  htmlwidgets::createWidget(
+    name = 'typed',
+    x,
+    width = width,
+    height = height,
+    package = 'typed',
+    elementId = elementId
+  )
+}
+```
+
+## HTML Element {-}
+
+As pointed out multiple times, the widget is generated in a `<div>`, which is works fine for most visualisation libraries. But we saw that chart.js requires placing it in a `<canvas>`, so one needs the ability to change that. It could be interesting to apply this to typed.js too as within a `<div>` it cannot be placed inline, using a `<span>`, however, this would work.
+
+This can be changed by placing a function named `nameOfWidget_html` which looked up by htmlwidgets and used if found. This function takes the three-dot construct `...` and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets needs be able to pass arguments, such as the all too critical `id`.
+
+```r
+typed_html <- function(...){
+  htmltools::tags$span(...)
+}
+```
+
+## Exercises {-}
+
+The full list of which is available in the [documentation of typed.js](https://github.com/mattboldt/typed.js/#customization). There are multiple ways to complete this package with regard to the options that are made available R-side and the API one wants to provide users of the package.
+
+1. Keep adding arguments as done with `loop`
+2. Use the three-dot construct (`...`) instead of adding arguments individually.
+3. Provide other functions for additional options.
+
+It might be unclear how to implement the last point, this is something we'll explore in the following section.
