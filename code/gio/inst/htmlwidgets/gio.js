@@ -24,7 +24,8 @@ HTMLWidgets.widget({
         controller.onCountryPicked( callback );
 
         function callback (selectedCountry, relatedCountries) {
-          Shiny.setInputValue(el.id + '_selected', selectedCountry.ISOCode);
+          Shiny.setInputValue(el.id + '_selected', selectedCountry);
+          Shiny.setInputValue(el.id + '_related', relatedCountries);
         }
 
         // render
