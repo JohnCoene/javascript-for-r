@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 10 For The Curious | JavaScript for R</title>
+  <title>Chapter 4 Get Started | JavaScript for R</title>
   <meta name="description" content="Invite JavaScript into your Data Science workflow." />
   <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 10 For The Curious | JavaScript for R" />
+  <meta property="og:title" content="Chapter 4 Get Started | JavaScript for R" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="yihui/bookdown-crc" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 10 For The Curious | JavaScript for R" />
+  <meta name="twitter:title" content="Chapter 4 Get Started | JavaScript for R" />
   
   <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="the-full-monty.html"/>
-<link rel="next" href="references.html"/>
+<link rel="prev" href="node.html"/>
+<link rel="next" href="a-first-look.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -265,18 +265,104 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="for-the-curious" class="section level1" number="10">
-<h1><span class="header-section-number">Chapter 10</span> For The Curious</h1>
-<p>htmlwidgets inner-workings</p>
+<div id="get-started" class="section level1" number="4">
+<h1><span class="header-section-number">Chapter 4</span> Get Started</h1>
+<p>Shiny is by far most popular, if not the only, web framework for the R programming language. In this chapter, after brushing up on the necessary to include JavaScript in shiny applications, we explore how to blend the JavaScript language with our R server and front-end.</p>
+<p>Then again, the aim is not to write a lot of convoluted JavaScript, on the contrary, it is to write as little as possible and demonstrate to the reader that it is often enough to greatly improve the user experience of shiny applications. Making shiny work with JavaScript can essentially be broken down into two operations: 1) passing data from the R server to the JavaScript client and 2) the other way around, from the client to the R server.</p>
+<p>In this chapter every section builds upon the previous, only skip those if you truly feel confident you understand it fully or you will get confused.</p>
+<div id="static-files" class="section level2 unnumbered" number="">
+<h2>Static Files</h2>
+<p>In order to introduce JavaScript to shiny applications one must understand static files and how they work with the framework. Static files are files that are downloaded by the clients, in this case web browsers accessing shiny applications, as-is, these generally include images, CSS (<code>.css</code>), and JavaScript (<code>.js</code>).</p>
+<p>If you are familiar with R package development, static files are to shiny applications what the “inst” directory is to an R package, those files are installed as-is and do not require further processing as opposed to the “src” folder which contains files that need compiling for instance.</p>
+<p>There are numerous ways to run a shiny application locally; the two most used probably are <code>shinyApp</code> and <code>runApp</code>. The RStudio IDE comes with a convenient “Run” button when writing a shiny application, which when clicked actually uses the function <code>shiny::runApp</code> in the background, this function looks for said static files in the <code>www</code> directory and makes them available at the same path (<code>/www</code>). If you are building your applications outside of RStudio, you should either also use <code>shiny::runApp</code> or specify the directory which then allows using <code>shiny::shinyApp</code>. Note that this only applies locally, shiny server (community and pro) as well as <a href="https://www.shinyapps.io/">shinyapps.io</a> use the same defaults as the RStudio IDE and <code>shiny::runApp</code>.</p>
+<p>In order to ensure the code in this book can run regardless of the reader’s machine or editor, the asset directory is always specified explicitly. This is probably advised to steer clear of the potential headaches as, unlike the default, it’ll work regardless of the environment. If you are using <a href="https://thinkr-open.github.io/golem/">golem</a> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> to develop your application then you should not worry about this as it specifies the directory internally.</p>
+<p>Below we build a basic shiny application, however, before we define the ui and server we use the <code>shiny::addResourcePath</code> function to specify the location of the directory of static files that will be served by the server and thus accessible by the client. This function takes two arguments, first the <code>prefix</code>, which is the path (URL) at which the assets will be available, second the path to the directory of static assets.</p>
+<p>We thus create the “assets” directory and a JavaScript file called <code>script.js</code> within it.</p>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="get-started.html#cb117-1"></a><span class="co"># run from root of app (where app.R is located)</span></span>
+<span id="cb117-2"><a href="get-started.html#cb117-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb117-3"><a href="get-started.html#cb117-3"></a><span class="kw">writeLines</span>(<span class="st">&quot;console.log(&#39;Hello JS!&#39;);&quot;</span>, <span class="dt">con =</span> <span class="st">&quot;assets/script.js&quot;</span>)</span></code></pre></div>
+<p>We can now use the <code>shiny::addResourcePath</code> to point to this directory. Generally the same name for the directory of static assets and prefix is used so as to avoid confusion, below we name them differently in order for the reader to clearly distinguish which is which.</p>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="get-started.html#cb118-1"></a><span class="co"># app.R</span></span>
+<span id="cb118-2"><a href="get-started.html#cb118-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb118-3"><a href="get-started.html#cb118-3"></a></span>
+<span id="cb118-4"><a href="get-started.html#cb118-4"></a><span class="co"># serve the files</span></span>
+<span id="cb118-5"><a href="get-started.html#cb118-5"></a><span class="kw">addResourcePath</span>(</span>
+<span id="cb118-6"><a href="get-started.html#cb118-6"></a>  <span class="co"># will be accessible at /files</span></span>
+<span id="cb118-7"><a href="get-started.html#cb118-7"></a>  <span class="dt">prefix =</span> <span class="st">&quot;files&quot;</span>, </span>
+<span id="cb118-8"><a href="get-started.html#cb118-8"></a>  <span class="co"># path to our assets directory</span></span>
+<span id="cb118-9"><a href="get-started.html#cb118-9"></a>  <span class="dt">directoryPath =</span> <span class="st">&quot;assets&quot;</span></span>
+<span id="cb118-10"><a href="get-started.html#cb118-10"></a>)</span>
+<span id="cb118-11"><a href="get-started.html#cb118-11"></a></span>
+<span id="cb118-12"><a href="get-started.html#cb118-12"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb118-13"><a href="get-started.html#cb118-13"></a>  <span class="kw">h1</span>(<span class="st">&quot;R and JavaScript&quot;</span>)</span>
+<span id="cb118-14"><a href="get-started.html#cb118-14"></a>)</span>
+<span id="cb118-15"><a href="get-started.html#cb118-15"></a></span>
+<span id="cb118-16"><a href="get-started.html#cb118-16"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){}</span>
+<span id="cb118-17"><a href="get-started.html#cb118-17"></a></span>
+<span id="cb118-18"><a href="get-started.html#cb118-18"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>If you then run the application and open it at the <code>/files/script.js</code> path (e.g.: <code>127.0.0.1:3000/files/script.js</code>) you should see the content of our JavaScript file (<code>console.log('Hello JS!')</code>), commenting the <code>addResourcePath</code> line will have a “Not Found” error displayed on the page instead.</p>
+<p>All files in your asset directory will be served online and accessible to anyone: do not place sensitive files in it.</p>
+<p>Though one may create multiple such directory and correspondingly use <code>addResourcePath</code> to specify multiple paths and prefixes, one will routinely specify a single one, named “assets” or “static,” which contains multiple subdirectories, one for each type of static file to obtain a directory that looks something like the tree below. This is, however, an unwritten convention which is by no means forced upon the developer: do as you wish.</p>
+<pre><code>assets/
+├── js/
+│    └── script.js
+├── css/
+│    └── style.css
+└── img/
+     └── pic.png</code></pre>
+<p>At this stage we have made the JavaScript file we created accessible by the clients but we still have to source this file in our <code>ui</code> as currently this file is, though served, not used by our application. Were one creating a static HTML page one would use the <code>script</code> to <code>src</code> the file in the <code>head</code> of the page.</p>
+<div class="sourceCode" id="cb120"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb120-1"><a href="get-started.html#cb120-1"></a><span class="kw">&lt;html&gt;</span></span>
+<span id="cb120-2"><a href="get-started.html#cb120-2"></a>  <span class="kw">&lt;head&gt;</span></span>
+<span id="cb120-3"><a href="get-started.html#cb120-3"></a>    <span class="er">&lt;</span>!–– source the JavaScript file ––&gt;</span>
+<span id="cb120-4"><a href="get-started.html#cb120-4"></a>    <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;path/to/script.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb120-5"><a href="get-started.html#cb120-5"></a>  <span class="kw">&lt;/head&gt;</span></span>
+<span id="cb120-6"><a href="get-started.html#cb120-6"></a>  <span class="kw">&lt;body&gt;</span></span>
+<span id="cb120-7"><a href="get-started.html#cb120-7"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb120-8"><a href="get-started.html#cb120-8"></a>  <span class="kw">&lt;/body&gt;</span></span>
+<span id="cb120-9"><a href="get-started.html#cb120-9"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<p>In shiny we write the ui in R and not in HTML (though this is also supported). Given the resemblance between the names of HTML tags and shiny UI functions it’s pretty straightforward, the html page above would look something like the shiny <code>ui</code> below.</p>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="get-started.html#cb121-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb121-2"><a href="get-started.html#cb121-2"></a></span>
+<span id="cb121-3"><a href="get-started.html#cb121-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb121-4"><a href="get-started.html#cb121-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb121-5"><a href="get-started.html#cb121-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;path/to/script.js&quot;</span>)</span>
+<span id="cb121-6"><a href="get-started.html#cb121-6"></a>  ),</span>
+<span id="cb121-7"><a href="get-started.html#cb121-7"></a>  <span class="kw">p</span>(<span class="dt">id =</span> <span class="st">&quot;content&quot;</span>, <span class="st">&quot;Trying JavaScript!&quot;</span>)</span>
+<span id="cb121-8"><a href="get-started.html#cb121-8"></a>)</span></code></pre></div>
+<p>Note that we use the <code>tags</code> object which comes from the shiny package and includes HTML tags that are not exported as standalone functions. For instance, you can create a <code>&lt;div&gt;</code> in shiny with the <code>div</code> function but <code>tags$div</code> will also work. This can now be applied to the shiny application, the <code>path/to/script.js</code> should be changed to <code>files/script.js</code> where <code>files</code> is the prefix we defined in <code>addResourcePath</code>.</p>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="get-started.html#cb122-1"></a><span class="co"># app.R</span></span>
+<span id="cb122-2"><a href="get-started.html#cb122-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb122-3"><a href="get-started.html#cb122-3"></a></span>
+<span id="cb122-4"><a href="get-started.html#cb122-4"></a><span class="co"># serve the files</span></span>
+<span id="cb122-5"><a href="get-started.html#cb122-5"></a><span class="kw">addResourcePath</span>(<span class="dt">prefix =</span> <span class="st">&quot;files&quot;</span>, <span class="dt">directoryPath =</span> <span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb122-6"><a href="get-started.html#cb122-6"></a></span>
+<span id="cb122-7"><a href="get-started.html#cb122-7"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb122-8"><a href="get-started.html#cb122-8"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb122-9"><a href="get-started.html#cb122-9"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;files/script.js&quot;</span>)</span>
+<span id="cb122-10"><a href="get-started.html#cb122-10"></a>  ),</span>
+<span id="cb122-11"><a href="get-started.html#cb122-11"></a>  <span class="kw">h1</span>(<span class="st">&quot;R and JavaScript&quot;</span>)</span>
+<span id="cb122-12"><a href="get-started.html#cb122-12"></a>)</span>
+<span id="cb122-13"><a href="get-started.html#cb122-13"></a></span>
+<span id="cb122-14"><a href="get-started.html#cb122-14"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){}</span>
+<span id="cb122-15"><a href="get-started.html#cb122-15"></a></span>
+<span id="cb122-16"><a href="get-started.html#cb122-16"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>From the browser, inspecting page (right click &gt; inspect &gt; console tab) one should see “Hello JS!” in the console which means our application correctly ran the code in our JavaScript file.</p>
 
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-R-golem">
+<p>Guyader, Vincent, Colin Fay, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://CRAN.R-project.org/package=golem">https://CRAN.R-project.org/package=golem</a>.</p>
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="the-full-monty.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="node.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="a-first-look.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -307,7 +393,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/23-curious.Rmd",
+"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/10-Shiny-get-started.Rmd",
 "text": "Edit"
 },
 "history": {
