@@ -9,7 +9,8 @@ gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
 
   # forward options using x
   x = list(
-    data = data
+    data = data,
+    style = "default"
   )
 
   attr(x, 'TOJSON_ARGS') <- list(dataframe = "rows")
@@ -21,8 +22,19 @@ gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
     width = width,
     height = height,
     package = 'gio',
-    elementId = elementId
+    elementId = elementId,
+    sizingPolicy = htmlwidgets::sizingPolicy(
+      padding = 0,
+      browser.fill = TRUE,
+      defaultWidth = "100%"
+    ),
+    preRenderHook = render_gio
   )
+}
+
+render_gio <- function(g){
+  g$x$data <- g$x$data[,c("e", "v", "i")]
+  return(g)
 }
 
 #' Shiny bindings for gio

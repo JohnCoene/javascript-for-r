@@ -4,7 +4,7 @@
 \alias{gio}
 \title{<Add Title>}
 \usage{
-gio(message, width = NULL, height = NULL, elementId = NULL)
+gio(data, width = NULL, height = NULL, elementId = NULL)
 }
 \description{
 <Add Description>

@@ -14,7 +14,20 @@ HTMLWidgets.widget({
 
         var container = document.getElementById(el.id);
         var controller = new GIO.Controller(container);
+        
+        // add data
         controller.addData(x.data);
+
+        controller.setStyle(x.style);
+
+        // callback
+        controller.onCountryPicked( callback );
+
+        function callback (selectedCountry, relatedCountries) {
+          Shiny.setInputValue(el.id + '_selected', selectedCountry.ISOCode);
+        }
+
+        // render
         controller.init();
 
       },

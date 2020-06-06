@@ -1,0 +1,172 @@
+# Advanced Usage
+
+In the previous chapter we put together an interesting, fully functioning widget but it lacks polish and does not use all the features htmlwidgets provides, this chapter looks into those.
+
+## Sizing
+
+The `gio` function of the package we developed in the previous chapter has arguments to specify the dimensions of the visualisation (width and height). However, think how rarely one specifies these parameters when using existing htmlwidgets. Indeed HTML visualisations should be responsive and fit the container they are placed in. This enables creating visualisations that look great on large desktop screens as well as the smaller mobile phones or iPad screens. Pre-defining the dimensions of the visualisation, likely in pixel (e.g.: `400px`), breaks all responsiveness. Note that this only applies to the width and not the height as this is what varies the most between screen sizes; a visualisation with a fixed height can still be responsive.
+
+```r
+arcs <- jsonlite::fromJSON(
+  '[
+    {
+      "e": "CN",
+      "i": "US",
+      "v": 3300000
+    },
+    {
+      "e": "CN",
+      "i": "RU",
+      "v": 10000
+    }
+  ]'
+)
+
+gio(cars)
+```
+
+![Gio no sizing management](images/gio-size-issue.png)
+
+The output produced by gio currently does not fit the container it is in: it should take the full width of the browser. This could be achieved by setting the width to `100%` (CSS value).
+
+```r
+gio(arcs, width = 500) # 500 px wide
+gio(arcs, width = "100%") # responsive
+```
+
+The next section on sizing policy delves a bit deeper into sizing and demonstrate how to make a package responsive by default.
+
+## Sizing Policy
+
+One can optionally specify a sizing policy when creating the widget which will dictate default dimensions and padding given different contexts:
+
+- Global defaults
+- RStudio viewer
+- Web browser
+- R markdown
+
+It is often enough to specify general defaults as widgets are rarely expected to behave differently with respect to size and padding depending on the context but it can be useful.
+
+Below we modify the sizing policy of gio via the `sizingPolicy` argument of the `createWidget` function. The function `htmlwidgets::sizingPolicy` has many arguments, below we set the default width to 100% to ensure the visualisation is and fills its container entirely regardless of where it is rendered. We also remove all padding by setting it to 0 and set `browser.fill` to `TRUE` so it automatically resize the visualisation to fit the entire browser page.
+
+```r
+# create widget
+htmlwidgets::createWidget(
+  name = 'gio',
+  x,
+  width = width,
+  height = height,
+  package = 'gio',
+  elementId = elementId,
+  sizingPolicy = htmlwidgets::sizingPolicy(
+    defaultWidth = "100%",
+    padding = 0,
+    browser.fill = TRUE
+  )
+)
+```
+
+![Gio with sizing policy](images/gio-fit.png)
+
+## Resizing
+
+In the first widget built in this book (`playground`), when deconstructed the JavaScript `factory` function we omitted the `resize` function. The `resize` function does what it says on the tin: it is called when the widget is resized. What this function will contain entirely depends on the JavaScript library one is working with. Some make it very easy other less so, that is for the developer to discover in the documentation of the library. Some libraries, like gio, do not even require it and handle automatically under the hood.
+
+![Gio resized](images/gio-small.png)
+
+However, to give the reader an idea of what these tend to look like we will see how plotly, highcharts.js, and chart.js implement it.
+
+__Plotly__
+
+```js
+Plotly.relayout('chartid', {width: width, height: height});
+```
+
+__Highcharts__
+
+```js
+chart.setSize(width, height);
+```
+
+__Chart.js__
+
+```js
+chart.resize();
+```
+
+The `width` and `height` used in the functions above are obtained from the `resize` function itself.
+
+```js
+...
+resize: function(width, height) {
+  
+}
+...
+```
+
+## Pre Render Hooks & Safety
+
+The `createWidget` function also comes with a `preRenderHook` argument to let one pass a a function which is run just prior to the rendering, it accepts the entire widget object as input, and should return a modified widget object. This was not used in any of the widgets previously built but can be extremely useful. It can be used to make checks on the object to ensure all is correct, or remove variables that should only be used internally.
+
+Currently, `gio` takes the entirety of the `data` and serialises it in its entirety which will cause security concerns as all the data used in the widget is visible in the source code of the package. What is the data used for the visualisation also contained sensitive information? We ought to ensure gio only serialises the data necessary to produce the visualisation.
+
+```r
+# add a variable that should not be shared
+arcs$secret_id <- 1:2
+```
+
+```r
+# preRenderHook function
+render_gio <- function(g){
+  # only keep relevant variables
+  g$x$data <- g$x$data[,c("e", "v", "i")]
+  return(g)
+}
+
+# create widget
+htmlwidgets::createWidget(
+  name = 'gio',
+  x,
+  width = width,
+  height = height,
+  package = 'gio',
+  elementId = elementId,
+  sizingPolicy = htmlwidgets::sizingPolicy(
+    defaultWidth = "100%",
+    padding = 0,
+    browser.fill = TRUE
+  ),
+  preRenderHook = render_gio # pass renderer
+)
+```
+
+## JavaScript Code {-}
+
+As mentioned in a previous chapter JavaScript code cannot be serialised to JSON.
+
+```{r}
+# serialised as string
+jsonlite::toJSON("var x = 3;")
+```
+
+Nonetheless, it is doable in htmlwdigets. The function `htmlwidgets::JS` can be used to mark a character vector so that it will be treated as literal JavaScript code when evaluated on the client-side.
+
+```{r}
+htmlwidgets::JS("var x = 3;")  
+```
+
+## Prepend & Append Content {-}
+
+There is the ability to append of prepend HTML content to the rendered widget. For instance, we could use the `htmlwidgets::prependContent` to allow displaying a title to the visualisation as shown below.
+
+```r
+#' @export
+gio_title <- function(g, title){
+  title <- htmltools::h3(title)
+  htmlwidgets::prependContent(g, title)
+}
+```
+
+![Gio output with a title](images/gio-title.png)
+
+While the `prepend*` function places the content above the visualisation, the `append*` function places it below, they accept any valid htmltools or shiny tag. A caveat though, prepending or appending content will not work in Shiny.

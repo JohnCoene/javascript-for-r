@@ -1,146 +1,10 @@
-# (PART) HTML Widgets Visualisation {-}
-
 # Your First Widget
 
-In this chapter we cover the integration of JavaScript with R using the htmlwidgets package, which focuses on libraries that produce a visual output, it is often used for data visualisation but is not limited to it.
-
-As in previous chapters we mainly learn by example, building multiple widgets of increasing complexity as we progress through the chapter. Before writing the first widget, we explore JavaScript libraries that make great candidates for htmlwidgets and attempt to understand how they work to grasp what is expected from the developer in order to integrate them with R. Finally, we build up on the previous chapter to improve how HTML widgets work with shiny.
-
-## Candidate Libraries {-}
-
-Before going down the rabbit hole it is good to take a look at the types of libraries one will work with. As htmlwidgets' main client are JavaScript visualisation libraries let us take a look at some such popular libraries and briefly look at how they work and what they have in common. This will greatly help conceptualise what one is trying to achieve in this chapter.
-
-### Plotly {-}
-
-[Plotly.js](https://plotly.com/javascript/) is probably one of the more popular out there, it provides over 40 fully customiseable chart types, many of which are very sophisticated. This is indeed the JavaScript library used by the R package of the same name: plotly.
-
-Looking at the code presented in the "Get Started" guide reveals just how convenient the library is. One must import plotly, of course, then have a `<div>` where to visualisation will be placed, then, using `Plotly.newPlot`, create the actual visualisation by passing it first the element previously mentioned and a JSON of options.
-
-```html
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
-
-<head>
-  <!-- Import library -->
-  <script src="plotly-latest.min.js"></script>
-</head>
-
-<body>
-  <!-- div to hold visualisation -->
-  <div id="chart" style="width:600px;height:250px;"></div>
-
-  <!-- Script to create visualsiation -->
-  <script>
-    el = document.getElementById('chart');
-    Plotly.newPlot(el, [{
-      x: [1, 2, 3, 4, 5],
-      y: [1, 2, 4, 8, 16] }]
-    );
-  </script>
-</body>
-
-</html>
-```
-
-Now let's look at how another popular library does it.
-
-### Highchart.js {-}
-
-[Highcharts](https://www.highcharts.com/) is another library which allows creating gorgeous visualisation, maps, and more, it's also very popular albeit not being entirely open-source.
-
-```html
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
-
-<head>
-  <!-- Import library -->
-  <script src="highcharts.js"></script>
-</head>
-
-<body>
-  <!-- div to hold visualisation -->
-  <div id="chart" style="width:100%; height:400px;"></div>
-
-  <!-- Script to create visualsiation -->
-  <script>
-    var myChart = Highcharts.chart('chart', {
-        xAxis: {
-            categories: ['Apples', 'Bananas', 'Oranges']
-        },
-        series: [{
-            name: 'Jane',
-            data: [1, 0, 4]
-        }, {
-            name: 'John',
-            data: [5, 7, 3]
-        }]
-    });
-  </script>
-</body>
-
-</html>
-```
-
-The above is very similar to what plotly.js requires: import libraries, create a `<div>` where to put the visualisation, and, to create the chart, run a function which also takes the id of the div where to place the chart and a JSON of options defining the actual chart, including the data.
-
-### Chart.js {-}
-
-[Chart.js](https://www.chartjs.org/) is yet another library which to draw standard charts popular for its permissive license and convenient API.
-
-```html
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
-
-<head>
-  <!-- Import library -->
-  <script src="Chart.min.js"></script>
-</head>
-
-<body>
-  <!-- canvas to hold visualisation -->
-  <canvas id="chart" width="400" height="400"></canvas>
-
-  <!-- Script to create visualsiation -->
-  <script>
-    var el = document.getElementById('chart').getContext('2d');    
-    var myChart = new Chart(el, {
-      type: 'bar',
-      data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-        datasets: [{
-          label: '# of Votes',
-          data: [12, 19, 3, 5, 2, 3]
-        }]
-      }
-    });
-  </script>
-</body>
-
-</html>
-```
-
-We again observe a very similar structure as with previous libraries. The library is imported, instead of a `div` chart.js uses a `canvas`, and the visualisation is also created from a single function which takes the canvas as first argument and a JSON of options as second.
-
-Hopefully this reveals the repeating structure such libraries tend to follow and also hints at should be reproduced, to some extent at least, using R.
-
-## How it works {-}
-
-Imagine there is no such package as HTML widgets to help create interactive visualisations from R: how would one attempt to go about it?
-
-An interactive visualisation using JavaScript will will be contained within an HTML document, therefore it would probably have to be created first. Secondly, the visualisation that is yet to be created likely relies on external libraries, these would need to be imported in the document. The document should also include an HTML element (e.g.: `<div>`) to host said visualisation. Then data would have to be serialised in R and embedded into the document where it should be read by JavaScript code that uses it to create the visualisation. Finally all should be managed to work seamlessly across R markdown, shiny, and other settings.
-
-Thankfully the htmlwidgets package is there to handle most of this. Nonetheless, it is important to understand that these operations are undertaken (to some degree) by htmlwidgets as it greatly helps use the package.
-
-Must remember when building HTML widgets:
-
-- Import dependencies
-- Create an html element to hold visualisation
-- Serialise R data to JSON
-- Handle JSON data to produce visualisation
+The previous chapter gave some indication of how widgets work but this is overall probably still shrouded in mystery. This chapter aims at demystifying what remains confusing. This is done by building a very basic widget with the aim of rummaging through its components to observe how they interact and ultimately grasp a greater understanding of how such interactive outputs are actually produced. 
 
 ## The Scaffold {-}
 
-With some vague understanding of how such widgets work internally one is ready to "scaffold" one with the aim of rummaging through its components to grasp a greater understanding of how such interactive outputs are actually produced. The way one sets up such a package is stunningly simple. Below we create a package named "playground" which will be used to mess around and explore. Though one could probably create widgets outside of an R package, it would only make things more complicated.
+Though one could probably create widgets outside of an R package, it would only make things more complicated, htmlwidgets naturally take the form of R packages and are stunningly simple to create. Below we create a package named "playground" which will be used to mess around and explore.
 
 ```r
 create_package("playground")
@@ -169,7 +33,7 @@ play(message = "This is a widget!")
 
 This displays the message in the RStudio "Viewer," or the your default browser which indicates that the function does indeed create an HTML output. One can use the the ![](images/open-in-browser.png) button located in the top right of the RStudio "Viewer" to open the message in web browser which can prove very useful to look under the hood of the widgets for debugging.
 
-## The Output {-}
+## Deconstruct the Output {-}
 
 With an out-of-the-box HTML widget package one can start exploring the internals to understand how it works. Let's start by retracing the path taken by the message written in R to its seemingly magical appearance in HTML. The `play` function previously used, takes the `message` wraps it into a list which is then used in `htmlwidgets::createWidget`.
 
@@ -193,7 +57,7 @@ Below is a part of the `<body>` of the output of `play("This is a widget!")` obt
 <script type="application/json" data-for="htmlwidget-c21cca0e76e520b46fc7">{"x":{"message":"This is a widget!"},"evals":[],"jsHooks":[]}</script>
 ```
 
-One thing the source code of the rendered output reveals is the element (`div`) created by the htmlwidgets package to hold the message (the class name is identical to that of the widget, `play`), as well as, below it, in the `<script>` tag, the JSON object which includes the `x` variable used in the `play` function. The `div` created bears a randomly generated `id` which one can define when creating the widget using the `elementId` argument.
+One thing the source code of the rendered output reveals is the element (`div`) created by the htmlwidgets package to hold the message (the class name is identical to that of the widget (`play`), as well as, below it, in the `<script>` tag, the JSON object which includes the `x` variable used in the `play` function. The `div` created bears a randomly generated `id` which one can define when creating the widget using the `elementId` argument.
 
 ```r
 # specify the id
@@ -218,7 +82,11 @@ Inspecting the output also shows the dependencies imported, these are placed wit
 <script src="lib/play-binding-0.0.0.9000/play.js"></script>
 ```
 
-This effectively imports the `htmlwidgets.js` library as well as the `play.js` file, and were the visualisation depending on external libraries they would appear alongside those. Peaking inside the `play.js` file located at `inst/htmlwidgets/play.js` reveals the code below we see:
+This effectively imports the `htmlwidgets.js` library as well as the `play.js` file, and were the visualisation depending on external libraries they would appear alongside those. 
+
+## JavaScript Renderer {-}
+
+Peaking inside the `play.js` file located at `inst/htmlwidgets/play.js` reveals the code below:
 
 ```js
 // play.js
@@ -252,7 +120,7 @@ HTMLWidgets.widget({
 });
 ```
 
-However convoluted this may appear at first do not let that intimate you. The `factory` function returns two functions, one of which, `resize`, is currently empty, let's therefore look at the other one first, `renderValue`: the function that in fact renders the visualisation. It takes an object `x` from which is accesses the "message" variable that it uses as text for object `el` (`el.innerText`). The object `x` passed to this function is actually the list of the same name that was build in the R function `play`! While in R one would access the `message` in list `x` with `x$message` in JavaScript to access the `message` in the JSON `x` one writes `x.message`, only changing the dollar sign to a dot. Let's show this perhaps more clearly by printing the content of `x`.
+However convoluted this may appear at first do not let that intimate you. The `factory` function returns two functions, `resize`, and `renderValue`. The first is used to dynamically resize the output, it is not relevant to this widget is thus tackled later in this book. Let us focus on `renderValue`, the function that actually renders the output. It takes an object `x` from which is accesses the "message" variable that it uses as text for object `el` (`el.innerText`). The object `x` passed to this function is actually the list of the same name that was build in the R function `play`! While in R one would access the `message` in list `x` with `x$message` in JavaScript to access the `message` in the JSON `x` one writes `x.message`, only changing the dollar sign to a dot. Let's show this perhaps more clearly by printing the content of `x`.
 
 ```js
 console.log(x);

@@ -1,0 +1,96 @@
+# Working with Shiny
+
+A previous set of chapters explored how to make JavaScript and R communicate by passing data from one to the other and back. This chapter explores how to apply that to htmlwidgets so one can dynamically interact with the rendered widget by sending it more data and capture server-side how the user interact with the widget.
+
+To demonstrate how to integrate these functionalities in widgets we shall implement them in the previously built gio package.
+
+## Callback {-}
+
+Wouldn't it be grand if one were able to pick up server-side which country is selected by the user. This could enable fetching further data on the selected country in a database or display the flag of the selected country in the application's UI, or both, or do many other things. With regard to the implementation itself little if anything changes from previous examples used in the collection of chapters on Shiny.
+
+The [documentation of gio.js](https://giojs.org/html/docs/callbackPicked.html) show the library features the possibility to pass a callback function that is run every time a country is selected, the example given is below.
+
+```js
+controller.onCountryPicked( callback );
+
+function callback (selectedCountry, relatedCountries) {
+
+  console.log(selectedCountry);
+  console.log(relatedCountries);
+
+}
+```
+
+This can be adapted as previously demonstrated and used in our widget as shown below.
+
+```js
+...
+renderValue: function(x) {
+
+  var container = document.getElementById(el.id);
+  var controller = new GIO.Controller(container);
+  controller.addData(x.data);
+  controller.setStyle(x.style);
+
+  // callback
+  controller.onCountryPicked( callback );
+
+  function callback (selectedCountry, relatedCountries) {
+    Shiny.setInputValue(el.id + '_selected', selectedCountry);
+  }
+
+  // render
+  controller.init();
+
+}
+...
+```
+
+This will set the input named `id_selected` with the data on the selected country. Install the package with `devtools::install` and try that functionality in a shiny application.
+
+```r
+library(gio)
+library(shiny)
+
+arcs <- data.frame(
+  e = c("US", "CN", "RU"),
+  i = c("CN", "RU", "US"),
+  v = c(100, 120, 130)
+)
+
+ui <- fluidRow(
+  gioOutput("globe"),
+  verbatimTextOutput("selectedCountry")
+)
+
+server <- function(input, output){
+
+  output$globe <- renderGio({
+    gio(arcs)
+  })
+
+  output$selectedCountry <- renderPrint({
+    print(input$globe_selected)
+  })
+
+}
+
+shinyApp(ui, server)
+```
+
+Gio.js also gives access to data on countries "related" (connected) to the selected country, this could be a separate input, e.g.: `id_connected` or even included in the already specified input but consider its impact on performances. The data is sent from the client to the server whether the user uses the input or not, though this likely will not have an impact with gio it can have a negative effect on the web browser and the server for other visualisations that include more numerous and frequent interactions, e.g.: setting an input value when the user hovers a scatter plot.
+
+The latter is not a bad idea but consider making it optional so the user has to explicitly state that they want this input value set. You can also consider not sending back all the data. For instance, gio returns the coordinates of the selected country where from arc connect; this is might be considered unnecessary. The code below only sets the input to the ISO code of the country selected.
+
+```js
+function callback (selectedCountry, relatedCountries) {
+  Shiny.setInputValue(el.id + '_selected', selectedCountry.ISOCode);
+}
+```
+
+## Parse Input {-}
+
+Parse result from JavaScript.
+
+## R to JavaScript {-}
+
