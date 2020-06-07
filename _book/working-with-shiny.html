@@ -418,7 +418,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="r-to-javascript" class="section level2 unnumbered" number="">
 <h2>R to JavaScript</h2>
-<p>This book previously explored how to send data to the from the shiny server to the front-end, this section looks to apply this to htmlwidgets. Currently, using htmlwidgets in shiny consist of generating the outputs using the <code>render</code> and complimentary <code>*Output</code> functions.</p>
+<p>This book previously explored how to send data to the from the shiny server to the front-end, this section looks to apply this to htmlwidgets. Currently, gio in shiny consists of generating the globe with the <code>renderGio</code> and complimentary <code>gioOutput</code> functions. This generates the entire visualisation, it creates the globe, draws the arcs based on the data, sets the style, everything.</p>
+<p>Now imagine a scenario where we provide a <code>selectInput</code> to the user so they can choose between two datasets to visualise. First, there is no need to re-generate the entire visualisation, only the data changes, the style, background globe, and everything else can remain unchanged. This is more efficient computationally, both for the server and the client, and makes for much cleaner transitions and animations. Secondly, running <code>renderGio</code> currently does not work properly, gio.js does not replace the initigeneral visualisation but instead creates a new one below. This is admittedly somewhat particular to the gio.js functions and will likely not be the case with other libraries. The problem described can be observed running the application below: multiple visualisations are generated.</p>
 <div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="working-with-shiny.html#cb269-1"></a><span class="kw">library</span>(gio)</span>
 <span id="cb269-2"><a href="working-with-shiny.html#cb269-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb269-3"><a href="working-with-shiny.html#cb269-3"></a></span>
@@ -458,6 +459,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb269-37"><a href="working-with-shiny.html#cb269-37"></a>}</span>
 <span id="cb269-38"><a href="working-with-shiny.html#cb269-38"></a></span>
 <span id="cb269-39"><a href="working-with-shiny.html#cb269-39"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>Internally gio.js creates a new element (<code>&lt;canvas&gt;</code>) within the <code>&lt;div&gt;</code> created by <code>htmlwidgets</code>, we could empty this element before creating every visualisation, thereby removing any previously created visualisations (if there are any). We can do this using the <code>innerHTML</code> method already used in this book.</p>
+<div class="sourceCode" id="cb270"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb270-1"><a href="working-with-shiny.html#cb270-1"></a><span class="co">// gio.js</span></span>
+<span id="cb270-2"><a href="working-with-shiny.html#cb270-2"></a><span class="kw">var</span> container <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
+<span id="cb270-3"><a href="working-with-shiny.html#cb270-3"></a><span class="va">container</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="st">&#39;&#39;</span><span class="op">;</span> <span class="co">// empty</span></span>
+<span id="cb270-4"><a href="working-with-shiny.html#cb270-4"></a>controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(container)<span class="op">;</span></span>
+<span id="cb270-5"><a href="working-with-shiny.html#cb270-5"></a>...</span></code></pre></div>
+<ol style="list-style-type: decimal">
+<li>In R, Create a proxy of the visualisation</li>
+<li>Send data to the client from R</li>
+<li>In JavaScript, get the visualisation</li>
+<li>Apply data to visualisation</li>
+</ol>
 
 </div>
 </div>

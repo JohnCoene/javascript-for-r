@@ -993,7 +993,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jun 07 2020 21:37:42 GMT+0200 (CEST)"
+## [1] "Sun Jun 07 2020 22:25:41 GMT+0200 (CEST)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1003,7 +1003,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jun 07 2020 21:37:42 GMT+0200 (CEST)"
+## [1] "Sun Jun 07 2020 22:25:41 GMT+0200 (CEST)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -4312,7 +4312,9 @@ Finally, we can reinstall the package with \texttt{devtools::install} and create
 \section*{R to JavaScript}\label{r-to-javascript}}
 
 
-This book previously explored how to send data to the from the shiny server to the front-end, this section looks to apply this to htmlwidgets. Currently, using htmlwidgets in shiny consist of generating the outputs using the \texttt{render} and complimentary \texttt{*Output} functions.
+This book previously explored how to send data to the from the shiny server to the front-end, this section looks to apply this to htmlwidgets. Currently, gio in shiny consists of generating the globe with the \texttt{renderGio} and complimentary \texttt{gioOutput} functions. This generates the entire visualisation, it creates the globe, draws the arcs based on the data, sets the style, everything.
+
+Now imagine a scenario where we provide a \texttt{selectInput} to the user so they can choose between two datasets to visualise. First, there is no need to re-generate the entire visualisation, only the data changes, the style, background globe, and everything else can remain unchanged. This is more efficient computationally, both for the server and the client, and makes for much cleaner transitions and animations. Secondly, running \texttt{renderGio} currently does not work properly, gio.js does not replace the initigeneral visualisation but instead creates a new one below. This is admittedly somewhat particular to the gio.js functions and will likely not be the case with other libraries. The problem described can be observed running the application below: multiple visualisations are generated.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4357,6 +4359,31 @@ This book previously explored how to send data to the from the shiny server to t
 \KeywordTok{shinyApp}\NormalTok{(ui, server)}
 \end{Highlighting}
 \end{Shaded}
+
+Internally gio.js creates a new element (\texttt{\textless{}canvas\textgreater{}}) within the \texttt{\textless{}div\textgreater{}} created by \texttt{htmlwidgets}, we could empty this element before creating every visualisation, thereby removing any previously created visualisations (if there are any). We can do this using the \texttt{innerHTML} method already used in this book.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// gio.js}
+\KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
+\VariableTok{container}\NormalTok{.}\AttributeTok{innerHTML} \OperatorTok{=} \StringTok{\textquotesingle{}\textquotesingle{}}\OperatorTok{;} \CommentTok{// empty}
+\NormalTok{controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+\NormalTok{...}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  In R, Create a proxy of the visualisation
+\item
+  Send data to the client from R
+\item
+  In JavaScript, get the visualisation
+\item
+  Apply data to visualisation
+\end{enumerate}
 
 \hypertarget{for-the-curious}{%
 \chapter{For The Curious}\label{for-the-curious}}

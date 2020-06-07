@@ -15,6 +15,7 @@ HTMLWidgets.widget({
       renderValue: function(x) {
 
         var container = document.getElementById(el.id);
+        container.innerHTML = '';
         controller = new GIO.Controller(container);
         
         // add data
