@@ -152,3 +152,81 @@ server <- function(input, output, session){
 
 shinyApp(ui, server)
 ```
+
+### Deserialise {-}
+
+In the section on sending data from R to JavaScript we used a "message handler" in JavaScript to handle the data coming from the server. The corollary exists, we can create an "input handler" to preprocess the data coming from JavaScript before it is made accessible by the input. In R, we create a function that accepts three arguments, the data coming JavaScript, a Shiny session, and the name of the input. Note that all of these arguments are mandatory even if we are not going to used them.
+
+To demonstrate, we will create a handler that adds some admittedly useless meta information to the data.
+
+```r
+# create handler
+process_input <- function(x, session, inputname){
+  data <- list(
+    data = x,
+    meta = "This is some meta-data"
+  )
+  return(data)
+}
+```
+
+Once this function created it needs to be registered with shiny using the `registerInputHandler` function which takes two arguments. First, the name of the handler which will need to be referenced in JavaScript inputs which should use the handler, second, the handler function. Attempt to give the handler a unique name yet simple to avoid clashes with other handlers. 
+
+```r
+# register with shiny
+registerInputHandler("alert.processor", process_input)
+```
+
+Note that handlers can only be registered once, running the above twice will fail the second time, even if the handler function has changed. This can be overwritten using the `force` argument. 
+
+```r
+# register with shiny
+registerInputHandler("alert.processor", process_input, force = TRUE)
+```
+
+Once the handler function created and registered with shiny what is left to do is tell shiny which input should use that handler. This is done by adding the name of the handler, `alert.processor`, preceded by a colon (`:alert.processor`) as a suffix to the input name.
+
+```js
+Shiny.setInputValue('delete_alert:alert.processor', true, {priority: 'event'});
+```
+
+We can then recap to see what the application would look like now.
+
+```r
+library(shiny)
+
+# create handler
+process_input <- function(x, session, inputname){
+  data <- list(
+    data = x,
+    meta = "This is some meta-data"
+  )
+  return(data)
+}
+
+# register with shiny
+registerInputHandler("alert.processor", process_input)
+
+ui <- fluidPage(
+  tags$script(
+    "Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
+      alert(message);
+      Shiny.setInputValue('delete_alert:alert.processor', true, {priority: 'event'});
+    });"
+  ),
+  h1("Hello")
+)
+
+server <- function(input, output, session){
+  session$sendCustomMessage(type = "send-alert", message = "Deleting a record!")
+
+  observeEvent(input$delete_alert, {
+    # print TRUE when button is clicked
+    print(input$delete_alert) 
+  })
+}
+
+shinyApp(ui, server)
+```
+
+The previous section on the input handler is entirely optional but as we will see in later parts of the book it can prove nice touch in some cases.

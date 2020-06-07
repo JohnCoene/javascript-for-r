@@ -993,7 +993,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jun 07 2020 10:41:43 GMT+0200 (CEST)"
+## [1] "Sun Jun 07 2020 16:24:40 GMT+0200 (CEST)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1003,7 +1003,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jun 07 2020 10:41:43 GMT+0200 (CEST)"
+## [1] "Sun Jun 07 2020 16:24:40 GMT+0200 (CEST)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -1748,6 +1748,125 @@ As mentioned earlier \texttt{alert} blocks code execution, therefore the input v
 \KeywordTok{shinyApp}\NormalTok{(ui, server)}
 \end{Highlighting}
 \end{Shaded}
+
+Note that Shiny performs optimisations on how those values are set. First, if the input is set to the same value then Shiny ignores it. This is fine if you are interested in the actual value of the input but will not work as expected if the input is to be used as event. Indeed if you want to use this input in an \texttt{observe}, \texttt{observeEvent}, or \texttt{eventReactive}, you want it to be triggered every time the input changes, regardless of whether that value is the same as before. The second optimisation Shiny does is when the input is set to multiple different values before these have been processed then only the most recent value will actually be sent to the server. One can opt-out of these optimisations using the \texttt{priority:\ "event"} option when setting the input value.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(shiny)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+\NormalTok{  tags}\OperatorTok{$}\KeywordTok{script}\NormalTok{(}
+    \StringTok{"Shiny.addCustomMessageHandler(type = \textquotesingle{}send{-}alert\textquotesingle{}, function(message) \{}
+\StringTok{      alert(message);}
+\StringTok{      Shiny.setInputValue(\textquotesingle{}delete\_alert\textquotesingle{}, true, \{priority: \textquotesingle{}event\textquotesingle{}\});}
+\StringTok{    \});"}
+\NormalTok{  ),}
+  \KeywordTok{h1}\NormalTok{(}\StringTok{"Hello"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output, session)\{}
+\NormalTok{  session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\DataTypeTok{type =} \StringTok{"send{-}alert"}\NormalTok{, }\DataTypeTok{message =} \StringTok{"Deleting a record!"}\NormalTok{)}
+
+  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{delete\_alert, \{}
+    \CommentTok{\# print TRUE when button is clicked}
+    \KeywordTok{print}\NormalTok{(input}\OperatorTok{$}\NormalTok{delete\_alert) }
+\NormalTok{  \})}
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{deserialise}{%
+\subsection*{Deserialise}\label{deserialise}}
+
+
+In the section on sending data from R to JavaScript we used a ``message handler'' in JavaScript to handle the data coming from the server. The corollary exists, we can create an ``input handler'' to preprocess the data coming from JavaScript before it is made accessible by the input. In R, we create a function that accepts three arguments, the data coming JavaScript, a Shiny session, and the name of the input. Note that all of these arguments are mandatory even if we are not going to used them.
+
+To demonstrate, we will create a handler that adds some admittedly useless meta information to the data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# create handler}
+\NormalTok{process\_input <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, session, inputname)\{}
+\NormalTok{  data <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{data =}\NormalTok{ x,}
+    \DataTypeTok{meta =} \StringTok{"This is some meta{-}data"}
+\NormalTok{  )}
+  \KeywordTok{return}\NormalTok{(data)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Once this function created it needs to be registered with shiny using the \texttt{registerInputHandler} function which takes two arguments. First, the name of the handler which will need to be referenced in JavaScript inputs which should use the handler, second, the handler function. Attempt to give the handler a unique name yet simple to avoid clashes with other handlers.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# register with shiny}
+\KeywordTok{registerInputHandler}\NormalTok{(}\StringTok{"alert.processor"}\NormalTok{, process\_input)}
+\end{Highlighting}
+\end{Shaded}
+
+Note that handlers can only be registered once, running the above twice will fail the second time, even if the handler function has changed. This can be overwritten using the \texttt{force} argument.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# register with shiny}
+\KeywordTok{registerInputHandler}\NormalTok{(}\StringTok{"alert.processor"}\NormalTok{, process\_input, }\DataTypeTok{force =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Once the handler function created and registered with shiny what is left to do is tell shiny which input should use that handler. This is done by adding the name of the handler, \texttt{alert.processor}, preceded by a colon (\texttt{:alert.processor}) as a suffix to the input name.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\StringTok{\textquotesingle{}delete\_alert:alert.processor\textquotesingle{}}\OperatorTok{,} \KeywordTok{true}\OperatorTok{,} \OperatorTok{\{}\DataTypeTok{priority}\OperatorTok{:} \StringTok{\textquotesingle{}event\textquotesingle{}}\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+We can then recap to see what the application would look like now.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(shiny)}
+
+\CommentTok{\# create handler}
+\NormalTok{process\_input <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, session, inputname)\{}
+\NormalTok{  data <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{data =}\NormalTok{ x,}
+    \DataTypeTok{meta =} \StringTok{"This is some meta{-}data"}
+\NormalTok{  )}
+  \KeywordTok{return}\NormalTok{(data)}
+\NormalTok{\}}
+
+\CommentTok{\# register with shiny}
+\KeywordTok{registerInputHandler}\NormalTok{(}\StringTok{"alert.processor"}\NormalTok{, process\_input)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+\NormalTok{  tags}\OperatorTok{$}\KeywordTok{script}\NormalTok{(}
+    \StringTok{"Shiny.addCustomMessageHandler(type = \textquotesingle{}send{-}alert\textquotesingle{}, function(message) \{}
+\StringTok{      alert(message);}
+\StringTok{      Shiny.setInputValue(\textquotesingle{}delete\_alert:alert.processor\textquotesingle{}, true, \{priority: \textquotesingle{}event\textquotesingle{}\});}
+\StringTok{    \});"}
+\NormalTok{  ),}
+  \KeywordTok{h1}\NormalTok{(}\StringTok{"Hello"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output, session)\{}
+\NormalTok{  session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\DataTypeTok{type =} \StringTok{"send{-}alert"}\NormalTok{, }\DataTypeTok{message =} \StringTok{"Deleting a record!"}\NormalTok{)}
+
+  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{delete\_alert, \{}
+    \CommentTok{\# print TRUE when button is clicked}
+    \KeywordTok{print}\NormalTok{(input}\OperatorTok{$}\NormalTok{delete\_alert) }
+\NormalTok{  \})}
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+The previous section on the input handler is entirely optional but as we will see in later parts of the book it can prove nice touch in some cases.
 
 \hypertarget{a-complete-integration---jbox.js}{%
 \chapter{A Complete Integration - jBox.js}\label{a-complete-integration---jbox.js}}
@@ -3653,12 +3772,13 @@ This closes this chapter but is not the last we see of gio.js, we shall use it a
 \hypertarget{advanced-usage}{%
 \chapter{Advanced Usage}\label{advanced-usage}}
 
-In the previous chapter we put together an interesting, fully functioning widget but it lacks polish and does not use all the features htmlwidgets provides, this chapter looks into those.
+In the previous chapter we put together an interesting, fully functioning widget but it lacks polish and does not use all the features htmlwidgets provides, this chapter explores those. We look into handling the size of widgets to ensure they are responsive as well as discuss potential security concerns and how to address them. Finally we show how to pass JavaScript code from R to JavaScript and how to add HTML content before and after our widget.
 
 \hypertarget{sizing}{%
-\section{Sizing}\label{sizing}}
+\section*{Sizing}\label{sizing}}
 
-The \texttt{gio} function of the package we developed in the previous chapter has arguments to specify the dimensions of the visualisation (width and height). However, think how rarely one specifies these parameters when using existing htmlwidgets. Indeed HTML visualisations should be responsive and fit the container they are placed in. This enables creating visualisations that look great on large desktop screens as well as the smaller mobile phones or iPad screens. Pre-defining the dimensions of the visualisation, likely in pixel (e.g.: \texttt{400px}), breaks all responsiveness. Note that this only applies to the width and not the height as this is what varies the most between screen sizes; a visualisation with a fixed height can still be responsive.
+
+The \texttt{gio} function of the package we developed in the previous chapter has arguments to specify the dimensions of the visualisation (width and height). However, think how rarely (if ever) one specifies these parameters when using plotly, highcharter or leaflet. Indeed HTML visualisations should be responsive and fit the container they are placed in---not to be confused though, these are two different things. This enables creating visualisations that look great on large desktop screens as well as the smaller mobile phones or iPad screens. Pre-defining the dimensions of the visualisation (e.g.: \texttt{400px}), breaks all responsiveness as the width is no longer relative to its container. Using a relative width like \texttt{100\%} ensures the visualisation always fits in the container edge to edge and enables responsiveness.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3687,21 +3807,22 @@ The \texttt{gio} function of the package we developed in the previous chapter ha
 \caption{Gio no sizing management}
 \end{figure}
 
-The output produced by gio currently does not fit the container it is in: it should take the full width of the browser. This could be achieved by setting the width to \texttt{100\%} (CSS value).
+When this is not specified htmlwdigets sets the width of the visualisation to 400 pixels.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{gio}\NormalTok{(arcs, }\DataTypeTok{width =} \DecValTok{500}\NormalTok{) }\CommentTok{\# 500 px wide}
-\KeywordTok{gio}\NormalTok{(arcs, }\DataTypeTok{width =} \StringTok{"100\%"}\NormalTok{) }\CommentTok{\# responsive}
+\KeywordTok{gio}\NormalTok{(arcs, }\DataTypeTok{width =} \StringTok{"100\%"}\NormalTok{) }\CommentTok{\# fits width}
 \end{Highlighting}
 \end{Shaded}
 
-The next section on sizing policy delves a bit deeper into sizing and demonstrate how to make a package responsive by default.
+The next section on sizing policy delves a bit deeper into sizing, it demonstrates how to make a package visualisation and default to a 100\% width.
 
 \hypertarget{sizing-policy}{%
-\section{Sizing Policy}\label{sizing-policy}}
+\section*{Sizing Policy}\label{sizing-policy}}
 
-One can optionally specify a sizing policy when creating the widget which will dictate default dimensions and padding given different contexts:
+
+One can optionally specify a sizing policy when creating the widget, the policy will dictate default dimensions and padding given different contexts:
 
 \begin{itemize}
 \tightlist
@@ -3715,9 +3836,9 @@ One can optionally specify a sizing policy when creating the widget which will d
   R markdown
 \end{itemize}
 
-It is often enough to specify general defaults as widgets are rarely expected to behave differently with respect to size and padding depending on the context but it can be useful.
+It is often enough to specify general defaults as widgets are rarely expected to behave differently with respect to size depending on the context but it can be useful.
 
-Below we modify the sizing policy of gio via the \texttt{sizingPolicy} argument of the \texttt{createWidget} function. The function \texttt{htmlwidgets::sizingPolicy} has many arguments, below we set the default width to 100\% to ensure the visualisation is and fills its container entirely regardless of where it is rendered. We also remove all padding by setting it to 0 and set \texttt{browser.fill} to \texttt{TRUE} so it automatically resize the visualisation to fit the entire browser page.
+Below we modify the sizing policy of gio via the \texttt{sizingPolicy} argument of the \texttt{createWidget} function. The function \texttt{htmlwidgets::sizingPolicy} has many arguments, we set the default width to 100\% to ensure the visualisation fills its container entirely regardless of where it is rendered. We also remove all padding by setting it to 0 and set \texttt{browser.fill} to \texttt{TRUE} so it automatically resize the visualisation to fit the entire browser page.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3745,9 +3866,10 @@ Below we modify the sizing policy of gio via the \texttt{sizingPolicy} argument 
 \end{figure}
 
 \hypertarget{resizing}{%
-\section{Resizing}\label{resizing}}
+\section*{Resizing}\label{resizing}}
 
-In the first widget built in this book (\texttt{playground}), when deconstructed the JavaScript \texttt{factory} function we omitted the \texttt{resize} function. The \texttt{resize} function does what it says on the tin: it is called when the widget is resized. What this function will contain entirely depends on the JavaScript library one is working with. Some make it very easy other less so, that is for the developer to discover in the documentation of the library. Some libraries, like gio, do not even require it and handle automatically under the hood.
+
+In the first widget built in this book (\texttt{playground}), when we deconstructed the JavaScript \texttt{factory} function but omitted the \texttt{resize} function. The \texttt{resize} function does what it says on the tin: it is called when the widget is resized. What this function will contain entirely depends on the JavaScript library one is working with. Some are very easy to resize other less so, that is for the developer to discover in the documentation of the library. Some libraries, like gio, do not even require using a resizing function and handle that automatically under the hood; resize the width of the RStudio viewer or web browser and gio.js resizes too.
 
 \begin{figure}
 \centering
@@ -3755,7 +3877,7 @@ In the first widget built in this book (\texttt{playground}), when deconstructed
 \caption{Gio resized}
 \end{figure}
 
-However, to give the reader an idea of what these tend to look like we will see how plotly, highcharts.js, and chart.js implement it.
+However, to give the reader an idea of what these tend to look like below are the ways plotly, highcharts, and chart.js do it.
 
 \textbf{Plotly}
 
@@ -3787,18 +3909,19 @@ The \texttt{width} and \texttt{height} used in the functions above are obtained 
 \begin{Highlighting}[]
 \NormalTok{...}
 \NormalTok{resize}\OperatorTok{:} \KeywordTok{function}\NormalTok{(width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
-  
+  \VariableTok{chart}\NormalTok{.}\AttributeTok{setSize}\NormalTok{(width}\OperatorTok{,}\NormalTok{ height)}\OperatorTok{;} \CommentTok{// highcharts example}
 \OperatorTok{\}}
 \NormalTok{...}
 \end{Highlighting}
 \end{Shaded}
 
 \hypertarget{pre-render-hooks-safety}{%
-\section{Pre Render Hooks \& Safety}\label{pre-render-hooks-safety}}
+\section*{Pre Render Hooks \& Safety}\label{pre-render-hooks-safety}}
 
-The \texttt{createWidget} function also comes with a \texttt{preRenderHook} argument to let one pass a a function which is run just prior to the rendering, it accepts the entire widget object as input, and should return a modified widget object. This was not used in any of the widgets previously built but can be extremely useful. It can be used to make checks on the object to ensure all is correct, or remove variables that should only be used internally.
 
-Currently, \texttt{gio} takes the entirety of the \texttt{data} and serialises it in its entirety which will cause security concerns as all the data used in the widget is visible in the source code of the package. What is the data used for the visualisation also contained sensitive information? We ought to ensure gio only serialises the data necessary to produce the visualisation.
+The \texttt{createWidget} function also comes with a \texttt{preRenderHook} argument which accepts a function that is run just prior to the rendering, it accepts the entire widget object as input, and should return a modified widget object. This was not used in any of the widgets previously built but is extremely useful. It can be used to make checks on the object to ensure all is correct, or remove variables that should only be used internally, and much more.
+
+Currently, \texttt{gio} takes the data frame \texttt{data} and serialises it in its entirety which will cause security concerns as all the data used in the widget is visible in the source code of the package. What if the data used for the visualisation contained an additional column with sensitive information? We ought to ensure gio only serialises the data necessary to produce the visualisation.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3806,6 +3929,8 @@ Currently, \texttt{gio} takes the entirety of the \texttt{data} and serialises i
 \NormalTok{arcs}\OperatorTok{$}\NormalTok{secret\_id <{-}}\StringTok{ }\DecValTok{1}\OperatorTok{:}\DecValTok{2}
 \end{Highlighting}
 \end{Shaded}
+
+We create a \texttt{render\_gio} function which accepts the entire widget, filters only the column necessary from the data and returns the widget.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3834,6 +3959,8 @@ Currently, \texttt{gio} takes the entirety of the \texttt{data} and serialises i
 \end{Highlighting}
 \end{Shaded}
 
+Moreover, security aside, this can also improve performances as only the data relevant to the visualisation is serialised and subsequently loaded by the client. Without the modification above, were one to use \texttt{gio} on a dataset with 100 columns all would have been serialised, thereby greatly impacting performances both of the R process rendering the output and the web browser viewing the visualisation.
+
 \hypertarget{javascript-code-1}{%
 \section*{JavaScript Code}\label{javascript-code-1}}
 
@@ -3851,7 +3978,7 @@ As mentioned in a previous chapter JavaScript code cannot be serialised to JSON.
 ## ["var x = 3;"]
 \end{verbatim}
 
-Nonetheless, it is doable in htmlwdigets. The function \texttt{htmlwidgets::JS} can be used to mark a character vector so that it will be treated as literal JavaScript code when evaluated on the client-side.
+Nonetheless, it is doable with htmlwdigets' serialiser (an only that one). The function \texttt{htmlwidgets::JS} can be used to mark a character vector so that it will be treated as literal JavaScript code when evaluated on the client-side.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3864,6 +3991,8 @@ Nonetheless, it is doable in htmlwdigets. The function \texttt{htmlwidgets::JS} 
 ## attr(,"class")
 ## [1] "JS_EVAL"
 \end{verbatim}
+
+This can be useful where the library requires the use of callback functions.
 
 \hypertarget{prepend-append-content}{%
 \section*{Prepend \& Append Content}\label{prepend-append-content}}
@@ -3878,6 +4007,13 @@ There is the ability to append of prepend HTML content to the rendered widget. F
 \NormalTok{  title <{-}}\StringTok{ }\NormalTok{htmltools}\OperatorTok{::}\KeywordTok{h3}\NormalTok{(title)}
 \NormalTok{  htmlwidgets}\OperatorTok{::}\KeywordTok{prependContent}\NormalTok{(g, title)}
 \NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{gio}\NormalTok{(arcs) }\OperatorTok{\%>\%}\StringTok{ }
+\StringTok{  }\KeywordTok{gio\_title}\NormalTok{(}\StringTok{"Gio.js htmlwidget!"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3900,9 +4036,9 @@ To demonstrate how to integrate these functionalities in widgets we shall implem
 \section*{Callback}\label{callback}}
 
 
-Wouldn't it be grand if one were able to pick up server-side which country is selected by the user as well as which are connected to that country! This could enable fetching further data on the selected country in a database or display the flag of the selected country in the application's UI, or both, or do many other things. With regard to the implementation itself little if anything changes from previous examples used in the collection of chapters on Shiny.
+Wouldn't it be grand if one were able to pick up server-side which country is selected by the user! This could enable fetching data on the selected country from a database or display the flag of the selected country in the application's UI, or both, or do many other things. With regard to the implementation itself little if anything changes from previous examples used in the collection of chapters on Shiny.
 
-The \href{https://giojs.org/html/docs/callbackPicked.html}{documentation of gio.js} show the library features the possibility to pass a callback function that is run every time a country is selected, the example given is below.
+The \href{https://giojs.org/html/docs/callbackPicked.html}{documentation of gio.js} shows the library features the possibility to pass a callback function that is run every time a country is selected, the example given is below.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3986,7 +4122,7 @@ This will set the input named \texttt{id\_selected} and \texttt{id\_related} wit
 \end{Highlighting}
 \end{Shaded}
 
-The data is sent from the client to the server whether the user uses the input or not, though this likely will not have an impact with gio it can have a negative effect on the web browser and the server for other visualisations that include more numerous and frequent interactions, e.g.: setting an input value when the user hovers a scatter plot.
+The data is sent from the client to the server whether the user uses the input or not, though this likely will not negatively impact gio it can reduce performances if the callback function is triggered too frequently. For instance setting an input value when the user hovers a scatter plot might lead to the event being fired very frequently and too much data being sent to the server, slowing things down and providing a poor experience.
 
 Therefore one might consider making the capture of such event optional so the web browser is not strained unless explicitly required. You can also consider not sending back all the data. For instance, gio returns the coordinates of the selected country where from arc connect; this is might be considered unnecessary. The code below only sets the input to the ISO code of the country selected.
 
@@ -3997,12 +4133,6 @@ Therefore one might consider making the capture of such event optional so the we
 \OperatorTok{\}}
 \end{Highlighting}
 \end{Shaded}
-
-\hypertarget{parse-input}{%
-\section*{Parse Input}\label{parse-input}}
-
-
-Parse result from JavaScript.
 
 \hypertarget{r-to-javascript}{%
 \section*{R to JavaScript}\label{r-to-javascript}}

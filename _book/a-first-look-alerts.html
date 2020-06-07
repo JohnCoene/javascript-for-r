@@ -197,7 +197,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5" data-path="a-first-look-alerts.html"><a href="a-first-look-alerts.html"><i class="fa fa-check"></i><b>5</b> A First Look - Alerts</a>
 <ul>
 <li class="chapter" data-level="" data-path="a-first-look-alerts.html"><a href="a-first-look-alerts.html#from-r-to-javascript"><i class="fa fa-check"></i>From R to JavaScript</a></li>
-<li class="chapter" data-level="" data-path="a-first-look-alerts.html"><a href="a-first-look-alerts.html#from-javascript-to-r"><i class="fa fa-check"></i>From JavaScript to R</a></li>
+<li class="chapter" data-level="" data-path="a-first-look-alerts.html"><a href="a-first-look-alerts.html#from-javascript-to-r"><i class="fa fa-check"></i>From JavaScript to R</a>
+<ul>
+<li class="chapter" data-level="" data-path="a-first-look-alerts.html"><a href="a-first-look-alerts.html#deserialise"><i class="fa fa-check"></i>Deserialise</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="a-complete-integration-jbox-js.html"><a href="a-complete-integration-jbox-js.html"><i class="fa fa-check"></i><b>6</b> A Complete Integration - jBox.js</a>
 <ul>
@@ -250,17 +253,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="11" data-path="advanced-usage.html"><a href="advanced-usage.html"><i class="fa fa-check"></i><b>11</b> Advanced Usage</a>
 <ul>
-<li class="chapter" data-level="11.1" data-path="advanced-usage.html"><a href="advanced-usage.html#sizing"><i class="fa fa-check"></i><b>11.1</b> Sizing</a></li>
-<li class="chapter" data-level="11.2" data-path="advanced-usage.html"><a href="advanced-usage.html#sizing-policy"><i class="fa fa-check"></i><b>11.2</b> Sizing Policy</a></li>
-<li class="chapter" data-level="11.3" data-path="advanced-usage.html"><a href="advanced-usage.html#resizing"><i class="fa fa-check"></i><b>11.3</b> Resizing</a></li>
-<li class="chapter" data-level="11.4" data-path="advanced-usage.html"><a href="advanced-usage.html#pre-render-hooks-safety"><i class="fa fa-check"></i><b>11.4</b> Pre Render Hooks &amp; Safety</a></li>
+<li class="chapter" data-level="" data-path="advanced-usage.html"><a href="advanced-usage.html#sizing"><i class="fa fa-check"></i>Sizing</a></li>
+<li class="chapter" data-level="" data-path="advanced-usage.html"><a href="advanced-usage.html#sizing-policy"><i class="fa fa-check"></i>Sizing Policy</a></li>
+<li class="chapter" data-level="" data-path="advanced-usage.html"><a href="advanced-usage.html#resizing"><i class="fa fa-check"></i>Resizing</a></li>
+<li class="chapter" data-level="" data-path="advanced-usage.html"><a href="advanced-usage.html#pre-render-hooks-safety"><i class="fa fa-check"></i>Pre Render Hooks &amp; Safety</a></li>
 <li class="chapter" data-level="" data-path="advanced-usage.html"><a href="advanced-usage.html#javascript-code-1"><i class="fa fa-check"></i>JavaScript Code</a></li>
 <li class="chapter" data-level="" data-path="advanced-usage.html"><a href="advanced-usage.html#prepend-append-content"><i class="fa fa-check"></i>Prepend &amp; Append Content</a></li>
 </ul></li>
 <li class="chapter" data-level="12" data-path="working-with-shiny.html"><a href="working-with-shiny.html"><i class="fa fa-check"></i><b>12</b> Working with Shiny</a>
 <ul>
 <li class="chapter" data-level="" data-path="working-with-shiny.html"><a href="working-with-shiny.html#callback"><i class="fa fa-check"></i>Callback</a></li>
-<li class="chapter" data-level="" data-path="working-with-shiny.html"><a href="working-with-shiny.html#parse-input"><i class="fa fa-check"></i>Parse Input</a></li>
 <li class="chapter" data-level="" data-path="working-with-shiny.html"><a href="working-with-shiny.html#r-to-javascript"><i class="fa fa-check"></i>R to JavaScript</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="for-the-curious.html"><a href="for-the-curious.html"><i class="fa fa-check"></i><b>13</b> For The Curious</a></li>
@@ -383,7 +385,87 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb129-20"><a href="a-first-look-alerts.html#cb129-20"></a>}</span>
 <span id="cb129-21"><a href="a-first-look-alerts.html#cb129-21"></a></span>
 <span id="cb129-22"><a href="a-first-look-alerts.html#cb129-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>Note that Shiny performs optimisations on how those values are set. First, if the input is set to the same value then Shiny ignores it. This is fine if you are interested in the actual value of the input but will not work as expected if the input is to be used as event. Indeed if you want to use this input in an <code>observe</code>, <code>observeEvent</code>, or <code>eventReactive</code>, you want it to be triggered every time the input changes, regardless of whether that value is the same as before. The second optimisation Shiny does is when the input is set to multiple different values before these have been processed then only the most recent value will actually be sent to the server. One can opt-out of these optimisations using the <code>priority: "event"</code> option when setting the input value.</p>
+<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb130-1"><a href="a-first-look-alerts.html#cb130-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb130-2"><a href="a-first-look-alerts.html#cb130-2"></a></span>
+<span id="cb130-3"><a href="a-first-look-alerts.html#cb130-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb130-4"><a href="a-first-look-alerts.html#cb130-4"></a>  tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb130-5"><a href="a-first-look-alerts.html#cb130-5"></a>    <span class="st">&quot;Shiny.addCustomMessageHandler(type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb130-6"><a href="a-first-look-alerts.html#cb130-6"></a><span class="st">      alert(message);</span></span>
+<span id="cb130-7"><a href="a-first-look-alerts.html#cb130-7"></a><span class="st">      Shiny.setInputValue(&#39;delete_alert&#39;, true, {priority: &#39;event&#39;});</span></span>
+<span id="cb130-8"><a href="a-first-look-alerts.html#cb130-8"></a><span class="st">    });&quot;</span></span>
+<span id="cb130-9"><a href="a-first-look-alerts.html#cb130-9"></a>  ),</span>
+<span id="cb130-10"><a href="a-first-look-alerts.html#cb130-10"></a>  <span class="kw">h1</span>(<span class="st">&quot;Hello&quot;</span>)</span>
+<span id="cb130-11"><a href="a-first-look-alerts.html#cb130-11"></a>)</span>
+<span id="cb130-12"><a href="a-first-look-alerts.html#cb130-12"></a></span>
+<span id="cb130-13"><a href="a-first-look-alerts.html#cb130-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb130-14"><a href="a-first-look-alerts.html#cb130-14"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Deleting a record!&quot;</span>)</span>
+<span id="cb130-15"><a href="a-first-look-alerts.html#cb130-15"></a></span>
+<span id="cb130-16"><a href="a-first-look-alerts.html#cb130-16"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>delete_alert, {</span>
+<span id="cb130-17"><a href="a-first-look-alerts.html#cb130-17"></a>    <span class="co"># print TRUE when button is clicked</span></span>
+<span id="cb130-18"><a href="a-first-look-alerts.html#cb130-18"></a>    <span class="kw">print</span>(input<span class="op">$</span>delete_alert) </span>
+<span id="cb130-19"><a href="a-first-look-alerts.html#cb130-19"></a>  })</span>
+<span id="cb130-20"><a href="a-first-look-alerts.html#cb130-20"></a>}</span>
+<span id="cb130-21"><a href="a-first-look-alerts.html#cb130-21"></a></span>
+<span id="cb130-22"><a href="a-first-look-alerts.html#cb130-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div id="deserialise" class="section level3 unnumbered" number="">
+<h3>Deserialise</h3>
+<p>In the section on sending data from R to JavaScript we used a “message handler” in JavaScript to handle the data coming from the server. The corollary exists, we can create an “input handler” to preprocess the data coming from JavaScript before it is made accessible by the input. In R, we create a function that accepts three arguments, the data coming JavaScript, a Shiny session, and the name of the input. Note that all of these arguments are mandatory even if we are not going to used them.</p>
+<p>To demonstrate, we will create a handler that adds some admittedly useless meta information to the data.</p>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="a-first-look-alerts.html#cb131-1"></a><span class="co"># create handler</span></span>
+<span id="cb131-2"><a href="a-first-look-alerts.html#cb131-2"></a>process_input &lt;-<span class="st"> </span><span class="cf">function</span>(x, session, inputname){</span>
+<span id="cb131-3"><a href="a-first-look-alerts.html#cb131-3"></a>  data &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb131-4"><a href="a-first-look-alerts.html#cb131-4"></a>    <span class="dt">data =</span> x,</span>
+<span id="cb131-5"><a href="a-first-look-alerts.html#cb131-5"></a>    <span class="dt">meta =</span> <span class="st">&quot;This is some meta-data&quot;</span></span>
+<span id="cb131-6"><a href="a-first-look-alerts.html#cb131-6"></a>  )</span>
+<span id="cb131-7"><a href="a-first-look-alerts.html#cb131-7"></a>  <span class="kw">return</span>(data)</span>
+<span id="cb131-8"><a href="a-first-look-alerts.html#cb131-8"></a>}</span></code></pre></div>
+<p>Once this function created it needs to be registered with shiny using the <code>registerInputHandler</code> function which takes two arguments. First, the name of the handler which will need to be referenced in JavaScript inputs which should use the handler, second, the handler function. Attempt to give the handler a unique name yet simple to avoid clashes with other handlers.</p>
+<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="a-first-look-alerts.html#cb132-1"></a><span class="co"># register with shiny</span></span>
+<span id="cb132-2"><a href="a-first-look-alerts.html#cb132-2"></a><span class="kw">registerInputHandler</span>(<span class="st">&quot;alert.processor&quot;</span>, process_input)</span></code></pre></div>
+<p>Note that handlers can only be registered once, running the above twice will fail the second time, even if the handler function has changed. This can be overwritten using the <code>force</code> argument.</p>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="a-first-look-alerts.html#cb133-1"></a><span class="co"># register with shiny</span></span>
+<span id="cb133-2"><a href="a-first-look-alerts.html#cb133-2"></a><span class="kw">registerInputHandler</span>(<span class="st">&quot;alert.processor&quot;</span>, process_input, <span class="dt">force =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<p>Once the handler function created and registered with shiny what is left to do is tell shiny which input should use that handler. This is done by adding the name of the handler, <code>alert.processor</code>, preceded by a colon (<code>:alert.processor</code>) as a suffix to the input name.</p>
+<div class="sourceCode" id="cb134"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb134-1"><a href="a-first-look-alerts.html#cb134-1"></a><span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&#39;delete_alert:alert.processor&#39;</span><span class="op">,</span> <span class="kw">true</span><span class="op">,</span> <span class="op">{</span><span class="dt">priority</span><span class="op">:</span> <span class="st">&#39;event&#39;</span><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<p>We can then recap to see what the application would look like now.</p>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="a-first-look-alerts.html#cb135-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb135-2"><a href="a-first-look-alerts.html#cb135-2"></a></span>
+<span id="cb135-3"><a href="a-first-look-alerts.html#cb135-3"></a><span class="co"># create handler</span></span>
+<span id="cb135-4"><a href="a-first-look-alerts.html#cb135-4"></a>process_input &lt;-<span class="st"> </span><span class="cf">function</span>(x, session, inputname){</span>
+<span id="cb135-5"><a href="a-first-look-alerts.html#cb135-5"></a>  data &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb135-6"><a href="a-first-look-alerts.html#cb135-6"></a>    <span class="dt">data =</span> x,</span>
+<span id="cb135-7"><a href="a-first-look-alerts.html#cb135-7"></a>    <span class="dt">meta =</span> <span class="st">&quot;This is some meta-data&quot;</span></span>
+<span id="cb135-8"><a href="a-first-look-alerts.html#cb135-8"></a>  )</span>
+<span id="cb135-9"><a href="a-first-look-alerts.html#cb135-9"></a>  <span class="kw">return</span>(data)</span>
+<span id="cb135-10"><a href="a-first-look-alerts.html#cb135-10"></a>}</span>
+<span id="cb135-11"><a href="a-first-look-alerts.html#cb135-11"></a></span>
+<span id="cb135-12"><a href="a-first-look-alerts.html#cb135-12"></a><span class="co"># register with shiny</span></span>
+<span id="cb135-13"><a href="a-first-look-alerts.html#cb135-13"></a><span class="kw">registerInputHandler</span>(<span class="st">&quot;alert.processor&quot;</span>, process_input)</span>
+<span id="cb135-14"><a href="a-first-look-alerts.html#cb135-14"></a></span>
+<span id="cb135-15"><a href="a-first-look-alerts.html#cb135-15"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb135-16"><a href="a-first-look-alerts.html#cb135-16"></a>  tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb135-17"><a href="a-first-look-alerts.html#cb135-17"></a>    <span class="st">&quot;Shiny.addCustomMessageHandler(type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb135-18"><a href="a-first-look-alerts.html#cb135-18"></a><span class="st">      alert(message);</span></span>
+<span id="cb135-19"><a href="a-first-look-alerts.html#cb135-19"></a><span class="st">      Shiny.setInputValue(&#39;delete_alert:alert.processor&#39;, true, {priority: &#39;event&#39;});</span></span>
+<span id="cb135-20"><a href="a-first-look-alerts.html#cb135-20"></a><span class="st">    });&quot;</span></span>
+<span id="cb135-21"><a href="a-first-look-alerts.html#cb135-21"></a>  ),</span>
+<span id="cb135-22"><a href="a-first-look-alerts.html#cb135-22"></a>  <span class="kw">h1</span>(<span class="st">&quot;Hello&quot;</span>)</span>
+<span id="cb135-23"><a href="a-first-look-alerts.html#cb135-23"></a>)</span>
+<span id="cb135-24"><a href="a-first-look-alerts.html#cb135-24"></a></span>
+<span id="cb135-25"><a href="a-first-look-alerts.html#cb135-25"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb135-26"><a href="a-first-look-alerts.html#cb135-26"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Deleting a record!&quot;</span>)</span>
+<span id="cb135-27"><a href="a-first-look-alerts.html#cb135-27"></a></span>
+<span id="cb135-28"><a href="a-first-look-alerts.html#cb135-28"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>delete_alert, {</span>
+<span id="cb135-29"><a href="a-first-look-alerts.html#cb135-29"></a>    <span class="co"># print TRUE when button is clicked</span></span>
+<span id="cb135-30"><a href="a-first-look-alerts.html#cb135-30"></a>    <span class="kw">print</span>(input<span class="op">$</span>delete_alert) </span>
+<span id="cb135-31"><a href="a-first-look-alerts.html#cb135-31"></a>  })</span>
+<span id="cb135-32"><a href="a-first-look-alerts.html#cb135-32"></a>}</span>
+<span id="cb135-33"><a href="a-first-look-alerts.html#cb135-33"></a></span>
+<span id="cb135-34"><a href="a-first-look-alerts.html#cb135-34"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>The previous section on the input handler is entirely optional but as we will see in later parts of the book it can prove nice touch in some cases.</p>
 
+</div>
 </div>
 </div>
             </section>
