@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-06-06" />
+<meta name="date" content="2020-06-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -459,103 +459,149 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb218-3"><a href="the-full-monty-gio-js.html#cb218-3"></a><span class="kw">gio</span>(arcs)</span></code></pre></div>
 <p>Unfortunately, this breaks everything and we are presented with a blank screen. Using <code>console.log</code> or looking at the source code the rendered widget reveals the problem: the data isn’t actually in the correct format!</p>
 <div class="sourceCode" id="cb219"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb219-1"><a href="the-full-monty-gio-js.html#cb219-1"></a><span class="fu">{</span><span class="dt">&quot;x&quot;</span><span class="fu">:{</span><span class="dt">&quot;data&quot;</span><span class="fu">:{</span><span class="dt">&quot;e&quot;</span><span class="fu">:</span><span class="ot">[</span><span class="st">&quot;CN&quot;</span><span class="ot">,</span><span class="st">&quot;CN&quot;</span><span class="ot">]</span><span class="fu">,</span><span class="dt">&quot;i&quot;</span><span class="fu">:</span><span class="ot">[</span><span class="st">&quot;US&quot;</span><span class="ot">,</span><span class="st">&quot;RU&quot;</span><span class="ot">]</span><span class="fu">,</span><span class="dt">&quot;v&quot;</span><span class="fu">:</span><span class="ot">[</span><span class="dv">3300000</span><span class="ot">,</span><span class="dv">10000</span><span class="ot">]</span><span class="fu">}},</span><span class="dt">&quot;evals&quot;</span><span class="fu">:</span><span class="ot">[]</span><span class="fu">,</span><span class="dt">&quot;jsHooks&quot;</span><span class="fu">:</span><span class="ot">[]</span><span class="fu">}</span></span></code></pre></div>
-<p>Htmlwidgets actually serialised the data frame column-wise (long) and not row-wise (wide).</p>
+<p>Htmlwidgets actually serialised the data frame column-wise (long) where each array is a column, whereas gio.js expect the data to be wide (row-wise serialisation) where each array is a arc (row).</p>
+<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="the-full-monty-gio-js.html#cb220-1"></a><span class="co"># column-wise</span></span>
+<span id="cb220-2"><a href="the-full-monty-gio-js.html#cb220-2"></a><span class="kw">apply</span>(arcs, <span class="dv">2</span>, as.list)</span></code></pre></div>
+<pre><code>## $e
+## $e$`1`
+## [1] &quot;CN&quot;
+## 
+## $e$`2`
+## [1] &quot;CN&quot;
+## 
+## 
+## $i
+## $i$`1`
+## [1] &quot;US&quot;
+## 
+## $i$`2`
+## [1] &quot;RU&quot;
+## 
+## 
+## $v
+## $v$`1`
+## [1] &quot;3300000&quot;
+## 
+## $v$`2`
+## [1] &quot;  10000&quot;</code></pre>
+<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb222-1"><a href="the-full-monty-gio-js.html#cb222-1"></a><span class="co"># row-wise</span></span>
+<span id="cb222-2"><a href="the-full-monty-gio-js.html#cb222-2"></a><span class="kw">apply</span>(arcs, <span class="dv">1</span>, as.list)</span></code></pre></div>
+<pre><code>## $`1`
+## $`1`$e
+## [1] &quot;CN&quot;
+## 
+## $`1`$i
+## [1] &quot;US&quot;
+## 
+## $`1`$v
+## [1] &quot;3300000&quot;
+## 
+## 
+## $`2`
+## $`2`$e
+## [1] &quot;CN&quot;
+## 
+## $`2`$i
+## [1] &quot;RU&quot;
+## 
+## $`2`$v
+## [1] &quot;  10000&quot;</code></pre>
+<p>As mentioned previously, convention has it that rectangular data (data frames) are serialised row-wise.</p>
 </div>
 <div id="transforming-data" class="section level2 unnumbered" number="">
 <h2>Transforming Data</h2>
-<p>There are multiple ways to transform the data and ensure the serialised JSON is as the JavaScript expects it to be.</p>
+<p>There are multiple ways to transform the data and ensure the serialised JSON is as the JavaScript library expects it to be.</p>
 <div id="in-javascript" class="section level3 unnumbered" number="">
 <h3>In JavaScript</h3>
-<p>One can use JavaScript to transform the data, leaving everything as-is R side to further handle the data JavaScript side. The HTMLwidget JavaScript library (already imported by default) exports an object which provides a method, <code>dataframeToD3</code>, to transform the data from long to wide.</p>
-<div class="sourceCode" id="cb220"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb220-1"><a href="the-full-monty-gio-js.html#cb220-1"></a>...</span>
-<span id="cb220-2"><a href="the-full-monty-gio-js.html#cb220-2"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb220-3"><a href="the-full-monty-gio-js.html#cb220-3"></a></span>
-<span id="cb220-4"><a href="the-full-monty-gio-js.html#cb220-4"></a>  <span class="co">// long to wide</span></span>
-<span id="cb220-5"><a href="the-full-monty-gio-js.html#cb220-5"></a>  <span class="va">x</span>.<span class="at">data</span> <span class="op">=</span> <span class="va">HTMLWidgets</span>.<span class="at">dataframeToD3</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span></span>
-<span id="cb220-6"><a href="the-full-monty-gio-js.html#cb220-6"></a></span>
-<span id="cb220-7"><a href="the-full-monty-gio-js.html#cb220-7"></a>  <span class="kw">var</span> container <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
-<span id="cb220-8"><a href="the-full-monty-gio-js.html#cb220-8"></a>  <span class="kw">var</span> controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(container)<span class="op">;</span></span>
-<span id="cb220-9"><a href="the-full-monty-gio-js.html#cb220-9"></a>  <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span> </span>
-<span id="cb220-10"><a href="the-full-monty-gio-js.html#cb220-10"></a>  <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
-<span id="cb220-11"><a href="the-full-monty-gio-js.html#cb220-11"></a></span>
-<span id="cb220-12"><a href="the-full-monty-gio-js.html#cb220-12"></a><span class="op">}</span></span>
-<span id="cb220-13"><a href="the-full-monty-gio-js.html#cb220-13"></a>...</span></code></pre></div>
+<p>JavaScript can be used to transform the data, leaving the serialiser as-is to reshape the data in the client. The HTMLwidget JavaScript library (already imported by default) exports an object which provides a method, <code>dataframeToD3</code>, to transform the data from long to wide.</p>
+<div class="sourceCode" id="cb224"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb224-1"><a href="the-full-monty-gio-js.html#cb224-1"></a>...</span>
+<span id="cb224-2"><a href="the-full-monty-gio-js.html#cb224-2"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb224-3"><a href="the-full-monty-gio-js.html#cb224-3"></a></span>
+<span id="cb224-4"><a href="the-full-monty-gio-js.html#cb224-4"></a>  <span class="co">// long to wide</span></span>
+<span id="cb224-5"><a href="the-full-monty-gio-js.html#cb224-5"></a>  <span class="va">x</span>.<span class="at">data</span> <span class="op">=</span> <span class="va">HTMLWidgets</span>.<span class="at">dataframeToD3</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span></span>
+<span id="cb224-6"><a href="the-full-monty-gio-js.html#cb224-6"></a></span>
+<span id="cb224-7"><a href="the-full-monty-gio-js.html#cb224-7"></a>  <span class="kw">var</span> container <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
+<span id="cb224-8"><a href="the-full-monty-gio-js.html#cb224-8"></a>  <span class="kw">var</span> controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(container)<span class="op">;</span></span>
+<span id="cb224-9"><a href="the-full-monty-gio-js.html#cb224-9"></a>  <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span> </span>
+<span id="cb224-10"><a href="the-full-monty-gio-js.html#cb224-10"></a>  <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
+<span id="cb224-11"><a href="the-full-monty-gio-js.html#cb224-11"></a></span>
+<span id="cb224-12"><a href="the-full-monty-gio-js.html#cb224-12"></a><span class="op">}</span></span>
+<span id="cb224-13"><a href="the-full-monty-gio-js.html#cb224-13"></a>...</span></code></pre></div>
 </div>
 <div id="in-r" class="section level3 unnumbered" number="">
 <h3>In R</h3>
-<p>Instead of serialising the data a certain way then correct in JavaScript as demonstrated previously, one can also modify, or even replace, htmlwidgets’ default serialiser. Speaking of which, below is the default serializer.</p>
-<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="the-full-monty-gio-js.html#cb221-1"></a><span class="cf">function</span> (x, ..., <span class="dt">dataframe =</span> <span class="st">&quot;columns&quot;</span>, <span class="dt">null =</span> <span class="st">&quot;null&quot;</span>, <span class="dt">na =</span> <span class="st">&quot;null&quot;</span>, </span>
-<span id="cb221-2"><a href="the-full-monty-gio-js.html#cb221-2"></a>    <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>, <span class="dt">digits =</span> <span class="kw">getOption</span>(<span class="st">&quot;shiny.json.digits&quot;</span>, </span>
-<span id="cb221-3"><a href="the-full-monty-gio-js.html#cb221-3"></a>        <span class="dv">16</span>), <span class="dt">use_signif =</span> <span class="ot">TRUE</span>, <span class="dt">force =</span> <span class="ot">TRUE</span>, <span class="dt">POSIXt =</span> <span class="st">&quot;ISO8601&quot;</span>, </span>
-<span id="cb221-4"><a href="the-full-monty-gio-js.html#cb221-4"></a>    <span class="dt">UTC =</span> <span class="ot">TRUE</span>, <span class="dt">rownames =</span> <span class="ot">FALSE</span>, <span class="dt">keep_vec_names =</span> <span class="ot">TRUE</span>, <span class="dt">strict_atomic =</span> <span class="ot">TRUE</span>) </span>
-<span id="cb221-5"><a href="the-full-monty-gio-js.html#cb221-5"></a>{</span>
-<span id="cb221-6"><a href="the-full-monty-gio-js.html#cb221-6"></a>    <span class="cf">if</span> (strict_atomic) </span>
-<span id="cb221-7"><a href="the-full-monty-gio-js.html#cb221-7"></a>        x &lt;-<span class="st"> </span><span class="kw">I</span>(x)</span>
-<span id="cb221-8"><a href="the-full-monty-gio-js.html#cb221-8"></a>    jsonlite<span class="op">::</span><span class="kw">toJSON</span>(x, <span class="dt">dataframe =</span> dataframe, <span class="dt">null =</span> null, <span class="dt">na =</span> na, </span>
-<span id="cb221-9"><a href="the-full-monty-gio-js.html#cb221-9"></a>        <span class="dt">auto_unbox =</span> auto_unbox, <span class="dt">digits =</span> digits, <span class="dt">use_signif =</span> use_signif, </span>
-<span id="cb221-10"><a href="the-full-monty-gio-js.html#cb221-10"></a>        <span class="dt">force =</span> force, <span class="dt">POSIXt =</span> POSIXt, <span class="dt">UTC =</span> UTC, <span class="dt">rownames =</span> rownames, </span>
-<span id="cb221-11"><a href="the-full-monty-gio-js.html#cb221-11"></a>        <span class="dt">keep_vec_names =</span> keep_vec_names, <span class="dt">json_verbatim =</span> <span class="ot">TRUE</span>, </span>
-<span id="cb221-12"><a href="the-full-monty-gio-js.html#cb221-12"></a>        ...)</span>
-<span id="cb221-13"><a href="the-full-monty-gio-js.html#cb221-13"></a>}</span></code></pre></div>
-<p>The problem we face is caused by the <code>dataframe</code> argument which is set to <code>columns</code> whereas we need it set to <code>rows</code>. This can be done by passing the arguments to the serialiser is a list as <code>TOJSON_ARGS</code> attribute of the object <code>x</code> that is serialised. We could thus change the <code>gio</code> function to reflect the aforementioned change.</p>
-<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb222-1"><a href="the-full-monty-gio-js.html#cb222-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
-<span id="cb222-2"><a href="the-full-monty-gio-js.html#cb222-2"></a></span>
-<span id="cb222-3"><a href="the-full-monty-gio-js.html#cb222-3"></a>  <span class="co"># forward options using x</span></span>
-<span id="cb222-4"><a href="the-full-monty-gio-js.html#cb222-4"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb222-5"><a href="the-full-monty-gio-js.html#cb222-5"></a>    <span class="dt">data =</span> data</span>
-<span id="cb222-6"><a href="the-full-monty-gio-js.html#cb222-6"></a>  )</span>
-<span id="cb222-7"><a href="the-full-monty-gio-js.html#cb222-7"></a></span>
-<span id="cb222-8"><a href="the-full-monty-gio-js.html#cb222-8"></a>  <span class="co"># serialise data.frames to wide (not long as default)</span></span>
-<span id="cb222-9"><a href="the-full-monty-gio-js.html#cb222-9"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_ARGS&#39;</span>) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">dataframe =</span> <span class="st">&quot;rows&quot;</span>)</span>
-<span id="cb222-10"><a href="the-full-monty-gio-js.html#cb222-10"></a></span>
-<span id="cb222-11"><a href="the-full-monty-gio-js.html#cb222-11"></a>  <span class="co"># create widget</span></span>
-<span id="cb222-12"><a href="the-full-monty-gio-js.html#cb222-12"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
-<span id="cb222-13"><a href="the-full-monty-gio-js.html#cb222-13"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
-<span id="cb222-14"><a href="the-full-monty-gio-js.html#cb222-14"></a>    x,</span>
-<span id="cb222-15"><a href="the-full-monty-gio-js.html#cb222-15"></a>    <span class="dt">width =</span> width,</span>
-<span id="cb222-16"><a href="the-full-monty-gio-js.html#cb222-16"></a>    <span class="dt">height =</span> height,</span>
-<span id="cb222-17"><a href="the-full-monty-gio-js.html#cb222-17"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
-<span id="cb222-18"><a href="the-full-monty-gio-js.html#cb222-18"></a>    <span class="dt">elementId =</span> elementId</span>
-<span id="cb222-19"><a href="the-full-monty-gio-js.html#cb222-19"></a>  )</span>
-<span id="cb222-20"><a href="the-full-monty-gio-js.html#cb222-20"></a>}</span></code></pre></div>
-<p>The above may seem confusing at first as one rarely encounters the <code>attr</code> replacement function.</p>
-<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="the-full-monty-gio-js.html#cb223-1"></a><span class="kw">attr</span>(cars, <span class="st">&quot;hello&quot;</span>) &lt;-<span class="st"> &quot;attributes&quot;</span> <span class="co"># set </span></span>
-<span id="cb223-2"><a href="the-full-monty-gio-js.html#cb223-2"></a><span class="kw">attr</span>(cars, <span class="st">&quot;hello&quot;</span>) <span class="co"># get </span></span></code></pre></div>
+<p>Instead of serialising the data a certain way then correct in JavaScript as demonstrated previously, one can also modify, or even replace, htmlwidgets’ default serialiser. Speaking of which, below is the default serializer used by htmlwidgets.</p>
+<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="the-full-monty-gio-js.html#cb225-1"></a><span class="cf">function</span> (x, ..., <span class="dt">dataframe =</span> <span class="st">&quot;columns&quot;</span>, <span class="dt">null =</span> <span class="st">&quot;null&quot;</span>, <span class="dt">na =</span> <span class="st">&quot;null&quot;</span>, </span>
+<span id="cb225-2"><a href="the-full-monty-gio-js.html#cb225-2"></a>  <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>, <span class="dt">digits =</span> <span class="kw">getOption</span>(<span class="st">&quot;shiny.json.digits&quot;</span>, <span class="dv">16</span>), </span>
+<span id="cb225-3"><a href="the-full-monty-gio-js.html#cb225-3"></a>  <span class="dt">use_signif =</span> <span class="ot">TRUE</span>, <span class="dt">force =</span> <span class="ot">TRUE</span>, <span class="dt">POSIXt =</span> <span class="st">&quot;ISO8601&quot;</span>, <span class="dt">UTC =</span> <span class="ot">TRUE</span>, </span>
+<span id="cb225-4"><a href="the-full-monty-gio-js.html#cb225-4"></a>  <span class="dt">rownames =</span> <span class="ot">FALSE</span>, <span class="dt">keep_vec_names =</span> <span class="ot">TRUE</span>, <span class="dt">strict_atomic =</span> <span class="ot">TRUE</span>) </span>
+<span id="cb225-5"><a href="the-full-monty-gio-js.html#cb225-5"></a>{</span>
+<span id="cb225-6"><a href="the-full-monty-gio-js.html#cb225-6"></a>  <span class="cf">if</span> (strict_atomic) </span>
+<span id="cb225-7"><a href="the-full-monty-gio-js.html#cb225-7"></a>      x &lt;-<span class="st"> </span><span class="kw">I</span>(x)</span>
+<span id="cb225-8"><a href="the-full-monty-gio-js.html#cb225-8"></a>  jsonlite<span class="op">::</span><span class="kw">toJSON</span>(x, <span class="dt">dataframe =</span> dataframe, <span class="dt">null =</span> null, <span class="dt">na =</span> na, </span>
+<span id="cb225-9"><a href="the-full-monty-gio-js.html#cb225-9"></a>    <span class="dt">auto_unbox =</span> auto_unbox, <span class="dt">digits =</span> digits, <span class="dt">use_signif =</span> use_signif, </span>
+<span id="cb225-10"><a href="the-full-monty-gio-js.html#cb225-10"></a>    <span class="dt">force =</span> force, <span class="dt">POSIXt =</span> POSIXt, <span class="dt">UTC =</span> UTC, <span class="dt">rownames =</span> rownames, </span>
+<span id="cb225-11"><a href="the-full-monty-gio-js.html#cb225-11"></a>    <span class="dt">keep_vec_names =</span> keep_vec_names, <span class="dt">json_verbatim =</span> <span class="ot">TRUE</span>, ...)</span>
+<span id="cb225-12"><a href="the-full-monty-gio-js.html#cb225-12"></a>}</span></code></pre></div>
+<p>The problem at hand is caused by the <code>dataframe</code> argument which is set to <code>columns</code> where it should be set <code>rows</code> (for row-wise). Arguments are passed to the serialiser indirectly, in the form of a list set as <code>TOJSON_ARGS</code> attribute to the object <code>x</code> that is serialised. We could thus change the <code>gio</code> function to reflect the aforementioned change.</p>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="the-full-monty-gio-js.html#cb226-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
+<span id="cb226-2"><a href="the-full-monty-gio-js.html#cb226-2"></a></span>
+<span id="cb226-3"><a href="the-full-monty-gio-js.html#cb226-3"></a>  <span class="co"># forward options using x</span></span>
+<span id="cb226-4"><a href="the-full-monty-gio-js.html#cb226-4"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb226-5"><a href="the-full-monty-gio-js.html#cb226-5"></a>    <span class="dt">data =</span> data</span>
+<span id="cb226-6"><a href="the-full-monty-gio-js.html#cb226-6"></a>  )</span>
+<span id="cb226-7"><a href="the-full-monty-gio-js.html#cb226-7"></a></span>
+<span id="cb226-8"><a href="the-full-monty-gio-js.html#cb226-8"></a>  <span class="co"># serialise data.frames to wide (not long as default)</span></span>
+<span id="cb226-9"><a href="the-full-monty-gio-js.html#cb226-9"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_ARGS&#39;</span>) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">dataframe =</span> <span class="st">&quot;rows&quot;</span>)</span>
+<span id="cb226-10"><a href="the-full-monty-gio-js.html#cb226-10"></a></span>
+<span id="cb226-11"><a href="the-full-monty-gio-js.html#cb226-11"></a>  <span class="co"># create widget</span></span>
+<span id="cb226-12"><a href="the-full-monty-gio-js.html#cb226-12"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
+<span id="cb226-13"><a href="the-full-monty-gio-js.html#cb226-13"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb226-14"><a href="the-full-monty-gio-js.html#cb226-14"></a>    x,</span>
+<span id="cb226-15"><a href="the-full-monty-gio-js.html#cb226-15"></a>    <span class="dt">width =</span> width,</span>
+<span id="cb226-16"><a href="the-full-monty-gio-js.html#cb226-16"></a>    <span class="dt">height =</span> height,</span>
+<span id="cb226-17"><a href="the-full-monty-gio-js.html#cb226-17"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb226-18"><a href="the-full-monty-gio-js.html#cb226-18"></a>    <span class="dt">elementId =</span> elementId</span>
+<span id="cb226-19"><a href="the-full-monty-gio-js.html#cb226-19"></a>  )</span>
+<span id="cb226-20"><a href="the-full-monty-gio-js.html#cb226-20"></a>}</span></code></pre></div>
+<p>The above may appear confusing at first as one rarely encounters the <code>attr</code> replacement function.</p>
+<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="the-full-monty-gio-js.html#cb227-1"></a><span class="kw">attr</span>(cars, <span class="st">&quot;hello&quot;</span>) &lt;-<span class="st"> &quot;attributes&quot;</span> <span class="co"># set </span></span>
+<span id="cb227-2"><a href="the-full-monty-gio-js.html#cb227-2"></a><span class="kw">attr</span>(cars, <span class="st">&quot;hello&quot;</span>) <span class="co"># get </span></span></code></pre></div>
 <pre><code>## [1] &quot;attributes&quot;</code></pre>
-<p>Otherwise one can completely override the serializer, also by setting an attribute, <code>TOJSON_FUNC</code>, to the function which should be used to serialise the data. Below the serialiser is changed to using jsonify <span class="citation">(Cooley <a href="#ref-R-jsonify" role="doc-biblioref">2020</a>)</span> which by default serialises data frames to wide, unlike htmlwidgets’ serialiser, thereby also fixing the issue.</p>
-<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="the-full-monty-gio-js.html#cb225-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
-<span id="cb225-2"><a href="the-full-monty-gio-js.html#cb225-2"></a></span>
-<span id="cb225-3"><a href="the-full-monty-gio-js.html#cb225-3"></a>  <span class="co"># forward options using x</span></span>
-<span id="cb225-4"><a href="the-full-monty-gio-js.html#cb225-4"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb225-5"><a href="the-full-monty-gio-js.html#cb225-5"></a>    <span class="dt">data =</span> data</span>
-<span id="cb225-6"><a href="the-full-monty-gio-js.html#cb225-6"></a>  )</span>
-<span id="cb225-7"><a href="the-full-monty-gio-js.html#cb225-7"></a></span>
-<span id="cb225-8"><a href="the-full-monty-gio-js.html#cb225-8"></a>  <span class="co"># replace serialiser</span></span>
-<span id="cb225-9"><a href="the-full-monty-gio-js.html#cb225-9"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_FUNC&#39;</span>) &lt;-<span class="st"> </span>gio_serialiser</span>
-<span id="cb225-10"><a href="the-full-monty-gio-js.html#cb225-10"></a></span>
-<span id="cb225-11"><a href="the-full-monty-gio-js.html#cb225-11"></a>  <span class="co"># create widget</span></span>
-<span id="cb225-12"><a href="the-full-monty-gio-js.html#cb225-12"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
-<span id="cb225-13"><a href="the-full-monty-gio-js.html#cb225-13"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
-<span id="cb225-14"><a href="the-full-monty-gio-js.html#cb225-14"></a>    x,</span>
-<span id="cb225-15"><a href="the-full-monty-gio-js.html#cb225-15"></a>    <span class="dt">width =</span> width,</span>
-<span id="cb225-16"><a href="the-full-monty-gio-js.html#cb225-16"></a>    <span class="dt">height =</span> height,</span>
-<span id="cb225-17"><a href="the-full-monty-gio-js.html#cb225-17"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
-<span id="cb225-18"><a href="the-full-monty-gio-js.html#cb225-18"></a>    <span class="dt">elementId =</span> elementId</span>
-<span id="cb225-19"><a href="the-full-monty-gio-js.html#cb225-19"></a>  )</span>
-<span id="cb225-20"><a href="the-full-monty-gio-js.html#cb225-20"></a>}</span>
-<span id="cb225-21"><a href="the-full-monty-gio-js.html#cb225-21"></a></span>
-<span id="cb225-22"><a href="the-full-monty-gio-js.html#cb225-22"></a>gio_serialiser &lt;-<span class="st"> </span><span class="cf">function</span>(x){</span>
-<span id="cb225-23"><a href="the-full-monty-gio-js.html#cb225-23"></a>  jsonify<span class="op">::</span><span class="kw">to_json</span>(x, <span class="dt">unbox =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb225-24"><a href="the-full-monty-gio-js.html#cb225-24"></a>}</span></code></pre></div>
+<p>Otherwise the serializer can also be replaced in its entirety, also by setting an attribute, <code>TOJSON_FUNC</code>, to the <code>x</code> object. Below the serialiser is changed to jsonify <span class="citation">(Cooley <a href="#ref-R-jsonify" role="doc-biblioref">2020</a>)</span> which by default serialises data frames to wide, unlike htmlwidgets’ serialiser, thereby also fixing the issue.</p>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="the-full-monty-gio-js.html#cb229-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
+<span id="cb229-2"><a href="the-full-monty-gio-js.html#cb229-2"></a></span>
+<span id="cb229-3"><a href="the-full-monty-gio-js.html#cb229-3"></a>  <span class="co"># forward options using x</span></span>
+<span id="cb229-4"><a href="the-full-monty-gio-js.html#cb229-4"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb229-5"><a href="the-full-monty-gio-js.html#cb229-5"></a>    <span class="dt">data =</span> data</span>
+<span id="cb229-6"><a href="the-full-monty-gio-js.html#cb229-6"></a>  )</span>
+<span id="cb229-7"><a href="the-full-monty-gio-js.html#cb229-7"></a></span>
+<span id="cb229-8"><a href="the-full-monty-gio-js.html#cb229-8"></a>  <span class="co"># replace serialiser</span></span>
+<span id="cb229-9"><a href="the-full-monty-gio-js.html#cb229-9"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_FUNC&#39;</span>) &lt;-<span class="st"> </span>gio_serialiser</span>
+<span id="cb229-10"><a href="the-full-monty-gio-js.html#cb229-10"></a></span>
+<span id="cb229-11"><a href="the-full-monty-gio-js.html#cb229-11"></a>  <span class="co"># create widget</span></span>
+<span id="cb229-12"><a href="the-full-monty-gio-js.html#cb229-12"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
+<span id="cb229-13"><a href="the-full-monty-gio-js.html#cb229-13"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb229-14"><a href="the-full-monty-gio-js.html#cb229-14"></a>    x,</span>
+<span id="cb229-15"><a href="the-full-monty-gio-js.html#cb229-15"></a>    <span class="dt">width =</span> width,</span>
+<span id="cb229-16"><a href="the-full-monty-gio-js.html#cb229-16"></a>    <span class="dt">height =</span> height,</span>
+<span id="cb229-17"><a href="the-full-monty-gio-js.html#cb229-17"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb229-18"><a href="the-full-monty-gio-js.html#cb229-18"></a>    <span class="dt">elementId =</span> elementId</span>
+<span id="cb229-19"><a href="the-full-monty-gio-js.html#cb229-19"></a>  )</span>
+<span id="cb229-20"><a href="the-full-monty-gio-js.html#cb229-20"></a>}</span>
+<span id="cb229-21"><a href="the-full-monty-gio-js.html#cb229-21"></a></span>
+<span id="cb229-22"><a href="the-full-monty-gio-js.html#cb229-22"></a><span class="co"># serialiser</span></span>
+<span id="cb229-23"><a href="the-full-monty-gio-js.html#cb229-23"></a>gio_serialiser &lt;-<span class="st"> </span><span class="cf">function</span>(x){</span>
+<span id="cb229-24"><a href="the-full-monty-gio-js.html#cb229-24"></a>  jsonify<span class="op">::</span><span class="kw">to_json</span>(x, <span class="dt">unbox =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb229-25"><a href="the-full-monty-gio-js.html#cb229-25"></a>}</span></code></pre></div>
 <p>Alternatively, one can also leave all serialisers unchanged and instead format the data in R prior to the serialisation, changing the dataframe to a row-wise list.</p>
-<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="the-full-monty-gio-js.html#cb226-1"></a><span class="co"># forward options using x</span></span>
-<span id="cb226-2"><a href="the-full-monty-gio-js.html#cb226-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb226-3"><a href="the-full-monty-gio-js.html#cb226-3"></a>  <span class="dt">data =</span> <span class="kw">apply</span>(data, <span class="dv">1</span>, as.list)</span>
-<span id="cb226-4"><a href="the-full-monty-gio-js.html#cb226-4"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="the-full-monty-gio-js.html#cb230-1"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb230-2"><a href="the-full-monty-gio-js.html#cb230-2"></a>  <span class="dt">data =</span> <span class="kw">apply</span>(data, <span class="dv">1</span>, as.list)</span>
+<span id="cb230-3"><a href="the-full-monty-gio-js.html#cb230-3"></a>)</span></code></pre></div>
 </div>
 <div id="pros-cons" class="section level3 unnumbered" number="">
 <h3>Pros &amp; Cons</h3>
-<p>There are pros and cons to each methods. The preferable method is probably to change the arguments that cause issue, this is the method used in the remaining of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Transforming the data in JavaScript has one drawback, <code>HTMLWidgets.dataframeToD3</code> cannot be applied to the entire <code>x</code> object but the subsets that hold the data frame which tends to lead to clunky code as one uses said function in various places and has to add if statements to make sure data is present, etc. This will become more evident as we progress.</p>
+<p>There are pros and cons to each methods. The preferable method is probably to only alter the argument(s) where needed, this is the method used in the remainder of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Moreover htmlwidgets’ serialiser extends jsonlite to allow converting JavaScript code which will come in handy later on. Transforming the data in JavaScript has one drawback, <code>HTMLWidgets.dataframeToD3</code> cannot be applied to the entire <code>x</code> object, it will only work on the subsets that hold the column-wise data (<code>x.data</code>) which tends to lead to clunky code as one uses said function in various places.</p>
 <div class="figure">
 <img src="images/gio-data.png" alt="" />
 <p class="caption">Gio output with correct serialisation</p>
@@ -564,58 +610,58 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="on-print" class="section level2 unnumbered" number="">
 <h2>On Print</h2>
-<p>Let’s add the option to style the globe, gio.js provides <a href="https://giojs.org/html/docs/colorStyle.html">themes</a> but they are currently not applicable from R. As a matter of fact, gio.js provides dozens of customisation options that should be available in the package as well. These probably should be split across different functions, just like they are in gio.js, rather than all grouped into a single function. This may first appear as difficult to implement, how, when, how would one use another function given the function <code>gio</code> generates the visualisation? As it happens <code>gio</code> itself (or rather the function <code>htmlwidgets::createWidget</code> it contains) returns an object of class “htmlwidget” which itself renders the visualisation on print (literally <code>htmlwidget.print</code> method).</p>
-<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="the-full-monty-gio-js.html#cb227-1"></a>g &lt;-<span class="st"> </span><span class="kw">gio</span>(arcs) <span class="co"># nothing renders</span></span>
-<span id="cb227-2"><a href="the-full-monty-gio-js.html#cb227-2"></a>g <span class="co"># visualisation renders</span></span></code></pre></div>
-<p>Therefore, one can use functions on the object returned by <code>gio</code> which contains, amongst other things, the <code>x</code> list originally that holds all the options and data: one can easily append data to this object.</p>
-<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="the-full-monty-gio-js.html#cb228-1"></a><span class="kw">print</span>(g<span class="op">$</span>x)</span>
-<span id="cb228-2"><a href="the-full-monty-gio-js.html#cb228-2"></a></span>
-<span id="cb228-3"><a href="the-full-monty-gio-js.html#cb228-3"></a><span class="co">## $data</span></span>
-<span id="cb228-4"><a href="the-full-monty-gio-js.html#cb228-4"></a><span class="co">##    e  i       v</span></span>
-<span id="cb228-5"><a href="the-full-monty-gio-js.html#cb228-5"></a><span class="co">## 1 CN US 3300000</span></span>
-<span id="cb228-6"><a href="the-full-monty-gio-js.html#cb228-6"></a><span class="co">## 2 CN RU   10000</span></span>
-<span id="cb228-7"><a href="the-full-monty-gio-js.html#cb228-7"></a><span class="co">## </span></span>
-<span id="cb228-8"><a href="the-full-monty-gio-js.html#cb228-8"></a><span class="co">## attr(,&quot;TOJSON_ARGS&quot;)</span></span>
-<span id="cb228-9"><a href="the-full-monty-gio-js.html#cb228-9"></a><span class="co">## attr(,&quot;TOJSON_ARGS&quot;)$dataframe</span></span>
-<span id="cb228-10"><a href="the-full-monty-gio-js.html#cb228-10"></a><span class="co">## [1] &quot;rows&quot;</span></span></code></pre></div>
-<p>Gio.js includes a collection of themes or <a href="https://giojs.org/html/docs/colorStyle.html">styles</a> which we ought to make available in the package. The function would take as input the output of <code>gio</code> and append the style (name of theme) to the <code>x</code> list, this would then be used in JavaScript to change the look of the visualisation.</p>
-<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="the-full-monty-gio-js.html#cb229-1"></a><span class="co">#&#39; @export</span></span>
-<span id="cb229-2"><a href="the-full-monty-gio-js.html#cb229-2"></a>gio_style &lt;-<span class="st"> </span><span class="cf">function</span>(g, <span class="dt">style =</span> <span class="st">&quot;magic&quot;</span>){</span>
-<span id="cb229-3"><a href="the-full-monty-gio-js.html#cb229-3"></a>  g<span class="op">$</span>x<span class="op">$</span>style &lt;-<span class="st"> </span>style</span>
-<span id="cb229-4"><a href="the-full-monty-gio-js.html#cb229-4"></a>  <span class="kw">return</span>(g)</span>
-<span id="cb229-5"><a href="the-full-monty-gio-js.html#cb229-5"></a>}</span></code></pre></div>
-<p>The style is applied using the <code>setStyle</code> method on the controller, before the visualisation is created (<code>init</code>), using the style passed from R: <code>x.style</code>.</p>
-<div class="sourceCode" id="cb230"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb230-1"><a href="the-full-monty-gio-js.html#cb230-1"></a>...</span>
-<span id="cb230-2"><a href="the-full-monty-gio-js.html#cb230-2"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb230-3"><a href="the-full-monty-gio-js.html#cb230-3"></a></span>
-<span id="cb230-4"><a href="the-full-monty-gio-js.html#cb230-4"></a>  <span class="kw">var</span> container <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
-<span id="cb230-5"><a href="the-full-monty-gio-js.html#cb230-5"></a>  <span class="kw">var</span> controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(container)<span class="op">;</span></span>
-<span id="cb230-6"><a href="the-full-monty-gio-js.html#cb230-6"></a>  <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span> </span>
-<span id="cb230-7"><a href="the-full-monty-gio-js.html#cb230-7"></a></span>
-<span id="cb230-8"><a href="the-full-monty-gio-js.html#cb230-8"></a>  <span class="va">controller</span>.<span class="at">setStyle</span>(<span class="va">x</span>.<span class="at">style</span>)<span class="op">;</span> <span class="co">// set style</span></span>
-<span id="cb230-9"><a href="the-full-monty-gio-js.html#cb230-9"></a></span>
-<span id="cb230-10"><a href="the-full-monty-gio-js.html#cb230-10"></a>  <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
-<span id="cb230-11"><a href="the-full-monty-gio-js.html#cb230-11"></a></span>
-<span id="cb230-12"><a href="the-full-monty-gio-js.html#cb230-12"></a><span class="op">}</span></span>
-<span id="cb230-13"><a href="the-full-monty-gio-js.html#cb230-13"></a>...</span></code></pre></div>
-<p>The package can now be documented (to export the newly added function) and loaded in order to test <code>gio_style</code>.</p>
-<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="the-full-monty-gio-js.html#cb231-1"></a>g1 &lt;-<span class="st"> </span><span class="kw">gio</span>(arcs)</span>
-<span id="cb231-2"><a href="the-full-monty-gio-js.html#cb231-2"></a>g2 &lt;-<span class="st"> </span><span class="kw">gio_style</span>(g1, <span class="st">&quot;juicyCake&quot;</span>)</span>
-<span id="cb231-3"><a href="the-full-monty-gio-js.html#cb231-3"></a></span>
-<span id="cb231-4"><a href="the-full-monty-gio-js.html#cb231-4"></a>g2</span></code></pre></div>
+<p>Let’s add the option to style the globe, gio.js provides mutliple <a href="https://giojs.org/html/docs/colorStyle.html">themes</a> but they are currently not applicable from R. As a matter of fact, gio.js provides dozens of customisation options that should be available in the package as well. These, however, probably should be split across different functions, just like they are in gio.js, rather than all be accessible from a single function. This begs the question, when would one use another function given the function <code>gio</code> generates the visualisation? As it happens <code>gio</code> itself (or rather the function <code>htmlwidgets::createWidget</code> it contains) does not render the output, it returns an object of class “htmlwidget” which actually renders the visualisation on print (literally <code>htmlwidget.print</code> method).</p>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="the-full-monty-gio-js.html#cb231-1"></a>g &lt;-<span class="st"> </span><span class="kw">gio</span>(arcs) <span class="co"># nothing renders</span></span>
+<span id="cb231-2"><a href="the-full-monty-gio-js.html#cb231-2"></a>g <span class="co"># visualisation renders</span></span></code></pre></div>
+<p>Therefore, one can use functions on the object returned by <code>gio</code> which contains, amongst other things, the <code>x</code> list to which we can append make changes, append data, or do any other operation that lists allow.</p>
+<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="the-full-monty-gio-js.html#cb232-1"></a><span class="kw">print</span>(g<span class="op">$</span>x)</span>
+<span id="cb232-2"><a href="the-full-monty-gio-js.html#cb232-2"></a></span>
+<span id="cb232-3"><a href="the-full-monty-gio-js.html#cb232-3"></a><span class="co">## $data</span></span>
+<span id="cb232-4"><a href="the-full-monty-gio-js.html#cb232-4"></a><span class="co">##    e  i       v</span></span>
+<span id="cb232-5"><a href="the-full-monty-gio-js.html#cb232-5"></a><span class="co">## 1 CN US 3300000</span></span>
+<span id="cb232-6"><a href="the-full-monty-gio-js.html#cb232-6"></a><span class="co">## 2 CN RU   10000</span></span>
+<span id="cb232-7"><a href="the-full-monty-gio-js.html#cb232-7"></a><span class="co">## </span></span>
+<span id="cb232-8"><a href="the-full-monty-gio-js.html#cb232-8"></a><span class="co">## attr(,&quot;TOJSON_ARGS&quot;)</span></span>
+<span id="cb232-9"><a href="the-full-monty-gio-js.html#cb232-9"></a><span class="co">## attr(,&quot;TOJSON_ARGS&quot;)$dataframe</span></span>
+<span id="cb232-10"><a href="the-full-monty-gio-js.html#cb232-10"></a><span class="co">## [1] &quot;rows&quot;</span></span></code></pre></div>
+<p>This clarified the function to change the style of the visualisation can be added to the package. It would take as input the output of <code>gio</code> and append the style (name of theme) to the <code>x</code> list, this would then be used in JavaScript to change the look of the visualisation.</p>
+<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="the-full-monty-gio-js.html#cb233-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb233-2"><a href="the-full-monty-gio-js.html#cb233-2"></a>gio_style &lt;-<span class="st"> </span><span class="cf">function</span>(g, <span class="dt">style =</span> <span class="st">&quot;magic&quot;</span>){</span>
+<span id="cb233-3"><a href="the-full-monty-gio-js.html#cb233-3"></a>  g<span class="op">$</span>x<span class="op">$</span>style &lt;-<span class="st"> </span>style</span>
+<span id="cb233-4"><a href="the-full-monty-gio-js.html#cb233-4"></a>  <span class="kw">return</span>(g)</span>
+<span id="cb233-5"><a href="the-full-monty-gio-js.html#cb233-5"></a>}</span></code></pre></div>
+<p>The style is applied using the <code>setStyle</code> method on the controller before the visualisation is created, before the <code>init</code> method is called, using the style passed from R: <code>x.style</code>.</p>
+<div class="sourceCode" id="cb234"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb234-1"><a href="the-full-monty-gio-js.html#cb234-1"></a>...</span>
+<span id="cb234-2"><a href="the-full-monty-gio-js.html#cb234-2"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb234-3"><a href="the-full-monty-gio-js.html#cb234-3"></a></span>
+<span id="cb234-4"><a href="the-full-monty-gio-js.html#cb234-4"></a>  <span class="kw">var</span> container <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
+<span id="cb234-5"><a href="the-full-monty-gio-js.html#cb234-5"></a>  <span class="kw">var</span> controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(container)<span class="op">;</span></span>
+<span id="cb234-6"><a href="the-full-monty-gio-js.html#cb234-6"></a>  <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span> </span>
+<span id="cb234-7"><a href="the-full-monty-gio-js.html#cb234-7"></a></span>
+<span id="cb234-8"><a href="the-full-monty-gio-js.html#cb234-8"></a>  <span class="va">controller</span>.<span class="at">setStyle</span>(<span class="va">x</span>.<span class="at">style</span>)<span class="op">;</span> <span class="co">// set style</span></span>
+<span id="cb234-9"><a href="the-full-monty-gio-js.html#cb234-9"></a></span>
+<span id="cb234-10"><a href="the-full-monty-gio-js.html#cb234-10"></a>  <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
+<span id="cb234-11"><a href="the-full-monty-gio-js.html#cb234-11"></a></span>
+<span id="cb234-12"><a href="the-full-monty-gio-js.html#cb234-12"></a><span class="op">}</span></span>
+<span id="cb234-13"><a href="the-full-monty-gio-js.html#cb234-13"></a>...</span></code></pre></div>
+<p>We can now run <code>devtools::load_all</code> to export the newly written function and load the functions in the environment with <code>devtools::load_all</code>.</p>
+<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="the-full-monty-gio-js.html#cb235-1"></a>g1 &lt;-<span class="st"> </span><span class="kw">gio</span>(arcs)</span>
+<span id="cb235-2"><a href="the-full-monty-gio-js.html#cb235-2"></a>g2 &lt;-<span class="st"> </span><span class="kw">gio_style</span>(g1, <span class="st">&quot;juicyCake&quot;</span>)</span>
+<span id="cb235-3"><a href="the-full-monty-gio-js.html#cb235-3"></a></span>
+<span id="cb235-4"><a href="the-full-monty-gio-js.html#cb235-4"></a>g2</span></code></pre></div>
 <div class="figure">
 <img src="images/gio-style.png" alt="" />
 <p class="caption">Gio with a new style</p>
 </div>
 <p>This is great but can be greatly improved upon with the magrittr pipe <span class="citation">(Bache and Wickham <a href="#ref-R-magrittr" role="doc-biblioref">2014</a>)</span>, it would allow easily passing the output of each function to the next to obtain an API akin to that of plotly or highcharter.</p>
-<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="the-full-monty-gio-js.html#cb232-1"></a><span class="kw">library</span>(magrittr)</span>
-<span id="cb232-2"><a href="the-full-monty-gio-js.html#cb232-2"></a></span>
-<span id="cb232-3"><a href="the-full-monty-gio-js.html#cb232-3"></a><span class="kw">gio</span>(arcs) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb232-4"><a href="the-full-monty-gio-js.html#cb232-4"></a><span class="st">  </span><span class="kw">gio_style</span>(<span class="st">&quot;juicyCake&quot;</span>)</span></code></pre></div>
-<p>The pipe makes htmlwidgets improves so much on htmlwidgets, providing the users of the package a much better interface, that widgets often export the pipe from magrittr; the usethis package provides a convenience function to do so.</p>
-<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="the-full-monty-gio-js.html#cb233-1"></a><span class="co"># export the pipe</span></span>
-<span id="cb233-2"><a href="the-full-monty-gio-js.html#cb233-2"></a>usethis<span class="op">::</span><span class="kw">use_pipe</span>()</span></code></pre></div>
-<p>This closes this chapter but is not the last we see of gio.js, we shall use it as examples to extend its functionalities, and polish certain aspects such as sizing and safety.</p>
+<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="the-full-monty-gio-js.html#cb236-1"></a><span class="kw">library</span>(magrittr)</span>
+<span id="cb236-2"><a href="the-full-monty-gio-js.html#cb236-2"></a></span>
+<span id="cb236-3"><a href="the-full-monty-gio-js.html#cb236-3"></a><span class="kw">gio</span>(arcs) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb236-4"><a href="the-full-monty-gio-js.html#cb236-4"></a><span class="st">  </span><span class="kw">gio_style</span>(<span class="st">&quot;juicyCake&quot;</span>)</span></code></pre></div>
+<p>The pipe drastically improves the API that gio provides its users and thus probably should be exported by the package; the usethis package provides a function to easily do so.</p>
+<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="the-full-monty-gio-js.html#cb237-1"></a><span class="co"># export the pipe</span></span>
+<span id="cb237-2"><a href="the-full-monty-gio-js.html#cb237-2"></a>usethis<span class="op">::</span><span class="kw">use_pipe</span>()</span></code></pre></div>
+<p>This closes this chapter but is not the last we see of gio.js, we shall use it as example in the next chapters as we extend its functionalities, polish certain aspects such as sizing and safety.</p>
 
 </div>
 </div>

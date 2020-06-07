@@ -169,7 +169,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2020-06-06}
+\date{2020-06-07}
 
 \begin{document}
 \maketitle
@@ -993,7 +993,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Jun 06 2020 20:31:57 GMT+0200 (CEST)"
+## [1] "Sun Jun 07 2020 10:41:43 GMT+0200 (CEST)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1003,7 +1003,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Jun 06 2020 20:31:57 GMT+0200 (CEST)"
+## [1] "Sun Jun 07 2020 10:41:43 GMT+0200 (CEST)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -3336,19 +3336,83 @@ Unfortunately, this breaks everything and we are presented with a blank screen. 
 \end{Highlighting}
 \end{Shaded}
 
-Htmlwidgets actually serialised the data frame column-wise (long) and not row-wise (wide).
+Htmlwidgets actually serialised the data frame column-wise (long) where each array is a column, whereas gio.js expect the data to be wide (row-wise serialisation) where each array is a arc (row).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# column{-}wise}
+\KeywordTok{apply}\NormalTok{(arcs, }\DecValTok{2}\NormalTok{, as.list)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $e
+## $e$`1`
+## [1] "CN"
+## 
+## $e$`2`
+## [1] "CN"
+## 
+## 
+## $i
+## $i$`1`
+## [1] "US"
+## 
+## $i$`2`
+## [1] "RU"
+## 
+## 
+## $v
+## $v$`1`
+## [1] "3300000"
+## 
+## $v$`2`
+## [1] "  10000"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# row{-}wise}
+\KeywordTok{apply}\NormalTok{(arcs, }\DecValTok{1}\NormalTok{, as.list)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $`1`
+## $`1`$e
+## [1] "CN"
+## 
+## $`1`$i
+## [1] "US"
+## 
+## $`1`$v
+## [1] "3300000"
+## 
+## 
+## $`2`
+## $`2`$e
+## [1] "CN"
+## 
+## $`2`$i
+## [1] "RU"
+## 
+## $`2`$v
+## [1] "  10000"
+\end{verbatim}
+
+As mentioned previously, convention has it that rectangular data (data frames) are serialised row-wise.
 
 \hypertarget{transforming-data}{%
 \section*{Transforming Data}\label{transforming-data}}
 
 
-There are multiple ways to transform the data and ensure the serialised JSON is as the JavaScript expects it to be.
+There are multiple ways to transform the data and ensure the serialised JSON is as the JavaScript library expects it to be.
 
 \hypertarget{in-javascript}{%
 \subsection*{In JavaScript}\label{in-javascript}}
 
 
-One can use JavaScript to transform the data, leaving everything as-is R side to further handle the data JavaScript side. The HTMLwidget JavaScript library (already imported by default) exports an object which provides a method, \texttt{dataframeToD3}, to transform the data from long to wide.
+JavaScript can be used to transform the data, leaving the serialiser as-is to reshape the data in the client. The HTMLwidget JavaScript library (already imported by default) exports an object which provides a method, \texttt{dataframeToD3}, to transform the data from long to wide.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3372,27 +3436,26 @@ One can use JavaScript to transform the data, leaving everything as-is R side to
 \subsection*{In R}\label{in-r}}
 
 
-Instead of serialising the data a certain way then correct in JavaScript as demonstrated previously, one can also modify, or even replace, htmlwidgets' default serialiser. Speaking of which, below is the default serializer.
+Instead of serialising the data a certain way then correct in JavaScript as demonstrated previously, one can also modify, or even replace, htmlwidgets' default serialiser. Speaking of which, below is the default serializer used by htmlwidgets.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \ControlFlowTok{function}\NormalTok{ (x, ..., }\DataTypeTok{dataframe =} \StringTok{"columns"}\NormalTok{, }\DataTypeTok{null =} \StringTok{"null"}\NormalTok{, }\DataTypeTok{na =} \StringTok{"null"}\NormalTok{, }
-    \DataTypeTok{auto\_unbox =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{digits =} \KeywordTok{getOption}\NormalTok{(}\StringTok{"shiny.json.digits"}\NormalTok{, }
-        \DecValTok{16}\NormalTok{), }\DataTypeTok{use\_signif =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{force =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{POSIXt =} \StringTok{"ISO8601"}\NormalTok{, }
-    \DataTypeTok{UTC =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{rownames =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{keep\_vec\_names =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{strict\_atomic =} \OtherTok{TRUE}\NormalTok{) }
+  \DataTypeTok{auto\_unbox =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{digits =} \KeywordTok{getOption}\NormalTok{(}\StringTok{"shiny.json.digits"}\NormalTok{, }\DecValTok{16}\NormalTok{), }
+  \DataTypeTok{use\_signif =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{force =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{POSIXt =} \StringTok{"ISO8601"}\NormalTok{, }\DataTypeTok{UTC =} \OtherTok{TRUE}\NormalTok{, }
+  \DataTypeTok{rownames =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{keep\_vec\_names =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{strict\_atomic =} \OtherTok{TRUE}\NormalTok{) }
 \NormalTok{\{}
-    \ControlFlowTok{if}\NormalTok{ (strict\_atomic) }
-\NormalTok{        x <{-}}\StringTok{ }\KeywordTok{I}\NormalTok{(x)}
-\NormalTok{    jsonlite}\OperatorTok{::}\KeywordTok{toJSON}\NormalTok{(x, }\DataTypeTok{dataframe =}\NormalTok{ dataframe, }\DataTypeTok{null =}\NormalTok{ null, }\DataTypeTok{na =}\NormalTok{ na, }
-        \DataTypeTok{auto\_unbox =}\NormalTok{ auto\_unbox, }\DataTypeTok{digits =}\NormalTok{ digits, }\DataTypeTok{use\_signif =}\NormalTok{ use\_signif, }
-        \DataTypeTok{force =}\NormalTok{ force, }\DataTypeTok{POSIXt =}\NormalTok{ POSIXt, }\DataTypeTok{UTC =}\NormalTok{ UTC, }\DataTypeTok{rownames =}\NormalTok{ rownames, }
-        \DataTypeTok{keep\_vec\_names =}\NormalTok{ keep\_vec\_names, }\DataTypeTok{json\_verbatim =} \OtherTok{TRUE}\NormalTok{, }
-\NormalTok{        ...)}
+  \ControlFlowTok{if}\NormalTok{ (strict\_atomic) }
+\NormalTok{      x <{-}}\StringTok{ }\KeywordTok{I}\NormalTok{(x)}
+\NormalTok{  jsonlite}\OperatorTok{::}\KeywordTok{toJSON}\NormalTok{(x, }\DataTypeTok{dataframe =}\NormalTok{ dataframe, }\DataTypeTok{null =}\NormalTok{ null, }\DataTypeTok{na =}\NormalTok{ na, }
+    \DataTypeTok{auto\_unbox =}\NormalTok{ auto\_unbox, }\DataTypeTok{digits =}\NormalTok{ digits, }\DataTypeTok{use\_signif =}\NormalTok{ use\_signif, }
+    \DataTypeTok{force =}\NormalTok{ force, }\DataTypeTok{POSIXt =}\NormalTok{ POSIXt, }\DataTypeTok{UTC =}\NormalTok{ UTC, }\DataTypeTok{rownames =}\NormalTok{ rownames, }
+    \DataTypeTok{keep\_vec\_names =}\NormalTok{ keep\_vec\_names, }\DataTypeTok{json\_verbatim =} \OtherTok{TRUE}\NormalTok{, ...)}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
 
-The problem we face is caused by the \texttt{dataframe} argument which is set to \texttt{columns} whereas we need it set to \texttt{rows}. This can be done by passing the arguments to the serialiser is a list as \texttt{TOJSON\_ARGS} attribute of the object \texttt{x} that is serialised. We could thus change the \texttt{gio} function to reflect the aforementioned change.
+The problem at hand is caused by the \texttt{dataframe} argument which is set to \texttt{columns} where it should be set \texttt{rows} (for row-wise). Arguments are passed to the serialiser indirectly, in the form of a list set as \texttt{TOJSON\_ARGS} attribute to the object \texttt{x} that is serialised. We could thus change the \texttt{gio} function to reflect the aforementioned change.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3419,7 +3482,7 @@ The problem we face is caused by the \texttt{dataframe} argument which is set to
 \end{Highlighting}
 \end{Shaded}
 
-The above may seem confusing at first as one rarely encounters the \texttt{attr} replacement function.
+The above may appear confusing at first as one rarely encounters the \texttt{attr} replacement function.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3432,7 +3495,7 @@ The above may seem confusing at first as one rarely encounters the \texttt{attr}
 ## [1] "attributes"
 \end{verbatim}
 
-Otherwise one can completely override the serializer, also by setting an attribute, \texttt{TOJSON\_FUNC}, to the function which should be used to serialise the data. Below the serialiser is changed to using jsonify \citep{R-jsonify} which by default serialises data frames to wide, unlike htmlwidgets' serialiser, thereby also fixing the issue.
+Otherwise the serializer can also be replaced in its entirety, also by setting an attribute, \texttt{TOJSON\_FUNC}, to the \texttt{x} object. Below the serialiser is changed to jsonify \citep{R-jsonify} which by default serialises data frames to wide, unlike htmlwidgets' serialiser, thereby also fixing the issue.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3457,6 +3520,7 @@ Otherwise one can completely override the serializer, also by setting an attribu
 \NormalTok{  )}
 \NormalTok{\}}
 
+\CommentTok{\# serialiser}
 \NormalTok{gio\_serialiser <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x)\{}
 \NormalTok{  jsonify}\OperatorTok{::}\KeywordTok{to\_json}\NormalTok{(x, }\DataTypeTok{unbox =} \OtherTok{TRUE}\NormalTok{)}
 \NormalTok{\}}
@@ -3467,7 +3531,6 @@ Alternatively, one can also leave all serialisers unchanged and instead format t
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# forward options using x}
 \NormalTok{x =}\StringTok{ }\KeywordTok{list}\NormalTok{(}
   \DataTypeTok{data =} \KeywordTok{apply}\NormalTok{(data, }\DecValTok{1}\NormalTok{, as.list)}
 \NormalTok{)}
@@ -3478,7 +3541,7 @@ Alternatively, one can also leave all serialisers unchanged and instead format t
 \subsection*{Pros \& Cons}\label{pros-cons}}
 
 
-There are pros and cons to each methods. The preferable method is probably to change the arguments that cause issue, this is the method used in the remaining of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Transforming the data in JavaScript has one drawback, \texttt{HTMLWidgets.dataframeToD3} cannot be applied to the entire \texttt{x} object but the subsets that hold the data frame which tends to lead to clunky code as one uses said function in various places and has to add if statements to make sure data is present, etc. This will become more evident as we progress.
+There are pros and cons to each methods. The preferable method is probably to only alter the argument(s) where needed, this is the method used in the remainder of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Moreover htmlwidgets' serialiser extends jsonlite to allow converting JavaScript code which will come in handy later on. Transforming the data in JavaScript has one drawback, \texttt{HTMLWidgets.dataframeToD3} cannot be applied to the entire \texttt{x} object, it will only work on the subsets that hold the column-wise data (\texttt{x.data}) which tends to lead to clunky code as one uses said function in various places.
 
 \begin{figure}
 \centering
@@ -3490,7 +3553,7 @@ There are pros and cons to each methods. The preferable method is probably to ch
 \section*{On Print}\label{on-print}}
 
 
-Let's add the option to style the globe, gio.js provides \href{https://giojs.org/html/docs/colorStyle.html}{themes} but they are currently not applicable from R. As a matter of fact, gio.js provides dozens of customisation options that should be available in the package as well. These probably should be split across different functions, just like they are in gio.js, rather than all grouped into a single function. This may first appear as difficult to implement, how, when, how would one use another function given the function \texttt{gio} generates the visualisation? As it happens \texttt{gio} itself (or rather the function \texttt{htmlwidgets::createWidget} it contains) returns an object of class ``htmlwidget'' which itself renders the visualisation on print (literally \texttt{htmlwidget.print} method).
+Let's add the option to style the globe, gio.js provides mutliple \href{https://giojs.org/html/docs/colorStyle.html}{themes} but they are currently not applicable from R. As a matter of fact, gio.js provides dozens of customisation options that should be available in the package as well. These, however, probably should be split across different functions, just like they are in gio.js, rather than all be accessible from a single function. This begs the question, when would one use another function given the function \texttt{gio} generates the visualisation? As it happens \texttt{gio} itself (or rather the function \texttt{htmlwidgets::createWidget} it contains) does not render the output, it returns an object of class ``htmlwidget'' which actually renders the visualisation on print (literally \texttt{htmlwidget.print} method).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3499,7 +3562,7 @@ Let's add the option to style the globe, gio.js provides \href{https://giojs.org
 \end{Highlighting}
 \end{Shaded}
 
-Therefore, one can use functions on the object returned by \texttt{gio} which contains, amongst other things, the \texttt{x} list originally that holds all the options and data: one can easily append data to this object.
+Therefore, one can use functions on the object returned by \texttt{gio} which contains, amongst other things, the \texttt{x} list to which we can append make changes, append data, or do any other operation that lists allow.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3516,7 +3579,7 @@ Therefore, one can use functions on the object returned by \texttt{gio} which co
 \end{Highlighting}
 \end{Shaded}
 
-Gio.js includes a collection of themes or \href{https://giojs.org/html/docs/colorStyle.html}{styles} which we ought to make available in the package. The function would take as input the output of \texttt{gio} and append the style (name of theme) to the \texttt{x} list, this would then be used in JavaScript to change the look of the visualisation.
+This clarified the function to change the style of the visualisation can be added to the package. It would take as input the output of \texttt{gio} and append the style (name of theme) to the \texttt{x} list, this would then be used in JavaScript to change the look of the visualisation.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3528,7 +3591,7 @@ Gio.js includes a collection of themes or \href{https://giojs.org/html/docs/colo
 \end{Highlighting}
 \end{Shaded}
 
-The style is applied using the \texttt{setStyle} method on the controller, before the visualisation is created (\texttt{init}), using the style passed from R: \texttt{x.style}.
+The style is applied using the \texttt{setStyle} method on the controller before the visualisation is created, before the \texttt{init} method is called, using the style passed from R: \texttt{x.style}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3548,7 +3611,7 @@ The style is applied using the \texttt{setStyle} method on the controller, befor
 \end{Highlighting}
 \end{Shaded}
 
-The package can now be documented (to export the newly added function) and loaded in order to test \texttt{gio\_style}.
+We can now run \texttt{devtools::load\_all} to export the newly written function and load the functions in the environment with \texttt{devtools::load\_all}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3576,7 +3639,7 @@ This is great but can be greatly improved upon with the magrittr pipe \citep{R-m
 \end{Highlighting}
 \end{Shaded}
 
-The pipe makes htmlwidgets improves so much on htmlwidgets, providing the users of the package a much better interface, that widgets often export the pipe from magrittr; the usethis package provides a convenience function to do so.
+The pipe drastically improves the API that gio provides its users and thus probably should be exported by the package; the usethis package provides a function to easily do so.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3585,7 +3648,7 @@ The pipe makes htmlwidgets improves so much on htmlwidgets, providing the users 
 \end{Highlighting}
 \end{Shaded}
 
-This closes this chapter but is not the last we see of gio.js, we shall use it as examples to extend its functionalities, and polish certain aspects such as sizing and safety.
+This closes this chapter but is not the last we see of gio.js, we shall use it as example in the next chapters as we extend its functionalities, polish certain aspects such as sizing and safety.
 
 \hypertarget{advanced-usage}{%
 \chapter{Advanced Usage}\label{advanced-usage}}
@@ -3837,7 +3900,7 @@ To demonstrate how to integrate these functionalities in widgets we shall implem
 \section*{Callback}\label{callback}}
 
 
-Wouldn't it be grand if one were able to pick up server-side which country is selected by the user. This could enable fetching further data on the selected country in a database or display the flag of the selected country in the application's UI, or both, or do many other things. With regard to the implementation itself little if anything changes from previous examples used in the collection of chapters on Shiny.
+Wouldn't it be grand if one were able to pick up server-side which country is selected by the user as well as which are connected to that country! This could enable fetching further data on the selected country in a database or display the flag of the selected country in the application's UI, or both, or do many other things. With regard to the implementation itself little if anything changes from previous examples used in the collection of chapters on Shiny.
 
 The \href{https://giojs.org/html/docs/callbackPicked.html}{documentation of gio.js} show the library features the possibility to pass a callback function that is run every time a country is selected, the example given is below.
 
@@ -3871,6 +3934,7 @@ This can be adapted as previously demonstrated and used in our widget as shown b
 
   \KeywordTok{function} \AttributeTok{callback}\NormalTok{ (selectedCountry}\OperatorTok{,}\NormalTok{ relatedCountries) }\OperatorTok{\{}
     \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_selected\textquotesingle{}}\OperatorTok{,}\NormalTok{ selectedCountry)}\OperatorTok{;}
+    \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_related\textquotesingle{}}\OperatorTok{,}\NormalTok{ relatedCountries)}\OperatorTok{;}
   \OperatorTok{\}}
 
   \CommentTok{// render}
@@ -3881,7 +3945,7 @@ This can be adapted as previously demonstrated and used in our widget as shown b
 \end{Highlighting}
 \end{Shaded}
 
-This will set the input named \texttt{id\_selected} with the data on the selected country. Install the package with \texttt{devtools::install} and try that functionality in a shiny application.
+This will set the input named \texttt{id\_selected} and \texttt{id\_related} with data on the selected country and data on countries connected to it respectively. Install the package with \texttt{devtools::install} and use those inputs in a shiny application.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3896,7 +3960,10 @@ This will set the input named \texttt{id\_selected} with the data on the selecte
 
 \NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidRow}\NormalTok{(}
   \KeywordTok{gioOutput}\NormalTok{(}\StringTok{"globe"}\NormalTok{),}
-  \KeywordTok{verbatimTextOutput}\NormalTok{(}\StringTok{"selectedCountry"}\NormalTok{)}
+  \KeywordTok{fluidRow}\NormalTok{(}
+    \KeywordTok{column}\NormalTok{(}\DecValTok{6}\NormalTok{, }\KeywordTok{verbatimTextOutput}\NormalTok{(}\StringTok{"selectedCountry"}\NormalTok{)),}
+    \KeywordTok{column}\NormalTok{(}\DecValTok{6}\NormalTok{, }\KeywordTok{verbatimTextOutput}\NormalTok{(}\StringTok{"relatedCountries"}\NormalTok{))}
+\NormalTok{  )}
 \NormalTok{)}
 
 \NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
@@ -3909,15 +3976,19 @@ This will set the input named \texttt{id\_selected} with the data on the selecte
     \KeywordTok{print}\NormalTok{(input}\OperatorTok{$}\NormalTok{globe\_selected)}
 \NormalTok{  \})}
 
+\NormalTok{  output}\OperatorTok{$}\NormalTok{relatedCountries <{-}}\StringTok{ }\KeywordTok{renderPrint}\NormalTok{(\{}
+    \KeywordTok{print}\NormalTok{(input}\OperatorTok{$}\NormalTok{globe\_related)}
+\NormalTok{  \})}
+
 \NormalTok{\}}
 
 \KeywordTok{shinyApp}\NormalTok{(ui, server)}
 \end{Highlighting}
 \end{Shaded}
 
-Gio.js also gives access to data on countries ``related'' (connected) to the selected country, this could be a separate input, e.g.: \texttt{id\_connected} or even included in the already specified input but consider its impact on performances. The data is sent from the client to the server whether the user uses the input or not, though this likely will not have an impact with gio it can have a negative effect on the web browser and the server for other visualisations that include more numerous and frequent interactions, e.g.: setting an input value when the user hovers a scatter plot.
+The data is sent from the client to the server whether the user uses the input or not, though this likely will not have an impact with gio it can have a negative effect on the web browser and the server for other visualisations that include more numerous and frequent interactions, e.g.: setting an input value when the user hovers a scatter plot.
 
-The latter is not a bad idea but consider making it optional so the user has to explicitly state that they want this input value set. You can also consider not sending back all the data. For instance, gio returns the coordinates of the selected country where from arc connect; this is might be considered unnecessary. The code below only sets the input to the ISO code of the country selected.
+Therefore one might consider making the capture of such event optional so the web browser is not strained unless explicitly required. You can also consider not sending back all the data. For instance, gio returns the coordinates of the selected country where from arc connect; this is might be considered unnecessary. The code below only sets the input to the ISO code of the country selected.
 
 \begin{Shaded}
 \begin{Highlighting}[]
