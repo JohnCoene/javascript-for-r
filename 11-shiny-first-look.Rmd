@@ -125,3 +125,30 @@ server <- function(input, output, session){
 
 shinyApp(ui, server)
 ```
+
+Note that Shiny performs optimisations on how those values are set. First, if the input is set to the same value then Shiny ignores it. This is fine if you are interested in the actual value of the input but will not work as expected if the input is to be used as event. Indeed if you want to use this input in an `observe`, `observeEvent`, or `eventReactive`, you want it to be triggered every time the input changes, regardless of whether that value is the same as before. The second optimisation Shiny does is when the input is set to multiple different values before these have been processed then only the most recent value will actually be sent to the server. One can opt-out of these optimisations using the `priority: "event"` option when setting the input value.
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  tags$script(
+    "Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
+      alert(message);
+      Shiny.setInputValue('delete_alert', true, {priority: 'event'});
+    });"
+  ),
+  h1("Hello")
+)
+
+server <- function(input, output, session){
+  session$sendCustomMessage(type = "send-alert", message = "Deleting a record!")
+
+  observeEvent(input$delete_alert, {
+    # print TRUE when button is clicked
+    print(input$delete_alert) 
+  })
+}
+
+shinyApp(ui, server)
+```

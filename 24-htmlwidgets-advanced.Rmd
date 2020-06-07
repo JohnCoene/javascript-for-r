@@ -1,10 +1,10 @@
 # Advanced Usage
 
-In the previous chapter we put together an interesting, fully functioning widget but it lacks polish and does not use all the features htmlwidgets provides, this chapter looks into those.
+In the previous chapter we put together an interesting, fully functioning widget but it lacks polish and does not use all the features htmlwidgets provides, this chapter explores those. We look into handling the size of widgets to ensure they are responsive as well as discuss potential security concerns and how to address them. Finally we show how to pass JavaScript code from R to JavaScript and how to add HTML content before and after our widget.
 
-## Sizing
+## Sizing {-}
 
-The `gio` function of the package we developed in the previous chapter has arguments to specify the dimensions of the visualisation (width and height). However, think how rarely one specifies these parameters when using existing htmlwidgets. Indeed HTML visualisations should be responsive and fit the container they are placed in. This enables creating visualisations that look great on large desktop screens as well as the smaller mobile phones or iPad screens. Pre-defining the dimensions of the visualisation, likely in pixel (e.g.: `400px`), breaks all responsiveness. Note that this only applies to the width and not the height as this is what varies the most between screen sizes; a visualisation with a fixed height can still be responsive.
+The `gio` function of the package we developed in the previous chapter has arguments to specify the dimensions of the visualisation (width and height). However, think how rarely (if ever) one specifies these parameters when using plotly, highcharter or leaflet. Indeed HTML visualisations should be responsive and fit the container they are placed in---not to be confused though, these are two different things. This enables creating visualisations that look great on large desktop screens as well as the smaller mobile phones or iPad screens. Pre-defining the dimensions of the visualisation (e.g.: `400px`), breaks all responsiveness as the width is no longer relative to its container. Using a relative width like `100%` ensures the visualisation always fits in the container edge to edge and enables responsiveness.
 
 ```r
 arcs <- jsonlite::fromJSON(
@@ -27,27 +27,27 @@ gio(cars)
 
 ![Gio no sizing management](images/gio-size-issue.png)
 
-The output produced by gio currently does not fit the container it is in: it should take the full width of the browser. This could be achieved by setting the width to `100%` (CSS value).
+When this is not specified htmlwdigets sets the width of the visualisation to 400 pixels.
 
 ```r
 gio(arcs, width = 500) # 500 px wide
-gio(arcs, width = "100%") # responsive
+gio(arcs, width = "100%") # fits width
 ```
 
-The next section on sizing policy delves a bit deeper into sizing and demonstrate how to make a package responsive by default.
+The next section on sizing policy delves a bit deeper into sizing, it demonstrates how to make a package visualisation and default to a 100% width.
 
-## Sizing Policy
+## Sizing Policy {-}
 
-One can optionally specify a sizing policy when creating the widget which will dictate default dimensions and padding given different contexts:
+One can optionally specify a sizing policy when creating the widget, the policy will dictate default dimensions and padding given different contexts:
 
 - Global defaults
 - RStudio viewer
 - Web browser
 - R markdown
 
-It is often enough to specify general defaults as widgets are rarely expected to behave differently with respect to size and padding depending on the context but it can be useful.
+It is often enough to specify general defaults as widgets are rarely expected to behave differently with respect to size depending on the context but it can be useful.
 
-Below we modify the sizing policy of gio via the `sizingPolicy` argument of the `createWidget` function. The function `htmlwidgets::sizingPolicy` has many arguments, below we set the default width to 100% to ensure the visualisation is and fills its container entirely regardless of where it is rendered. We also remove all padding by setting it to 0 and set `browser.fill` to `TRUE` so it automatically resize the visualisation to fit the entire browser page.
+Below we modify the sizing policy of gio via the `sizingPolicy` argument of the `createWidget` function. The function `htmlwidgets::sizingPolicy` has many arguments, we set the default width to 100% to ensure the visualisation fills its container entirely regardless of where it is rendered. We also remove all padding by setting it to 0 and set `browser.fill` to `TRUE` so it automatically resize the visualisation to fit the entire browser page.
 
 ```r
 # create widget
@@ -68,13 +68,13 @@ htmlwidgets::createWidget(
 
 ![Gio with sizing policy](images/gio-fit.png)
 
-## Resizing
+## Resizing {-}
 
-In the first widget built in this book (`playground`), when deconstructed the JavaScript `factory` function we omitted the `resize` function. The `resize` function does what it says on the tin: it is called when the widget is resized. What this function will contain entirely depends on the JavaScript library one is working with. Some make it very easy other less so, that is for the developer to discover in the documentation of the library. Some libraries, like gio, do not even require it and handle automatically under the hood.
+In the first widget built in this book (`playground`), when we deconstructed the JavaScript `factory` function but omitted the `resize` function. The `resize` function does what it says on the tin: it is called when the widget is resized. What this function will contain entirely depends on the JavaScript library one is working with. Some are very easy to resize other less so, that is for the developer to discover in the documentation of the library. Some libraries, like gio, do not even require using a resizing function and handle that automatically under the hood; resize the width of the RStudio viewer or web browser and gio.js resizes too.
 
 ![Gio resized](images/gio-small.png)
 
-However, to give the reader an idea of what these tend to look like we will see how plotly, highcharts.js, and chart.js implement it.
+However, to give the reader an idea of what these tend to look like below are the ways plotly, highcharts, and chart.js do it.
 
 __Plotly__
 
@@ -99,21 +99,23 @@ The `width` and `height` used in the functions above are obtained from the `resi
 ```js
 ...
 resize: function(width, height) {
-  
+  chart.setSize(width, height); // highcharts example
 }
 ...
 ```
 
-## Pre Render Hooks & Safety
+## Pre Render Hooks & Safety {-}
 
-The `createWidget` function also comes with a `preRenderHook` argument to let one pass a a function which is run just prior to the rendering, it accepts the entire widget object as input, and should return a modified widget object. This was not used in any of the widgets previously built but can be extremely useful. It can be used to make checks on the object to ensure all is correct, or remove variables that should only be used internally.
+The `createWidget` function also comes with a `preRenderHook` argument which accepts a function that is run just prior to the rendering, it accepts the entire widget object as input, and should return a modified widget object. This was not used in any of the widgets previously built but is extremely useful. It can be used to make checks on the object to ensure all is correct, or remove variables that should only be used internally, and much more.
 
-Currently, `gio` takes the entirety of the `data` and serialises it in its entirety which will cause security concerns as all the data used in the widget is visible in the source code of the package. What is the data used for the visualisation also contained sensitive information? We ought to ensure gio only serialises the data necessary to produce the visualisation.
+Currently, `gio` takes the data frame `data` and serialises it in its entirety which will cause security concerns as all the data used in the widget is visible in the source code of the package. What if the data used for the visualisation contained an additional column with sensitive information? We ought to ensure gio only serialises the data necessary to produce the visualisation.
 
 ```r
 # add a variable that should not be shared
 arcs$secret_id <- 1:2
 ```
+
+We create a `render_gio` function which accepts the entire widget, filters only the column necessary from the data and returns the widget.
 
 ```r
 # preRenderHook function
@@ -140,6 +142,8 @@ htmlwidgets::createWidget(
 )
 ```
 
+Moreover, security aside, this can also improve performances as only the data relevant to the visualisation is serialised and subsequently loaded by the client. Without the modification above, were one to use `gio` on a dataset with 100 columns all would have been serialised, thereby greatly impacting performances both of the R process rendering the output and the web browser viewing the visualisation.
+
 ## JavaScript Code {-}
 
 As mentioned in a previous chapter JavaScript code cannot be serialised to JSON.
@@ -149,11 +153,13 @@ As mentioned in a previous chapter JavaScript code cannot be serialised to JSON.
 jsonlite::toJSON("var x = 3;")
 ```
 
-Nonetheless, it is doable in htmlwdigets. The function `htmlwidgets::JS` can be used to mark a character vector so that it will be treated as literal JavaScript code when evaluated on the client-side.
+Nonetheless, it is doable with htmlwdigets' serialiser (an only that one). The function `htmlwidgets::JS` can be used to mark a character vector so that it will be treated as literal JavaScript code when evaluated on the client-side.
 
 ```{r}
 htmlwidgets::JS("var x = 3;")  
 ```
+
+This can be useful where the library requires the use of callback functions.
 
 ## Prepend & Append Content {-}
 
@@ -165,6 +171,11 @@ gio_title <- function(g, title){
   title <- htmltools::h3(title)
   htmlwidgets::prependContent(g, title)
 }
+```
+
+```r
+gio(arcs) %>% 
+  gio_title("Gio.js htmlwidget!")
 ```
 
 ![Gio output with a title](images/gio-title.png)
