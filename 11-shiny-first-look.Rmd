@@ -155,9 +155,9 @@ shinyApp(ui, server)
 
 ### Deserialise {-}
 
-In the section on sending data from R to JavaScript we used a "message handler" in JavaScript to handle the data coming from the server. The corollary exists, we can create an "input handler" to preprocess the data coming from JavaScript before it is made accessible by the input. In R, we create a function that accepts three arguments, the data coming JavaScript, a Shiny session, and the name of the input. Note that all of these arguments are mandatory even if we are not going to used them.
+In the section on sending data from R to JavaScript we used a "message handler" in JavaScript to handle the data coming from the server. There is also the corollary, an "input handler" to preprocess the data coming from JavaScript before it is made accessible by the input. In R, this is a function that must accept three arguments, the data coming JavaScript, a shiny session, and the name of the input. Note that all of these arguments are mandatory even if they are used in the function.
 
-To demonstrate, we will create a handler that adds some admittedly useless meta information to the data.
+Input handlers are most often used to reshape or change the type of the data coming in. To demonstrate how use them, we create a handler for the `delete_alert` which adds some admittedly useless meta information to the data.
 
 ```r
 # create handler
@@ -170,14 +170,14 @@ process_input <- function(x, session, inputname){
 }
 ```
 
-Once this function created it needs to be registered with shiny using the `registerInputHandler` function which takes two arguments. First, the name of the handler which will need to be referenced in JavaScript inputs which should use the handler, second, the handler function. Attempt to give the handler a unique name yet simple to avoid clashes with other handlers. 
+Once this function created it needs to be registered with shiny using the `registerInputHandler` function which takes two arguments. First, a unique identifier for the handler, second, the handler function. Attempt to give the handler a unique yet simple name (alphanumeric characters, underscores, and periods) to avoid clashes with other handlers. 
 
 ```r
 # register with shiny
 registerInputHandler("alert.processor", process_input)
 ```
 
-Note that handlers can only be registered once, running the above twice will fail the second time, even if the handler function has changed. This can be overwritten using the `force` argument. 
+Note that handlers can only be registered once, running the above twice will fail the second time, even if the handler function has changed. Thus, the handler can be overwritten by setting `force` to `TRUE`. 
 
 ```r
 # register with shiny
@@ -221,7 +221,6 @@ server <- function(input, output, session){
   session$sendCustomMessage(type = "send-alert", message = "Deleting a record!")
 
   observeEvent(input$delete_alert, {
-    # print TRUE when button is clicked
     print(input$delete_alert) 
   })
 }
@@ -229,4 +228,4 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-The previous section on the input handler is entirely optional but as we will see in later parts of the book it can prove nice touch in some cases.
+The previous section on the input handler is entirely optional but as we will see in later parts of the book it can be nice touch in some cases.

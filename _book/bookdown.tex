@@ -993,7 +993,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jun 07 2020 16:24:40 GMT+0200 (CEST)"
+## [1] "Sun Jun 07 2020 18:55:47 GMT+0200 (CEST)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1003,7 +1003,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jun 07 2020 16:24:40 GMT+0200 (CEST)"
+## [1] "Sun Jun 07 2020 18:55:47 GMT+0200 (CEST)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -1782,9 +1782,9 @@ Note that Shiny performs optimisations on how those values are set. First, if th
 \subsection*{Deserialise}\label{deserialise}}
 
 
-In the section on sending data from R to JavaScript we used a ``message handler'' in JavaScript to handle the data coming from the server. The corollary exists, we can create an ``input handler'' to preprocess the data coming from JavaScript before it is made accessible by the input. In R, we create a function that accepts three arguments, the data coming JavaScript, a Shiny session, and the name of the input. Note that all of these arguments are mandatory even if we are not going to used them.
+In the section on sending data from R to JavaScript we used a ``message handler'' in JavaScript to handle the data coming from the server. There is also the corollary, an ``input handler'' to preprocess the data coming from JavaScript before it is made accessible by the input. In R, this is a function that must accept three arguments, the data coming JavaScript, a shiny session, and the name of the input. Note that all of these arguments are mandatory even if they are used in the function.
 
-To demonstrate, we will create a handler that adds some admittedly useless meta information to the data.
+Input handlers are most often used to reshape or change the type of the data coming in. To demonstrate how use them, we create a handler for the \texttt{delete\_alert} which adds some admittedly useless meta information to the data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1799,7 +1799,7 @@ To demonstrate, we will create a handler that adds some admittedly useless meta 
 \end{Highlighting}
 \end{Shaded}
 
-Once this function created it needs to be registered with shiny using the \texttt{registerInputHandler} function which takes two arguments. First, the name of the handler which will need to be referenced in JavaScript inputs which should use the handler, second, the handler function. Attempt to give the handler a unique name yet simple to avoid clashes with other handlers.
+Once this function created it needs to be registered with shiny using the \texttt{registerInputHandler} function which takes two arguments. First, a unique identifier for the handler, second, the handler function. Attempt to give the handler a unique yet simple name (alphanumeric characters, underscores, and periods) to avoid clashes with other handlers.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1808,7 +1808,7 @@ Once this function created it needs to be registered with shiny using the \textt
 \end{Highlighting}
 \end{Shaded}
 
-Note that handlers can only be registered once, running the above twice will fail the second time, even if the handler function has changed. This can be overwritten using the \texttt{force} argument.
+Note that handlers can only be registered once, running the above twice will fail the second time, even if the handler function has changed. Thus, the handler can be overwritten by setting \texttt{force} to \texttt{TRUE}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1857,7 +1857,6 @@ We can then recap to see what the application would look like now.
 \NormalTok{  session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\DataTypeTok{type =} \StringTok{"send{-}alert"}\NormalTok{, }\DataTypeTok{message =} \StringTok{"Deleting a record!"}\NormalTok{)}
 
   \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{delete\_alert, \{}
-    \CommentTok{\# print TRUE when button is clicked}
     \KeywordTok{print}\NormalTok{(input}\OperatorTok{$}\NormalTok{delete\_alert) }
 \NormalTok{  \})}
 \NormalTok{\}}
@@ -1866,7 +1865,7 @@ We can then recap to see what the application would look like now.
 \end{Highlighting}
 \end{Shaded}
 
-The previous section on the input handler is entirely optional but as we will see in later parts of the book it can prove nice touch in some cases.
+The previous section on the input handler is entirely optional but as we will see in later parts of the book it can be nice touch in some cases.
 
 \hypertarget{a-complete-integration---jbox.js}{%
 \chapter{A Complete Integration - jBox.js}\label{a-complete-integration---jbox.js}}

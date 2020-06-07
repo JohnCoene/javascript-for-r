@@ -410,8 +410,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb130-22"><a href="a-first-look-alerts.html#cb130-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div id="deserialise" class="section level3 unnumbered" number="">
 <h3>Deserialise</h3>
-<p>In the section on sending data from R to JavaScript we used a “message handler” in JavaScript to handle the data coming from the server. The corollary exists, we can create an “input handler” to preprocess the data coming from JavaScript before it is made accessible by the input. In R, we create a function that accepts three arguments, the data coming JavaScript, a Shiny session, and the name of the input. Note that all of these arguments are mandatory even if we are not going to used them.</p>
-<p>To demonstrate, we will create a handler that adds some admittedly useless meta information to the data.</p>
+<p>In the section on sending data from R to JavaScript we used a “message handler” in JavaScript to handle the data coming from the server. There is also the corollary, an “input handler” to preprocess the data coming from JavaScript before it is made accessible by the input. In R, this is a function that must accept three arguments, the data coming JavaScript, a shiny session, and the name of the input. Note that all of these arguments are mandatory even if they are used in the function.</p>
+<p>Input handlers are most often used to reshape or change the type of the data coming in. To demonstrate how use them, we create a handler for the <code>delete_alert</code> which adds some admittedly useless meta information to the data.</p>
 <div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="a-first-look-alerts.html#cb131-1"></a><span class="co"># create handler</span></span>
 <span id="cb131-2"><a href="a-first-look-alerts.html#cb131-2"></a>process_input &lt;-<span class="st"> </span><span class="cf">function</span>(x, session, inputname){</span>
 <span id="cb131-3"><a href="a-first-look-alerts.html#cb131-3"></a>  data &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
@@ -420,10 +420,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb131-6"><a href="a-first-look-alerts.html#cb131-6"></a>  )</span>
 <span id="cb131-7"><a href="a-first-look-alerts.html#cb131-7"></a>  <span class="kw">return</span>(data)</span>
 <span id="cb131-8"><a href="a-first-look-alerts.html#cb131-8"></a>}</span></code></pre></div>
-<p>Once this function created it needs to be registered with shiny using the <code>registerInputHandler</code> function which takes two arguments. First, the name of the handler which will need to be referenced in JavaScript inputs which should use the handler, second, the handler function. Attempt to give the handler a unique name yet simple to avoid clashes with other handlers.</p>
+<p>Once this function created it needs to be registered with shiny using the <code>registerInputHandler</code> function which takes two arguments. First, a unique identifier for the handler, second, the handler function. Attempt to give the handler a unique yet simple name (alphanumeric characters, underscores, and periods) to avoid clashes with other handlers.</p>
 <div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="a-first-look-alerts.html#cb132-1"></a><span class="co"># register with shiny</span></span>
 <span id="cb132-2"><a href="a-first-look-alerts.html#cb132-2"></a><span class="kw">registerInputHandler</span>(<span class="st">&quot;alert.processor&quot;</span>, process_input)</span></code></pre></div>
-<p>Note that handlers can only be registered once, running the above twice will fail the second time, even if the handler function has changed. This can be overwritten using the <code>force</code> argument.</p>
+<p>Note that handlers can only be registered once, running the above twice will fail the second time, even if the handler function has changed. Thus, the handler can be overwritten by setting <code>force</code> to <code>TRUE</code>.</p>
 <div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="a-first-look-alerts.html#cb133-1"></a><span class="co"># register with shiny</span></span>
 <span id="cb133-2"><a href="a-first-look-alerts.html#cb133-2"></a><span class="kw">registerInputHandler</span>(<span class="st">&quot;alert.processor&quot;</span>, process_input, <span class="dt">force =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <p>Once the handler function created and registered with shiny what is left to do is tell shiny which input should use that handler. This is done by adding the name of the handler, <code>alert.processor</code>, preceded by a colon (<code>:alert.processor</code>) as a suffix to the input name.</p>
@@ -457,13 +457,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb135-26"><a href="a-first-look-alerts.html#cb135-26"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Deleting a record!&quot;</span>)</span>
 <span id="cb135-27"><a href="a-first-look-alerts.html#cb135-27"></a></span>
 <span id="cb135-28"><a href="a-first-look-alerts.html#cb135-28"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>delete_alert, {</span>
-<span id="cb135-29"><a href="a-first-look-alerts.html#cb135-29"></a>    <span class="co"># print TRUE when button is clicked</span></span>
-<span id="cb135-30"><a href="a-first-look-alerts.html#cb135-30"></a>    <span class="kw">print</span>(input<span class="op">$</span>delete_alert) </span>
-<span id="cb135-31"><a href="a-first-look-alerts.html#cb135-31"></a>  })</span>
-<span id="cb135-32"><a href="a-first-look-alerts.html#cb135-32"></a>}</span>
-<span id="cb135-33"><a href="a-first-look-alerts.html#cb135-33"></a></span>
-<span id="cb135-34"><a href="a-first-look-alerts.html#cb135-34"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>The previous section on the input handler is entirely optional but as we will see in later parts of the book it can prove nice touch in some cases.</p>
+<span id="cb135-29"><a href="a-first-look-alerts.html#cb135-29"></a>    <span class="kw">print</span>(input<span class="op">$</span>delete_alert) </span>
+<span id="cb135-30"><a href="a-first-look-alerts.html#cb135-30"></a>  })</span>
+<span id="cb135-31"><a href="a-first-look-alerts.html#cb135-31"></a>}</span>
+<span id="cb135-32"><a href="a-first-look-alerts.html#cb135-32"></a></span>
+<span id="cb135-33"><a href="a-first-look-alerts.html#cb135-33"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>The previous section on the input handler is entirely optional but as we will see in later parts of the book it can be nice touch in some cases.</p>
 
 </div>
 </div>
