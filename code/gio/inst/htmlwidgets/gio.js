@@ -7,13 +7,15 @@ HTMLWidgets.widget({
   factory: function(el, width, height) {
 
     // TODO: define shared variables for this instance
+    var controller;
+    var rendered = false;
 
     return {
 
       renderValue: function(x) {
 
         var container = document.getElementById(el.id);
-        var controller = new GIO.Controller(container);
+        controller = new GIO.Controller(container);
         
         // add data
         controller.addData(x.data);
@@ -25,17 +27,19 @@ HTMLWidgets.widget({
 
         function callback (selectedCountry, relatedCountries) {
           Shiny.setInputValue(el.id + '_selected', selectedCountry);
-          Shiny.setInputValue(el.id + '_related', relatedCountries);
+          Shiny.setInputValue(el.id + '_related:gio.related.countries', relatedCountries);
         }
 
         // render
-        controller.init();
+        if(!rendered)
+          controller.init();
 
       },
 
       resize: function(width, height) {
 
         // TODO: code to re-render the widget with a new size
+        controller.resizeUpdate()
 
       }
 

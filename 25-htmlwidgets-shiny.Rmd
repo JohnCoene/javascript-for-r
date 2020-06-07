@@ -96,5 +96,110 @@ function callback (selectedCountry, relatedCountries) {
 }
 ```
 
+## Input Handler {-}
+
+While input handlers were explored previously we found limited use for them as the input were set to simple boolean values. It can be useful in this case as the inputs return more data which could do with some preprocessing. Namely the input returning data on the related countries, it is deserialised to a list but could be reshaped to a data frame of arcs.
+
+Below we create a handler that is going to loop over the list and return a data frame.
+
+```r
+# R/zzz.R
+related_countries_handler <- function(x, session, inputname){
+  purrr::map_dfr(x, as.data.frame)
+}
+```
+
+Then we register the handler when the package is loaded.
+
+```r
+# R/zzz.R
+related_countries_handler <- function(x, session, inputname){
+  purrr::map_dfr(x, as.data.frame)
+}
+
+.onLoad <- function(libname, pkgname) {
+  shiny::registerInputHandler("gio.related.countries", related_countries_handler)
+}
+```
+
+Finally, we can reinstall the package with `devtools::install` and create shiny application to observe the change. Below we use a large example dataset and, since the input now returns a data frame, we can display the input value in a table.
+
+```r
+library(DT)
+library(gio)
+library(shiny)
+
+# large sample data
+url <- paste0(
+  "https://raw.githubusercontent.com/syt123450/",
+  "giojs/master/examples/data/sampleData.json"
+)
+arcs <- jsonlite::fromJSON(url)
+
+ui <- fluidRow(
+  gioOutput("globe"),
+  DTOutput("relatedCountries")
+)
+
+server <- function(input, output){
+
+  output$globe <- renderGio({
+    gio(arcs)
+  })
+
+  output$relatedCountries <- renderDT({
+    datatable(input$globe_related)
+  })
+
+}
+
+shinyApp(ui, server)
+```
+
+![Input transformed to data frame](images/gio-input-handler.png)
+
 ## R to JavaScript {-}
 
+This book previously explored how to send data to the from the shiny server to the front-end, this section looks to apply this to htmlwidgets. Currently, using htmlwidgets in shiny consist of generating the outputs using the `render` and complimentary `*Output` functions.
+
+```r
+library(gio)
+library(shiny)
+
+arcs1 <- data.frame(
+  e = c("US", "CN", "RU"),
+  i = c("CN", "RU", "US"),
+  v = c(100, 120, 130)
+)
+
+arcs2 <- data.frame(
+  e = c("CN", "CN", "JP"),
+  i = c("IN", "JP", "US"),
+  v = c(100, 120, 130)
+)
+
+ui <- fluidRow(
+  selectInput(
+    "dataset", 
+    "Select a dataset", 
+    choices = c("First", "Second")
+  ),
+  gioOutput("globe")
+)
+
+server <- function(input, output){
+
+  reactive_arcs <- reactive({
+    if(input$dataset == "First") 
+      return(arcs1)
+    return(arcs2)
+  })
+
+  output$globe <- renderGio({
+    gio(reactive_arcs())
+  })
+
+}
+
+shinyApp(ui, server)
+```

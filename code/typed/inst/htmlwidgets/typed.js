@@ -7,12 +7,13 @@ HTMLWidgets.widget({
   factory: function(el, width, height) {
 
     // TODO: define shared variables for this instance
+    var typed;
 
     return {
 
       renderValue: function(x) {
 
-        var typed = new Typed('#' + el.id, x);
+        typed = new Typed('#' + el.id, x);
 
       },
 
