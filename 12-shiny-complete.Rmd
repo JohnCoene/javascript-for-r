@@ -439,6 +439,32 @@ Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
 });
 ```
 
+### Input Handler {-}
+
+The input defined in this package simply consists of a boolean value which does not warrant the use of an input handler. However, were one required the place to put it would be in the `.onLoad` function as the handler can only be registered once.
+
+```r
+# R/zzz.R
+
+jbox_handler <- function(data, session, inputname){
+  list(
+    data = data,
+    meta = "This is some metadata"
+  )
+}
+
+.onLoad <- function(libname, pkgname) {
+  # serve static files
+  shiny::addResourcePath(
+    "jbox-assets",
+    system.file("assets", package = "jbox")
+  )
+
+  # register input handler
+  registerInputHandler("jbox.alert.handler", jbox_handler)
+}
+```
+
 ### Wrapping up {-}
 
 Building and installing the package will now provide the user an interface demonstrated below.
