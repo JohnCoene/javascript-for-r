@@ -1,27 +1,27 @@
 # Working with Shiny
 
-A previous set of chapters explored how to make JavaScript and R communicate by passing data from one to the other and back. This chapter explores how to apply that to htmlwidgets so one can dynamically interact with the rendered widget by sending it more data and capture server-side how the user interact with the widget.
+A previous set of chapters explored how to make JavaScript and R communicate in shiny applications by passing data from the server to the client and back. This chapter explores how to apply that to htmlwidgets so they can provide additional functionalities when used in Shiny applications. 
 
 To demonstrate how to integrate these functionalities in widgets we shall implement them in the previously built gio package.
 
 ## Callback {-}
 
-Wouldn't it be grand if one were able to pick up server-side which country is selected by the user! This could enable fetching data on the selected country from a database or display the flag of the selected country in the application's UI, or both, or do many other things. With regard to the implementation itself little if anything changes from previous examples used in the collection of chapters on Shiny.
+JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one be notified and run code when a user clicks a point on a scatter plot, or when the user clicks the legend of a chart for example. Gio.js provides a callback that is fired when a country is selected on the globe, this callback function accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). This could be used to send that data back to the R server where it could be used from many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element.
 
-The [documentation of gio.js](https://giojs.org/html/docs/callbackPicked.html) shows the library features the possibility to pass a callback function that is run every time a country is selected, the example given is below.
+The [documentation of gio.js](https://giojs.org/html/docs/callbackPicked.html) gives the following example callback function.
 
 ```js
-controller.onCountryPicked( callback );
-
+// define callback function
 function callback (selectedCountry, relatedCountries) {
-
   console.log(selectedCountry);
   console.log(relatedCountries);
-
 }
+
+// use callback function
+controller.onCountryPicked(callback);
 ```
 
-This can be adapted as previously demonstrated and used in our widget as shown below.
+This defines a function named `callback` which takes the two aforementioned objects and logs them in the JavaScript console. Then the function is passed to the `controller` which will run it every time a country is picked. This can be incorporated into the widget. Instead of logging the data in the console it is used to define two different shiny inputs. Note the use of the widget identifier to define the input name.
 
 ```js
 ...
@@ -33,12 +33,12 @@ renderValue: function(x) {
   controller.setStyle(x.style);
 
   // callback
-  controller.onCountryPicked( callback );
-
   function callback (selectedCountry, relatedCountries) {
     Shiny.setInputValue(el.id + '_selected', selectedCountry);
     Shiny.setInputValue(el.id + '_related', relatedCountries);
   }
+
+  controller.onCountryPicked(callback);
 
   // render
   controller.init();
@@ -47,17 +47,18 @@ renderValue: function(x) {
 ...
 ```
 
-This will set the input named `id_selected` and `id_related` with data on the selected country and data on countries connected to it respectively. Install the package with `devtools::install` and use those inputs in a shiny application.
+The package can then be installed with `devtools::install` so we can test these inputs in a shiny application.
 
 ```r
 library(gio)
 library(shiny)
 
-arcs <- data.frame(
-  e = c("US", "CN", "RU"),
-  i = c("CN", "RU", "US"),
-  v = c(100, 120, 130)
+# large sample data
+url <- paste0(
+  "https://raw.githubusercontent.com/syt123450/",
+  "giojs/master/examples/data/sampleData.json"
 )
+arcs <- jsonlite::fromJSON(url)
 
 ui <- fluidRow(
   gioOutput("globe"),
