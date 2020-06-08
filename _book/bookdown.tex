@@ -169,7 +169,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2020-06-07}
+\date{2020-06-08}
 
 \begin{document}
 \maketitle
@@ -993,7 +993,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jun 07 2020 22:25:41 GMT+0200 (CEST)"
+## [1] "Mon Jun 08 2020 18:35:26 GMT+0200 (CEST)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1003,7 +1003,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jun 07 2020 22:25:41 GMT+0200 (CEST)"
+## [1] "Mon Jun 08 2020 18:35:26 GMT+0200 (CEST)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -3803,57 +3803,13 @@ This closes this chapter but is not the last we see of gio.js, we shall use it a
 
 In the previous chapter we put together an interesting, fully functioning widget but it lacks polish and does not use all the features htmlwidgets provides, this chapter explores those. We look into handling the size of widgets to ensure they are responsive as well as discuss potential security concerns and how to address them. Finally we show how to pass JavaScript code from R to JavaScript and how to add HTML content before and after our widget.
 
-\hypertarget{sizing}{%
-\section*{Sizing}\label{sizing}}
-
-
-The \texttt{gio} function of the package we developed in the previous chapter has arguments to specify the dimensions of the visualisation (width and height). However, think how rarely (if ever) one specifies these parameters when using plotly, highcharter or leaflet. Indeed HTML visualisations should be responsive and fit the container they are placed in---not to be confused though, these are two different things. This enables creating visualisations that look great on large desktop screens as well as the smaller mobile phones or iPad screens. Pre-defining the dimensions of the visualisation (e.g.: \texttt{400px}), breaks all responsiveness as the width is no longer relative to its container. Using a relative width like \texttt{100\%} ensures the visualisation always fits in the container edge to edge and enables responsiveness.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{arcs <{-}}\StringTok{ }\NormalTok{jsonlite}\OperatorTok{::}\KeywordTok{fromJSON}\NormalTok{(}
-  \StringTok{\textquotesingle{}[}
-\StringTok{    \{}
-\StringTok{      "e": "CN",}
-\StringTok{      "i": "US",}
-\StringTok{      "v": 3300000}
-\StringTok{    \},}
-\StringTok{    \{}
-\StringTok{      "e": "CN",}
-\StringTok{      "i": "RU",}
-\StringTok{      "v": 10000}
-\StringTok{    \}}
-\StringTok{  ]\textquotesingle{}}
-\NormalTok{)}
-
-\KeywordTok{gio}\NormalTok{(cars)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{figure}
-\centering
-\includegraphics{images/gio-size-issue.png}
-\caption{Gio no sizing management}
-\end{figure}
-
-When this is not specified htmlwdigets sets the width of the visualisation to 400 pixels.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{gio}\NormalTok{(arcs, }\DataTypeTok{width =} \DecValTok{500}\NormalTok{) }\CommentTok{\# 500 px wide}
-\KeywordTok{gio}\NormalTok{(arcs, }\DataTypeTok{width =} \StringTok{"100\%"}\NormalTok{) }\CommentTok{\# fits width}
-\end{Highlighting}
-\end{Shaded}
-
-The next section on sizing policy delves a bit deeper into sizing, it demonstrates how to make a package visualisation and default to a 100\% width.
-
 \hypertarget{shared-variables}{%
 \section*{Shared Variables}\label{shared-variables}}
 
 
-Up until now the topic of shared variables had been omitted as it was not relevant, however, it will be in the coming chapters. Indeed we will later discover how to further manipulate the widget; changing the data, resizing, and more. This will require accessing the \texttt{controller}, which, being defined in the \texttt{renderValue} function is not accessible outside of it. To make it accessible outside of \texttt{renderValue} requires a tiny but consequential change without which the next section on resizing the widget will not work for instance.
+Up until now the topic of shared variables had been omitted as it was not relevant, however, it will be from here onwards. Indeed we are about to discover how to further manipulate the widget; changing the data, resizing, and more. This will generally the JavaScript instance of the visualisation, the object named \texttt{controller} in the gio package, which, being defined in the \texttt{renderValue} function is not accessible outside of it. To make it accessible outside of \texttt{renderValue} requires a tiny but consequential change without which resizing the widget will not be doable for instance.
 
-We need to declare the \texttt{controller} variable outside of \texttt{renderValue}, inside the \texttt{factory}. This was in fact indicated from the onset by the following comment: \texttt{//\ TODO:\ define\ shared\ variables\ for\ this\ instance} (comment generated by \texttt{htmlwdigets::scaffoldWidget}). Any variable declared as shown below will be accessible by all functions declared in the \texttt{factory}.
+Therefore the \texttt{controller} variable has to be declared outside of the \texttt{renderValue} function, inside the \texttt{factory}. This was in fact indicated from the onset by the following comment: \texttt{//\ TODO:\ define\ shared\ variables\ for\ this\ instance} (comment generated by \texttt{htmlwdigets::scaffoldWidget}). Any variable declared as shown below will be accessible by all functions declared in the \texttt{factory}; \texttt{renderValue}, but also \texttt{resize} and other yet to be added.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3905,6 +3861,50 @@ We need to declare the \texttt{controller} variable outside of \texttt{renderVal
 \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
 \end{Highlighting}
 \end{Shaded}
+
+\hypertarget{sizing}{%
+\section*{Sizing}\label{sizing}}
+
+
+The \texttt{gio} function of the package we developed in the previous chapter has arguments to specify the dimensions of the visualisation (width and height). However, think how rarely (if ever) one specifies these parameters when using plotly, highcharter or leaflet. Indeed HTML visualisations should be responsive and fit the container they are placed in---not to be confused though, these are two different things. This enables creating visualisations that look great on large desktop screens as well as the smaller mobile phones or iPad screens. Pre-defining the dimensions of the visualisation (e.g.: \texttt{400px}), breaks all responsiveness as the width is no longer relative to its container. Using a relative width like \texttt{100\%} ensures the visualisation always fits in the container edge to edge and enables responsiveness.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{arcs <{-}}\StringTok{ }\NormalTok{jsonlite}\OperatorTok{::}\KeywordTok{fromJSON}\NormalTok{(}
+  \StringTok{\textquotesingle{}[}
+\StringTok{    \{}
+\StringTok{      "e": "CN",}
+\StringTok{      "i": "US",}
+\StringTok{      "v": 3300000}
+\StringTok{    \},}
+\StringTok{    \{}
+\StringTok{      "e": "CN",}
+\StringTok{      "i": "RU",}
+\StringTok{      "v": 10000}
+\StringTok{    \}}
+\StringTok{  ]\textquotesingle{}}
+\NormalTok{)}
+
+\KeywordTok{gio}\NormalTok{(cars)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/gio-size-issue.png}
+\caption{Gio no sizing management}
+\end{figure}
+
+When this is not specified htmlwdigets sets the width of the visualisation to 400 pixels.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{gio}\NormalTok{(arcs, }\DataTypeTok{width =} \DecValTok{500}\NormalTok{) }\CommentTok{\# 500 px wide}
+\KeywordTok{gio}\NormalTok{(arcs, }\DataTypeTok{width =} \StringTok{"100\%"}\NormalTok{) }\CommentTok{\# fits width}
+\end{Highlighting}
+\end{Shaded}
+
+The next section on sizing policy delves a bit deeper into sizing, it demonstrates how to make a package visualisation and default to a 100\% width.
 
 \hypertarget{sizing-policy}{%
 \section*{Sizing Policy}\label{sizing-policy}}
