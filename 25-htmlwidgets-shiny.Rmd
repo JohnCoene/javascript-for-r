@@ -55,8 +55,8 @@ library(shiny)
 
 # large sample data
 url <- paste0(
-  "https://raw.githubusercontent.com/syt123450/",
-  "giojs/master/examples/data/sampleData.json"
+  "https://raw.githubusercontent.com/JohnCoene/",
+  "javascript-for-r/master/data/countries.json"
 )
 arcs <- jsonlite::fromJSON(url)
 
@@ -87,9 +87,9 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-The data is sent from the client to the server whether the user uses the input or not, though this likely will not negatively impact gio it can reduce performances if the callback function is triggered too frequently. For instance an input value set when the user hovers a scatter plot might lead to the event being fired very frequently and too much data being sent to the server, slowing things down and providing a poor experience.
+The data is sent from the client to the server whether the inputs is used or not, though this likely will not negatively impact gio it can reduce performances if the callback function is triggered too frequently. For instance an input value set when the user hovers a scatter plot might lead to the event being fired very frequently and too much data being sent to the server, slowing things down and providing a poor experience.
 
-Therefore one might consider making the capture of such event optional so the web browser is not strained unless explicitly required. You can also consider not sending back all the data. For instance, gio returns the coordinates of the selected country where from arc connect; this is might be considered unnecessary. The code below only sets the input to the ISO code of the country selected.
+Therefore one might consider making the capture of such event optional so the web browser is not strained unless explicitly asked by the developer of the application. You can also consider not sending back all the data. For instance, gio returns the coordinates of the selected country where from arc connect; this is might be considered unnecessary. The code below only sets the input to the ISO code of the country selected.
 
 ```js
 function callback (selectedCountry, relatedCountries) {
@@ -99,9 +99,9 @@ function callback (selectedCountry, relatedCountries) {
 
 ## Input Handler {-}
 
-While input handlers were explored previously we found limited use for them as the input were set to simple boolean values. It can be useful in this case as the inputs return more data which could do with some preprocessing. Namely the input returning data on the related countries, it is deserialised to a list but could be reshaped to a data frame of arcs.
+While input handlers were explored previously we found limited use for them as the inputs were set to simple boolean values. It can be useful in this case as the inputs return more data where preprocessing is relevant. Namely the input returning data on the related countries, it is deserialised to a list but could be reshaped to a data frame of arcs.
 
-Below we create a handler that is going to loop over the list and return a data frame.
+Below we create a handler that is going to loop over the list (over each arc) and return a data frame.
 
 ```r
 # R/zzz.R
@@ -110,7 +110,7 @@ related_countries_handler <- function(x, session, inputname){
 }
 ```
 
-Then we register the handler when the package is loaded.
+Then the handler must be registered with shiny, since handler can only be registered once a good place to put it is in the `.onLoad` function of the package.
 
 ```r
 # R/zzz.R
@@ -132,8 +132,8 @@ library(shiny)
 
 # large sample data
 url <- paste0(
-  "https://raw.githubusercontent.com/syt123450/",
-  "giojs/master/examples/data/sampleData.json"
+  "https://raw.githubusercontent.com/JohnCoene/",
+  "javascript-for-r/master/data/countries.json"
 )
 arcs <- jsonlite::fromJSON(url)
 
@@ -161,9 +161,11 @@ shinyApp(ui, server)
 
 ## R to JavaScript {-}
 
-This book previously explored how to send data to the from the shiny server to the front-end, this section looks to apply this to htmlwidgets. Currently, gio in shiny consists of generating the globe with the `renderGio` and complimentary `gioOutput` functions. This generates the entire visualisation, it creates the globe, draws the arcs based on the data, sets the style, everything. 
+This book previously explored how to send data to the from the shiny server to the front-end, this section applies this to htmlwidgets. Currently, using gio in shiny consists of generating the globe with the `renderGio` and complimentary `gioOutput` functions. This generates the entire visualisation, it creates the HTML element where it places the globe, draws the arcs based on the data, sets the style, etc.
 
-Now imagine a scenario where we provide a `selectInput` to the user so they can choose between two datasets to visualise. First, there is no need to re-generate the entire visualisation, only the data changes, the style, background globe, and everything else can remain unchanged. This is more efficient computationally, both for the server and the client, and makes for much cleaner transitions and animations. Secondly, running `renderGio` currently does not work properly, gio.js does not replace the initigeneral visualisation but instead creates a new one below. This is admittedly somewhat particular to the gio.js functions and will likely not be the case with other libraries. The problem described can be observed running the application below: multiple visualisations are generated.
+Now imagine that only one of the elements of the globe needs changing say the data, or the style, given the functions currently at hand one would have to redraw the entire visualisation, only changing the data or the style. However, most JavaScript visualisation libraries, including gio.js, will enable changing only certain aspects of the output.
+
+Before we look into the implementation, let us create a shiny application which would benefit from such a feature. The shiny application below provides a drop-down menu to select between two datasets to draw on the globe, running it reveals an issue with gio though. Upon selecting a dataset with the drop down a second globe appears underneath the original one. This is because internally gio.js creates a new element (`<canvas>`) within the `<div>` created by `htmlwidgets` when running `init`, regardless of whether one was already created. Note that most visualisation libraries will not have that issue, they will detect the existing output and override it instead.
 
 ```r
 library(gio)
@@ -207,15 +209,19 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-Internally gio.js creates a new element (`<canvas>`) within the `<div>` created by `htmlwidgets`, we could empty this element before creating every visualisation, thereby removing any previously created visualisations (if there are any). We can do this using the `innerHTML` method already used in this book.
+A solution to this is to ensure the div created by htmlwidgets is empty before create the visualisation. Incidentally this can be executed with a JavaScript method previously used in this book: `innerHTML`. This can be used on the `container` before it is used to create an instance of gio.
 
 ```js
 // gio.js
 var container = document.getElementById(el.id);
-container.innerHTML = ''; // empty
+container.innerHTML = ''; // empty the container
 controller = new GIO.Controller(container);
 ...
 ```
+
+We got sidetracked but this had to be fixed. Ideally, when the user selects an dataset from the dropdown the entire visualisation is not redrawn, only the underlying data (the arcs) change. To do so a new set of functions divorced from the ones currently used need to be created. This separation will allow leaving the current functions as-is, using `gio` to initialise a visualisation and its JavaScript complement `renderValue`, and have a separate set dedicated to working with a different set of JavaScript functions which circumvent `renderValue` to directly change aspects of the visualisation (such as the underlying dataset).
+
+This involves a few moving parts, thankfully some of them were already explored. 
 
 1. In R, Create a proxy of the visualisation
 2. Send data to the client from R

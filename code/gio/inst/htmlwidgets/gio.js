@@ -8,7 +8,6 @@ HTMLWidgets.widget({
 
     // TODO: define shared variables for this instance
     var controller;
-    var rendered = false;
 
     return {
 
@@ -32,8 +31,7 @@ HTMLWidgets.widget({
         }
 
         // render
-        if(!rendered)
-          controller.init();
+        controller.init();
 
       },
 

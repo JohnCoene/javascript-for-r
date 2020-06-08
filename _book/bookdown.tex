@@ -993,7 +993,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Mon Jun 08 2020 18:35:26 GMT+0200 (CEST)"
+## [1] "Mon Jun 08 2020 22:41:46 GMT+0200 (CEST)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1003,7 +1003,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Mon Jun 08 2020 18:35:26 GMT+0200 (CEST)"
+## [1] "Mon Jun 08 2020 22:41:46 GMT+0200 (CEST)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -3904,7 +3904,7 @@ When this is not specified htmlwdigets sets the width of the visualisation to 40
 \end{Highlighting}
 \end{Shaded}
 
-The next section on sizing policy delves a bit deeper into sizing, it demonstrates how to make a package visualisation and default to a 100\% width.
+These options are destined for the user of the package, the next section details how the developer can define default sizing behaviour.
 
 \hypertarget{sizing-policy}{%
 \section*{Sizing Policy}\label{sizing-policy}}
@@ -4128,7 +4128,7 @@ While the \texttt{prependContent} function places the content above the visualis
 \hypertarget{working-with-shiny}{%
 \chapter{Working with Shiny}\label{working-with-shiny}}
 
-A previous set of chapters explored how to make JavaScript and R communicate by passing data from one to the other and back. This chapter explores how to apply that to htmlwidgets so one can dynamically interact with the rendered widget by sending it more data and capture server-side how the user interact with the widget.
+A previous set of chapters explored how to make JavaScript and R communicate in shiny applications by passing data from the server to the client and back. This chapter explores how to apply that to htmlwidgets so they can provide additional functionalities when used in Shiny applications.
 
 To demonstrate how to integrate these functionalities in widgets we shall implement them in the previously built gio package.
 
@@ -4136,24 +4136,24 @@ To demonstrate how to integrate these functionalities in widgets we shall implem
 \section*{Callback}\label{callback}}
 
 
-Wouldn't it be grand if one were able to pick up server-side which country is selected by the user! This could enable fetching data on the selected country from a database or display the flag of the selected country in the application's UI, or both, or do many other things. With regard to the implementation itself little if anything changes from previous examples used in the collection of chapters on Shiny.
+JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one be notified and run code when a user clicks a point on a scatter plot, or when the user clicks the legend of a chart for example. Gio.js provides a callback that is fired when a country is selected on the globe, this callback function accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). This could be used to send that data back to the R server where it could be used from many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element.
 
-The \href{https://giojs.org/html/docs/callbackPicked.html}{documentation of gio.js} shows the library features the possibility to pass a callback function that is run every time a country is selected, the example given is below.
+The \href{https://giojs.org/html/docs/callbackPicked.html}{documentation of gio.js} gives the following example callback function.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\VariableTok{controller}\NormalTok{.}\AttributeTok{onCountryPicked}\NormalTok{( callback )}\OperatorTok{;}
-
+\CommentTok{// define callback function}
 \KeywordTok{function} \AttributeTok{callback}\NormalTok{ (selectedCountry}\OperatorTok{,}\NormalTok{ relatedCountries) }\OperatorTok{\{}
-
   \VariableTok{console}\NormalTok{.}\AttributeTok{log}\NormalTok{(selectedCountry)}\OperatorTok{;}
   \VariableTok{console}\NormalTok{.}\AttributeTok{log}\NormalTok{(relatedCountries)}\OperatorTok{;}
-
 \OperatorTok{\}}
+
+\CommentTok{// use callback function}
+\VariableTok{controller}\NormalTok{.}\AttributeTok{onCountryPicked}\NormalTok{(callback)}\OperatorTok{;}
 \end{Highlighting}
 \end{Shaded}
 
-This can be adapted as previously demonstrated and used in our widget as shown below.
+This defines a function named \texttt{callback} which takes the two aforementioned objects and logs them in the JavaScript console. Then the function is passed to the \texttt{controller} which will run it every time a country is picked. This can be incorporated into the widget. Instead of logging the data in the console it is used to define two different shiny inputs. Note the use of the widget identifier to define the input name.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4166,12 +4166,12 @@ This can be adapted as previously demonstrated and used in our widget as shown b
   \VariableTok{controller}\NormalTok{.}\AttributeTok{setStyle}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{style}\NormalTok{)}\OperatorTok{;}
 
   \CommentTok{// callback}
-  \VariableTok{controller}\NormalTok{.}\AttributeTok{onCountryPicked}\NormalTok{( callback )}\OperatorTok{;}
-
   \KeywordTok{function} \AttributeTok{callback}\NormalTok{ (selectedCountry}\OperatorTok{,}\NormalTok{ relatedCountries) }\OperatorTok{\{}
     \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_selected\textquotesingle{}}\OperatorTok{,}\NormalTok{ selectedCountry)}\OperatorTok{;}
     \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_related\textquotesingle{}}\OperatorTok{,}\NormalTok{ relatedCountries)}\OperatorTok{;}
   \OperatorTok{\}}
+
+  \VariableTok{controller}\NormalTok{.}\AttributeTok{onCountryPicked}\NormalTok{(callback)}\OperatorTok{;}
 
   \CommentTok{// render}
   \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
@@ -4181,18 +4181,19 @@ This can be adapted as previously demonstrated and used in our widget as shown b
 \end{Highlighting}
 \end{Shaded}
 
-This will set the input named \texttt{id\_selected} and \texttt{id\_related} with data on the selected country and data on countries connected to it respectively. Install the package with \texttt{devtools::install} and use those inputs in a shiny application.
+The package can then be installed with \texttt{devtools::install} so we can test these inputs in a shiny application.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(gio)}
 \KeywordTok{library}\NormalTok{(shiny)}
 
-\NormalTok{arcs <{-}}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}
-  \DataTypeTok{e =} \KeywordTok{c}\NormalTok{(}\StringTok{"US"}\NormalTok{, }\StringTok{"CN"}\NormalTok{, }\StringTok{"RU"}\NormalTok{),}
-  \DataTypeTok{i =} \KeywordTok{c}\NormalTok{(}\StringTok{"CN"}\NormalTok{, }\StringTok{"RU"}\NormalTok{, }\StringTok{"US"}\NormalTok{),}
-  \DataTypeTok{v =} \KeywordTok{c}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{120}\NormalTok{, }\DecValTok{130}\NormalTok{)}
+\CommentTok{\# large sample data}
+\NormalTok{url <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(}
+  \StringTok{"https://raw.githubusercontent.com/JohnCoene/"}\NormalTok{,}
+  \StringTok{"javascript{-}for{-}r/master/data/countries.json"}
 \NormalTok{)}
+\NormalTok{arcs <{-}}\StringTok{ }\NormalTok{jsonlite}\OperatorTok{::}\KeywordTok{fromJSON}\NormalTok{(url)}
 
 \NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidRow}\NormalTok{(}
   \KeywordTok{gioOutput}\NormalTok{(}\StringTok{"globe"}\NormalTok{),}
@@ -4222,9 +4223,9 @@ This will set the input named \texttt{id\_selected} and \texttt{id\_related} wit
 \end{Highlighting}
 \end{Shaded}
 
-The data is sent from the client to the server whether the user uses the input or not, though this likely will not negatively impact gio it can reduce performances if the callback function is triggered too frequently. For instance setting an input value when the user hovers a scatter plot might lead to the event being fired very frequently and too much data being sent to the server, slowing things down and providing a poor experience.
+The data is sent from the client to the server whether the inputs is used or not, though this likely will not negatively impact gio it can reduce performances if the callback function is triggered too frequently. For instance an input value set when the user hovers a scatter plot might lead to the event being fired very frequently and too much data being sent to the server, slowing things down and providing a poor experience.
 
-Therefore one might consider making the capture of such event optional so the web browser is not strained unless explicitly required. You can also consider not sending back all the data. For instance, gio returns the coordinates of the selected country where from arc connect; this is might be considered unnecessary. The code below only sets the input to the ISO code of the country selected.
+Therefore one might consider making the capture of such event optional so the web browser is not strained unless explicitly asked by the developer of the application. You can also consider not sending back all the data. For instance, gio returns the coordinates of the selected country where from arc connect; this is might be considered unnecessary. The code below only sets the input to the ISO code of the country selected.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4238,9 +4239,9 @@ Therefore one might consider making the capture of such event optional so the we
 \section*{Input Handler}\label{input-handler-1}}
 
 
-While input handlers were explored previously we found limited use for them as the input were set to simple boolean values. It can be useful in this case as the inputs return more data which could do with some preprocessing. Namely the input returning data on the related countries, it is deserialised to a list but could be reshaped to a data frame of arcs.
+While input handlers were explored previously we found limited use for them as the inputs were set to simple boolean values. It can be useful in this case as the inputs return more data where preprocessing is relevant. Namely the input returning data on the related countries, it is deserialised to a list but could be reshaped to a data frame of arcs.
 
-Below we create a handler that is going to loop over the list and return a data frame.
+Below we create a handler that is going to loop over the list (over each arc) and return a data frame.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4251,7 +4252,7 @@ Below we create a handler that is going to loop over the list and return a data 
 \end{Highlighting}
 \end{Shaded}
 
-Then we register the handler when the package is loaded.
+Then the handler must be registered with shiny, since handler can only be registered once a good place to put it is in the \texttt{.onLoad} function of the package.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4276,8 +4277,8 @@ Finally, we can reinstall the package with \texttt{devtools::install} and create
 
 \CommentTok{\# large sample data}
 \NormalTok{url <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(}
-  \StringTok{"https://raw.githubusercontent.com/syt123450/"}\NormalTok{,}
-  \StringTok{"giojs/master/examples/data/sampleData.json"}
+  \StringTok{"https://raw.githubusercontent.com/JohnCoene/"}\NormalTok{,}
+  \StringTok{"javascript{-}for{-}r/master/data/countries.json"}
 \NormalTok{)}
 \NormalTok{arcs <{-}}\StringTok{ }\NormalTok{jsonlite}\OperatorTok{::}\KeywordTok{fromJSON}\NormalTok{(url)}
 
@@ -4312,9 +4313,11 @@ Finally, we can reinstall the package with \texttt{devtools::install} and create
 \section*{R to JavaScript}\label{r-to-javascript}}
 
 
-This book previously explored how to send data to the from the shiny server to the front-end, this section looks to apply this to htmlwidgets. Currently, gio in shiny consists of generating the globe with the \texttt{renderGio} and complimentary \texttt{gioOutput} functions. This generates the entire visualisation, it creates the globe, draws the arcs based on the data, sets the style, everything.
+This book previously explored how to send data to the from the shiny server to the front-end, this section applies this to htmlwidgets. Currently, using gio in shiny consists of generating the globe with the \texttt{renderGio} and complimentary \texttt{gioOutput} functions. This generates the entire visualisation, it creates the HTML element where it places the globe, draws the arcs based on the data, sets the style, etc.
 
-Now imagine a scenario where we provide a \texttt{selectInput} to the user so they can choose between two datasets to visualise. First, there is no need to re-generate the entire visualisation, only the data changes, the style, background globe, and everything else can remain unchanged. This is more efficient computationally, both for the server and the client, and makes for much cleaner transitions and animations. Secondly, running \texttt{renderGio} currently does not work properly, gio.js does not replace the initigeneral visualisation but instead creates a new one below. This is admittedly somewhat particular to the gio.js functions and will likely not be the case with other libraries. The problem described can be observed running the application below: multiple visualisations are generated.
+Now imagine that only one of the elements of the globe needs changing say the data, or the style, given the functions currently at hand one would have to redraw the entire visualisation, only changing the data or the style. However, most JavaScript visualisation libraries, including gio.js, will enable changing only certain aspects of the output.
+
+Before we look into the implementation, let us create a shiny application which would benefit from such a feature. The shiny application below provides a drop-down menu to select between two datasets to draw on the globe, running it reveals an issue with gio though. Upon selecting a dataset with the drop down a second globe appears underneath the original one. This is because internally gio.js creates a new element (\texttt{\textless{}canvas\textgreater{}}) within the \texttt{\textless{}div\textgreater{}} created by \texttt{htmlwidgets} when running \texttt{init}, regardless of whether one was already created. Note that most visualisation libraries will not have that issue, they will detect the existing output and override it instead.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4360,17 +4363,21 @@ Now imagine a scenario where we provide a \texttt{selectInput} to the user so th
 \end{Highlighting}
 \end{Shaded}
 
-Internally gio.js creates a new element (\texttt{\textless{}canvas\textgreater{}}) within the \texttt{\textless{}div\textgreater{}} created by \texttt{htmlwidgets}, we could empty this element before creating every visualisation, thereby removing any previously created visualisations (if there are any). We can do this using the \texttt{innerHTML} method already used in this book.
+A solution to this is to ensure the div created by htmlwidgets is empty before create the visualisation. Incidentally this can be executed with a JavaScript method previously used in this book: \texttt{innerHTML}. This can be used on the \texttt{container} before it is used to create an instance of gio.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{// gio.js}
 \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
-\VariableTok{container}\NormalTok{.}\AttributeTok{innerHTML} \OperatorTok{=} \StringTok{\textquotesingle{}\textquotesingle{}}\OperatorTok{;} \CommentTok{// empty}
+\VariableTok{container}\NormalTok{.}\AttributeTok{innerHTML} \OperatorTok{=} \StringTok{\textquotesingle{}\textquotesingle{}}\OperatorTok{;} \CommentTok{// empty the container}
 \NormalTok{controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
 \NormalTok{...}
 \end{Highlighting}
 \end{Shaded}
+
+We got sidetracked but this had to be fixed. Ideally, when the user selects an dataset from the dropdown the entire visualisation is not redrawn, only the underlying data (the arcs) change. To do so a new set of functions divorced from the ones currently used need to be created. This separation will allow leaving the current functions as-is, using \texttt{gio} to initialise a visualisation and its JavaScript complement \texttt{renderValue}, and have a separate set dedicated to working with a different set of JavaScript functions which circumvent \texttt{renderValue} to directly change aspects of the visualisation (such as the underlying dataset).
+
+This involves a few moving parts, thankfully some of them were already explored.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
