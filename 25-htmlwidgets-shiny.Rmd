@@ -219,11 +219,241 @@ controller = new GIO.Controller(container);
 ...
 ```
 
-We got sidetracked but this had to be fixed. Ideally, when the user selects an dataset from the dropdown the entire visualisation is not redrawn, only the underlying data (the arcs) change. To do so a new set of functions divorced from the ones currently used need to be created. This separation will allow leaving the current functions as-is, using `gio` to initialise a visualisation and its JavaScript complement `renderValue`, and have a separate set dedicated to working with a different set of JavaScript functions which circumvent `renderValue` to directly change aspects of the visualisation (such as the underlying dataset).
+We got sidetracked but this had to be fixed. Ideally, when the user selects an dataset from the dropdown the entire visualisation is not redrawn, only the underlying data (the arcs) changes. To do so, a new set of functions divorced from the ones currently at hand needs to be created. This separation will allow leaving the already created functions as-is, using `gio` to initialise a visualisation and its JavaScript complement `renderValue`, and have a separate family of functions dedicated to working with different JavaScript functions which circumvent `renderValue` to directly change aspects of the visualisation (such as the underlying dataset).
 
-This involves a few moving parts, thankfully some of them were already explored. 
+This involves a few moving parts, thankfully some of them were already explored, just not in the context of htmlwidgets. The scheme is to send data from R to JavaScript using the formerly exploited `session$sendCustomMessage`, then in JavaScript fetch the visualisation object (`controller` in this case) to enable interacting with the widget, bypassing `renderValue`.
 
-1. In R, Create a proxy of the visualisation
-2. Send data to the client from R
-3. In JavaScript, get the visualisation
-4. Apply data to visualisation
+### Send Data {-}
+
+Let's start by creating the R function used to send data to JavaScript. This is hopefully reminiscent of a previous chapter, this function sends a message to JavaScript where it is paired with "message handler" that does something with said message.
+
+```r
+#' @export
+gio_send_data <- function(id, data, session = shiny::getDefaultReactiveDomain()){
+  message <- list(id = id, data = data)
+  session$sendCustomMessage("send-data", message)
+}
+```
+
+The function takes the id of the visualisation the data is destined for, the data itself, and a shiny session used to send the data. The id of the visualisation is sent as part of the message and will be used to retrieve the instance of the visualisation and subsequently apply the data. Note that we give this message the `send-data` identifier, this will be needed when we write its handler.
+
+There is one caveat that will make it such that the above will not work. To have gio.js work with data changes had to be made to the serialiser (using the `TOJSON_ARGS` attribute), this cannot be used here. The data being sent with Shiny via the session object the problem reoccurs: shiny, like htmlwidgets, serialises data frames column-wise and not row-wise. One can preview the way shiny serialises with `shiny:::toJSON` (three-colon).
+
+```{r}
+# preview shiny serialisation
+shiny:::toJSON(arcs)
+```
+
+Unfortunately this serialiser cannot be changed, therefore we have to reformat the data to a list which resembles the JSON output desired, using `apply` to turn every row into a list will do the job in most cases.
+
+```r
+#' @export
+gio_send_data <- function(id, data, session = shiny::getDefaultReactiveDomain()){
+  message <- list(id = id, data = apply(data, 1, as.list))
+  session$sendCustomMessage("send-data", message)
+}
+```
+
+## Retrieve Instance {-}
+
+We will need to be able to access the instance of the visualisation (`controller`) outside of the function `factory`. This can be made accessible by adding a function (technically a method) that returns the `controller`. Below we create a function called `getGlobe` which returns the `controller`.
+
+```js
+HTMLWidgets.widget({
+
+  name: 'gio',
+
+  type: 'output',
+
+  factory: function(el, width, height) {
+
+    var controller;
+
+    return {
+
+      renderValue: function(x) {
+
+        var container = document.getElementById(el.id);
+        container.innerHTML = '';
+        controller = new GIO.Controller(container);
+        
+        // add data
+        controller.addData(x.data);
+
+        controller.setStyle(x.style);
+
+        // callback
+        controller.onCountryPicked(callback);
+
+        function callback (selectedCountry, relatedCountries) {
+          Shiny.setInputValue(el.id + '_selected', selectedCountry);
+          Shiny.setInputValue(el.id + '_related:gio.related.countries', relatedCountries);
+        }
+
+        // render
+        controller.init();
+
+      },
+
+      resize: function(width, height) {
+
+        controller.resizeUpdate()
+
+      },
+
+      getGlobe: function(){
+        return controller;
+      }
+
+    };
+  }
+});
+```
+
+Then we create a function which uses `HTMLWidgets.find` to retrieve the htmlwidgets instance that contains the object returned by `factory`. This object includes the function `getGlobe` which we then use to obtain the `controller`.
+
+```js
+HTMLWidgets.widget({
+
+  name: 'gio',
+
+  type: 'output',
+
+  factory: function(el, width, height) {
+
+    var controller;
+
+    return {
+
+      renderValue: function(x) {
+
+        var container = document.getElementById(el.id);
+        container.innerHTML = '';
+        controller = new GIO.Controller(container);
+        
+        // add data
+        controller.addData(x.data);
+
+        controller.setStyle(x.style);
+
+        // callback
+        controller.onCountryPicked(callback);
+
+        function callback (selectedCountry, relatedCountries) {
+          Shiny.setInputValue(el.id + '_selected', selectedCountry);
+          Shiny.setInputValue(el.id + '_related:gio.related.countries', relatedCountries);
+        }
+
+        // render
+        controller.init();
+
+      },
+
+      resize: function(width, height) {
+
+        controller.resizeUpdate()
+
+      },
+
+      getGlobe: function(){
+        return controller;
+      }
+
+    };
+  }
+});
+
+// return the widget
+function get_gio(id){
+  var widget = HTMLWidgets.find("#" + id);
+  var globe = widget.getGlobe();
+  return globe;
+}
+```
+
+### Use Data {-}
+
+Now that there is a function which sends data and a chart identifier to the client from R and that there is a JavaScript function to retrieve the visualisation object using the aforementioned identifier, all this is missing is the handling of that data so it is applied to the visualisation: the "message handler." Registering the message handler being only relevant if shiny is running HTMLWidgets comes with a JavaScript method to check whether that is the case. This is useful to avoid needless errors as the registration of the shiny message handler will only work if the widget is used in shiny. We can thus use it in an if statement where all message handlers should be registered.
+
+```js
+// gio.js
+
+// check if shiny running
+if (HTMLWidgets.shinyMode){
+
+  // send-data message handler
+  Shiny.addCustomMessageHandler(type = 'send-data', function(message) {
+
+  });
+
+}
+```
+
+What the currently empty `send-alert` message handler should do is fetch the widget using the `id` sent from R with the `get_gio` function and then use the `addData` method to override the previously define arcs.
+
+```js
+// gio.js
+
+// check if shiny running
+if (HTMLWidgets.shinyMode){
+
+  // send-data message handler
+  Shiny.addCustomMessageHandler(type = 'send-data', function(message) {
+
+    var controller = get_gio(message.id);
+    controlle.addData(message.data);
+
+  });
+
+}
+```
+
+```r
+library(gio)
+library(shiny)
+
+arcs1 <- data.frame(
+  e = c("US", "CN", "RU"),
+  i = c("CN", "RU", "US"),
+  v = c(100, 120, 130)
+)
+
+arcs2 <- data.frame(
+  e = c("CN", "CN", "JP"),
+  i = c("IN", "JP", "US"),
+  v = c(100, 120, 130)
+)
+
+ui <- fluidRow(
+  selectInput(
+    "dataset", 
+    "Select a dataset", 
+    choices = c("First", "Second")
+  ),
+  gioOutput("globe")
+)
+
+server <- function(input, output){
+
+  reactive_arcs <- reactive({
+    if(input$dataset == "First") 
+      return(arcs1)
+    return(arcs2)
+  })
+
+  output$globe <- renderGio({
+    gio(arcs1)
+  })
+
+  observeEvent(input$dataset, {
+    if(input$dataset == "First")
+      data <- arcs1
+    else
+      data <- arcs2
+    gio_send_data("globe", data)
+  })
+
+}
+
+shinyApp(ui, server)
+```

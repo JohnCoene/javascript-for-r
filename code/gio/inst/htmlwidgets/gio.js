@@ -40,8 +40,34 @@ HTMLWidgets.widget({
         // TODO: code to re-render the widget with a new size
         controller.resizeUpdate()
 
+      },
+
+      getGlobe: function(){
+        return controller;
       }
 
     };
   }
 });
+
+// retrieve widget
+function get_gio(id){
+  var widget = HTMLWidgets.find("#" + id);
+  var globe = widget.getGlobe();
+  return globe;
+}
+
+// check if shiny running
+if (HTMLWidgets.shinyMode){
+
+  // send-data message handler
+  Shiny.addCustomMessageHandler(type = 'send-data', function(message) {
+
+    console.log(message);
+
+    var controller = get_gio(message.id);
+    controller.addData(message.data);
+
+  });
+
+}

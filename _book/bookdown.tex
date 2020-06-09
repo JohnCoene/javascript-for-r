@@ -169,7 +169,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2020-06-08}
+\date{2020-06-09}
 
 \begin{document}
 \maketitle
@@ -993,7 +993,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Mon Jun 08 2020 22:41:46 GMT+0200 (CEST)"
+## [1] "Tue Jun 09 2020 22:42:16 GMT+0200 (CEST)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1003,7 +1003,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Mon Jun 08 2020 22:41:46 GMT+0200 (CEST)"
+## [1] "Tue Jun 09 2020 22:42:16 GMT+0200 (CEST)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -3885,7 +3885,7 @@ The \texttt{gio} function of the package we developed in the previous chapter ha
 \StringTok{  ]\textquotesingle{}}
 \NormalTok{)}
 
-\KeywordTok{gio}\NormalTok{(cars)}
+\KeywordTok{gio}\NormalTok{(arcs)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4375,22 +4375,270 @@ A solution to this is to ensure the div created by htmlwidgets is empty before c
 \end{Highlighting}
 \end{Shaded}
 
-We got sidetracked but this had to be fixed. Ideally, when the user selects an dataset from the dropdown the entire visualisation is not redrawn, only the underlying data (the arcs) change. To do so a new set of functions divorced from the ones currently used need to be created. This separation will allow leaving the current functions as-is, using \texttt{gio} to initialise a visualisation and its JavaScript complement \texttt{renderValue}, and have a separate set dedicated to working with a different set of JavaScript functions which circumvent \texttt{renderValue} to directly change aspects of the visualisation (such as the underlying dataset).
+We got sidetracked but this had to be fixed. Ideally, when the user selects an dataset from the dropdown the entire visualisation is not redrawn, only the underlying data (the arcs) changes. To do so, a new set of functions divorced from the ones currently at hand needs to be created. This separation will allow leaving the already created functions as-is, using \texttt{gio} to initialise a visualisation and its JavaScript complement \texttt{renderValue}, and have a separate family of functions dedicated to working with different JavaScript functions which circumvent \texttt{renderValue} to directly change aspects of the visualisation (such as the underlying dataset).
 
-This involves a few moving parts, thankfully some of them were already explored.
+This involves a few moving parts, thankfully some of them were already explored, just not in the context of htmlwidgets. The scheme is to send data from R to JavaScript using the formerly exploited \texttt{session\$sendCustomMessage}, then in JavaScript fetch the visualisation object (\texttt{controller} in this case) to enable interacting with the widget, bypassing \texttt{renderValue}.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  In R, Create a proxy of the visualisation
-\item
-  Send data to the client from R
-\item
-  In JavaScript, get the visualisation
-\item
-  Apply data to visualisation
-\end{enumerate}
+\hypertarget{send-data}{%
+\subsection*{Send Data}\label{send-data}}
+
+
+Let's start by creating the R function used to send data to JavaScript. This is hopefully reminiscent of a previous chapter, this function sends a message to JavaScript where it is paired with ``message handler'' that does something with said message.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export}
+\NormalTok{gio\_send\_data <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id, data, }\DataTypeTok{session =}\NormalTok{ shiny}\OperatorTok{::}\KeywordTok{getDefaultReactiveDomain}\NormalTok{())\{}
+\NormalTok{  message <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{data =}\NormalTok{ data)}
+\NormalTok{  session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\StringTok{"send{-}data"}\NormalTok{, message)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The function takes the id of the visualisation the data is destined for, the data itself, and a shiny session used to send the data. The id of the visualisation is sent as part of the message and will be used to retrieve the instance of the visualisation and subsequently apply the data. Note that we give this message the \texttt{send-data} identifier, this will be needed when we write its handler.
+
+There is one caveat that will make it such that the above will not work. To have gio.js work with data changes had to be made to the serialiser (using the \texttt{TOJSON\_ARGS} attribute), this cannot be used here. The data being sent with Shiny via the session object the problem reoccurs: shiny, like htmlwidgets, serialises data frames column-wise and not row-wise. One can preview the way shiny serialises with \texttt{shiny:::toJSON} (three-colon).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# preview shiny serialisation}
+\NormalTok{shiny}\OperatorTok{:::}\KeywordTok{toJSON}\NormalTok{(arcs)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## {"e":["CN","CN"],"i":["US","RU"],"v":[3300000,10000]}
+\end{verbatim}
+
+Unfortunately this serialiser cannot be changed, therefore we have to reformat the data to a list which resembles the JSON output desired, using \texttt{apply} to turn every row into a list will do the job in most cases.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export}
+\NormalTok{gio\_send\_data <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id, data, }\DataTypeTok{session =}\NormalTok{ shiny}\OperatorTok{::}\KeywordTok{getDefaultReactiveDomain}\NormalTok{())\{}
+\NormalTok{  message <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{data =} \KeywordTok{apply}\NormalTok{(data, }\DecValTok{1}\NormalTok{, as.list))}
+\NormalTok{  session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\StringTok{"send{-}data"}\NormalTok{, message)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{retrieve-instance}{%
+\section*{Retrieve Instance}\label{retrieve-instance}}
+
+
+We will need to be able to access the instance of the visualisation (\texttt{controller}) outside of the function \texttt{factory}. This can be made accessible by adding a function (technically a method) that returns the \texttt{controller}. Below we create a function called \texttt{getGlobe} which returns the \texttt{controller}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{widget}\NormalTok{(}\OperatorTok{\{}
+
+  \DataTypeTok{name}\OperatorTok{:} \StringTok{\textquotesingle{}gio\textquotesingle{}}\OperatorTok{,}
+
+  \DataTypeTok{type}\OperatorTok{:} \StringTok{\textquotesingle{}output\textquotesingle{}}\OperatorTok{,}
+
+  \DataTypeTok{factory}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
+
+    \KeywordTok{var}\NormalTok{ controller}\OperatorTok{;}
+
+    \ControlFlowTok{return} \OperatorTok{\{}
+
+      \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+
+        \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
+        \VariableTok{container}\NormalTok{.}\AttributeTok{innerHTML} \OperatorTok{=} \StringTok{\textquotesingle{}\textquotesingle{}}\OperatorTok{;}
+\NormalTok{        controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+        
+        \CommentTok{// add data}
+        \VariableTok{controller}\NormalTok{.}\AttributeTok{addData}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;}
+
+        \VariableTok{controller}\NormalTok{.}\AttributeTok{setStyle}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{style}\NormalTok{)}\OperatorTok{;}
+
+        \CommentTok{// callback}
+        \VariableTok{controller}\NormalTok{.}\AttributeTok{onCountryPicked}\NormalTok{(callback)}\OperatorTok{;}
+
+        \KeywordTok{function} \AttributeTok{callback}\NormalTok{ (selectedCountry}\OperatorTok{,}\NormalTok{ relatedCountries) }\OperatorTok{\{}
+          \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_selected\textquotesingle{}}\OperatorTok{,}\NormalTok{ selectedCountry)}\OperatorTok{;}
+          \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_related:gio.related.countries\textquotesingle{}}\OperatorTok{,}\NormalTok{ relatedCountries)}\OperatorTok{;}
+        \OperatorTok{\}}
+
+        \CommentTok{// render}
+        \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
+
+      \OperatorTok{\},}
+
+      \DataTypeTok{resize}\OperatorTok{:} \KeywordTok{function}\NormalTok{(width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
+
+        \VariableTok{controller}\NormalTok{.}\AttributeTok{resizeUpdate}\NormalTok{()}
+
+      \OperatorTok{\},}
+
+      \DataTypeTok{getGlobe}\OperatorTok{:} \KeywordTok{function}\NormalTok{()}\OperatorTok{\{}
+        \ControlFlowTok{return}\NormalTok{ controller}\OperatorTok{;}
+      \OperatorTok{\}}
+
+    \OperatorTok{\};}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+Then we create a function which uses \texttt{HTMLWidgets.find} to retrieve the htmlwidgets instance that contains the object returned by \texttt{factory}. This object includes the function \texttt{getGlobe} which we then use to obtain the \texttt{controller}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{widget}\NormalTok{(}\OperatorTok{\{}
+
+  \DataTypeTok{name}\OperatorTok{:} \StringTok{\textquotesingle{}gio\textquotesingle{}}\OperatorTok{,}
+
+  \DataTypeTok{type}\OperatorTok{:} \StringTok{\textquotesingle{}output\textquotesingle{}}\OperatorTok{,}
+
+  \DataTypeTok{factory}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
+
+    \KeywordTok{var}\NormalTok{ controller}\OperatorTok{;}
+
+    \ControlFlowTok{return} \OperatorTok{\{}
+
+      \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+
+        \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
+        \VariableTok{container}\NormalTok{.}\AttributeTok{innerHTML} \OperatorTok{=} \StringTok{\textquotesingle{}\textquotesingle{}}\OperatorTok{;}
+\NormalTok{        controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+        
+        \CommentTok{// add data}
+        \VariableTok{controller}\NormalTok{.}\AttributeTok{addData}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;}
+
+        \VariableTok{controller}\NormalTok{.}\AttributeTok{setStyle}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{style}\NormalTok{)}\OperatorTok{;}
+
+        \CommentTok{// callback}
+        \VariableTok{controller}\NormalTok{.}\AttributeTok{onCountryPicked}\NormalTok{(callback)}\OperatorTok{;}
+
+        \KeywordTok{function} \AttributeTok{callback}\NormalTok{ (selectedCountry}\OperatorTok{,}\NormalTok{ relatedCountries) }\OperatorTok{\{}
+          \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_selected\textquotesingle{}}\OperatorTok{,}\NormalTok{ selectedCountry)}\OperatorTok{;}
+          \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_related:gio.related.countries\textquotesingle{}}\OperatorTok{,}\NormalTok{ relatedCountries)}\OperatorTok{;}
+        \OperatorTok{\}}
+
+        \CommentTok{// render}
+        \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
+
+      \OperatorTok{\},}
+
+      \DataTypeTok{resize}\OperatorTok{:} \KeywordTok{function}\NormalTok{(width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
+
+        \VariableTok{controller}\NormalTok{.}\AttributeTok{resizeUpdate}\NormalTok{()}
+
+      \OperatorTok{\},}
+
+      \DataTypeTok{getGlobe}\OperatorTok{:} \KeywordTok{function}\NormalTok{()}\OperatorTok{\{}
+        \ControlFlowTok{return}\NormalTok{ controller}\OperatorTok{;}
+      \OperatorTok{\}}
+
+    \OperatorTok{\};}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+
+\CommentTok{// return the widget}
+\KeywordTok{function} \AttributeTok{get\_gio}\NormalTok{(id)}\OperatorTok{\{}
+  \KeywordTok{var}\NormalTok{ widget }\OperatorTok{=} \VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{find}\NormalTok{(}\StringTok{"\#"} \OperatorTok{+}\NormalTok{ id)}\OperatorTok{;}
+  \KeywordTok{var}\NormalTok{ globe }\OperatorTok{=} \VariableTok{widget}\NormalTok{.}\AttributeTok{getGlobe}\NormalTok{()}\OperatorTok{;}
+  \ControlFlowTok{return}\NormalTok{ globe}\OperatorTok{;}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{use-data}{%
+\subsection*{Use Data}\label{use-data}}
+
+
+Now that there is a function which sends data and a chart identifier to the client from R and that there is a JavaScript function to retrieve the visualisation object using the aforementioned identifier, all this is missing is the handling of that data so it is applied to the visualisation: the ``message handler.'' Registering the message handler being only relevant if shiny is running HTMLWidgets comes with a JavaScript method to check whether that is the case. This is useful to avoid needless errors as the registration of the shiny message handler will only work if the widget is used in shiny. We can thus use it in an if statement where all message handlers should be registered.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// gio.js}
+
+\CommentTok{// check if shiny running}
+\ControlFlowTok{if}\NormalTok{ (}\VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{shinyMode}\NormalTok{)}\OperatorTok{\{}
+
+  \CommentTok{// send{-}data message handler}
+  \VariableTok{Shiny}\NormalTok{.}\AttributeTok{addCustomMessageHandler}\NormalTok{(type }\OperatorTok{=} \StringTok{\textquotesingle{}send{-}data\textquotesingle{}}\OperatorTok{,} \KeywordTok{function}\NormalTok{(message) }\OperatorTok{\{}
+
+  \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+What the currently empty \texttt{send-alert} message handler should do is fetch the widget using the \texttt{id} sent from R with the \texttt{get\_gio} function and then use the \texttt{addData} method to override the previously define arcs.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// gio.js}
+
+\CommentTok{// check if shiny running}
+\ControlFlowTok{if}\NormalTok{ (}\VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{shinyMode}\NormalTok{)}\OperatorTok{\{}
+
+  \CommentTok{// send{-}data message handler}
+  \VariableTok{Shiny}\NormalTok{.}\AttributeTok{addCustomMessageHandler}\NormalTok{(type }\OperatorTok{=} \StringTok{\textquotesingle{}send{-}data\textquotesingle{}}\OperatorTok{,} \KeywordTok{function}\NormalTok{(message) }\OperatorTok{\{}
+
+    \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \AttributeTok{get\_gio}\NormalTok{(}\VariableTok{message}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{controlle}\NormalTok{.}\AttributeTok{addData}\NormalTok{(}\VariableTok{message}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;}
+
+  \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(gio)}
+\KeywordTok{library}\NormalTok{(shiny)}
+
+\NormalTok{arcs1 <{-}}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}
+  \DataTypeTok{e =} \KeywordTok{c}\NormalTok{(}\StringTok{"US"}\NormalTok{, }\StringTok{"CN"}\NormalTok{, }\StringTok{"RU"}\NormalTok{),}
+  \DataTypeTok{i =} \KeywordTok{c}\NormalTok{(}\StringTok{"CN"}\NormalTok{, }\StringTok{"RU"}\NormalTok{, }\StringTok{"US"}\NormalTok{),}
+  \DataTypeTok{v =} \KeywordTok{c}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{120}\NormalTok{, }\DecValTok{130}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{arcs2 <{-}}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}
+  \DataTypeTok{e =} \KeywordTok{c}\NormalTok{(}\StringTok{"CN"}\NormalTok{, }\StringTok{"CN"}\NormalTok{, }\StringTok{"JP"}\NormalTok{),}
+  \DataTypeTok{i =} \KeywordTok{c}\NormalTok{(}\StringTok{"IN"}\NormalTok{, }\StringTok{"JP"}\NormalTok{, }\StringTok{"US"}\NormalTok{),}
+  \DataTypeTok{v =} \KeywordTok{c}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{120}\NormalTok{, }\DecValTok{130}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidRow}\NormalTok{(}
+  \KeywordTok{selectInput}\NormalTok{(}
+    \StringTok{"dataset"}\NormalTok{, }
+    \StringTok{"Select a dataset"}\NormalTok{, }
+    \DataTypeTok{choices =} \KeywordTok{c}\NormalTok{(}\StringTok{"First"}\NormalTok{, }\StringTok{"Second"}\NormalTok{)}
+\NormalTok{  ),}
+  \KeywordTok{gioOutput}\NormalTok{(}\StringTok{"globe"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
+
+\NormalTok{  reactive\_arcs <{-}}\StringTok{ }\KeywordTok{reactive}\NormalTok{(\{}
+    \ControlFlowTok{if}\NormalTok{(input}\OperatorTok{$}\NormalTok{dataset }\OperatorTok{==}\StringTok{ "First"}\NormalTok{) }
+      \KeywordTok{return}\NormalTok{(arcs1)}
+    \KeywordTok{return}\NormalTok{(arcs2)}
+\NormalTok{  \})}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{globe <{-}}\StringTok{ }\KeywordTok{renderGio}\NormalTok{(\{}
+    \KeywordTok{gio}\NormalTok{(arcs1)}
+\NormalTok{  \})}
+
+  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{dataset, \{}
+    \ControlFlowTok{if}\NormalTok{(input}\OperatorTok{$}\NormalTok{dataset }\OperatorTok{==}\StringTok{ "First"}\NormalTok{)}
+\NormalTok{      data <{-}}\StringTok{ }\NormalTok{arcs1}
+    \ControlFlowTok{else}
+\NormalTok{      data <{-}}\StringTok{ }\NormalTok{arcs2}
+    \KeywordTok{gio\_send\_data}\NormalTok{(}\StringTok{"globe"}\NormalTok{, data)}
+\NormalTok{  \})}
+
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{for-the-curious}{%
 \chapter{For The Curious}\label{for-the-curious}}
