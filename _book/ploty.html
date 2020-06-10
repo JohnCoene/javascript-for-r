@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 12 For The Curious | JavaScript for R</title>
+  <title>Chapter 13 Ploty | JavaScript for R</title>
   <meta name="description" content="Invite JavaScript into your Data Science workflow." />
   <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 12 For The Curious | JavaScript for R" />
+  <meta property="og:title" content="Chapter 13 Ploty | JavaScript for R" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="yihui/bookdown-crc" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 12 For The Curious | JavaScript for R" />
+  <meta name="twitter:title" content="Chapter 13 Ploty | JavaScript for R" />
   
   <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="working-with-shiny.html"/>
-<link rel="next" href="ploty.html"/>
+<link rel="prev" href="for-the-curious.html"/>
+<link rel="next" href="references.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -290,21 +290,141 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="for-the-curious" class="section level1" number="12">
-<h1><span class="header-section-number">Chapter 12</span> For The Curious</h1>
-<p>htmlwidgets inner-workings</p>
-
+<div id="ploty" class="section level1" number="13">
+<h1><span class="header-section-number">Chapter 13</span> Ploty</h1>
+<p>In this chapter we build a widget for plotly.js, or a tiny part of it; it’ll allow drawing a scatter and line plot and have some additional functionalities in shiny. Below is the example from the <a href="https://plotly.com/javascript/line-and-scatter/">plotly website</a> which we will reproduce.</p>
+<div class="sourceCode" id="cb280"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb280-1"><a href="ploty.html#cb280-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
+<span id="cb280-2"><a href="ploty.html#cb280-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb280-3"><a href="ploty.html#cb280-3"></a></span>
+<span id="cb280-4"><a href="ploty.html#cb280-4"></a><span class="kw">&lt;head&gt;</span></span>
+<span id="cb280-5"><a href="ploty.html#cb280-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
+<span id="cb280-6"><a href="ploty.html#cb280-6"></a>  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;plotly-latest.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb280-7"><a href="ploty.html#cb280-7"></a><span class="kw">&lt;/head&gt;</span></span>
+<span id="cb280-8"><a href="ploty.html#cb280-8"></a></span>
+<span id="cb280-9"><a href="ploty.html#cb280-9"></a><span class="kw">&lt;body&gt;</span></span>
+<span id="cb280-10"><a href="ploty.html#cb280-10"></a>  <span class="co">&lt;!-- div to hold visualisation --&gt;</span></span>
+<span id="cb280-11"><a href="ploty.html#cb280-11"></a>  <span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&quot;chart&quot;</span><span class="ot"> style=</span><span class="st">&quot;width:600px;height:250px;&quot;</span><span class="kw">&gt;&lt;/div&gt;</span></span>
+<span id="cb280-12"><a href="ploty.html#cb280-12"></a></span>
+<span id="cb280-13"><a href="ploty.html#cb280-13"></a>  <span class="co">&lt;!-- Script to create visualsiation --&gt;</span></span>
+<span id="cb280-14"><a href="ploty.html#cb280-14"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb280-15"><a href="ploty.html#cb280-15"></a>    <span class="kw">var</span> trace1 <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb280-16"><a href="ploty.html#cb280-16"></a>      <span class="dt">x</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span>]<span class="op">,</span></span>
+<span id="cb280-17"><a href="ploty.html#cb280-17"></a>      <span class="dt">y</span><span class="op">:</span> [<span class="dv">10</span><span class="op">,</span> <span class="dv">15</span><span class="op">,</span> <span class="dv">13</span><span class="op">,</span> <span class="dv">17</span>]<span class="op">,</span></span>
+<span id="cb280-18"><a href="ploty.html#cb280-18"></a>      <span class="dt">mode</span><span class="op">:</span> <span class="st">&#39;markers&#39;</span><span class="op">,</span></span>
+<span id="cb280-19"><a href="ploty.html#cb280-19"></a>      <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;scatter&#39;</span></span>
+<span id="cb280-20"><a href="ploty.html#cb280-20"></a>    <span class="op">};</span></span>
+<span id="cb280-21"><a href="ploty.html#cb280-21"></a></span>
+<span id="cb280-22"><a href="ploty.html#cb280-22"></a>    <span class="kw">var</span> trace2 <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb280-23"><a href="ploty.html#cb280-23"></a>      <span class="dt">x</span><span class="op">:</span> [<span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">5</span>]<span class="op">,</span></span>
+<span id="cb280-24"><a href="ploty.html#cb280-24"></a>      <span class="dt">y</span><span class="op">:</span> [<span class="dv">16</span><span class="op">,</span> <span class="dv">5</span><span class="op">,</span> <span class="dv">11</span><span class="op">,</span> <span class="dv">9</span>]<span class="op">,</span></span>
+<span id="cb280-25"><a href="ploty.html#cb280-25"></a>      <span class="dt">mode</span><span class="op">:</span> <span class="st">&#39;lines&#39;</span><span class="op">,</span></span>
+<span id="cb280-26"><a href="ploty.html#cb280-26"></a>      <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;scatter&#39;</span></span>
+<span id="cb280-27"><a href="ploty.html#cb280-27"></a>    <span class="op">};</span></span>
+<span id="cb280-28"><a href="ploty.html#cb280-28"></a></span>
+<span id="cb280-29"><a href="ploty.html#cb280-29"></a>    <span class="kw">var</span> data <span class="op">=</span> [trace1<span class="op">,</span> trace2<span class="op">,</span> trace3]<span class="op">;</span></span>
+<span id="cb280-30"><a href="ploty.html#cb280-30"></a></span>
+<span id="cb280-31"><a href="ploty.html#cb280-31"></a>    <span class="va">Plotly</span>.<span class="at">newPlot</span>(<span class="st">&#39;chart&#39;</span><span class="op">,</span> data)<span class="op">;</span></span>
+<span id="cb280-32"><a href="ploty.html#cb280-32"></a>    )<span class="op">;</span></span>
+<span id="cb280-33"><a href="ploty.html#cb280-33"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb280-34"><a href="ploty.html#cb280-34"></a><span class="kw">&lt;/body&gt;</span></span>
+<span id="cb280-35"><a href="ploty.html#cb280-35"></a></span>
+<span id="cb280-36"><a href="ploty.html#cb280-36"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<p>The aim is to obtain an R API like the pseudo code below. It’ll allow initialising the visualisation with the <code>plotly</code> function and add a line or scatter plot with <code>plot_line</code> and <code>plot_marker</code>.</p>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="ploty.html#cb281-1"></a><span class="kw">plotly</span>(<span class="dt">data =</span> cars) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb281-2"><a href="ploty.html#cb281-2"></a><span class="st">  </span><span class="kw">plot_line</span>(<span class="dt">x =</span> <span class="st">&quot;dist&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;speed&quot;</span>)</span></code></pre></div>
+<p>The story starts like all other widgets: create a package and scaffold the widget. We name the package plotlier so as not to override the local installation of the actual plotly package. We also add the magrittr pipe (<code>%&gt;%</code>) while we’re at it.</p>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="ploty.html#cb282-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;plotlier&quot;</span>) <span class="co"># create package</span></span>
+<span id="cb282-2"><a href="ploty.html#cb282-2"></a>usethis<span class="op">::</span><span class="kw">scaffoldWidget</span>(<span class="st">&quot;plotly&quot;</span>) <span class="co"># scaffold plotly</span></span>
+<span id="cb282-3"><a href="ploty.html#cb282-3"></a>usethis<span class="op">::</span><span class="kw">use_pipe</span>() <span class="co"># export pipe</span></span></code></pre></div>
+<p>Then we download the dependency from the CDN, the latest version at the time of writing this is <code>1.54.2</code>, and edit the <code>plotly.yml</code> file to point to the downloaded file.</p>
+<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="ploty.html#cb283-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;inst/htmlwidgets/plotly&quot;</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb283-2"><a href="ploty.html#cb283-2"></a>url &lt;-<span class="st"> &quot;https://cdn.plot.ly/plotly-1.54.2.min.js&quot;</span></span>
+<span id="cb283-3"><a href="ploty.html#cb283-3"></a><span class="kw">download.file</span>(url, <span class="st">&quot;inst/htmlwidgets/plotly/plotly.min.js&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb284"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb284-1"><a href="ploty.html#cb284-1"></a><span class="fu">dependencies</span><span class="kw">:</span></span>
+<span id="cb284-2"><a href="ploty.html#cb284-2"></a><span class="at"> </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> plotly</span></span>
+<span id="cb284-3"><a href="ploty.html#cb284-3"></a><span class="at">   </span><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.54.2</span></span>
+<span id="cb284-4"><a href="ploty.html#cb284-4"></a><span class="at">   </span><span class="fu">src</span><span class="kw">:</span><span class="at"> htmlwidgets/plotly</span></span>
+<span id="cb284-5"><a href="ploty.html#cb284-5"></a><span class="at">   </span><span class="fu">script</span><span class="kw">:</span><span class="at"> plotly.min.js</span></span></code></pre></div>
+<p>We start by editing the <code>plotly</code> function to accept a data frame which will be stored in the <code>x</code> object. This will not be passed to JavaScript, we only need the data to pull the x and y data later down the pipe (<code>%&gt;%</code>). Therefore we also add a pre render hook which removes that data.</p>
+<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="ploty.html#cb285-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb285-2"><a href="ploty.html#cb285-2"></a>plotly &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
+<span id="cb285-3"><a href="ploty.html#cb285-3"></a></span>
+<span id="cb285-4"><a href="ploty.html#cb285-4"></a>  <span class="co"># forward options using x</span></span>
+<span id="cb285-5"><a href="ploty.html#cb285-5"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb285-6"><a href="ploty.html#cb285-6"></a>    <span class="dt">data =</span> data,</span>
+<span id="cb285-7"><a href="ploty.html#cb285-7"></a>    <span class="dt">options =</span> <span class="kw">list</span>()</span>
+<span id="cb285-8"><a href="ploty.html#cb285-8"></a>  )</span>
+<span id="cb285-9"><a href="ploty.html#cb285-9"></a></span>
+<span id="cb285-10"><a href="ploty.html#cb285-10"></a>  <span class="co"># create widget</span></span>
+<span id="cb285-11"><a href="ploty.html#cb285-11"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
+<span id="cb285-12"><a href="ploty.html#cb285-12"></a>    <span class="dt">name =</span> <span class="st">&#39;plotly&#39;</span>,</span>
+<span id="cb285-13"><a href="ploty.html#cb285-13"></a>    x,</span>
+<span id="cb285-14"><a href="ploty.html#cb285-14"></a>    <span class="dt">width =</span> width,</span>
+<span id="cb285-15"><a href="ploty.html#cb285-15"></a>    <span class="dt">height =</span> height,</span>
+<span id="cb285-16"><a href="ploty.html#cb285-16"></a>    <span class="dt">package =</span> <span class="st">&#39;plotlier&#39;</span>,</span>
+<span id="cb285-17"><a href="ploty.html#cb285-17"></a>    <span class="dt">elementId =</span> elementId,</span>
+<span id="cb285-18"><a href="ploty.html#cb285-18"></a>    <span class="dt">preRenderHook =</span> render_plotlier</span>
+<span id="cb285-19"><a href="ploty.html#cb285-19"></a>  )</span>
+<span id="cb285-20"><a href="ploty.html#cb285-20"></a>}</span>
+<span id="cb285-21"><a href="ploty.html#cb285-21"></a></span>
+<span id="cb285-22"><a href="ploty.html#cb285-22"></a>render_plotlier &lt;-<span class="st"> </span><span class="cf">function</span>(p){</span>
+<span id="cb285-23"><a href="ploty.html#cb285-23"></a>  p<span class="op">$</span>x<span class="op">$</span>data &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb285-24"><a href="ploty.html#cb285-24"></a>  <span class="kw">return</span>(p)</span>
+<span id="cb285-25"><a href="ploty.html#cb285-25"></a>}</span></code></pre></div>
+<p>Then it’s a matter of reproducing the JSON that defines what plotly defines as a “trace” and what more or less corresponds to a “geom” in ggplot2 <span class="citation">(Wickham, Chang, et al. <a href="#ref-R-ggplot2" role="doc-biblioref">2020</a>)</span>. A trace for a scatter plot is defined with the JSON below, which we can read in R to understand the shape of the list to reproduce.</p>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="ploty.html#cb286-1"></a>jsonlite<span class="op">::</span><span class="kw">fromJSON</span>(<span class="st">&#39;{</span></span>
+<span id="cb286-2"><a href="ploty.html#cb286-2"></a><span class="st">    &quot;x&quot;: [1, 2, 3, 4],</span></span>
+<span id="cb286-3"><a href="ploty.html#cb286-3"></a><span class="st">    &quot;y&quot;: [10, 15, 13, 17],</span></span>
+<span id="cb286-4"><a href="ploty.html#cb286-4"></a><span class="st">    &quot;mode&quot;: &quot;markers&quot;,</span></span>
+<span id="cb286-5"><a href="ploty.html#cb286-5"></a><span class="st">    &quot;type&quot;: &quot;scatter&quot;</span></span>
+<span id="cb286-6"><a href="ploty.html#cb286-6"></a><span class="st">}&#39;</span>)</span></code></pre></div>
+<pre><code>## $x
+## [1] 1 2 3 4
+## 
+## $y
+## [1] 10 15 13 17
+## 
+## $mode
+## [1] &quot;markers&quot;
+## 
+## $type
+## [1] &quot;scatter&quot;</code></pre>
+<p>We can then create a function that takes the name of the x and y columns to fetch from the data which is accessible from the plotly object with <code>p$x$data</code></p>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="ploty.html#cb288-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb288-2"><a href="ploty.html#cb288-2"></a>plot_marker &lt;-<span class="st"> </span><span class="cf">function</span>(p, x, y){</span>
+<span id="cb288-3"><a href="ploty.html#cb288-3"></a>  layer &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb288-4"><a href="ploty.html#cb288-4"></a>    <span class="dt">x =</span> p<span class="op">$</span>x<span class="op">$</span>data[[x]],</span>
+<span id="cb288-5"><a href="ploty.html#cb288-5"></a>    <span class="dt">y =</span> p<span class="op">$</span>x<span class="op">$</span>data[[y]],</span>
+<span id="cb288-6"><a href="ploty.html#cb288-6"></a>    <span class="dt">type =</span> <span class="st">&quot;scatter&quot;</span>,</span>
+<span id="cb288-7"><a href="ploty.html#cb288-7"></a>    <span class="dt">mode =</span> <span class="st">&quot;markers&quot;</span></span>
+<span id="cb288-8"><a href="ploty.html#cb288-8"></a>  )</span>
+<span id="cb288-9"><a href="ploty.html#cb288-9"></a></span>
+<span id="cb288-10"><a href="ploty.html#cb288-10"></a>  p<span class="op">$</span>x<span class="op">$</span>options &lt;-<span class="st"> </span><span class="kw">append</span>(p<span class="op">$</span>x<span class="op">$</span>options, <span class="kw">list</span>(layer))</span>
+<span id="cb288-11"><a href="ploty.html#cb288-11"></a>  <span class="kw">return</span>(p)</span>
+<span id="cb288-12"><a href="ploty.html#cb288-12"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="ploty.html#cb289-1"></a><span class="kw">library</span>(plotlier)</span>
+<span id="cb289-2"><a href="ploty.html#cb289-2"></a></span>
+<span id="cb289-3"><a href="ploty.html#cb289-3"></a><span class="kw">plotly</span>(cars) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb289-4"><a href="ploty.html#cb289-4"></a><span class="st">  </span><span class="kw">plot_marker</span>(<span class="st">&quot;dist&quot;</span>, <span class="st">&quot;speed&quot;</span>)</span></code></pre></div>
+<div class="figure">
+<img src="images/plotlier-scatter.png" alt="" />
+<p class="caption">Plotlier Scatter plot</p>
 </div>
 
-
-
+</div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-R-ggplot2">
+<p>Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen, Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, and Dewey Dunnington. 2020. <em>Ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics</em>. <a href="https://CRAN.R-project.org/package=ggplot2">https://CRAN.R-project.org/package=ggplot2</a>.</p>
+</div>
+</div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="working-with-shiny.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="ploty.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="for-the-curious.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -335,7 +455,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/26-curious.Rmd",
+"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/30-examples.Rmd",
 "text": "Edit"
 },
 "history": {

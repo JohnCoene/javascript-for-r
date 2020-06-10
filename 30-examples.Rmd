@@ -1,0 +1,142 @@
+# (PART) Examples {-}
+
+# Ploty
+
+In this chapter we build a widget for plotly.js, or a tiny part of it; it'll allow drawing a scatter and line plot and have some additional functionalities in shiny. Below is the example from the [plotly website](https://plotly.com/javascript/line-and-scatter/) which we will reproduce.
+
+```html
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <!-- Import library -->
+  <script src="plotly-latest.min.js"></script>
+</head>
+
+<body>
+  <!-- div to hold visualisation -->
+  <div id="chart" style="width:600px;height:250px;"></div>
+
+  <!-- Script to create visualsiation -->
+  <script>
+    var trace1 = {
+      x: [1, 2, 3, 4],
+      y: [10, 15, 13, 17],
+      mode: 'markers',
+      type: 'scatter'
+    };
+
+    var trace2 = {
+      x: [2, 3, 4, 5],
+      y: [16, 5, 11, 9],
+      mode: 'lines',
+      type: 'scatter'
+    };
+
+    var data = [trace1, trace2, trace3];
+
+    Plotly.newPlot('chart', data);
+    );
+  </script>
+</body>
+
+</html>
+```
+
+The aim is to obtain an R API like the pseudo code below. It'll allow initialising the visualisation with the `plotly` function and add a line or scatter plot with `plot_line` and `plot_marker`.
+
+```r
+plotly(data = cars) %>% 
+  plot_line(x = "dist", y = "speed")
+```
+
+The story starts like all other widgets: create a package and scaffold the widget. We name the package plotlier so as not to override the local installation of the actual plotly package. We also add the magrittr pipe (`%>%`) while we're at it.
+
+```r
+usethis::create_package("plotlier") # create package
+usethis::scaffoldWidget("plotly") # scaffold plotly
+usethis::use_pipe() # export pipe
+```
+
+Then we download the dependency from the CDN, the latest version at the time of writing this is `1.54.2`, and edit the `plotly.yml` file to point to the downloaded file.
+
+```r
+dir.create("inst/htmlwidgets/plotly", recursive = TRUE)
+url <- "https://cdn.plot.ly/plotly-1.54.2.min.js"
+download.file(url, "inst/htmlwidgets/plotly/plotly.min.js")
+```
+
+```yaml
+dependencies:
+ - name: plotly
+   version: 1.54.2
+   src: htmlwidgets/plotly
+   script: plotly.min.js
+```
+
+We start by editing the `plotly` function to accept a data frame which will be stored in the `x` object. This will not be passed to JavaScript, we only need the data to pull the x and y data later down the pipe (`%>%`). Therefore we also add a pre render hook which removes that data.
+
+```r
+#' @export
+plotly <- function(data, width = NULL, height = NULL, elementId = NULL) {
+
+  # forward options using x
+  x = list(
+    data = data,
+    options = list()
+  )
+
+  # create widget
+  htmlwidgets::createWidget(
+    name = 'plotly',
+    x,
+    width = width,
+    height = height,
+    package = 'plotlier',
+    elementId = elementId,
+    preRenderHook = render_plotlier
+  )
+}
+
+render_plotlier <- function(p){
+  p$x$data <- NULL
+  return(p)
+}
+```
+
+Then it's a matter of reproducing the JSON that defines what plotly defines as a "trace" and what more or less corresponds to a "geom" in ggplot2 [@R-ggplot2]. A trace for a scatter plot is defined with the JSON below, which we can read in R to understand the shape of the list to reproduce.
+
+```{r}
+jsonlite::fromJSON('{
+	"x": [1, 2, 3, 4],
+	"y": [10, 15, 13, 17],
+	"mode": "markers",
+	"type": "scatter"
+}')
+```
+
+We can then create a function that takes the name of the x and y columns to fetch from the data which is accessible from the plotly object with `p$x$data`
+
+```r
+#' @export
+plot_marker <- function(p, x, y){
+  layer <- list(
+    x = p$x$data[[x]],
+    y = p$x$data[[y]],
+    type = "scatter",
+    mode = "markers"
+  )
+
+  p$x$options <- append(p$x$options, list(layer))
+  return(p)
+}
+```
+
+```r
+library(plotlier)
+
+plotly(cars) %>% 
+  plot_marker("dist", "speed")
+```
+
+![Plotlier Scatter plot](images/plotlier-scatter.png)
