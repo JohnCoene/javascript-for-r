@@ -4,7 +4,7 @@ A previous set of chapters explored how to make JavaScript and R communicate in 
 
 To demonstrate how to integrate these functionalities in widgets we shall implement them in the previously built gio package.
 
-## Callback {-}
+## JavaScript to R {-}
 
 JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one be notified and run code when a user clicks a point on a scatter plot, or when the user clicks the legend of a chart for example. Gio.js provides a callback that is fired when a country is selected on the globe, this callback function accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). This could be used to send that data back to the R server where it could be used from many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element.
 
@@ -254,7 +254,7 @@ gio_send_data <- function(id, data, session = shiny::getDefaultReactiveDomain())
 }
 ```
 
-## Retrieve Instance {-}
+### Retrieve Widget Instance {-}
 
 We will need to be able to access the instance of the visualisation (`controller`) outside of the function `factory`. This can be made accessible by adding a function (technically a method) that returns the `controller`. Below we create a function called `getGlobe` which returns the `controller`.
 
@@ -371,7 +371,7 @@ function get_gio(id){
 }
 ```
 
-### Use Data {-}
+### Handle Data {-}
 
 Now that there is a function which sends data and a chart identifier to the client from R and that there is a JavaScript function to retrieve the visualisation object using the aforementioned identifier, all this is missing is the handling of that data so it is applied to the visualisation: the "message handler." Registering the message handler being only relevant if shiny is running HTMLWidgets comes with a JavaScript method to check whether that is the case. This is useful to avoid needless errors as the registration of the shiny message handler will only work if the widget is used in shiny. We can thus use it in an if statement where all message handlers should be registered.
 
