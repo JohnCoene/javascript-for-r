@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# render book
 echo "\e[31mCleaning book\033[0m"
 Rscript -e "bookdown::clean_book()"
 echo "\e[33mCreating HTML\033[0m"
