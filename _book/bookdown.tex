@@ -169,7 +169,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2020-06-13}
+\date{2020-06-14}
 
 \begin{document}
 \maketitle
@@ -993,7 +993,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Jun 13 2020 23:28:53 GMT+0200 (CEST)"
+## [1] "Sun Jun 14 2020 20:24:13 GMT+0200 (CEST)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1003,7 +1003,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Jun 13 2020 23:28:53 GMT+0200 (CEST)"
+## [1] "Sun Jun 14 2020 20:24:13 GMT+0200 (CEST)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -1877,8 +1877,8 @@ We can then recap to see what the application would look like now.
 
 The previous section on the input handler is entirely optional but as we will see in later parts of the book it can be nice touch in some cases.
 
-\hypertarget{a-complete-integration---jbox.js}{%
-\chapter{A Complete Integration - jBox.js}\label{a-complete-integration---jbox.js}}
+\hypertarget{a-complete-integration}{%
+\chapter{A Complete Integration}\label{a-complete-integration}}
 
 Thus far, this collection of chapters has covered both ways data travels between JavaScript and R in Shiny. However, the alerts displayed in the previous chapter are rather hideous and, though demonstrates how both languages can work together within shiny, comes short of illustrating how to make use of external libraries or how to package such code.
 
@@ -2657,7 +2657,7 @@ Must remember when building HTML widgets:
 \hypertarget{your-first-widget}{%
 \chapter{Your First Widget}\label{your-first-widget}}
 
-The previous chapter gave some indication of how widgets work but this is overall probably still shrouded in mystery. This chapter aims at demystifying what remains confusing. This is done by building a very basic widget with the aim of rummaging through its components to observe how they interact and ultimately grasp a greater understanding of how such interactive outputs are actually produced.
+The previous chapter gave some indication as to how how widgets work but this is overall probably still shrouded in mystery. This chapter aims at demystifying what remains confusing. This is done by building a very basic widget with the aim of rummaging through its components to observe how they interact and ultimately grasp a greater understanding of how such interactive outputs are actually produced.
 
 \hypertarget{the-scaffold}{%
 \section*{The Scaffold}\label{the-scaffold}}
@@ -2947,8 +2947,8 @@ Reloading the package with \texttt{devtools::load\_all} lets one use shiny tags 
 
 This hopefully provides some understanding of how htmlwidgets work internally and thereby helps building such packages. To recapitulate, an HTML document is created in which div is placed and given a certain id, this id is also used in a script tag that contains JSON data passed from R so that a JavaScript function we define can read that data in and use it to generate a visual output in a div. However, as much as this section covered, the topic of JavaScript dependencies was not touched, this is approached in the following section where we build another, more interesting widget, which uses an external dependency.
 
-\hypertarget{a-realistic-widget---typed.js}{%
-\chapter{A Realistic Widget - Typed.js}\label{a-realistic-widget---typed.js}}
+\hypertarget{a-realistic-widget}{%
+\chapter{A Realistic Widget}\label{a-realistic-widget}}
 
 In this section we build a package called \texttt{typed}, which wraps the JavaScript library of the same name, \href{https://github.com/mattboldt/typed.js/}{typed.js} that mimics text being typed. This builds upon many things we explored in the playground package.
 
@@ -3238,8 +3238,8 @@ This can be changed by placing a function named \texttt{nameOfWidget\_html} whic
 
 We shall leave it at that and move on to building another widget but completing the package makes for an interesting exercise.
 
-\hypertarget{the-full-monty---gio.js}{%
-\chapter{The Full Monty - Gio.js}\label{the-full-monty---gio.js}}
+\hypertarget{the-full-monty}{%
+\chapter{The Full Monty}\label{the-full-monty}}
 
 With a first widget built one can jump onto another one: \href{https://giojs.org/}{gio.js}, a library to draw arcs between countries on a 3 dimensional globe. This will include many more functionalities such packages can comprise.
 
@@ -4794,6 +4794,42 @@ We start by editing the \texttt{plotly} function to accept a data frame which wi
 \end{Highlighting}
 \end{Shaded}
 
+The JavaScript would look like the code below. Declaring a shared \texttt{plot} variable that is assigned the plotly output created from the \texttt{options}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{widget}\NormalTok{(}\OperatorTok{\{}
+
+  \DataTypeTok{name}\OperatorTok{:} \StringTok{\textquotesingle{}plotly\textquotesingle{}}\OperatorTok{,}
+
+  \DataTypeTok{type}\OperatorTok{:} \StringTok{\textquotesingle{}output\textquotesingle{}}\OperatorTok{,}
+
+  \DataTypeTok{factory}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
+
+    \CommentTok{// shared variable}
+    \KeywordTok{var}\NormalTok{ plot}\OperatorTok{;}
+
+    \ControlFlowTok{return} \OperatorTok{\{}
+
+      \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+
+\NormalTok{        plot }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
+        \VariableTok{Plotly}\NormalTok{.}\AttributeTok{newPlot}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\OperatorTok{,} \VariableTok{x}\NormalTok{.}\AttributeTok{options}\NormalTok{)}\OperatorTok{;}
+
+      \OperatorTok{\},}
+
+      \DataTypeTok{resize}\OperatorTok{:} \KeywordTok{function}\NormalTok{(width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
+
+        \CommentTok{// }\AlertTok{TODO}\CommentTok{: code to re{-}render the widget with a new size}
+
+      \OperatorTok{\}}
+
+    \OperatorTok{\};}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
 Then it's a matter of reproducing the JSON that defines what plotly defines as a ``trace'' and what more or less corresponds to a ``geom'' in ggplot2 \citep{R-ggplot2}. A trace for a scatter plot is defined with the JSON below, which we can read in R to understand the shape of the list to reproduce.
 
 \begin{Shaded}
@@ -4854,6 +4890,57 @@ We can then create a function that takes the name of the x and y columns to fetc
 \includegraphics{images/plotlier-scatter.png}
 \caption{Plotlier Scatter plot}
 \end{figure}
+
+\hypertarget{callback}{%
+\section{Callback}\label{callback}}
+
+We can now look up plotly's documentation on \href{https://plotly.com/javascript/plotlyjs-events/}{callback} to send data to the R server when a point is clicked.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{...}
+\NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+
+\NormalTok{  plot }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
+  \VariableTok{Plotly}\NormalTok{.}\AttributeTok{newPlot}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\OperatorTok{,} \VariableTok{x}\NormalTok{.}\AttributeTok{options}\NormalTok{)}\OperatorTok{;}
+
+  \VariableTok{plot}\NormalTok{.}\AttributeTok{on}\NormalTok{(}\StringTok{\textquotesingle{}plotly\_click\textquotesingle{}}\OperatorTok{,} \KeywordTok{function}\NormalTok{(data)}\OperatorTok{\{}
+    \KeywordTok{var}\NormalTok{ coords }\OperatorTok{=}\NormalTok{ [}\VariableTok{data}\NormalTok{.}\AttributeTok{points}\NormalTok{[}\DecValTok{0}\NormalTok{].}\AttributeTok{x}\OperatorTok{,} \VariableTok{data}\NormalTok{.}\AttributeTok{points}\NormalTok{[}\DecValTok{0}\NormalTok{].}\AttributeTok{y}\NormalTok{]}\OperatorTok{;}
+    \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_clicked\textquotesingle{}}\OperatorTok{,}\NormalTok{ coords)}\OperatorTok{;}
+  \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+
+\OperatorTok{\}}
+\NormalTok{...}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(shiny)}
+\KeywordTok{library}\NormalTok{(plotlier)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+  \KeywordTok{plotlyOutput}\NormalTok{(}\StringTok{"plot"}\NormalTok{),}
+  \KeywordTok{verbatimTextOutput}\NormalTok{(}\StringTok{"clicked"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{plot <{-}}\StringTok{ }\KeywordTok{renderPlotly}\NormalTok{(\{}
+    \KeywordTok{plotly}\NormalTok{(cars) }\OperatorTok{\%>\%}\StringTok{ }
+\StringTok{      }\KeywordTok{plot\_marker}\NormalTok{(}\StringTok{"dist"}\NormalTok{, }\StringTok{"speed"}\NormalTok{)}
+\NormalTok{  \})}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{clicked <{-}}\StringTok{ }\KeywordTok{renderPrint}\NormalTok{(\{}
+    \KeywordTok{print}\NormalTok{(input}\OperatorTok{$}\NormalTok{plot\_clicked)}
+\NormalTok{  \})}
+
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
 
   \bibliography{book.bib,packages.bib}
 
