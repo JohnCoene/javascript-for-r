@@ -4,13 +4,13 @@
 
 # Introduction
 
-In this chapter, after briefly going through prerequisites, we provide a rationale for integrating JavaScript with R which we support with examples, namely packages already available on CRAN. Then, we list the various ways in which one might go about making both languages work together. Finally, we end with a review of concepts fundamental to fully understand the more advanced topics residing in the forthcoming chapters.
+This book starts with a rationale for integrating JavaScript with R and supports it with examples, namely packages that use JavaScript and are available on CRAN. Then, we go through prerequisites and a review of concepts fundamental to fully understand the more advanced topics residing in the forthcoming chapters. Finally, we list the various ways in which one might go about making both languages work together.
 
 ## Rationale {-}
 
-Why merge JavaScript and R? They are two fundamentally different languages that each have their strengths and weaknesses, combining the two allows making the most of their consolidated advantages and circumvent their respective limitations to produce software altogether better for it.
+Why merge JavaScript and R? Precisely because they are fundamentally different languages that each have their strengths and weaknesses, combining the two allows making the most of their consolidated advantages and circumvent their respective limitations to produce software altogether better for it. Though we also uncover other reasons.
 
-A fair reason to use JavaScript might simply be that the thing one wants to achieve in R has already been realised in JavaScript. Why reinvent the wheel when the solution already exists and that it can be made accessible from R? The R package [lawn](https://github.com/ropensci/lawn) [@R-lawn] by Ropensci integrates [turf.js](http://turfjs.org/), a brilliant library for geo-spatial analysis. JavaScript is not required to make those computations, it could be rewritten solely in R but that would be vastly more laborious than wrapping the JavaScript API in R.
+A fair reason to use JavaScript might simply be that the thing one wants to achieve in R has already been realised in JavaScript. Why reinvent the wheel when the solution already exists and that it can be made accessible from R? The R package [lawn](https://github.com/ropensci/lawn) [@R-lawn] by Ropensci integrates [turf.js](http://turfjs.org/), a brilliant library for geo-spatial analysis. JavaScript is not required to make those computations, it could be rewritten solely in R but that would be vastly more laborious than wrapping the JavaScript API in R as done by the package lawn.
 
 ```{r, warning=FALSE}
 library(lawn)
@@ -56,11 +56,11 @@ shinyApp(ui, server)
 knitr::include_graphics("images/waiter.png", dpi = 300)
 ```
 
-Hopefully this makes a couple of great reasons and alluring examples to entice you to persevere with this book.
+Hopefully this makes a couple of great reasons and alluring examples to entice the reader to persevere with this book.
 
 ## Prerequisites {-}
 
-The code contained in the following pages is approachable to readers with basic knowledge of R, although familiarity with package development using [devtools](https://devtools.r-lib.org/) [@R-devtools], as well as the [Shiny](https://shiny.rstudio.com/) [@R-shiny] framework is helpful. The reason for the former is that some of the ways one builds integrations with JavaScript naturally take the form of R packages. The following section thus runs over the essentials of building a package to ensure everyone can keep up. As both Shiny and JavaScript run in the browser they make for axiomatic companions; we'll therefore use Shiny extensively.
+The code contained in the following pages is approachable to readers with basic knowledge of R, although familiarity with package development using [devtools](https://devtools.r-lib.org/) [@R-devtools], as well as the [Shiny](https://shiny.rstudio.com/) framework [@R-shiny] is helpful. The reason for the former is that some of the ways one builds integrations with JavaScript naturally take the form of R packages. The following section thus runs over the essentials of building a package to ensure everyone can keep up. As both Shiny and JavaScript run in the browser they make for axiomatic companions; we'll therefore use Shiny extensively.
 
 Only basic knowledge of JavaScript is required to understand and learn from the book as not only is JavaScript rather uncomplicated and its syntax similar to R's in places, we write surprisingly little of it. Understanding of JSON and HTML, however, is essential. In essence, if one has already used external JavaScript libraries in HTML or R markdown documents then one is well-equipped to tackle this book but in the event that you have not, we will go through a quick review of the basics of both JavaScript and JSON.
 
@@ -68,9 +68,9 @@ It is highly recommended to use the freely available [RStudio IDE](https://rstud
 
 ### Package Development {-}
 
-Developing packages used to be notoriously difficult but things have greatly changed, namely thanks to the devtools and more recent [usethis](https://usethis.r-lib.org/) [@R-usethis] packages. The first is specifically designed to help creating packages; setting up tests, running checks, building and installing packages, etc. The second, usethis, more broadly helps setting up projects, and automating repetitive tasks. Here, we only skim over the fundamentals, there is an entire book by Hadley Wickham called [R Packages](http://r-pkgs.had.co.nz/) solely dedicated to the topic.
+Developing packages used to be notoriously difficult but things have greatly changed, namely thanks to the devtools, roxygen2 [@R-roxygen2] and more recent [usethis](https://usethis.r-lib.org/) [@R-usethis] packages. The first is specifically designed to help creating packages; setting up tests, running checks, building and installing packages, etc. The second provides an all too convenient way to generate the documentation of packages, and usethis, more broadly helps setting up projects, and automating repetitive tasks. Here, we only skim over the fundamentals, there is an entire book by Hadley Wickham called [R Packages](http://r-pkgs.had.co.nz/) solely dedicated to the topic.
 
-Start by installing the two packages from CRAN.
+Start by installing those packages from CRAN.
 
 ```r
 install.packages(c("devtools", "usethis"))
@@ -84,7 +84,7 @@ Let's create the package, either do so using the RStudio IDE or with usethis. Fr
 usethis::create_package("test")
 ```
 
-This creates an empty package called "test". Let's add the JavaScript file that the yet-to-be-written R function will eventually print out. R packages must follow strict rules, this file cannot be placed anywhere we want; it must be stored in a directory called `inst` which stands for "installation;" these are files that will simply be copied to the users' machine when they install your package. Create the `inst` directory in the root of the package (e.g.: next to the already existing `R`) and place a file called `javascript.js` within it.
+This creates an empty package called "test". Let's add the JavaScript file that the yet-to-be-written R function will eventually print out. R packages must follow strict rules, this file cannot be placed anywhere we want; it must be stored in a directory called `inst` which stands for "installation;" these are files that will simply be copied to the users' machine when they install your package. Create the `inst` directory in the root of the package (e.g.: where the `R` folder is located) and place a file called `javascript.js` within it.
 
 Let's create the following, extremely simple JavaScript file that contains code which declares a variable named `x`. 
 
@@ -100,17 +100,18 @@ dir.create("inst") # create directory
 writeLines("var x = 3;", con = "inst/javascript.js") # create file
 ```
 
-This should produce a directory looking something like:
+At this point the package should look something like this.
 
 ```
-DESCRIPTION
-NAMESPACE
-R/
-inst/
-|-- javascript.js
+.
+├── DESCRIPTION
+├── NAMESPACE
+├── R
+└── inst
+    └── javascript.js
 ```
 
-Onto creating the R function that will read and print this file. Then again, R is strict, R files must be placed in the `R` directory. Then again, this can be done from the console or the RStudio IDE.
+Onto creating the R function that will read and print this file. Then again, R is strict, R files must be placed in the `R` directory. This can also be done from the console or the RStudio IDE.
 
 ```r
 # create the file from the R console
@@ -137,7 +138,7 @@ print_file <- function(){
 }
 ```
 
-Let's add a pretty message, using the [cli](https://cli.r-lib.org/) [@R-cli] package, before we print the file as it allows introducing another concept; using external libraries in our package. To use cli we can run:
+Let's add a pretty message, using the [cli](https://cli.r-lib.org/) [@R-cli] package, before we print the file as it allows introducing another concept; importing external libraries in a package. To use cli we can run:
 
 ```r
 # install.packages("cli")
@@ -146,7 +147,7 @@ usethis::use_package("cli")
 ## ● Refer to functions with `cli::fun()`
 ```
 
-It does exactly what it printed. The `DESCRIPTION` file includes information about the package and, very importantly, dependencies. The package we are creating will depend on the cli package; the `DESCRIPTION` file essentially tells R to check whether it is installed on the machine, if not it installs it (packages are for sharing). You should now see the following entry in the `DESCRIPTION` file.
+It does exactly what it printed in the console. The `DESCRIPTION` file includes information about the package and, very importantly, dependencies. The package we are creating will depend on the cli package; the `DESCRIPTION` file essentially tells R to check whether it is installed on the machine, if not it installs it (packages are for sharing). You should now see the following entry in the `DESCRIPTION` file.
 
 ```r
 Imports: 
@@ -164,7 +165,7 @@ print_file <- function(){
 }
 ```
 
-It's not done just yet. Let's demonstrate why: it allows introducing devtools. We can install the "test" package we created with `devtools::install()`, afterwards we can expect to be able to run the `print_file` function we wrote but it returns the following error: `could not find function "print_file"`. Odd. This is because we have not explicitly "exported" the function, by default functions and objects declared in `.R` files (in packages) can only be used internally (within the package itself). In order to export it we need another package called roxygen2 [@R-roxygen2], it allows writing the documentation in the `.R` file rather than have to create separate file, a lifesaver. Note that roxygen2 should already be installed on your machine. Using said documentation we can specify which function should be exported with a "tag".
+It's not done just yet. Let's demonstrate why: it allows introducing devtools. We can install the "test" package we created with `devtools::install()`, afterwards we would expect to be able to run the `print_file` function from the package test but doing so returns the following error: `could not find function "print_file"`. This is because we have not explicitly "exported" the function, by default functions and objects declared in `.R` files (in packages) can only be used internally (within the package itself). In order to export it we need another package called roxygen2, it allows writing the documentation in the `.R` file rather than have to create a separate `.Rd` file, a lifesaver. Note that roxygen2 should already be installed as it is a dependency of devtools. Using said documentation we can specify which function should be exported with a "tag".
 
 Tags are preceded by `#' @`, there are plenty of them, we don't explore any other here.
 
@@ -178,7 +179,7 @@ print_file <- function(){
 }
 ```
 
-Now one can run `devtools::document()` to document the package based on the tag we added: this exports the function. Then we can run `devtools::install()` to build and install the package.
+Now one can run `devtools::document()` to generate the documentation of the package (the `.Rd` files) using the export tag we added: this exports the function. Then we can run `devtools::install()` to build and install the package.
 
 ```r
 test::print_file()
@@ -189,7 +190,7 @@ test::print_file()
 Finally, the cyclical nature of building packages substitute `devtools::install()` with `devtools::load_all()`, the latter does not install the package and simply loads all the functions and objects of the package in the environment, this is much faster than installing it.
 
 1. Write some code
-2. Run `devtools::document()`
+2. Run `devtools::document()` (not necessary if documentation tags have not changed)
 3. Run `devtools::load_all()`
 4. Repeat
 
@@ -308,7 +309,7 @@ y = [1,2,3]; // define it as array
 y = 'string'; // change to character string
 ```
 
-In R like in JavaScript, variables can be accessed from the parent environment (often referred to as "context" in the latter). One immense difference though is that while it is seen as bad practice in R it is not in JavaScript where it comes very useful.
+In R like in JavaScript, variables can be accessed from the parent environment (often referred to as "context" in the latter). One immense difference though is that while it is seen as bad practice in R it is not in JavaScript where it is extremely useful.
 
 ```{r}
 # it works but don't do this in R
@@ -334,7 +335,7 @@ foo();
 
 One concept which does not exist in R is that of the "DOM" which stands for Document Object Model. When a web page is loaded, the browser creates a Document Object Model of the web page which can be accessed in JavaScript from the `document` object. This lets the developer programmatically manipulate the page itself so one can for instance, add an element (e.g.: a button), change the text of another, and plenty more.
 
-The JavaScript code below grabs the element where `id='content'` from the `document` with `getElementById` and replaces the text (`innerText`). Even though our page only contains "Trying JavaScript!" when the page is opened (loaded) in your web browse JavaScript runs our code and changes it: this happen very fast so you likely don't even see the original text.
+The JavaScript code below grabs the element where `id='content'` from the `document` with `getElementById` and replaces the text (`innerText`). Even though our page only contains "Trying JavaScript!" when the page is opened (loaded) in the web browser JavaScript runs the code and changes it: this happens very fast so the original text cannot be seen.
 
 ```html
  <!–– index.html ––>
@@ -351,11 +352,11 @@ The JavaScript code below grabs the element where `id='content'` from the `docum
 </html>
 ```
 
-This of course only scratches the surface of JavaScript but provides ample understanding of the language to keep up with the next chapters. Also, a somewhat interesting fact that will prove useful later in the book: the RStudio IDE is actually is a browser, therefore, in the IDE, one can right-click and "inspect element" to rendered source code.
+This of course only scratches the surface of JavaScript thus this provides ample understanding of the language to keep up with the next chapters. Also, a somewhat interesting fact that will prove useful later in the book: the RStudio IDE is actually a browser, therefore, in the IDE, one can right-click and "inspect element" to view the rendered source code.
 
 ## Methods {-}
 
-Though perhaps not obvious at first, all of the packages used as examples in the previous section internally interface with JavaScript very differently. As we'll discover, there many ways in which one can blend JavaScript with R, generally the way to go about it is dictated by the nature of what is to be achieved.
+Though perhaps not obvious at first, all of the packages used as examples in the first section of this chapter interfaced with R very differently. As we'll discover, there many ways in which one can blend JavaScript with R, generally the way to go about it is dictated by the nature of what is to be achieved.
 
 Let's list the methods available to us to blend JavaScript with R before covering them each in-depth in their own respective chapter later in the book.
 
