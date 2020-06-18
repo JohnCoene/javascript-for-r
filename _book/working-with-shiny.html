@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-06-14" />
+<meta name="date" content="2020-06-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -257,6 +257,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="advanced-usage.html"><a href="advanced-usage.html#pre-render-hooks-safety"><i class="fa fa-check"></i>Pre Render Hooks &amp; Safety</a></li>
 <li class="chapter" data-level="" data-path="advanced-usage.html"><a href="advanced-usage.html#javascript-code-1"><i class="fa fa-check"></i>JavaScript Code</a></li>
 <li class="chapter" data-level="" data-path="advanced-usage.html"><a href="advanced-usage.html#prepend-append-content"><i class="fa fa-check"></i>Prepend &amp; Append Content</a></li>
+<li class="chapter" data-level="" data-path="advanced-usage.html"><a href="advanced-usage.html#dependencies-2"><i class="fa fa-check"></i>Dependencies</a></li>
+<li class="chapter" data-level="" data-path="advanced-usage.html"><a href="advanced-usage.html#compatibility"><i class="fa fa-check"></i>Compatibility</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="working-with-shiny.html"><a href="working-with-shiny.html"><i class="fa fa-check"></i><b>11</b> Working with Shiny</a>
 <ul>
@@ -301,125 +303,125 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2>JavaScript to R</h2>
 <p>JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. Gio.js provides a callback that is fired when a country is selected on the globe, this callback function accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). This could be used to send that data back to the R server where it could be used from many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element.</p>
 <p>The <a href="https://giojs.org/html/docs/callbackPicked.html">documentation of gio.js</a> gives the following example callback function.</p>
-<div class="sourceCode" id="cb265"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb265-1"><a href="working-with-shiny.html#cb265-1"></a><span class="co">// define callback function</span></span>
-<span id="cb265-2"><a href="working-with-shiny.html#cb265-2"></a><span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
-<span id="cb265-3"><a href="working-with-shiny.html#cb265-3"></a>  <span class="va">console</span>.<span class="at">log</span>(selectedCountry)<span class="op">;</span></span>
-<span id="cb265-4"><a href="working-with-shiny.html#cb265-4"></a>  <span class="va">console</span>.<span class="at">log</span>(relatedCountries)<span class="op">;</span></span>
-<span id="cb265-5"><a href="working-with-shiny.html#cb265-5"></a><span class="op">}</span></span>
-<span id="cb265-6"><a href="working-with-shiny.html#cb265-6"></a></span>
-<span id="cb265-7"><a href="working-with-shiny.html#cb265-7"></a><span class="co">// use callback function</span></span>
-<span id="cb265-8"><a href="working-with-shiny.html#cb265-8"></a><span class="va">controller</span>.<span class="at">onCountryPicked</span>(callback)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb277"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb277-1"><a href="working-with-shiny.html#cb277-1"></a><span class="co">// define callback function</span></span>
+<span id="cb277-2"><a href="working-with-shiny.html#cb277-2"></a><span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
+<span id="cb277-3"><a href="working-with-shiny.html#cb277-3"></a>  <span class="va">console</span>.<span class="at">log</span>(selectedCountry)<span class="op">;</span></span>
+<span id="cb277-4"><a href="working-with-shiny.html#cb277-4"></a>  <span class="va">console</span>.<span class="at">log</span>(relatedCountries)<span class="op">;</span></span>
+<span id="cb277-5"><a href="working-with-shiny.html#cb277-5"></a><span class="op">}</span></span>
+<span id="cb277-6"><a href="working-with-shiny.html#cb277-6"></a></span>
+<span id="cb277-7"><a href="working-with-shiny.html#cb277-7"></a><span class="co">// use callback function</span></span>
+<span id="cb277-8"><a href="working-with-shiny.html#cb277-8"></a><span class="va">controller</span>.<span class="at">onCountryPicked</span>(callback)<span class="op">;</span></span></code></pre></div>
 <p>This defines a function named <code>callback</code> which takes the two aforementioned objects and logs them in the JavaScript console. Then the function is passed to the <code>controller</code> which will run it every time a country is picked. This can be incorporated into the widget. Instead of logging the data in the console it is used to define two different shiny inputs. Note the use of the widget identifier to define the input name.</p>
-<div class="sourceCode" id="cb266"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb266-1"><a href="working-with-shiny.html#cb266-1"></a>...</span>
-<span id="cb266-2"><a href="working-with-shiny.html#cb266-2"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb266-3"><a href="working-with-shiny.html#cb266-3"></a></span>
-<span id="cb266-4"><a href="working-with-shiny.html#cb266-4"></a>  <span class="kw">var</span> container <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
-<span id="cb266-5"><a href="working-with-shiny.html#cb266-5"></a>  <span class="kw">var</span> controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(container)<span class="op">;</span></span>
-<span id="cb266-6"><a href="working-with-shiny.html#cb266-6"></a>  <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span></span>
-<span id="cb266-7"><a href="working-with-shiny.html#cb266-7"></a>  <span class="va">controller</span>.<span class="at">setStyle</span>(<span class="va">x</span>.<span class="at">style</span>)<span class="op">;</span></span>
-<span id="cb266-8"><a href="working-with-shiny.html#cb266-8"></a></span>
-<span id="cb266-9"><a href="working-with-shiny.html#cb266-9"></a>  <span class="co">// callback</span></span>
-<span id="cb266-10"><a href="working-with-shiny.html#cb266-10"></a>  <span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
-<span id="cb266-11"><a href="working-with-shiny.html#cb266-11"></a>    <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_selected&#39;</span><span class="op">,</span> selectedCountry)<span class="op">;</span></span>
-<span id="cb266-12"><a href="working-with-shiny.html#cb266-12"></a>    <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_related&#39;</span><span class="op">,</span> relatedCountries)<span class="op">;</span></span>
-<span id="cb266-13"><a href="working-with-shiny.html#cb266-13"></a>  <span class="op">}</span></span>
-<span id="cb266-14"><a href="working-with-shiny.html#cb266-14"></a></span>
-<span id="cb266-15"><a href="working-with-shiny.html#cb266-15"></a>  <span class="va">controller</span>.<span class="at">onCountryPicked</span>(callback)<span class="op">;</span></span>
-<span id="cb266-16"><a href="working-with-shiny.html#cb266-16"></a></span>
-<span id="cb266-17"><a href="working-with-shiny.html#cb266-17"></a>  <span class="co">// render</span></span>
-<span id="cb266-18"><a href="working-with-shiny.html#cb266-18"></a>  <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
-<span id="cb266-19"><a href="working-with-shiny.html#cb266-19"></a></span>
-<span id="cb266-20"><a href="working-with-shiny.html#cb266-20"></a><span class="op">}</span></span>
-<span id="cb266-21"><a href="working-with-shiny.html#cb266-21"></a>...</span></code></pre></div>
+<div class="sourceCode" id="cb278"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb278-1"><a href="working-with-shiny.html#cb278-1"></a>...</span>
+<span id="cb278-2"><a href="working-with-shiny.html#cb278-2"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb278-3"><a href="working-with-shiny.html#cb278-3"></a></span>
+<span id="cb278-4"><a href="working-with-shiny.html#cb278-4"></a>  <span class="kw">var</span> container <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
+<span id="cb278-5"><a href="working-with-shiny.html#cb278-5"></a>  <span class="kw">var</span> controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(container)<span class="op">;</span></span>
+<span id="cb278-6"><a href="working-with-shiny.html#cb278-6"></a>  <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span></span>
+<span id="cb278-7"><a href="working-with-shiny.html#cb278-7"></a>  <span class="va">controller</span>.<span class="at">setStyle</span>(<span class="va">x</span>.<span class="at">style</span>)<span class="op">;</span></span>
+<span id="cb278-8"><a href="working-with-shiny.html#cb278-8"></a></span>
+<span id="cb278-9"><a href="working-with-shiny.html#cb278-9"></a>  <span class="co">// callback</span></span>
+<span id="cb278-10"><a href="working-with-shiny.html#cb278-10"></a>  <span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
+<span id="cb278-11"><a href="working-with-shiny.html#cb278-11"></a>    <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_selected&#39;</span><span class="op">,</span> selectedCountry)<span class="op">;</span></span>
+<span id="cb278-12"><a href="working-with-shiny.html#cb278-12"></a>    <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_related&#39;</span><span class="op">,</span> relatedCountries)<span class="op">;</span></span>
+<span id="cb278-13"><a href="working-with-shiny.html#cb278-13"></a>  <span class="op">}</span></span>
+<span id="cb278-14"><a href="working-with-shiny.html#cb278-14"></a></span>
+<span id="cb278-15"><a href="working-with-shiny.html#cb278-15"></a>  <span class="va">controller</span>.<span class="at">onCountryPicked</span>(callback)<span class="op">;</span></span>
+<span id="cb278-16"><a href="working-with-shiny.html#cb278-16"></a></span>
+<span id="cb278-17"><a href="working-with-shiny.html#cb278-17"></a>  <span class="co">// render</span></span>
+<span id="cb278-18"><a href="working-with-shiny.html#cb278-18"></a>  <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
+<span id="cb278-19"><a href="working-with-shiny.html#cb278-19"></a></span>
+<span id="cb278-20"><a href="working-with-shiny.html#cb278-20"></a><span class="op">}</span></span>
+<span id="cb278-21"><a href="working-with-shiny.html#cb278-21"></a>...</span></code></pre></div>
 <p>The package can then be installed with <code>devtools::install</code> so we can test these inputs in a shiny application.</p>
-<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb267-1"><a href="working-with-shiny.html#cb267-1"></a><span class="kw">library</span>(gio)</span>
-<span id="cb267-2"><a href="working-with-shiny.html#cb267-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb267-3"><a href="working-with-shiny.html#cb267-3"></a></span>
-<span id="cb267-4"><a href="working-with-shiny.html#cb267-4"></a><span class="co"># large sample data</span></span>
-<span id="cb267-5"><a href="working-with-shiny.html#cb267-5"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb267-6"><a href="working-with-shiny.html#cb267-6"></a>  <span class="st">&quot;https://raw.githubusercontent.com/JohnCoene/&quot;</span>,</span>
-<span id="cb267-7"><a href="working-with-shiny.html#cb267-7"></a>  <span class="st">&quot;javascript-for-r/master/data/countries.json&quot;</span></span>
-<span id="cb267-8"><a href="working-with-shiny.html#cb267-8"></a>)</span>
-<span id="cb267-9"><a href="working-with-shiny.html#cb267-9"></a>arcs &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">fromJSON</span>(url)</span>
-<span id="cb267-10"><a href="working-with-shiny.html#cb267-10"></a></span>
-<span id="cb267-11"><a href="working-with-shiny.html#cb267-11"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidRow</span>(</span>
-<span id="cb267-12"><a href="working-with-shiny.html#cb267-12"></a>  <span class="kw">gioOutput</span>(<span class="st">&quot;globe&quot;</span>),</span>
-<span id="cb267-13"><a href="working-with-shiny.html#cb267-13"></a>  <span class="kw">fluidRow</span>(</span>
-<span id="cb267-14"><a href="working-with-shiny.html#cb267-14"></a>    <span class="kw">column</span>(<span class="dv">6</span>, <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;selectedCountry&quot;</span>)),</span>
-<span id="cb267-15"><a href="working-with-shiny.html#cb267-15"></a>    <span class="kw">column</span>(<span class="dv">6</span>, <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;relatedCountries&quot;</span>))</span>
-<span id="cb267-16"><a href="working-with-shiny.html#cb267-16"></a>  )</span>
-<span id="cb267-17"><a href="working-with-shiny.html#cb267-17"></a>)</span>
-<span id="cb267-18"><a href="working-with-shiny.html#cb267-18"></a></span>
-<span id="cb267-19"><a href="working-with-shiny.html#cb267-19"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb267-20"><a href="working-with-shiny.html#cb267-20"></a></span>
-<span id="cb267-21"><a href="working-with-shiny.html#cb267-21"></a>  output<span class="op">$</span>globe &lt;-<span class="st"> </span><span class="kw">renderGio</span>({</span>
-<span id="cb267-22"><a href="working-with-shiny.html#cb267-22"></a>    <span class="kw">gio</span>(arcs)</span>
-<span id="cb267-23"><a href="working-with-shiny.html#cb267-23"></a>  })</span>
-<span id="cb267-24"><a href="working-with-shiny.html#cb267-24"></a></span>
-<span id="cb267-25"><a href="working-with-shiny.html#cb267-25"></a>  output<span class="op">$</span>selectedCountry &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
-<span id="cb267-26"><a href="working-with-shiny.html#cb267-26"></a>    <span class="kw">print</span>(input<span class="op">$</span>globe_selected)</span>
-<span id="cb267-27"><a href="working-with-shiny.html#cb267-27"></a>  })</span>
-<span id="cb267-28"><a href="working-with-shiny.html#cb267-28"></a></span>
-<span id="cb267-29"><a href="working-with-shiny.html#cb267-29"></a>  output<span class="op">$</span>relatedCountries &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
-<span id="cb267-30"><a href="working-with-shiny.html#cb267-30"></a>    <span class="kw">print</span>(input<span class="op">$</span>globe_related)</span>
-<span id="cb267-31"><a href="working-with-shiny.html#cb267-31"></a>  })</span>
-<span id="cb267-32"><a href="working-with-shiny.html#cb267-32"></a></span>
-<span id="cb267-33"><a href="working-with-shiny.html#cb267-33"></a>}</span>
-<span id="cb267-34"><a href="working-with-shiny.html#cb267-34"></a></span>
-<span id="cb267-35"><a href="working-with-shiny.html#cb267-35"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="working-with-shiny.html#cb279-1"></a><span class="kw">library</span>(gio)</span>
+<span id="cb279-2"><a href="working-with-shiny.html#cb279-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb279-3"><a href="working-with-shiny.html#cb279-3"></a></span>
+<span id="cb279-4"><a href="working-with-shiny.html#cb279-4"></a><span class="co"># large sample data</span></span>
+<span id="cb279-5"><a href="working-with-shiny.html#cb279-5"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb279-6"><a href="working-with-shiny.html#cb279-6"></a>  <span class="st">&quot;https://raw.githubusercontent.com/JohnCoene/&quot;</span>,</span>
+<span id="cb279-7"><a href="working-with-shiny.html#cb279-7"></a>  <span class="st">&quot;javascript-for-r/master/data/countries.json&quot;</span></span>
+<span id="cb279-8"><a href="working-with-shiny.html#cb279-8"></a>)</span>
+<span id="cb279-9"><a href="working-with-shiny.html#cb279-9"></a>arcs &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">fromJSON</span>(url)</span>
+<span id="cb279-10"><a href="working-with-shiny.html#cb279-10"></a></span>
+<span id="cb279-11"><a href="working-with-shiny.html#cb279-11"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidRow</span>(</span>
+<span id="cb279-12"><a href="working-with-shiny.html#cb279-12"></a>  <span class="kw">gioOutput</span>(<span class="st">&quot;globe&quot;</span>),</span>
+<span id="cb279-13"><a href="working-with-shiny.html#cb279-13"></a>  <span class="kw">fluidRow</span>(</span>
+<span id="cb279-14"><a href="working-with-shiny.html#cb279-14"></a>    <span class="kw">column</span>(<span class="dv">6</span>, <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;selectedCountry&quot;</span>)),</span>
+<span id="cb279-15"><a href="working-with-shiny.html#cb279-15"></a>    <span class="kw">column</span>(<span class="dv">6</span>, <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;relatedCountries&quot;</span>))</span>
+<span id="cb279-16"><a href="working-with-shiny.html#cb279-16"></a>  )</span>
+<span id="cb279-17"><a href="working-with-shiny.html#cb279-17"></a>)</span>
+<span id="cb279-18"><a href="working-with-shiny.html#cb279-18"></a></span>
+<span id="cb279-19"><a href="working-with-shiny.html#cb279-19"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb279-20"><a href="working-with-shiny.html#cb279-20"></a></span>
+<span id="cb279-21"><a href="working-with-shiny.html#cb279-21"></a>  output<span class="op">$</span>globe &lt;-<span class="st"> </span><span class="kw">renderGio</span>({</span>
+<span id="cb279-22"><a href="working-with-shiny.html#cb279-22"></a>    <span class="kw">gio</span>(arcs)</span>
+<span id="cb279-23"><a href="working-with-shiny.html#cb279-23"></a>  })</span>
+<span id="cb279-24"><a href="working-with-shiny.html#cb279-24"></a></span>
+<span id="cb279-25"><a href="working-with-shiny.html#cb279-25"></a>  output<span class="op">$</span>selectedCountry &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb279-26"><a href="working-with-shiny.html#cb279-26"></a>    <span class="kw">print</span>(input<span class="op">$</span>globe_selected)</span>
+<span id="cb279-27"><a href="working-with-shiny.html#cb279-27"></a>  })</span>
+<span id="cb279-28"><a href="working-with-shiny.html#cb279-28"></a></span>
+<span id="cb279-29"><a href="working-with-shiny.html#cb279-29"></a>  output<span class="op">$</span>relatedCountries &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb279-30"><a href="working-with-shiny.html#cb279-30"></a>    <span class="kw">print</span>(input<span class="op">$</span>globe_related)</span>
+<span id="cb279-31"><a href="working-with-shiny.html#cb279-31"></a>  })</span>
+<span id="cb279-32"><a href="working-with-shiny.html#cb279-32"></a></span>
+<span id="cb279-33"><a href="working-with-shiny.html#cb279-33"></a>}</span>
+<span id="cb279-34"><a href="working-with-shiny.html#cb279-34"></a></span>
+<span id="cb279-35"><a href="working-with-shiny.html#cb279-35"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>The data is sent from the client to the server whether the inputs is used or not, though this likely will not negatively impact gio it can reduce performances if the callback function is triggered too frequently. For instance an input value set when the user hovers a scatter plot might lead to the event being fired very frequently and too much data being sent to the server, slowing things down and providing a poor experience.</p>
 <p>Therefore one might consider making the capture of such event optional so the web browser is not strained unless explicitly asked by the developer of the application. You can also consider not sending back all the data. For instance, gio returns the coordinates of the selected country where from arcs connect; this is might be considered unnecessary. The code below only sets the input to the ISO code of the country selected.</p>
-<div class="sourceCode" id="cb268"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb268-1"><a href="working-with-shiny.html#cb268-1"></a><span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
-<span id="cb268-2"><a href="working-with-shiny.html#cb268-2"></a>  <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_selected&#39;</span><span class="op">,</span> <span class="va">selectedCountry</span>.<span class="at">ISOCode</span>)<span class="op">;</span></span>
-<span id="cb268-3"><a href="working-with-shiny.html#cb268-3"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb280"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb280-1"><a href="working-with-shiny.html#cb280-1"></a><span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
+<span id="cb280-2"><a href="working-with-shiny.html#cb280-2"></a>  <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_selected&#39;</span><span class="op">,</span> <span class="va">selectedCountry</span>.<span class="at">ISOCode</span>)<span class="op">;</span></span>
+<span id="cb280-3"><a href="working-with-shiny.html#cb280-3"></a><span class="op">}</span></span></code></pre></div>
 </div>
 <div id="input-handler-1" class="section level2 unnumbered" number="">
 <h2>Input Handler</h2>
 <p>While input handlers were explored previously we found limited use for them as the inputs were set to simple boolean values. It can be useful in this case as the inputs return more data where preprocessing is relevant. Namely the input returning data on the related countries, it is deserialised to a list but could be reshaped to a data frame of arcs.</p>
 <p>Below we create a handler that is going to loop over the list (over each arc) and return a data frame.</p>
-<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="working-with-shiny.html#cb269-1"></a><span class="co"># R/zzz.R</span></span>
-<span id="cb269-2"><a href="working-with-shiny.html#cb269-2"></a>related_countries_handler &lt;-<span class="st"> </span><span class="cf">function</span>(x, session, inputname){</span>
-<span id="cb269-3"><a href="working-with-shiny.html#cb269-3"></a>  purrr<span class="op">::</span><span class="kw">map_dfr</span>(x, as.data.frame)</span>
-<span id="cb269-4"><a href="working-with-shiny.html#cb269-4"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="working-with-shiny.html#cb281-1"></a><span class="co"># R/zzz.R</span></span>
+<span id="cb281-2"><a href="working-with-shiny.html#cb281-2"></a>related_countries_handler &lt;-<span class="st"> </span><span class="cf">function</span>(x, session, inputname){</span>
+<span id="cb281-3"><a href="working-with-shiny.html#cb281-3"></a>  purrr<span class="op">::</span><span class="kw">map_dfr</span>(x, as.data.frame)</span>
+<span id="cb281-4"><a href="working-with-shiny.html#cb281-4"></a>}</span></code></pre></div>
 <p>Then the handler must be registered with shiny, since handler can only be registered once a good place to put it is in the <code>.onLoad</code> function of the package.</p>
-<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb270-1"><a href="working-with-shiny.html#cb270-1"></a><span class="co"># R/zzz.R</span></span>
-<span id="cb270-2"><a href="working-with-shiny.html#cb270-2"></a>related_countries_handler &lt;-<span class="st"> </span><span class="cf">function</span>(x, session, inputname){</span>
-<span id="cb270-3"><a href="working-with-shiny.html#cb270-3"></a>  purrr<span class="op">::</span><span class="kw">map_dfr</span>(x, as.data.frame)</span>
-<span id="cb270-4"><a href="working-with-shiny.html#cb270-4"></a>}</span>
-<span id="cb270-5"><a href="working-with-shiny.html#cb270-5"></a></span>
-<span id="cb270-6"><a href="working-with-shiny.html#cb270-6"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname) {</span>
-<span id="cb270-7"><a href="working-with-shiny.html#cb270-7"></a>  shiny<span class="op">::</span><span class="kw">registerInputHandler</span>(<span class="st">&quot;gio.related.countries&quot;</span>, related_countries_handler)</span>
-<span id="cb270-8"><a href="working-with-shiny.html#cb270-8"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="working-with-shiny.html#cb282-1"></a><span class="co"># R/zzz.R</span></span>
+<span id="cb282-2"><a href="working-with-shiny.html#cb282-2"></a>related_countries_handler &lt;-<span class="st"> </span><span class="cf">function</span>(x, session, inputname){</span>
+<span id="cb282-3"><a href="working-with-shiny.html#cb282-3"></a>  purrr<span class="op">::</span><span class="kw">map_dfr</span>(x, as.data.frame)</span>
+<span id="cb282-4"><a href="working-with-shiny.html#cb282-4"></a>}</span>
+<span id="cb282-5"><a href="working-with-shiny.html#cb282-5"></a></span>
+<span id="cb282-6"><a href="working-with-shiny.html#cb282-6"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname) {</span>
+<span id="cb282-7"><a href="working-with-shiny.html#cb282-7"></a>  shiny<span class="op">::</span><span class="kw">registerInputHandler</span>(<span class="st">&quot;gio.related.countries&quot;</span>, related_countries_handler)</span>
+<span id="cb282-8"><a href="working-with-shiny.html#cb282-8"></a>}</span></code></pre></div>
 <p>Finally, we can reinstall the package with <code>devtools::install</code> and create shiny application to observe the change. Below we use a large example dataset and, since the input now returns a data frame, we can display the input value in a table.</p>
-<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb271-1"><a href="working-with-shiny.html#cb271-1"></a><span class="kw">library</span>(DT)</span>
-<span id="cb271-2"><a href="working-with-shiny.html#cb271-2"></a><span class="kw">library</span>(gio)</span>
-<span id="cb271-3"><a href="working-with-shiny.html#cb271-3"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb271-4"><a href="working-with-shiny.html#cb271-4"></a></span>
-<span id="cb271-5"><a href="working-with-shiny.html#cb271-5"></a><span class="co"># large sample data</span></span>
-<span id="cb271-6"><a href="working-with-shiny.html#cb271-6"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb271-7"><a href="working-with-shiny.html#cb271-7"></a>  <span class="st">&quot;https://raw.githubusercontent.com/JohnCoene/&quot;</span>,</span>
-<span id="cb271-8"><a href="working-with-shiny.html#cb271-8"></a>  <span class="st">&quot;javascript-for-r/master/data/countries.json&quot;</span></span>
-<span id="cb271-9"><a href="working-with-shiny.html#cb271-9"></a>)</span>
-<span id="cb271-10"><a href="working-with-shiny.html#cb271-10"></a>arcs &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">fromJSON</span>(url)</span>
-<span id="cb271-11"><a href="working-with-shiny.html#cb271-11"></a></span>
-<span id="cb271-12"><a href="working-with-shiny.html#cb271-12"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidRow</span>(</span>
-<span id="cb271-13"><a href="working-with-shiny.html#cb271-13"></a>  <span class="kw">gioOutput</span>(<span class="st">&quot;globe&quot;</span>),</span>
-<span id="cb271-14"><a href="working-with-shiny.html#cb271-14"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;relatedCountries&quot;</span>)</span>
-<span id="cb271-15"><a href="working-with-shiny.html#cb271-15"></a>)</span>
-<span id="cb271-16"><a href="working-with-shiny.html#cb271-16"></a></span>
-<span id="cb271-17"><a href="working-with-shiny.html#cb271-17"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb271-18"><a href="working-with-shiny.html#cb271-18"></a></span>
-<span id="cb271-19"><a href="working-with-shiny.html#cb271-19"></a>  output<span class="op">$</span>globe &lt;-<span class="st"> </span><span class="kw">renderGio</span>({</span>
-<span id="cb271-20"><a href="working-with-shiny.html#cb271-20"></a>    <span class="kw">gio</span>(arcs)</span>
-<span id="cb271-21"><a href="working-with-shiny.html#cb271-21"></a>  })</span>
-<span id="cb271-22"><a href="working-with-shiny.html#cb271-22"></a></span>
-<span id="cb271-23"><a href="working-with-shiny.html#cb271-23"></a>  output<span class="op">$</span>relatedCountries &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
-<span id="cb271-24"><a href="working-with-shiny.html#cb271-24"></a>    <span class="kw">datatable</span>(input<span class="op">$</span>globe_related)</span>
-<span id="cb271-25"><a href="working-with-shiny.html#cb271-25"></a>  })</span>
-<span id="cb271-26"><a href="working-with-shiny.html#cb271-26"></a></span>
-<span id="cb271-27"><a href="working-with-shiny.html#cb271-27"></a>}</span>
-<span id="cb271-28"><a href="working-with-shiny.html#cb271-28"></a></span>
-<span id="cb271-29"><a href="working-with-shiny.html#cb271-29"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="working-with-shiny.html#cb283-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb283-2"><a href="working-with-shiny.html#cb283-2"></a><span class="kw">library</span>(gio)</span>
+<span id="cb283-3"><a href="working-with-shiny.html#cb283-3"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb283-4"><a href="working-with-shiny.html#cb283-4"></a></span>
+<span id="cb283-5"><a href="working-with-shiny.html#cb283-5"></a><span class="co"># large sample data</span></span>
+<span id="cb283-6"><a href="working-with-shiny.html#cb283-6"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb283-7"><a href="working-with-shiny.html#cb283-7"></a>  <span class="st">&quot;https://raw.githubusercontent.com/JohnCoene/&quot;</span>,</span>
+<span id="cb283-8"><a href="working-with-shiny.html#cb283-8"></a>  <span class="st">&quot;javascript-for-r/master/data/countries.json&quot;</span></span>
+<span id="cb283-9"><a href="working-with-shiny.html#cb283-9"></a>)</span>
+<span id="cb283-10"><a href="working-with-shiny.html#cb283-10"></a>arcs &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">fromJSON</span>(url)</span>
+<span id="cb283-11"><a href="working-with-shiny.html#cb283-11"></a></span>
+<span id="cb283-12"><a href="working-with-shiny.html#cb283-12"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidRow</span>(</span>
+<span id="cb283-13"><a href="working-with-shiny.html#cb283-13"></a>  <span class="kw">gioOutput</span>(<span class="st">&quot;globe&quot;</span>),</span>
+<span id="cb283-14"><a href="working-with-shiny.html#cb283-14"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;relatedCountries&quot;</span>)</span>
+<span id="cb283-15"><a href="working-with-shiny.html#cb283-15"></a>)</span>
+<span id="cb283-16"><a href="working-with-shiny.html#cb283-16"></a></span>
+<span id="cb283-17"><a href="working-with-shiny.html#cb283-17"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb283-18"><a href="working-with-shiny.html#cb283-18"></a></span>
+<span id="cb283-19"><a href="working-with-shiny.html#cb283-19"></a>  output<span class="op">$</span>globe &lt;-<span class="st"> </span><span class="kw">renderGio</span>({</span>
+<span id="cb283-20"><a href="working-with-shiny.html#cb283-20"></a>    <span class="kw">gio</span>(arcs)</span>
+<span id="cb283-21"><a href="working-with-shiny.html#cb283-21"></a>  })</span>
+<span id="cb283-22"><a href="working-with-shiny.html#cb283-22"></a></span>
+<span id="cb283-23"><a href="working-with-shiny.html#cb283-23"></a>  output<span class="op">$</span>relatedCountries &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
+<span id="cb283-24"><a href="working-with-shiny.html#cb283-24"></a>    <span class="kw">datatable</span>(input<span class="op">$</span>globe_related)</span>
+<span id="cb283-25"><a href="working-with-shiny.html#cb283-25"></a>  })</span>
+<span id="cb283-26"><a href="working-with-shiny.html#cb283-26"></a></span>
+<span id="cb283-27"><a href="working-with-shiny.html#cb283-27"></a>}</span>
+<span id="cb283-28"><a href="working-with-shiny.html#cb283-28"></a></span>
+<span id="cb283-29"><a href="working-with-shiny.html#cb283-29"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div class="figure">
 <img src="images/gio-input-handler.png" alt="" />
 <p class="caption">Input transformed to data frame</p>
@@ -430,260 +432,260 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>This book previously explored how to send data to the from the shiny server to the front-end, this section applies this to htmlwidgets. Currently, using gio in shiny consists of generating the globe with the <code>renderGio</code> and complimentary <code>gioOutput</code> functions. This generates the entire visualisation, it creates the HTML element where it places the globe, draws the arcs based on the data, sets the style, etc.</p>
 <p>Now imagine that only one of the elements of the globe needs changing say the data, or the style, given the functions currently at hand one would have to redraw the entire visualisation, only changing the data or the style. However, most JavaScript visualisation libraries, including gio.js, will enable changing only certain aspects of the output.</p>
 <p>Before we look into the implementation, let us create a shiny application which would benefit from such a feature. The shiny application below provides a drop-down menu to select between two datasets to draw on the globe, running it reveals an issue with gio though. Upon selecting a dataset with the drop down a second globe appears underneath the original one. This is because internally gio.js creates a new element (<code>&lt;canvas&gt;</code>) within the <code>&lt;div&gt;</code> created by <code>htmlwidgets</code> when running <code>init</code>, regardless of whether one was already created. Note that most visualisation libraries will not have that issue, they will detect the existing output and override it instead.</p>
-<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="working-with-shiny.html#cb272-1"></a><span class="kw">library</span>(gio)</span>
-<span id="cb272-2"><a href="working-with-shiny.html#cb272-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb272-3"><a href="working-with-shiny.html#cb272-3"></a></span>
-<span id="cb272-4"><a href="working-with-shiny.html#cb272-4"></a>arcs1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
-<span id="cb272-5"><a href="working-with-shiny.html#cb272-5"></a>  <span class="dt">e =</span> <span class="kw">c</span>(<span class="st">&quot;US&quot;</span>, <span class="st">&quot;CN&quot;</span>, <span class="st">&quot;RU&quot;</span>),</span>
-<span id="cb272-6"><a href="working-with-shiny.html#cb272-6"></a>  <span class="dt">i =</span> <span class="kw">c</span>(<span class="st">&quot;CN&quot;</span>, <span class="st">&quot;RU&quot;</span>, <span class="st">&quot;US&quot;</span>),</span>
-<span id="cb272-7"><a href="working-with-shiny.html#cb272-7"></a>  <span class="dt">v =</span> <span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">120</span>, <span class="dv">130</span>)</span>
-<span id="cb272-8"><a href="working-with-shiny.html#cb272-8"></a>)</span>
-<span id="cb272-9"><a href="working-with-shiny.html#cb272-9"></a></span>
-<span id="cb272-10"><a href="working-with-shiny.html#cb272-10"></a>arcs2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
-<span id="cb272-11"><a href="working-with-shiny.html#cb272-11"></a>  <span class="dt">e =</span> <span class="kw">c</span>(<span class="st">&quot;CN&quot;</span>, <span class="st">&quot;CN&quot;</span>, <span class="st">&quot;JP&quot;</span>),</span>
-<span id="cb272-12"><a href="working-with-shiny.html#cb272-12"></a>  <span class="dt">i =</span> <span class="kw">c</span>(<span class="st">&quot;IN&quot;</span>, <span class="st">&quot;JP&quot;</span>, <span class="st">&quot;US&quot;</span>),</span>
-<span id="cb272-13"><a href="working-with-shiny.html#cb272-13"></a>  <span class="dt">v =</span> <span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">120</span>, <span class="dv">130</span>)</span>
-<span id="cb272-14"><a href="working-with-shiny.html#cb272-14"></a>)</span>
-<span id="cb272-15"><a href="working-with-shiny.html#cb272-15"></a></span>
-<span id="cb272-16"><a href="working-with-shiny.html#cb272-16"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidRow</span>(</span>
-<span id="cb272-17"><a href="working-with-shiny.html#cb272-17"></a>  <span class="kw">selectInput</span>(</span>
-<span id="cb272-18"><a href="working-with-shiny.html#cb272-18"></a>    <span class="st">&quot;dataset&quot;</span>, </span>
-<span id="cb272-19"><a href="working-with-shiny.html#cb272-19"></a>    <span class="st">&quot;Select a dataset&quot;</span>, </span>
-<span id="cb272-20"><a href="working-with-shiny.html#cb272-20"></a>    <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;First&quot;</span>, <span class="st">&quot;Second&quot;</span>)</span>
-<span id="cb272-21"><a href="working-with-shiny.html#cb272-21"></a>  ),</span>
-<span id="cb272-22"><a href="working-with-shiny.html#cb272-22"></a>  <span class="kw">gioOutput</span>(<span class="st">&quot;globe&quot;</span>)</span>
-<span id="cb272-23"><a href="working-with-shiny.html#cb272-23"></a>)</span>
-<span id="cb272-24"><a href="working-with-shiny.html#cb272-24"></a></span>
-<span id="cb272-25"><a href="working-with-shiny.html#cb272-25"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb272-26"><a href="working-with-shiny.html#cb272-26"></a></span>
-<span id="cb272-27"><a href="working-with-shiny.html#cb272-27"></a>  reactive_arcs &lt;-<span class="st"> </span><span class="kw">reactive</span>({</span>
-<span id="cb272-28"><a href="working-with-shiny.html#cb272-28"></a>    <span class="cf">if</span>(input<span class="op">$</span>dataset <span class="op">==</span><span class="st"> &quot;First&quot;</span>) </span>
-<span id="cb272-29"><a href="working-with-shiny.html#cb272-29"></a>      <span class="kw">return</span>(arcs1)</span>
-<span id="cb272-30"><a href="working-with-shiny.html#cb272-30"></a>    <span class="kw">return</span>(arcs2)</span>
-<span id="cb272-31"><a href="working-with-shiny.html#cb272-31"></a>  })</span>
-<span id="cb272-32"><a href="working-with-shiny.html#cb272-32"></a></span>
-<span id="cb272-33"><a href="working-with-shiny.html#cb272-33"></a>  output<span class="op">$</span>globe &lt;-<span class="st"> </span><span class="kw">renderGio</span>({</span>
-<span id="cb272-34"><a href="working-with-shiny.html#cb272-34"></a>    <span class="kw">gio</span>(<span class="kw">reactive_arcs</span>())</span>
-<span id="cb272-35"><a href="working-with-shiny.html#cb272-35"></a>  })</span>
-<span id="cb272-36"><a href="working-with-shiny.html#cb272-36"></a></span>
-<span id="cb272-37"><a href="working-with-shiny.html#cb272-37"></a>}</span>
-<span id="cb272-38"><a href="working-with-shiny.html#cb272-38"></a></span>
-<span id="cb272-39"><a href="working-with-shiny.html#cb272-39"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="working-with-shiny.html#cb284-1"></a><span class="kw">library</span>(gio)</span>
+<span id="cb284-2"><a href="working-with-shiny.html#cb284-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb284-3"><a href="working-with-shiny.html#cb284-3"></a></span>
+<span id="cb284-4"><a href="working-with-shiny.html#cb284-4"></a>arcs1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb284-5"><a href="working-with-shiny.html#cb284-5"></a>  <span class="dt">e =</span> <span class="kw">c</span>(<span class="st">&quot;US&quot;</span>, <span class="st">&quot;CN&quot;</span>, <span class="st">&quot;RU&quot;</span>),</span>
+<span id="cb284-6"><a href="working-with-shiny.html#cb284-6"></a>  <span class="dt">i =</span> <span class="kw">c</span>(<span class="st">&quot;CN&quot;</span>, <span class="st">&quot;RU&quot;</span>, <span class="st">&quot;US&quot;</span>),</span>
+<span id="cb284-7"><a href="working-with-shiny.html#cb284-7"></a>  <span class="dt">v =</span> <span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">120</span>, <span class="dv">130</span>)</span>
+<span id="cb284-8"><a href="working-with-shiny.html#cb284-8"></a>)</span>
+<span id="cb284-9"><a href="working-with-shiny.html#cb284-9"></a></span>
+<span id="cb284-10"><a href="working-with-shiny.html#cb284-10"></a>arcs2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb284-11"><a href="working-with-shiny.html#cb284-11"></a>  <span class="dt">e =</span> <span class="kw">c</span>(<span class="st">&quot;CN&quot;</span>, <span class="st">&quot;CN&quot;</span>, <span class="st">&quot;JP&quot;</span>),</span>
+<span id="cb284-12"><a href="working-with-shiny.html#cb284-12"></a>  <span class="dt">i =</span> <span class="kw">c</span>(<span class="st">&quot;IN&quot;</span>, <span class="st">&quot;JP&quot;</span>, <span class="st">&quot;US&quot;</span>),</span>
+<span id="cb284-13"><a href="working-with-shiny.html#cb284-13"></a>  <span class="dt">v =</span> <span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">120</span>, <span class="dv">130</span>)</span>
+<span id="cb284-14"><a href="working-with-shiny.html#cb284-14"></a>)</span>
+<span id="cb284-15"><a href="working-with-shiny.html#cb284-15"></a></span>
+<span id="cb284-16"><a href="working-with-shiny.html#cb284-16"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidRow</span>(</span>
+<span id="cb284-17"><a href="working-with-shiny.html#cb284-17"></a>  <span class="kw">selectInput</span>(</span>
+<span id="cb284-18"><a href="working-with-shiny.html#cb284-18"></a>    <span class="st">&quot;dataset&quot;</span>, </span>
+<span id="cb284-19"><a href="working-with-shiny.html#cb284-19"></a>    <span class="st">&quot;Select a dataset&quot;</span>, </span>
+<span id="cb284-20"><a href="working-with-shiny.html#cb284-20"></a>    <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;First&quot;</span>, <span class="st">&quot;Second&quot;</span>)</span>
+<span id="cb284-21"><a href="working-with-shiny.html#cb284-21"></a>  ),</span>
+<span id="cb284-22"><a href="working-with-shiny.html#cb284-22"></a>  <span class="kw">gioOutput</span>(<span class="st">&quot;globe&quot;</span>)</span>
+<span id="cb284-23"><a href="working-with-shiny.html#cb284-23"></a>)</span>
+<span id="cb284-24"><a href="working-with-shiny.html#cb284-24"></a></span>
+<span id="cb284-25"><a href="working-with-shiny.html#cb284-25"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb284-26"><a href="working-with-shiny.html#cb284-26"></a></span>
+<span id="cb284-27"><a href="working-with-shiny.html#cb284-27"></a>  reactive_arcs &lt;-<span class="st"> </span><span class="kw">reactive</span>({</span>
+<span id="cb284-28"><a href="working-with-shiny.html#cb284-28"></a>    <span class="cf">if</span>(input<span class="op">$</span>dataset <span class="op">==</span><span class="st"> &quot;First&quot;</span>) </span>
+<span id="cb284-29"><a href="working-with-shiny.html#cb284-29"></a>      <span class="kw">return</span>(arcs1)</span>
+<span id="cb284-30"><a href="working-with-shiny.html#cb284-30"></a>    <span class="kw">return</span>(arcs2)</span>
+<span id="cb284-31"><a href="working-with-shiny.html#cb284-31"></a>  })</span>
+<span id="cb284-32"><a href="working-with-shiny.html#cb284-32"></a></span>
+<span id="cb284-33"><a href="working-with-shiny.html#cb284-33"></a>  output<span class="op">$</span>globe &lt;-<span class="st"> </span><span class="kw">renderGio</span>({</span>
+<span id="cb284-34"><a href="working-with-shiny.html#cb284-34"></a>    <span class="kw">gio</span>(<span class="kw">reactive_arcs</span>())</span>
+<span id="cb284-35"><a href="working-with-shiny.html#cb284-35"></a>  })</span>
+<span id="cb284-36"><a href="working-with-shiny.html#cb284-36"></a></span>
+<span id="cb284-37"><a href="working-with-shiny.html#cb284-37"></a>}</span>
+<span id="cb284-38"><a href="working-with-shiny.html#cb284-38"></a></span>
+<span id="cb284-39"><a href="working-with-shiny.html#cb284-39"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>A solution to this is to ensure the div created by htmlwidgets is empty before create the visualisation. Incidentally this can be executed with a JavaScript method previously used in this book: <code>innerHTML</code>. This can be used on the <code>container</code> before it is used to create an instance of gio.</p>
-<div class="sourceCode" id="cb273"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb273-1"><a href="working-with-shiny.html#cb273-1"></a><span class="co">// gio.js</span></span>
-<span id="cb273-2"><a href="working-with-shiny.html#cb273-2"></a><span class="kw">var</span> container <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
-<span id="cb273-3"><a href="working-with-shiny.html#cb273-3"></a><span class="va">container</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="st">&#39;&#39;</span><span class="op">;</span> <span class="co">// empty the container</span></span>
-<span id="cb273-4"><a href="working-with-shiny.html#cb273-4"></a>controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(container)<span class="op">;</span></span>
-<span id="cb273-5"><a href="working-with-shiny.html#cb273-5"></a>...</span></code></pre></div>
+<div class="sourceCode" id="cb285"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb285-1"><a href="working-with-shiny.html#cb285-1"></a><span class="co">// gio.js</span></span>
+<span id="cb285-2"><a href="working-with-shiny.html#cb285-2"></a><span class="kw">var</span> container <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
+<span id="cb285-3"><a href="working-with-shiny.html#cb285-3"></a><span class="va">container</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="st">&#39;&#39;</span><span class="op">;</span> <span class="co">// empty the container</span></span>
+<span id="cb285-4"><a href="working-with-shiny.html#cb285-4"></a>controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(container)<span class="op">;</span></span>
+<span id="cb285-5"><a href="working-with-shiny.html#cb285-5"></a>...</span></code></pre></div>
 <p>We got sidetracked but this had to be fixed. Ideally, when the user selects an dataset from the dropdown the entire visualisation is not redrawn, only the underlying data (the arcs) changes. To do so, a new set of functions divorced from the ones currently at hand needs to be created. This separation will allow leaving the already created functions as-is, using <code>gio</code> to initialise a visualisation and its JavaScript complement <code>renderValue</code>, and have a separate family of functions dedicated to working with different JavaScript functions which circumvent <code>renderValue</code> to directly change aspects of the visualisation (such as the underlying dataset).</p>
 <p>This involves a few moving parts, thankfully some of them were already explored, just not in the context of htmlwidgets. The scheme is to send data from R to JavaScript using the formerly exploited <code>session$sendCustomMessage</code>, then in JavaScript fetch the visualisation object (<code>controller</code> in this case) to enable interacting with the widget, bypassing <code>renderValue</code>.</p>
 <div id="send-data" class="section level3 unnumbered" number="">
 <h3>Send Data</h3>
 <p>Let’s start by creating the R function used to send data to JavaScript. This is hopefully reminiscent of a previous chapter, this function sends a message to JavaScript where it is paired with “message handler” that does something with said message.</p>
-<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb274-1"><a href="working-with-shiny.html#cb274-1"></a><span class="co">#&#39; @export</span></span>
-<span id="cb274-2"><a href="working-with-shiny.html#cb274-2"></a>gio_send_data &lt;-<span class="st"> </span><span class="cf">function</span>(id, data, <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</span>
-<span id="cb274-3"><a href="working-with-shiny.html#cb274-3"></a>  message &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">id =</span> id, <span class="dt">data =</span> data)</span>
-<span id="cb274-4"><a href="working-with-shiny.html#cb274-4"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;send-data&quot;</span>, message)</span>
-<span id="cb274-5"><a href="working-with-shiny.html#cb274-5"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="working-with-shiny.html#cb286-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb286-2"><a href="working-with-shiny.html#cb286-2"></a>gio_send_data &lt;-<span class="st"> </span><span class="cf">function</span>(id, data, <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</span>
+<span id="cb286-3"><a href="working-with-shiny.html#cb286-3"></a>  message &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">id =</span> id, <span class="dt">data =</span> data)</span>
+<span id="cb286-4"><a href="working-with-shiny.html#cb286-4"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;send-data&quot;</span>, message)</span>
+<span id="cb286-5"><a href="working-with-shiny.html#cb286-5"></a>}</span></code></pre></div>
 <p>The function takes the id of the visualisation the data is destined for, the data itself, and a shiny session used to send the data. The id of the visualisation is sent as part of the message and will be used to retrieve the instance of the visualisation and subsequently apply the data. Note that we give this message the <code>send-data</code> identifier, this will be needed when we write its handler.</p>
 <p>There is one caveat that will make it such that the above will not work. To have gio.js work with data changes had to be made to the serialiser (using the <code>TOJSON_ARGS</code> attribute), this cannot be used here. The data being sent with Shiny via the session object the problem reoccurs: shiny, like htmlwidgets, serialises data frames column-wise and not row-wise. One can preview the way shiny serialises with <code>shiny:::toJSON</code> (three-colon).</p>
-<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb275-1"><a href="working-with-shiny.html#cb275-1"></a><span class="co"># preview shiny serialisation</span></span>
-<span id="cb275-2"><a href="working-with-shiny.html#cb275-2"></a>shiny<span class="op">:::</span><span class="kw">toJSON</span>(arcs)</span></code></pre></div>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="working-with-shiny.html#cb287-1"></a><span class="co"># preview shiny serialisation</span></span>
+<span id="cb287-2"><a href="working-with-shiny.html#cb287-2"></a>shiny<span class="op">:::</span><span class="kw">toJSON</span>(arcs)</span></code></pre></div>
 <pre><code>## {&quot;e&quot;:[&quot;CN&quot;,&quot;CN&quot;],&quot;i&quot;:[&quot;US&quot;,&quot;RU&quot;],&quot;v&quot;:[3300000,10000]}</code></pre>
 <p>Unfortunately this serialiser cannot be changed, therefore we have to reformat the data to a list which resembles the JSON output desired, using <code>apply</code> to turn every row into a list will do the job in most cases.</p>
-<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb277-1"><a href="working-with-shiny.html#cb277-1"></a><span class="co">#&#39; @export</span></span>
-<span id="cb277-2"><a href="working-with-shiny.html#cb277-2"></a>gio_send_data &lt;-<span class="st"> </span><span class="cf">function</span>(id, data, <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</span>
-<span id="cb277-3"><a href="working-with-shiny.html#cb277-3"></a>  message &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">id =</span> id, <span class="dt">data =</span> <span class="kw">apply</span>(data, <span class="dv">1</span>, as.list))</span>
-<span id="cb277-4"><a href="working-with-shiny.html#cb277-4"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;send-data&quot;</span>, message)</span>
-<span id="cb277-5"><a href="working-with-shiny.html#cb277-5"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="working-with-shiny.html#cb289-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb289-2"><a href="working-with-shiny.html#cb289-2"></a>gio_send_data &lt;-<span class="st"> </span><span class="cf">function</span>(id, data, <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</span>
+<span id="cb289-3"><a href="working-with-shiny.html#cb289-3"></a>  message &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">id =</span> id, <span class="dt">data =</span> <span class="kw">apply</span>(data, <span class="dv">1</span>, as.list))</span>
+<span id="cb289-4"><a href="working-with-shiny.html#cb289-4"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;send-data&quot;</span>, message)</span>
+<span id="cb289-5"><a href="working-with-shiny.html#cb289-5"></a>}</span></code></pre></div>
 </div>
 <div id="retrieve-widget-instance" class="section level3 unnumbered" number="">
 <h3>Retrieve Widget Instance</h3>
 <p>We will need to be able to access the instance of the visualisation (<code>controller</code>) outside of the function <code>factory</code>. This can be made accessible by adding a function (technically a method) that returns the <code>controller</code>. Below we create a function called <code>getGlobe</code> which returns the <code>controller</code>.</p>
-<div class="sourceCode" id="cb278"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb278-1"><a href="working-with-shiny.html#cb278-1"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
-<span id="cb278-2"><a href="working-with-shiny.html#cb278-2"></a></span>
-<span id="cb278-3"><a href="working-with-shiny.html#cb278-3"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;gio&#39;</span><span class="op">,</span></span>
-<span id="cb278-4"><a href="working-with-shiny.html#cb278-4"></a></span>
-<span id="cb278-5"><a href="working-with-shiny.html#cb278-5"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
-<span id="cb278-6"><a href="working-with-shiny.html#cb278-6"></a></span>
-<span id="cb278-7"><a href="working-with-shiny.html#cb278-7"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
-<span id="cb278-8"><a href="working-with-shiny.html#cb278-8"></a></span>
-<span id="cb278-9"><a href="working-with-shiny.html#cb278-9"></a>    <span class="kw">var</span> controller<span class="op">;</span></span>
-<span id="cb278-10"><a href="working-with-shiny.html#cb278-10"></a></span>
-<span id="cb278-11"><a href="working-with-shiny.html#cb278-11"></a>    <span class="cf">return</span> <span class="op">{</span></span>
-<span id="cb278-12"><a href="working-with-shiny.html#cb278-12"></a></span>
-<span id="cb278-13"><a href="working-with-shiny.html#cb278-13"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb278-14"><a href="working-with-shiny.html#cb278-14"></a></span>
-<span id="cb278-15"><a href="working-with-shiny.html#cb278-15"></a>        <span class="kw">var</span> container <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
-<span id="cb278-16"><a href="working-with-shiny.html#cb278-16"></a>        <span class="va">container</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="st">&#39;&#39;</span><span class="op">;</span></span>
-<span id="cb278-17"><a href="working-with-shiny.html#cb278-17"></a>        controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(container)<span class="op">;</span></span>
-<span id="cb278-18"><a href="working-with-shiny.html#cb278-18"></a>        </span>
-<span id="cb278-19"><a href="working-with-shiny.html#cb278-19"></a>        <span class="co">// add data</span></span>
-<span id="cb278-20"><a href="working-with-shiny.html#cb278-20"></a>        <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span></span>
-<span id="cb278-21"><a href="working-with-shiny.html#cb278-21"></a></span>
-<span id="cb278-22"><a href="working-with-shiny.html#cb278-22"></a>        <span class="va">controller</span>.<span class="at">setStyle</span>(<span class="va">x</span>.<span class="at">style</span>)<span class="op">;</span></span>
-<span id="cb278-23"><a href="working-with-shiny.html#cb278-23"></a></span>
-<span id="cb278-24"><a href="working-with-shiny.html#cb278-24"></a>        <span class="co">// callback</span></span>
-<span id="cb278-25"><a href="working-with-shiny.html#cb278-25"></a>        <span class="va">controller</span>.<span class="at">onCountryPicked</span>(callback)<span class="op">;</span></span>
-<span id="cb278-26"><a href="working-with-shiny.html#cb278-26"></a></span>
-<span id="cb278-27"><a href="working-with-shiny.html#cb278-27"></a>        <span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
-<span id="cb278-28"><a href="working-with-shiny.html#cb278-28"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_selected&#39;</span><span class="op">,</span> selectedCountry)<span class="op">;</span></span>
-<span id="cb278-29"><a href="working-with-shiny.html#cb278-29"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_related:gio.related.countries&#39;</span><span class="op">,</span> relatedCountries)<span class="op">;</span></span>
-<span id="cb278-30"><a href="working-with-shiny.html#cb278-30"></a>        <span class="op">}</span></span>
-<span id="cb278-31"><a href="working-with-shiny.html#cb278-31"></a></span>
-<span id="cb278-32"><a href="working-with-shiny.html#cb278-32"></a>        <span class="co">// render</span></span>
-<span id="cb278-33"><a href="working-with-shiny.html#cb278-33"></a>        <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
-<span id="cb278-34"><a href="working-with-shiny.html#cb278-34"></a></span>
-<span id="cb278-35"><a href="working-with-shiny.html#cb278-35"></a>      <span class="op">},</span></span>
-<span id="cb278-36"><a href="working-with-shiny.html#cb278-36"></a></span>
-<span id="cb278-37"><a href="working-with-shiny.html#cb278-37"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
-<span id="cb278-38"><a href="working-with-shiny.html#cb278-38"></a></span>
-<span id="cb278-39"><a href="working-with-shiny.html#cb278-39"></a>        <span class="va">controller</span>.<span class="at">resizeUpdate</span>()</span>
-<span id="cb278-40"><a href="working-with-shiny.html#cb278-40"></a></span>
-<span id="cb278-41"><a href="working-with-shiny.html#cb278-41"></a>      <span class="op">},</span></span>
-<span id="cb278-42"><a href="working-with-shiny.html#cb278-42"></a></span>
-<span id="cb278-43"><a href="working-with-shiny.html#cb278-43"></a>      <span class="dt">getGlobe</span><span class="op">:</span> <span class="kw">function</span>()<span class="op">{</span></span>
-<span id="cb278-44"><a href="working-with-shiny.html#cb278-44"></a>        <span class="cf">return</span> controller<span class="op">;</span></span>
-<span id="cb278-45"><a href="working-with-shiny.html#cb278-45"></a>      <span class="op">}</span></span>
-<span id="cb278-46"><a href="working-with-shiny.html#cb278-46"></a></span>
-<span id="cb278-47"><a href="working-with-shiny.html#cb278-47"></a>    <span class="op">};</span></span>
-<span id="cb278-48"><a href="working-with-shiny.html#cb278-48"></a>  <span class="op">}</span></span>
-<span id="cb278-49"><a href="working-with-shiny.html#cb278-49"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb290"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb290-1"><a href="working-with-shiny.html#cb290-1"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
+<span id="cb290-2"><a href="working-with-shiny.html#cb290-2"></a></span>
+<span id="cb290-3"><a href="working-with-shiny.html#cb290-3"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;gio&#39;</span><span class="op">,</span></span>
+<span id="cb290-4"><a href="working-with-shiny.html#cb290-4"></a></span>
+<span id="cb290-5"><a href="working-with-shiny.html#cb290-5"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
+<span id="cb290-6"><a href="working-with-shiny.html#cb290-6"></a></span>
+<span id="cb290-7"><a href="working-with-shiny.html#cb290-7"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb290-8"><a href="working-with-shiny.html#cb290-8"></a></span>
+<span id="cb290-9"><a href="working-with-shiny.html#cb290-9"></a>    <span class="kw">var</span> controller<span class="op">;</span></span>
+<span id="cb290-10"><a href="working-with-shiny.html#cb290-10"></a></span>
+<span id="cb290-11"><a href="working-with-shiny.html#cb290-11"></a>    <span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb290-12"><a href="working-with-shiny.html#cb290-12"></a></span>
+<span id="cb290-13"><a href="working-with-shiny.html#cb290-13"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb290-14"><a href="working-with-shiny.html#cb290-14"></a></span>
+<span id="cb290-15"><a href="working-with-shiny.html#cb290-15"></a>        <span class="kw">var</span> container <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
+<span id="cb290-16"><a href="working-with-shiny.html#cb290-16"></a>        <span class="va">container</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="st">&#39;&#39;</span><span class="op">;</span></span>
+<span id="cb290-17"><a href="working-with-shiny.html#cb290-17"></a>        controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(container)<span class="op">;</span></span>
+<span id="cb290-18"><a href="working-with-shiny.html#cb290-18"></a>        </span>
+<span id="cb290-19"><a href="working-with-shiny.html#cb290-19"></a>        <span class="co">// add data</span></span>
+<span id="cb290-20"><a href="working-with-shiny.html#cb290-20"></a>        <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span></span>
+<span id="cb290-21"><a href="working-with-shiny.html#cb290-21"></a></span>
+<span id="cb290-22"><a href="working-with-shiny.html#cb290-22"></a>        <span class="va">controller</span>.<span class="at">setStyle</span>(<span class="va">x</span>.<span class="at">style</span>)<span class="op">;</span></span>
+<span id="cb290-23"><a href="working-with-shiny.html#cb290-23"></a></span>
+<span id="cb290-24"><a href="working-with-shiny.html#cb290-24"></a>        <span class="co">// callback</span></span>
+<span id="cb290-25"><a href="working-with-shiny.html#cb290-25"></a>        <span class="va">controller</span>.<span class="at">onCountryPicked</span>(callback)<span class="op">;</span></span>
+<span id="cb290-26"><a href="working-with-shiny.html#cb290-26"></a></span>
+<span id="cb290-27"><a href="working-with-shiny.html#cb290-27"></a>        <span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
+<span id="cb290-28"><a href="working-with-shiny.html#cb290-28"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_selected&#39;</span><span class="op">,</span> selectedCountry)<span class="op">;</span></span>
+<span id="cb290-29"><a href="working-with-shiny.html#cb290-29"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_related:gio.related.countries&#39;</span><span class="op">,</span> relatedCountries)<span class="op">;</span></span>
+<span id="cb290-30"><a href="working-with-shiny.html#cb290-30"></a>        <span class="op">}</span></span>
+<span id="cb290-31"><a href="working-with-shiny.html#cb290-31"></a></span>
+<span id="cb290-32"><a href="working-with-shiny.html#cb290-32"></a>        <span class="co">// render</span></span>
+<span id="cb290-33"><a href="working-with-shiny.html#cb290-33"></a>        <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
+<span id="cb290-34"><a href="working-with-shiny.html#cb290-34"></a></span>
+<span id="cb290-35"><a href="working-with-shiny.html#cb290-35"></a>      <span class="op">},</span></span>
+<span id="cb290-36"><a href="working-with-shiny.html#cb290-36"></a></span>
+<span id="cb290-37"><a href="working-with-shiny.html#cb290-37"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb290-38"><a href="working-with-shiny.html#cb290-38"></a></span>
+<span id="cb290-39"><a href="working-with-shiny.html#cb290-39"></a>        <span class="va">controller</span>.<span class="at">resizeUpdate</span>()</span>
+<span id="cb290-40"><a href="working-with-shiny.html#cb290-40"></a></span>
+<span id="cb290-41"><a href="working-with-shiny.html#cb290-41"></a>      <span class="op">},</span></span>
+<span id="cb290-42"><a href="working-with-shiny.html#cb290-42"></a></span>
+<span id="cb290-43"><a href="working-with-shiny.html#cb290-43"></a>      <span class="dt">getGlobe</span><span class="op">:</span> <span class="kw">function</span>()<span class="op">{</span></span>
+<span id="cb290-44"><a href="working-with-shiny.html#cb290-44"></a>        <span class="cf">return</span> controller<span class="op">;</span></span>
+<span id="cb290-45"><a href="working-with-shiny.html#cb290-45"></a>      <span class="op">}</span></span>
+<span id="cb290-46"><a href="working-with-shiny.html#cb290-46"></a></span>
+<span id="cb290-47"><a href="working-with-shiny.html#cb290-47"></a>    <span class="op">};</span></span>
+<span id="cb290-48"><a href="working-with-shiny.html#cb290-48"></a>  <span class="op">}</span></span>
+<span id="cb290-49"><a href="working-with-shiny.html#cb290-49"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 <p>Then we create a function which uses <code>HTMLWidgets.find</code> to retrieve the htmlwidgets instance that contains the object returned by <code>factory</code>. This object includes the function <code>getGlobe</code> which we then use to obtain the <code>controller</code>.</p>
-<div class="sourceCode" id="cb279"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb279-1"><a href="working-with-shiny.html#cb279-1"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
-<span id="cb279-2"><a href="working-with-shiny.html#cb279-2"></a></span>
-<span id="cb279-3"><a href="working-with-shiny.html#cb279-3"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;gio&#39;</span><span class="op">,</span></span>
-<span id="cb279-4"><a href="working-with-shiny.html#cb279-4"></a></span>
-<span id="cb279-5"><a href="working-with-shiny.html#cb279-5"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
-<span id="cb279-6"><a href="working-with-shiny.html#cb279-6"></a></span>
-<span id="cb279-7"><a href="working-with-shiny.html#cb279-7"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
-<span id="cb279-8"><a href="working-with-shiny.html#cb279-8"></a></span>
-<span id="cb279-9"><a href="working-with-shiny.html#cb279-9"></a>    <span class="kw">var</span> controller<span class="op">;</span></span>
-<span id="cb279-10"><a href="working-with-shiny.html#cb279-10"></a></span>
-<span id="cb279-11"><a href="working-with-shiny.html#cb279-11"></a>    <span class="cf">return</span> <span class="op">{</span></span>
-<span id="cb279-12"><a href="working-with-shiny.html#cb279-12"></a></span>
-<span id="cb279-13"><a href="working-with-shiny.html#cb279-13"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb279-14"><a href="working-with-shiny.html#cb279-14"></a></span>
-<span id="cb279-15"><a href="working-with-shiny.html#cb279-15"></a>        <span class="kw">var</span> container <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
-<span id="cb279-16"><a href="working-with-shiny.html#cb279-16"></a>        <span class="va">container</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="st">&#39;&#39;</span><span class="op">;</span></span>
-<span id="cb279-17"><a href="working-with-shiny.html#cb279-17"></a>        controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(container)<span class="op">;</span></span>
-<span id="cb279-18"><a href="working-with-shiny.html#cb279-18"></a>        </span>
-<span id="cb279-19"><a href="working-with-shiny.html#cb279-19"></a>        <span class="co">// add data</span></span>
-<span id="cb279-20"><a href="working-with-shiny.html#cb279-20"></a>        <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span></span>
-<span id="cb279-21"><a href="working-with-shiny.html#cb279-21"></a></span>
-<span id="cb279-22"><a href="working-with-shiny.html#cb279-22"></a>        <span class="va">controller</span>.<span class="at">setStyle</span>(<span class="va">x</span>.<span class="at">style</span>)<span class="op">;</span></span>
-<span id="cb279-23"><a href="working-with-shiny.html#cb279-23"></a></span>
-<span id="cb279-24"><a href="working-with-shiny.html#cb279-24"></a>        <span class="co">// callback</span></span>
-<span id="cb279-25"><a href="working-with-shiny.html#cb279-25"></a>        <span class="va">controller</span>.<span class="at">onCountryPicked</span>(callback)<span class="op">;</span></span>
-<span id="cb279-26"><a href="working-with-shiny.html#cb279-26"></a></span>
-<span id="cb279-27"><a href="working-with-shiny.html#cb279-27"></a>        <span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
-<span id="cb279-28"><a href="working-with-shiny.html#cb279-28"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_selected&#39;</span><span class="op">,</span> selectedCountry)<span class="op">;</span></span>
-<span id="cb279-29"><a href="working-with-shiny.html#cb279-29"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_related:gio.related.countries&#39;</span><span class="op">,</span> relatedCountries)<span class="op">;</span></span>
-<span id="cb279-30"><a href="working-with-shiny.html#cb279-30"></a>        <span class="op">}</span></span>
-<span id="cb279-31"><a href="working-with-shiny.html#cb279-31"></a></span>
-<span id="cb279-32"><a href="working-with-shiny.html#cb279-32"></a>        <span class="co">// render</span></span>
-<span id="cb279-33"><a href="working-with-shiny.html#cb279-33"></a>        <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
-<span id="cb279-34"><a href="working-with-shiny.html#cb279-34"></a></span>
-<span id="cb279-35"><a href="working-with-shiny.html#cb279-35"></a>      <span class="op">},</span></span>
-<span id="cb279-36"><a href="working-with-shiny.html#cb279-36"></a></span>
-<span id="cb279-37"><a href="working-with-shiny.html#cb279-37"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
-<span id="cb279-38"><a href="working-with-shiny.html#cb279-38"></a></span>
-<span id="cb279-39"><a href="working-with-shiny.html#cb279-39"></a>        <span class="va">controller</span>.<span class="at">resizeUpdate</span>()</span>
-<span id="cb279-40"><a href="working-with-shiny.html#cb279-40"></a></span>
-<span id="cb279-41"><a href="working-with-shiny.html#cb279-41"></a>      <span class="op">},</span></span>
-<span id="cb279-42"><a href="working-with-shiny.html#cb279-42"></a></span>
-<span id="cb279-43"><a href="working-with-shiny.html#cb279-43"></a>      <span class="dt">getGlobe</span><span class="op">:</span> <span class="kw">function</span>()<span class="op">{</span></span>
-<span id="cb279-44"><a href="working-with-shiny.html#cb279-44"></a>        <span class="cf">return</span> controller<span class="op">;</span></span>
-<span id="cb279-45"><a href="working-with-shiny.html#cb279-45"></a>      <span class="op">}</span></span>
-<span id="cb279-46"><a href="working-with-shiny.html#cb279-46"></a></span>
-<span id="cb279-47"><a href="working-with-shiny.html#cb279-47"></a>    <span class="op">};</span></span>
-<span id="cb279-48"><a href="working-with-shiny.html#cb279-48"></a>  <span class="op">}</span></span>
-<span id="cb279-49"><a href="working-with-shiny.html#cb279-49"></a><span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb279-50"><a href="working-with-shiny.html#cb279-50"></a></span>
-<span id="cb279-51"><a href="working-with-shiny.html#cb279-51"></a><span class="co">// return the widget</span></span>
-<span id="cb279-52"><a href="working-with-shiny.html#cb279-52"></a><span class="kw">function</span> <span class="at">get_gio</span>(id)<span class="op">{</span></span>
-<span id="cb279-53"><a href="working-with-shiny.html#cb279-53"></a>  <span class="kw">var</span> widget <span class="op">=</span> <span class="va">HTMLWidgets</span>.<span class="at">find</span>(<span class="st">&quot;#&quot;</span> <span class="op">+</span> id)<span class="op">;</span></span>
-<span id="cb279-54"><a href="working-with-shiny.html#cb279-54"></a>  <span class="kw">var</span> globe <span class="op">=</span> <span class="va">widget</span>.<span class="at">getGlobe</span>()<span class="op">;</span></span>
-<span id="cb279-55"><a href="working-with-shiny.html#cb279-55"></a>  <span class="cf">return</span> globe<span class="op">;</span></span>
-<span id="cb279-56"><a href="working-with-shiny.html#cb279-56"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb291"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb291-1"><a href="working-with-shiny.html#cb291-1"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
+<span id="cb291-2"><a href="working-with-shiny.html#cb291-2"></a></span>
+<span id="cb291-3"><a href="working-with-shiny.html#cb291-3"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;gio&#39;</span><span class="op">,</span></span>
+<span id="cb291-4"><a href="working-with-shiny.html#cb291-4"></a></span>
+<span id="cb291-5"><a href="working-with-shiny.html#cb291-5"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
+<span id="cb291-6"><a href="working-with-shiny.html#cb291-6"></a></span>
+<span id="cb291-7"><a href="working-with-shiny.html#cb291-7"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb291-8"><a href="working-with-shiny.html#cb291-8"></a></span>
+<span id="cb291-9"><a href="working-with-shiny.html#cb291-9"></a>    <span class="kw">var</span> controller<span class="op">;</span></span>
+<span id="cb291-10"><a href="working-with-shiny.html#cb291-10"></a></span>
+<span id="cb291-11"><a href="working-with-shiny.html#cb291-11"></a>    <span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb291-12"><a href="working-with-shiny.html#cb291-12"></a></span>
+<span id="cb291-13"><a href="working-with-shiny.html#cb291-13"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb291-14"><a href="working-with-shiny.html#cb291-14"></a></span>
+<span id="cb291-15"><a href="working-with-shiny.html#cb291-15"></a>        <span class="kw">var</span> container <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></span>
+<span id="cb291-16"><a href="working-with-shiny.html#cb291-16"></a>        <span class="va">container</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="st">&#39;&#39;</span><span class="op">;</span></span>
+<span id="cb291-17"><a href="working-with-shiny.html#cb291-17"></a>        controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(container)<span class="op">;</span></span>
+<span id="cb291-18"><a href="working-with-shiny.html#cb291-18"></a>        </span>
+<span id="cb291-19"><a href="working-with-shiny.html#cb291-19"></a>        <span class="co">// add data</span></span>
+<span id="cb291-20"><a href="working-with-shiny.html#cb291-20"></a>        <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span></span>
+<span id="cb291-21"><a href="working-with-shiny.html#cb291-21"></a></span>
+<span id="cb291-22"><a href="working-with-shiny.html#cb291-22"></a>        <span class="va">controller</span>.<span class="at">setStyle</span>(<span class="va">x</span>.<span class="at">style</span>)<span class="op">;</span></span>
+<span id="cb291-23"><a href="working-with-shiny.html#cb291-23"></a></span>
+<span id="cb291-24"><a href="working-with-shiny.html#cb291-24"></a>        <span class="co">// callback</span></span>
+<span id="cb291-25"><a href="working-with-shiny.html#cb291-25"></a>        <span class="va">controller</span>.<span class="at">onCountryPicked</span>(callback)<span class="op">;</span></span>
+<span id="cb291-26"><a href="working-with-shiny.html#cb291-26"></a></span>
+<span id="cb291-27"><a href="working-with-shiny.html#cb291-27"></a>        <span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
+<span id="cb291-28"><a href="working-with-shiny.html#cb291-28"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_selected&#39;</span><span class="op">,</span> selectedCountry)<span class="op">;</span></span>
+<span id="cb291-29"><a href="working-with-shiny.html#cb291-29"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_related:gio.related.countries&#39;</span><span class="op">,</span> relatedCountries)<span class="op">;</span></span>
+<span id="cb291-30"><a href="working-with-shiny.html#cb291-30"></a>        <span class="op">}</span></span>
+<span id="cb291-31"><a href="working-with-shiny.html#cb291-31"></a></span>
+<span id="cb291-32"><a href="working-with-shiny.html#cb291-32"></a>        <span class="co">// render</span></span>
+<span id="cb291-33"><a href="working-with-shiny.html#cb291-33"></a>        <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
+<span id="cb291-34"><a href="working-with-shiny.html#cb291-34"></a></span>
+<span id="cb291-35"><a href="working-with-shiny.html#cb291-35"></a>      <span class="op">},</span></span>
+<span id="cb291-36"><a href="working-with-shiny.html#cb291-36"></a></span>
+<span id="cb291-37"><a href="working-with-shiny.html#cb291-37"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb291-38"><a href="working-with-shiny.html#cb291-38"></a></span>
+<span id="cb291-39"><a href="working-with-shiny.html#cb291-39"></a>        <span class="va">controller</span>.<span class="at">resizeUpdate</span>()</span>
+<span id="cb291-40"><a href="working-with-shiny.html#cb291-40"></a></span>
+<span id="cb291-41"><a href="working-with-shiny.html#cb291-41"></a>      <span class="op">},</span></span>
+<span id="cb291-42"><a href="working-with-shiny.html#cb291-42"></a></span>
+<span id="cb291-43"><a href="working-with-shiny.html#cb291-43"></a>      <span class="dt">getGlobe</span><span class="op">:</span> <span class="kw">function</span>()<span class="op">{</span></span>
+<span id="cb291-44"><a href="working-with-shiny.html#cb291-44"></a>        <span class="cf">return</span> controller<span class="op">;</span></span>
+<span id="cb291-45"><a href="working-with-shiny.html#cb291-45"></a>      <span class="op">}</span></span>
+<span id="cb291-46"><a href="working-with-shiny.html#cb291-46"></a></span>
+<span id="cb291-47"><a href="working-with-shiny.html#cb291-47"></a>    <span class="op">};</span></span>
+<span id="cb291-48"><a href="working-with-shiny.html#cb291-48"></a>  <span class="op">}</span></span>
+<span id="cb291-49"><a href="working-with-shiny.html#cb291-49"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb291-50"><a href="working-with-shiny.html#cb291-50"></a></span>
+<span id="cb291-51"><a href="working-with-shiny.html#cb291-51"></a><span class="co">// return the widget</span></span>
+<span id="cb291-52"><a href="working-with-shiny.html#cb291-52"></a><span class="kw">function</span> <span class="at">get_gio</span>(id)<span class="op">{</span></span>
+<span id="cb291-53"><a href="working-with-shiny.html#cb291-53"></a>  <span class="kw">var</span> widget <span class="op">=</span> <span class="va">HTMLWidgets</span>.<span class="at">find</span>(<span class="st">&quot;#&quot;</span> <span class="op">+</span> id)<span class="op">;</span></span>
+<span id="cb291-54"><a href="working-with-shiny.html#cb291-54"></a>  <span class="kw">var</span> globe <span class="op">=</span> <span class="va">widget</span>.<span class="at">getGlobe</span>()<span class="op">;</span></span>
+<span id="cb291-55"><a href="working-with-shiny.html#cb291-55"></a>  <span class="cf">return</span> globe<span class="op">;</span></span>
+<span id="cb291-56"><a href="working-with-shiny.html#cb291-56"></a><span class="op">}</span></span></code></pre></div>
 </div>
 <div id="handle-data" class="section level3 unnumbered" number="">
 <h3>Handle Data</h3>
 <p>Now that there is a function which sends data and a chart identifier to the client from R and that there is a JavaScript function to retrieve the visualisation object using the aforementioned identifier, all this is missing is the handling of that data so it is applied to the visualisation: the “message handler.” Registering the message handler being only relevant if shiny is running HTMLWidgets comes with a JavaScript method to check whether that is the case. This is useful to avoid needless errors as the registration of the shiny message handler will only work if the widget is used in shiny. We can thus use it in an if statement where all message handlers should be registered.</p>
-<div class="sourceCode" id="cb280"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb280-1"><a href="working-with-shiny.html#cb280-1"></a><span class="co">// gio.js</span></span>
-<span id="cb280-2"><a href="working-with-shiny.html#cb280-2"></a></span>
-<span id="cb280-3"><a href="working-with-shiny.html#cb280-3"></a><span class="co">// check if shiny running</span></span>
-<span id="cb280-4"><a href="working-with-shiny.html#cb280-4"></a><span class="cf">if</span> (<span class="va">HTMLWidgets</span>.<span class="at">shinyMode</span>)<span class="op">{</span></span>
-<span id="cb280-5"><a href="working-with-shiny.html#cb280-5"></a></span>
-<span id="cb280-6"><a href="working-with-shiny.html#cb280-6"></a>  <span class="co">// send-data message handler</span></span>
-<span id="cb280-7"><a href="working-with-shiny.html#cb280-7"></a>  <span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(type <span class="op">=</span> <span class="st">&#39;send-data&#39;</span><span class="op">,</span> <span class="kw">function</span>(message) <span class="op">{</span></span>
-<span id="cb280-8"><a href="working-with-shiny.html#cb280-8"></a></span>
-<span id="cb280-9"><a href="working-with-shiny.html#cb280-9"></a>  <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb280-10"><a href="working-with-shiny.html#cb280-10"></a></span>
-<span id="cb280-11"><a href="working-with-shiny.html#cb280-11"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb292"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb292-1"><a href="working-with-shiny.html#cb292-1"></a><span class="co">// gio.js</span></span>
+<span id="cb292-2"><a href="working-with-shiny.html#cb292-2"></a></span>
+<span id="cb292-3"><a href="working-with-shiny.html#cb292-3"></a><span class="co">// check if shiny running</span></span>
+<span id="cb292-4"><a href="working-with-shiny.html#cb292-4"></a><span class="cf">if</span> (<span class="va">HTMLWidgets</span>.<span class="at">shinyMode</span>)<span class="op">{</span></span>
+<span id="cb292-5"><a href="working-with-shiny.html#cb292-5"></a></span>
+<span id="cb292-6"><a href="working-with-shiny.html#cb292-6"></a>  <span class="co">// send-data message handler</span></span>
+<span id="cb292-7"><a href="working-with-shiny.html#cb292-7"></a>  <span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(type <span class="op">=</span> <span class="st">&#39;send-data&#39;</span><span class="op">,</span> <span class="kw">function</span>(message) <span class="op">{</span></span>
+<span id="cb292-8"><a href="working-with-shiny.html#cb292-8"></a></span>
+<span id="cb292-9"><a href="working-with-shiny.html#cb292-9"></a>  <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb292-10"><a href="working-with-shiny.html#cb292-10"></a></span>
+<span id="cb292-11"><a href="working-with-shiny.html#cb292-11"></a><span class="op">}</span></span></code></pre></div>
 <p>What the currently empty <code>send-alert</code> message handler should do is fetch the widget using the <code>id</code> sent from R with the <code>get_gio</code> function and then use the <code>addData</code> method to override the previously define arcs.</p>
-<div class="sourceCode" id="cb281"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb281-1"><a href="working-with-shiny.html#cb281-1"></a><span class="co">// gio.js</span></span>
-<span id="cb281-2"><a href="working-with-shiny.html#cb281-2"></a></span>
-<span id="cb281-3"><a href="working-with-shiny.html#cb281-3"></a><span class="co">// check if shiny running</span></span>
-<span id="cb281-4"><a href="working-with-shiny.html#cb281-4"></a><span class="cf">if</span> (<span class="va">HTMLWidgets</span>.<span class="at">shinyMode</span>)<span class="op">{</span></span>
-<span id="cb281-5"><a href="working-with-shiny.html#cb281-5"></a></span>
-<span id="cb281-6"><a href="working-with-shiny.html#cb281-6"></a>  <span class="co">// send-data message handler</span></span>
-<span id="cb281-7"><a href="working-with-shiny.html#cb281-7"></a>  <span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(type <span class="op">=</span> <span class="st">&#39;send-data&#39;</span><span class="op">,</span> <span class="kw">function</span>(message) <span class="op">{</span></span>
-<span id="cb281-8"><a href="working-with-shiny.html#cb281-8"></a></span>
-<span id="cb281-9"><a href="working-with-shiny.html#cb281-9"></a>    <span class="kw">var</span> controller <span class="op">=</span> <span class="at">get_gio</span>(<span class="va">message</span>.<span class="at">id</span>)<span class="op">;</span></span>
-<span id="cb281-10"><a href="working-with-shiny.html#cb281-10"></a>    <span class="va">controlle</span>.<span class="at">addData</span>(<span class="va">message</span>.<span class="at">data</span>)<span class="op">;</span></span>
-<span id="cb281-11"><a href="working-with-shiny.html#cb281-11"></a></span>
-<span id="cb281-12"><a href="working-with-shiny.html#cb281-12"></a>  <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb281-13"><a href="working-with-shiny.html#cb281-13"></a></span>
-<span id="cb281-14"><a href="working-with-shiny.html#cb281-14"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb293"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb293-1"><a href="working-with-shiny.html#cb293-1"></a><span class="co">// gio.js</span></span>
+<span id="cb293-2"><a href="working-with-shiny.html#cb293-2"></a></span>
+<span id="cb293-3"><a href="working-with-shiny.html#cb293-3"></a><span class="co">// check if shiny running</span></span>
+<span id="cb293-4"><a href="working-with-shiny.html#cb293-4"></a><span class="cf">if</span> (<span class="va">HTMLWidgets</span>.<span class="at">shinyMode</span>)<span class="op">{</span></span>
+<span id="cb293-5"><a href="working-with-shiny.html#cb293-5"></a></span>
+<span id="cb293-6"><a href="working-with-shiny.html#cb293-6"></a>  <span class="co">// send-data message handler</span></span>
+<span id="cb293-7"><a href="working-with-shiny.html#cb293-7"></a>  <span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(type <span class="op">=</span> <span class="st">&#39;send-data&#39;</span><span class="op">,</span> <span class="kw">function</span>(message) <span class="op">{</span></span>
+<span id="cb293-8"><a href="working-with-shiny.html#cb293-8"></a></span>
+<span id="cb293-9"><a href="working-with-shiny.html#cb293-9"></a>    <span class="kw">var</span> controller <span class="op">=</span> <span class="at">get_gio</span>(<span class="va">message</span>.<span class="at">id</span>)<span class="op">;</span></span>
+<span id="cb293-10"><a href="working-with-shiny.html#cb293-10"></a>    <span class="va">controlle</span>.<span class="at">addData</span>(<span class="va">message</span>.<span class="at">data</span>)<span class="op">;</span></span>
+<span id="cb293-11"><a href="working-with-shiny.html#cb293-11"></a></span>
+<span id="cb293-12"><a href="working-with-shiny.html#cb293-12"></a>  <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb293-13"><a href="working-with-shiny.html#cb293-13"></a></span>
+<span id="cb293-14"><a href="working-with-shiny.html#cb293-14"></a><span class="op">}</span></span></code></pre></div>
 <p>We can then build a shiny application to test the new functionality.</p>
-<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="working-with-shiny.html#cb282-1"></a><span class="kw">library</span>(gio)</span>
-<span id="cb282-2"><a href="working-with-shiny.html#cb282-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb282-3"><a href="working-with-shiny.html#cb282-3"></a></span>
-<span id="cb282-4"><a href="working-with-shiny.html#cb282-4"></a>arcs1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
-<span id="cb282-5"><a href="working-with-shiny.html#cb282-5"></a>  <span class="dt">e =</span> <span class="kw">c</span>(<span class="st">&quot;US&quot;</span>, <span class="st">&quot;CN&quot;</span>, <span class="st">&quot;RU&quot;</span>),</span>
-<span id="cb282-6"><a href="working-with-shiny.html#cb282-6"></a>  <span class="dt">i =</span> <span class="kw">c</span>(<span class="st">&quot;CN&quot;</span>, <span class="st">&quot;RU&quot;</span>, <span class="st">&quot;US&quot;</span>),</span>
-<span id="cb282-7"><a href="working-with-shiny.html#cb282-7"></a>  <span class="dt">v =</span> <span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">120</span>, <span class="dv">130</span>)</span>
-<span id="cb282-8"><a href="working-with-shiny.html#cb282-8"></a>)</span>
-<span id="cb282-9"><a href="working-with-shiny.html#cb282-9"></a></span>
-<span id="cb282-10"><a href="working-with-shiny.html#cb282-10"></a>arcs2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
-<span id="cb282-11"><a href="working-with-shiny.html#cb282-11"></a>  <span class="dt">e =</span> <span class="kw">c</span>(<span class="st">&quot;CN&quot;</span>, <span class="st">&quot;CN&quot;</span>, <span class="st">&quot;JP&quot;</span>),</span>
-<span id="cb282-12"><a href="working-with-shiny.html#cb282-12"></a>  <span class="dt">i =</span> <span class="kw">c</span>(<span class="st">&quot;IN&quot;</span>, <span class="st">&quot;JP&quot;</span>, <span class="st">&quot;US&quot;</span>),</span>
-<span id="cb282-13"><a href="working-with-shiny.html#cb282-13"></a>  <span class="dt">v =</span> <span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">120</span>, <span class="dv">130</span>)</span>
-<span id="cb282-14"><a href="working-with-shiny.html#cb282-14"></a>)</span>
-<span id="cb282-15"><a href="working-with-shiny.html#cb282-15"></a></span>
-<span id="cb282-16"><a href="working-with-shiny.html#cb282-16"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidRow</span>(</span>
-<span id="cb282-17"><a href="working-with-shiny.html#cb282-17"></a>  <span class="kw">selectInput</span>(</span>
-<span id="cb282-18"><a href="working-with-shiny.html#cb282-18"></a>    <span class="st">&quot;dataset&quot;</span>, </span>
-<span id="cb282-19"><a href="working-with-shiny.html#cb282-19"></a>    <span class="st">&quot;Select a dataset&quot;</span>, </span>
-<span id="cb282-20"><a href="working-with-shiny.html#cb282-20"></a>    <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;First&quot;</span>, <span class="st">&quot;Second&quot;</span>)</span>
-<span id="cb282-21"><a href="working-with-shiny.html#cb282-21"></a>  ),</span>
-<span id="cb282-22"><a href="working-with-shiny.html#cb282-22"></a>  <span class="kw">gioOutput</span>(<span class="st">&quot;globe&quot;</span>)</span>
-<span id="cb282-23"><a href="working-with-shiny.html#cb282-23"></a>)</span>
-<span id="cb282-24"><a href="working-with-shiny.html#cb282-24"></a></span>
-<span id="cb282-25"><a href="working-with-shiny.html#cb282-25"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb282-26"><a href="working-with-shiny.html#cb282-26"></a></span>
-<span id="cb282-27"><a href="working-with-shiny.html#cb282-27"></a>  reactive_arcs &lt;-<span class="st"> </span><span class="kw">reactive</span>({</span>
-<span id="cb282-28"><a href="working-with-shiny.html#cb282-28"></a>    <span class="cf">if</span>(input<span class="op">$</span>dataset <span class="op">==</span><span class="st"> &quot;First&quot;</span>) </span>
-<span id="cb282-29"><a href="working-with-shiny.html#cb282-29"></a>      <span class="kw">return</span>(arcs1)</span>
-<span id="cb282-30"><a href="working-with-shiny.html#cb282-30"></a>    <span class="kw">return</span>(arcs2)</span>
-<span id="cb282-31"><a href="working-with-shiny.html#cb282-31"></a>  })</span>
-<span id="cb282-32"><a href="working-with-shiny.html#cb282-32"></a></span>
-<span id="cb282-33"><a href="working-with-shiny.html#cb282-33"></a>  output<span class="op">$</span>globe &lt;-<span class="st"> </span><span class="kw">renderGio</span>({</span>
-<span id="cb282-34"><a href="working-with-shiny.html#cb282-34"></a>    <span class="kw">gio</span>(arcs1)</span>
-<span id="cb282-35"><a href="working-with-shiny.html#cb282-35"></a>  })</span>
-<span id="cb282-36"><a href="working-with-shiny.html#cb282-36"></a></span>
-<span id="cb282-37"><a href="working-with-shiny.html#cb282-37"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>dataset, {</span>
-<span id="cb282-38"><a href="working-with-shiny.html#cb282-38"></a>    <span class="cf">if</span>(input<span class="op">$</span>dataset <span class="op">==</span><span class="st"> &quot;First&quot;</span>)</span>
-<span id="cb282-39"><a href="working-with-shiny.html#cb282-39"></a>      data &lt;-<span class="st"> </span>arcs1</span>
-<span id="cb282-40"><a href="working-with-shiny.html#cb282-40"></a>    <span class="cf">else</span></span>
-<span id="cb282-41"><a href="working-with-shiny.html#cb282-41"></a>      data &lt;-<span class="st"> </span>arcs2</span>
-<span id="cb282-42"><a href="working-with-shiny.html#cb282-42"></a>    <span class="kw">gio_send_data</span>(<span class="st">&quot;globe&quot;</span>, data)</span>
-<span id="cb282-43"><a href="working-with-shiny.html#cb282-43"></a>  })</span>
-<span id="cb282-44"><a href="working-with-shiny.html#cb282-44"></a></span>
-<span id="cb282-45"><a href="working-with-shiny.html#cb282-45"></a>}</span>
-<span id="cb282-46"><a href="working-with-shiny.html#cb282-46"></a></span>
-<span id="cb282-47"><a href="working-with-shiny.html#cb282-47"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb294"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb294-1"><a href="working-with-shiny.html#cb294-1"></a><span class="kw">library</span>(gio)</span>
+<span id="cb294-2"><a href="working-with-shiny.html#cb294-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb294-3"><a href="working-with-shiny.html#cb294-3"></a></span>
+<span id="cb294-4"><a href="working-with-shiny.html#cb294-4"></a>arcs1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb294-5"><a href="working-with-shiny.html#cb294-5"></a>  <span class="dt">e =</span> <span class="kw">c</span>(<span class="st">&quot;US&quot;</span>, <span class="st">&quot;CN&quot;</span>, <span class="st">&quot;RU&quot;</span>),</span>
+<span id="cb294-6"><a href="working-with-shiny.html#cb294-6"></a>  <span class="dt">i =</span> <span class="kw">c</span>(<span class="st">&quot;CN&quot;</span>, <span class="st">&quot;RU&quot;</span>, <span class="st">&quot;US&quot;</span>),</span>
+<span id="cb294-7"><a href="working-with-shiny.html#cb294-7"></a>  <span class="dt">v =</span> <span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">120</span>, <span class="dv">130</span>)</span>
+<span id="cb294-8"><a href="working-with-shiny.html#cb294-8"></a>)</span>
+<span id="cb294-9"><a href="working-with-shiny.html#cb294-9"></a></span>
+<span id="cb294-10"><a href="working-with-shiny.html#cb294-10"></a>arcs2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb294-11"><a href="working-with-shiny.html#cb294-11"></a>  <span class="dt">e =</span> <span class="kw">c</span>(<span class="st">&quot;CN&quot;</span>, <span class="st">&quot;CN&quot;</span>, <span class="st">&quot;JP&quot;</span>),</span>
+<span id="cb294-12"><a href="working-with-shiny.html#cb294-12"></a>  <span class="dt">i =</span> <span class="kw">c</span>(<span class="st">&quot;IN&quot;</span>, <span class="st">&quot;JP&quot;</span>, <span class="st">&quot;US&quot;</span>),</span>
+<span id="cb294-13"><a href="working-with-shiny.html#cb294-13"></a>  <span class="dt">v =</span> <span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">120</span>, <span class="dv">130</span>)</span>
+<span id="cb294-14"><a href="working-with-shiny.html#cb294-14"></a>)</span>
+<span id="cb294-15"><a href="working-with-shiny.html#cb294-15"></a></span>
+<span id="cb294-16"><a href="working-with-shiny.html#cb294-16"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidRow</span>(</span>
+<span id="cb294-17"><a href="working-with-shiny.html#cb294-17"></a>  <span class="kw">selectInput</span>(</span>
+<span id="cb294-18"><a href="working-with-shiny.html#cb294-18"></a>    <span class="st">&quot;dataset&quot;</span>, </span>
+<span id="cb294-19"><a href="working-with-shiny.html#cb294-19"></a>    <span class="st">&quot;Select a dataset&quot;</span>, </span>
+<span id="cb294-20"><a href="working-with-shiny.html#cb294-20"></a>    <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;First&quot;</span>, <span class="st">&quot;Second&quot;</span>)</span>
+<span id="cb294-21"><a href="working-with-shiny.html#cb294-21"></a>  ),</span>
+<span id="cb294-22"><a href="working-with-shiny.html#cb294-22"></a>  <span class="kw">gioOutput</span>(<span class="st">&quot;globe&quot;</span>)</span>
+<span id="cb294-23"><a href="working-with-shiny.html#cb294-23"></a>)</span>
+<span id="cb294-24"><a href="working-with-shiny.html#cb294-24"></a></span>
+<span id="cb294-25"><a href="working-with-shiny.html#cb294-25"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb294-26"><a href="working-with-shiny.html#cb294-26"></a></span>
+<span id="cb294-27"><a href="working-with-shiny.html#cb294-27"></a>  reactive_arcs &lt;-<span class="st"> </span><span class="kw">reactive</span>({</span>
+<span id="cb294-28"><a href="working-with-shiny.html#cb294-28"></a>    <span class="cf">if</span>(input<span class="op">$</span>dataset <span class="op">==</span><span class="st"> &quot;First&quot;</span>) </span>
+<span id="cb294-29"><a href="working-with-shiny.html#cb294-29"></a>      <span class="kw">return</span>(arcs1)</span>
+<span id="cb294-30"><a href="working-with-shiny.html#cb294-30"></a>    <span class="kw">return</span>(arcs2)</span>
+<span id="cb294-31"><a href="working-with-shiny.html#cb294-31"></a>  })</span>
+<span id="cb294-32"><a href="working-with-shiny.html#cb294-32"></a></span>
+<span id="cb294-33"><a href="working-with-shiny.html#cb294-33"></a>  output<span class="op">$</span>globe &lt;-<span class="st"> </span><span class="kw">renderGio</span>({</span>
+<span id="cb294-34"><a href="working-with-shiny.html#cb294-34"></a>    <span class="kw">gio</span>(arcs1)</span>
+<span id="cb294-35"><a href="working-with-shiny.html#cb294-35"></a>  })</span>
+<span id="cb294-36"><a href="working-with-shiny.html#cb294-36"></a></span>
+<span id="cb294-37"><a href="working-with-shiny.html#cb294-37"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>dataset, {</span>
+<span id="cb294-38"><a href="working-with-shiny.html#cb294-38"></a>    <span class="cf">if</span>(input<span class="op">$</span>dataset <span class="op">==</span><span class="st"> &quot;First&quot;</span>)</span>
+<span id="cb294-39"><a href="working-with-shiny.html#cb294-39"></a>      data &lt;-<span class="st"> </span>arcs1</span>
+<span id="cb294-40"><a href="working-with-shiny.html#cb294-40"></a>    <span class="cf">else</span></span>
+<span id="cb294-41"><a href="working-with-shiny.html#cb294-41"></a>      data &lt;-<span class="st"> </span>arcs2</span>
+<span id="cb294-42"><a href="working-with-shiny.html#cb294-42"></a>    <span class="kw">gio_send_data</span>(<span class="st">&quot;globe&quot;</span>, data)</span>
+<span id="cb294-43"><a href="working-with-shiny.html#cb294-43"></a>  })</span>
+<span id="cb294-44"><a href="working-with-shiny.html#cb294-44"></a></span>
+<span id="cb294-45"><a href="working-with-shiny.html#cb294-45"></a>}</span>
+<span id="cb294-46"><a href="working-with-shiny.html#cb294-46"></a></span>
+<span id="cb294-47"><a href="working-with-shiny.html#cb294-47"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 
 </div>
 </div>
