@@ -30,6 +30,10 @@ HTMLWidgets.widget({
           Shiny.setInputValue(el.id + '_related:gio.related.countries', relatedCountries);
         }
 
+        // use stats
+        if(x.stats)
+          controller.enableStats();
+
         // render
         controller.init();
 
