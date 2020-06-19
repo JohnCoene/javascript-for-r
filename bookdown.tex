@@ -994,7 +994,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Fri Jun 19 2020 11:23:42 GMT+0200 (CEST)"
+## [1] "Fri Jun 19 2020 21:34:53 GMT+0200 (CEST)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1004,7 +1004,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Fri Jun 19 2020 11:23:42 GMT+0200 (CEST)"
+## [1] "Fri Jun 19 2020 21:34:53 GMT+0200 (CEST)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -2495,13 +2495,13 @@ If one wants to create such packages or make extensive use of such integrations 
 
 In this chapter we create a custom shiny output, in practical terms, custom \texttt{render*} and \texttt{*Output} functions to use in Shiny. Note that this is destined for the curious who want to grasp some understanding of how these functions work under the hood as it is often easier to create an htmlwidgets package (covered in the next chapter). Custom shiny outputs are akin to custom shiny inputs which are not covered in this book but are extensively discussed in David Granjon's book on \href{https://divadnojnarg.github.io/outstanding-shiny-ui/shiny-input-system.html}{Outstanding User Interfaces with Shiny}.
 
-We will demonstrate by creating a wrapper for \href{https://github.com/davidsonfellipe/lena.js}{lena.js}, a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs and there are much easier ways to apply such filters (e.g.: CSS).
+We will demonstrate by creating a wrapper for \href{https://github.com/davidsonfellipe/lena.js}{lena.js}, a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs, there are much easier ways to apply such filters (e.g.: CSS).
 
 \hypertarget{inner-workings}{%
 \section*{Inner-workings}\label{inner-workings}}
 
 
-At the core, this consists in creating the \texttt{render*} and \texttt{*Output} functions which are linked by an ``output binding'' in JavaScript. The latter function essentially creates an HTML element (e.g.: \texttt{\textless{}div\textgreater{}}) with its dependencies attached. Previous work with shiny and JavaScript covered in this book had no dedicated ``output'' element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: \texttt{usejBox}). However, since this is not the case here the dependencies can be attached together with the output.
+At the core, this consists in creating a \texttt{lena}, \texttt{renderLena} and \texttt{lenaOutput} functions (analogous to \texttt{plot}, \texttt{renderPlot}, \texttt{plotOutput}) which are linked by an ``output binding'' in JavaScript. The latter function essentially creates an HTML element (e.g.: \texttt{\textless{}div\textgreater{}}) with its dependencies attached. Previous work with shiny and JavaScript covered in this book had no dedicated ``output'' element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: \texttt{usejBox}). However, since this is not the case here the dependencies can be attached together with the output.
 
 Then the \texttt{render*} function will be very simple as, unlike previously, the data does not need to be sent to the front-end using \texttt{session\$sendCustomMessage} as this is handled by shiny itself under the hood.
 
@@ -2627,7 +2627,7 @@ The dependencies should be added to the above, since this function must be place
 \section*{Render}\label{render}}
 
 
-Onto coding the server-side functions that will work server-side
+Onto coding the server-side functions that will work server-side, we first define a function called ``lena'' which takes two arguments and return them as a list (which will eventually be used in JavaScript). First, the id of the image to apply the filter to and second the name of the filter to apply. Again, were we not creating a custom output we could use \texttt{session\$sendCustomMessage} to send that list of options JavaScript directly. Here we do not as it will be indirectly handled by the \texttt{render} function we are creating next.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2638,9 +2638,108 @@ Onto coding the server-side functions that will work server-side
 \end{Highlighting}
 \end{Shaded}
 
+The function \texttt{renderLena} should accept an expression, like other such \texttt{render*} function. For instance in the example below the \texttt{renderPlot} function does accept an expression which uses the \texttt{plot} function, not only the \texttt{plot} function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{output}\OperatorTok{$}\NormalTok{myPlot <{-}}\StringTok{ }\KeywordTok{renderPlot}\NormalTok{(\{}
+  \CommentTok{\# this is an expression}
+\NormalTok{  cars }\OperatorTok{\%>\%}\StringTok{ }
+\StringTok{    }\KeywordTok{head}\NormalTok{() }\OperatorTok{\%>\%}\StringTok{ }
+\StringTok{    }\KeywordTok{plot}\NormalTok{()}
+\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+The function \texttt{renderLena} takes an expression and other arguments that are passed to \texttt{shiny::exprToFunction} this does pretty much what it says on the tin. It returns a function from an expression (unless that expression is a function, in which case it returns the expression). This function must be further wrapped in another as the render function must itself return a function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export}
+\NormalTok{renderLena <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(expr, }\DataTypeTok{env =} \KeywordTok{parent.frame}\NormalTok{(), }\DataTypeTok{quoted =} \OtherTok{FALSE}\NormalTok{) \{}
+  \CommentTok{\# Convert the expression + environment into a function}
+\NormalTok{  func <{-}}\StringTok{ }\NormalTok{shiny}\OperatorTok{::}\KeywordTok{exprToFunction}\NormalTok{(expr, env, quoted)}
+
+  \ControlFlowTok{function}\NormalTok{()\{}
+    \KeywordTok{func}\NormalTok{()}
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+This covers all R-related code, what's yet missing is the JavaScript binding.
+
 \hypertarget{javascript-binding}{%
 \section*{JavaScript Binding}\label{javascript-binding}}
 
+
+Here we create an ``output binding,'' it tells Shiny how to find the component and how to interact with it. An output binding is initialised from \texttt{Shiny.OutputBinding}. Below we initialise a new binding.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// custom.js}
+\KeywordTok{var}\NormalTok{ lenaBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+Then, this must be ``extended'' by specifying a number of methods, a very necessary one being \texttt{find}. The first is used to look for the output HTML element in the document (\texttt{scope}), and return them as an array (\texttt{HTMLcollection}). Other methods all take an el argument; that value will always be an element that was returned from \texttt{find}. A very straightforward way to accomplish this is to use jQuery's find method to identify elements with the \texttt{lena} class used in \texttt{lenaOutput}. You are by no means forced to use a CSS class to identify the elements but there is no reason not to.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// custom.js}
+\KeywordTok{var}\NormalTok{ lenaBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(lenaBinding}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".lena"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+One might then want to use the \texttt{getId}, a method to return the \texttt{id} of the element, by default, as can be seen in the \href{https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js}{source code}, shiny looks for the id as the \texttt{data-input-id} attribute and if that is not found it looks for the element's \texttt{id}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// getId default}
+\KeywordTok{this}\NormalTok{.}\AttributeTok{getId} \OperatorTok{=} \KeywordTok{function}\NormalTok{(el) }\OperatorTok{\{}
+  \ControlFlowTok{return}\NormalTok{ el[}\StringTok{\textquotesingle{}data{-}input{-}id\textquotesingle{}}\NormalTok{] }\OperatorTok{||} \VariableTok{el}\NormalTok{.}\AttributeTok{id}\OperatorTok{;}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Since we use the element id, this can be skipped entirely and last crucial method: \texttt{renderValue}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// custom.js}
+\KeywordTok{var}\NormalTok{ lenaBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(lenaBinding}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".lena"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ data) }\OperatorTok{\{}
+
+    \AttributeTok{$}\NormalTok{(document).}\AttributeTok{ready}\NormalTok{(}\KeywordTok{function}\NormalTok{()}\OperatorTok{\{}
+      \CommentTok{// Get the image}
+      \KeywordTok{var}\NormalTok{ originalImage }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{data}\NormalTok{.}\AttributeTok{img\_id}\NormalTok{)}\OperatorTok{;}
+      \CommentTok{// The canvas where the processed image will be rendered (With filter)}
+      \KeywordTok{var}\NormalTok{ filteredImageCanvas }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
+
+      \CommentTok{// Filter to apply, in this case the red filter}
+      \KeywordTok{var}\NormalTok{ filter }\OperatorTok{=}\NormalTok{ LenaJS[}\VariableTok{data}\NormalTok{.}\AttributeTok{filter}\NormalTok{]}\OperatorTok{;}
+
+      \CommentTok{// Apply the filter}
+      \VariableTok{LenaJS}\NormalTok{.}\AttributeTok{filterImage}\NormalTok{(filteredImageCanvas}\OperatorTok{,}\NormalTok{ filter}\OperatorTok{,}\NormalTok{ originalImage)}\OperatorTok{;}
+    \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+  
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+
+\VariableTok{Shiny}\NormalTok{.}\VariableTok{outputBindings}\NormalTok{.}\AttributeTok{register}\NormalTok{(lenaBinding}\OperatorTok{,} \StringTok{"johnCoene.lenaBinding"}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{part-data-visualisation}{%
 \part{Data Visualisation}\label{part-data-visualisation}}

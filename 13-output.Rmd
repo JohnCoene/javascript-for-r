@@ -2,11 +2,11 @@
 
 In this chapter we create a custom shiny output, in practical terms, custom `render*` and `*Output` functions to use in Shiny. Note that this is destined for the curious who want to grasp some understanding of how these functions work under the hood as it is often easier to create an htmlwidgets package (covered in the next chapter). Custom shiny outputs are akin to custom shiny inputs which are not covered in this book but are extensively discussed in David Granjon's book on [Outstanding User Interfaces with Shiny](https://divadnojnarg.github.io/outstanding-shiny-ui/shiny-input-system.html).
 
-We will demonstrate by creating a wrapper for [lena.js](https://github.com/davidsonfellipe/lena.js), a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs and there are much easier ways to apply such filters (e.g.: CSS). 
+We will demonstrate by creating a wrapper for [lena.js](https://github.com/davidsonfellipe/lena.js), a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs, there are much easier ways to apply such filters (e.g.: CSS). 
 
 ## Inner-workings {-}
 
-At the core, this consists in creating the `render*` and `*Output` functions which are linked by an "output binding" in JavaScript. The latter function essentially creates an HTML element (e.g.: `<div>`) with its dependencies attached. Previous work with shiny and JavaScript covered in this book had no dedicated "output" element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: `usejBox`). However, since this is not the case here the dependencies can be attached together with the output.
+At the core, this consists in creating a `lena`, `renderLena` and `lenaOutput` functions (analogous to `plot`, `renderPlot`, `plotOutput`) which are linked by an "output binding" in JavaScript. The latter function essentially creates an HTML element (e.g.: `<div>`) with its dependencies attached. Previous work with shiny and JavaScript covered in this book had no dedicated "output" element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: `usejBox`). However, since this is not the case here the dependencies can be attached together with the output.
 
 Then the `render*` function will be very simple as, unlike previously, the data does not need to be sent to the front-end using `session$sendCustomMessage` as this is handled by shiny itself under the hood.
 
@@ -107,7 +107,7 @@ lenaOutput <- function(id){
 
 ## Render {-}
 
-Onto coding the server-side functions that will work server-side
+Onto coding the server-side functions that will work server-side, we first define a function called "lena" which takes two arguments and return them as a list (which will eventually be used in JavaScript). First, the id of the image to apply the filter to and second the name of the filter to apply. Again, were we not creating a custom output we could use `session$sendCustomMessage` to send that list of options JavaScript directly. Here we do not as it will be indirectly handled by the `render` function we are creating next. 
 
 ```r
 #' @export
@@ -116,4 +116,92 @@ lena <- function(img_id, filter = "red"){
 }
 ```
 
+The function `renderLena` should accept an expression, like other such `render*` function. For instance in the example below the `renderPlot` function does accept an expression which uses the `plot` function, not only the `plot` function.
+
+```r
+output$myPlot <- renderPlot({
+  # this is an expression
+  cars %>% 
+    head() %>% 
+    plot()
+})
+```
+
+The function `renderLena` takes an expression and other arguments that are passed to `shiny::exprToFunction` this does pretty much what it says on the tin. It returns a function from an expression (unless that expression is a function, in which case it returns the expression). This function must be further wrapped in another as the render function must itself return a function.
+
+```r
+#' @export
+renderLena <- function(expr, env = parent.frame(), quoted = FALSE) {
+  # Convert the expression + environment into a function
+  func <- shiny::exprToFunction(expr, env, quoted)
+
+  function(){
+    func()
+  }
+}
+```
+
+This covers all R-related code, what's yet missing is the JavaScript binding.
+
 ## JavaScript Binding {-}
+
+Here we create an "output binding," it tells Shiny how to find the component and how to interact with it. An output binding is initialised from `Shiny.OutputBinding`. Below we initialise a new binding.
+
+```js
+// custom.js
+var lenaBinding = new Shiny.OutputBinding();
+```
+
+Then, this must be "extended" by specifying a number of methods, a very necessary one being `find`. The first is used to look for the output HTML element in the document (`scope`), and return them as an array (`HTMLcollection`). Other methods all take an el argument; that value will always be an element that was returned from `find`. A very straightforward way to accomplish this is to use jQuery’s find method to identify elements with the `lena` class used in `lenaOutput`. You are by no means forced to use a CSS class to identify the elements but there is no reason not to.
+
+```js
+// custom.js
+var lenaBinding = new Shiny.OutputBinding();
+
+$.extend(lenaBinding, {
+  find: function(scope) {
+    return $(scope).find(".lena");
+  }
+});
+```
+
+One might then want to use the `getId`, a method to return the `id` of the element, by default, as can be seen in the [source code](https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js), shiny looks for the id as the `data-input-id` attribute and if that is not found it looks for the element's `id`.
+
+```js
+// getId default
+this.getId = function(el) {
+  return el['data-input-id'] || el.id;
+}
+```
+
+Since we use the element id, this can be skipped entirely and last crucial method: `renderValue`.
+
+
+```js
+// custom.js
+var lenaBinding = new Shiny.OutputBinding();
+
+$.extend(lenaBinding, {
+  find: function(scope) {
+    return $(scope).find(".lena");
+  },
+  renderValue: function(el, data) {
+
+    $(document).ready(function(){
+      // Get the image
+      var originalImage = document.getElementById(data.img_id);
+      // The canvas where the processed image will be rendered (With filter)
+      var filteredImageCanvas = document.getElementById(el.id);
+
+      // Filter to apply, in this case the red filter
+      var filter = LenaJS[data.filter];
+
+      // Apply the filter
+      LenaJS.filterImage(filteredImageCanvas, filter, originalImage);
+    });
+  
+  }
+});
+
+Shiny.outputBindings.register(lenaBinding, "johnCoene.lenaBinding");
+```
