@@ -1,4 +1,4 @@
-# Advanced Usage
+# Advanced Topics
 
 In the previous chapter we put together an interesting, fully functioning widget but it lacks polish and does not use all the features htmlwidgets provides, this chapter explores those. We look into handling the size of widgets to ensure they are responsive as well as discuss potential security concerns and how to address them. Finally we show how to pass JavaScript code from R to JavaScript and how to add HTML content before and after our widget.
 
@@ -294,7 +294,7 @@ gio_stats <- function(g){
 }
 ```
 
-Then we use the htmltools package to create a dependency, the `htmltools::htmlDependency` function returns an object of class `html_dependency` which htmlwidgets can understand subsequently insert in the output. On the `src` parameter, since we reference a dependency from the filesystem we name the character string `file` but we could use the CDN directly and name it `href` instead.
+Then we use the htmltools package to create a dependency, the `htmltools::htmlDependency` function returns an object of class `html_dependency` which htmlwidgets can understand and subsequently insert in the output. On the `src` parameter, since we reference a dependency from the filesystem we name the character string `file` but we could use the CDN (web hosted file) and name it `href` instead.
 
 ```r
 # stats.R
@@ -364,6 +364,7 @@ gio_stats <- function(g){
 Then it's a matter of using the `stats` variable added to `x` in the JavaScript `renderValue` function to determine whether the stats feature should be enabled.
 
 ```js
+// gio.js
 if(x.stats)
   controller.enableStats();
 
@@ -383,7 +384,7 @@ arcs %>%
 
 ## Compatibility {-}  
 
-One issue that might arise is that of compatibility between widgets. What if someone else builds another htmlwidget for gio.js which uses a different version of the library and that a user decides to use both packages in a shiny app or R markdown document? Something is likely to fail as two different version of gio.js are imported and that one overrides the other. For instance, the package echarts4r [@R-echarts4r] allows working with leaflet which could clash with the leaflet package.
+One issue that might arise is that of compatibility between widgets. What if someone else builds another htmlwidget for gio.js which uses a different version of the library and that a user decides to use both packages in a shiny app or R markdown document? Something is likely to fail as two different version of gio.js are imported and that one overrides the other. For instance, the package echarts4r [@R-echarts4r] allows working with leaflet but including the dependencies could clash with the leaflet package itself, therefore it uses the dependencies from the leaflet package instead.
 
 The htmlwidgets package comes with a function to extract the dependencies from a widget, which can be useful to use those thereby ensuring no JavaScript dependency clash. The function `htmlwidgets::getDependency` returns a list of objects of class `html_dependency` and can therefore be used as demonstrated in the previous section.
 

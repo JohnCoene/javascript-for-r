@@ -1,0 +1,119 @@
+# Custom Outputs
+
+In this chapter we create a custom shiny output, in practical terms, custom `render*` and `*Output` functions to use in Shiny. Note that this is destined for the curious who want to grasp some understanding of how these functions work under the hood as it is often easier to create an htmlwidgets package (covered in the next chapter). Custom shiny outputs are akin to custom shiny inputs which are not covered in this book but are extensively discussed in David Granjon's book on [Outstanding User Interfaces with Shiny](https://divadnojnarg.github.io/outstanding-shiny-ui/shiny-input-system.html).
+
+We will demonstrate by creating a wrapper for [lena.js](https://github.com/davidsonfellipe/lena.js), a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs and there are much easier ways to apply such filters (e.g.: CSS). 
+
+## Inner-workings {-}
+
+At the core, this consists in creating the `render*` and `*Output` functions which are linked by an "output binding" in JavaScript. The latter function essentially creates an HTML element (e.g.: `<div>`) with its dependencies attached. Previous work with shiny and JavaScript covered in this book had no dedicated "output" element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: `usejBox`). However, since this is not the case here the dependencies can be attached together with the output.
+
+Then the `render*` function will be very simple as, unlike previously, the data does not need to be sent to the front-end using `session$sendCustomMessage` as this is handled by shiny itself under the hood.
+
+Finally, the two R functions are "bound" JavaScript-side with an "output binding" that matches the data from the `render*` function with its output.
+
+## Setup {-}
+
+Start by creating a package called "lena."
+
+```r
+usethis::create_package("lena")
+```
+
+Then, from the root of the package, create the `inst` directory and `assets` subdirectory then download and place the `lena.js` dependency within it.
+
+```r
+dir.create("inst/assets", recursive = TRUE)
+
+url <- paste0(
+  "https://raw.githubusercontent.com/davidsonfellipe/",
+  "lena.js/master/dist/lena.min.js"
+)
+download.file(url, "inst/assets/lena.min.js")
+```
+
+We also need to create a JavaScript file that will include the custom JavaScript code that will eventually generate the custom output.
+
+```r
+file.create("inst/assets/custom.js")
+```
+
+At this point one should have a package directory looking like the tree below.
+
+```
+.
+├── DESCRIPTION
+├── NAMESPACE
+├── R
+├── inst
+│   └── assets
+│       ├── custom.js
+│       └── lena.min.js
+└── man
+```
+
+## Output {-}
+
+Then we create the `zzz.R` file in the `R` directory that will serve the assets previously created at the `/lena-assets` path.
+
+```r
+# zzz.R
+.onLoad <- function(libname, pkgname) {
+  shiny::addResourcePath(
+    "lena-assets",
+    system.file("assets", package = "lena")
+  )
+}
+```
+
+Then we can create the `lenaOutput` function. This function should return an HTML tag which bears at least an `id` and a `class`. The first is to be used by the user of the function in Shiny just like any other such outputs. For instance, `plotOutput` creates a `<div>` the `id` of which is actually the `id` used in the `plotOutput` function.
+
+```{r}
+# the id is used as id to the element
+shiny::plotOutput("myPlotId")
+```
+
+Note that the above also includes a `class`, this is used JavaScript-side to "find" the outputs in the DOM (document object model) and generate the output. This by no means has to be a class, it can other attributes. The function `lenaOutput` could thus use like below, the `id` is passed along to the `<canvas>` which is created with a `lena` class that will be used in the output binding to find that element and generate the output within it.
+
+```r
+#' @export
+lenaOutput <- function(id){
+  tags$canvas(id = id, class = "lena")
+}
+```
+
+The dependencies should be added to the above, since this function must be placed in the UI for anything to work we can have the dependencies piggyback on the output element. This works using the htmltools package. The function `htmltools::htmlDependency` is used to create a dependency that is then attached with `htmltools::attachDependencies`. While the former creates an object that shiny can understand and translate into `<script>` or `<style>` tags, the former attaches them to the output object and ensures dependencies are not imported multiple times (e.g.: when `lenaOutput` is used more than once).
+
+```r
+#' @export
+lenaOutput <- function(id){
+  el <- shiny::tags$canvas(id = id, class = "lena")
+
+  path <- system.file("assets", package = "lena")
+
+  deps <- list(
+    htmltools::htmlDependency(
+      name = "lena",
+      version = "1.0",
+      src = c(file = path),
+      script = c("lena.min.js", "custom.js")
+    )
+  )
+
+  htmltools::attachDependencies(el, deps)
+
+}
+```
+
+## Render {-}
+
+Onto coding the server-side functions that will work server-side
+
+```r
+#' @export
+lena <- function(img_id, filter = "red"){
+  list(img_id = img_id, filter = filter)
+}
+```
+
+## JavaScript Binding {-}
