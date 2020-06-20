@@ -66,12 +66,8 @@ if (HTMLWidgets.shinyMode){
 
   // send-data message handler
   Shiny.addCustomMessageHandler(type = 'send-data', function(message) {
-
-    console.log(message);
-
     var controller = get_gio(message.id);
     controller.addData(message.data);
-
   });
 
 }
