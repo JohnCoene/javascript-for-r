@@ -2,15 +2,15 @@
 
 In this chapter we create a custom shiny output, in practical terms, custom `render*` and `*Output` functions to use in Shiny. Note that this is destined for the curious who want to grasp some understanding of how these functions work under the hood as it is often easier to create an htmlwidgets package (covered in the next chapter). Custom shiny outputs are akin to custom shiny inputs which are not covered in this book but are extensively discussed in David Granjon's book on [Outstanding User Interfaces with Shiny](https://divadnojnarg.github.io/outstanding-shiny-ui/shiny-input-system.html).
 
-We will demonstrate by creating a wrapper for [lena.js](https://github.com/davidsonfellipe/lena.js), a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs, there are much easier ways to apply such filters (e.g.: CSS). 
+We will demonstrate by creating a wrapper for [lena.js](https://github.com/davidsonfellipe/lena.js), a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs, there are much easier ways to apply such filters ina shiny application (e.g.: CSS). 
 
 ## Inner-workings {-}
 
-At the core, this consists in creating a `lena`, `renderLena` and `lenaOutput` functions (analogous to `plot`, `renderPlot`, `plotOutput`) which are linked by an "output binding" in JavaScript. The latter function essentially creates an HTML element (e.g.: `<div>`) with its dependencies attached. Previous work with shiny and JavaScript covered in this book had no dedicated "output" element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: `usejBox`). However, since this is not the case here the dependencies can be attached together with the output.
+At the core, this consists in creating a `lena`, `renderLena` and `lenaOutput` functions (analogous to `plot`, `renderPlot`, `plotOutput`) which are linked by an "output binding" in JavaScript. The latter function essentially creates an HTML element (e.g.: `<div>`) with its dependencies attached, the former `render*` rather straightforward, unlike previous examples, the data does not need to be explicitly sent to the front-end using `session$sendCustomMessage` as this is handled by shiny itself under the hood.
 
-Then the `render*` function will be very simple as, unlike previously, the data does not need to be sent to the front-end using `session$sendCustomMessage` as this is handled by shiny itself under the hood.
+Previous work with shiny and JavaScript covered in this book had no dedicated "output" element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: `usejBox`). However, since this is not the case here the dependencies can be attached together with the output.
 
-Finally, the two R functions are "bound" JavaScript-side with an "output binding" that matches the data from the `render*` function with its output.
+Finally, the two R functions are "bound" JavaScript-side with an "output binding" that renders the data from the `render*` function with its `*output`.
 
 ## Setup {-}
 
@@ -54,19 +54,7 @@ At this point one should have a package directory looking like the tree below.
 
 ## Output {-}
 
-Then we create the `zzz.R` file in the `R` directory that will serve the assets previously created at the `/lena-assets` path.
-
-```r
-# zzz.R
-.onLoad <- function(libname, pkgname) {
-  shiny::addResourcePath(
-    "lena-assets",
-    system.file("assets", package = "lena")
-  )
-}
-```
-
-Then we can create the `lenaOutput` function. This function should return an HTML tag which bears at least an `id` and a `class`. The first is to be used by the user of the function in Shiny just like any other such outputs. For instance, `plotOutput` creates a `<div>` the `id` of which is actually the `id` used in the `plotOutput` function.
+We can then create the `lenaOutput` function. This function should return an HTML tag which bears an `id`, or a `data-input-id` attribute (more on that later) and a `class`. The first is to be used by the user of the function in Shiny just like any other such outputs. For instance, `plotOutput` creates a `<div>` the `id` of which is actually the `id` used in the `plotOutput` function.
 
 ```r
 # the id is used as id to the element
