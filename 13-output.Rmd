@@ -1,7 +1,6 @@
 # Custom Outputs
 
-In this chapter we create a custom shiny output, in practical terms, custom `render*` and `*Output` functions to use in Shiny. Note that this is destined for the curious who want to grasp some understanding of how these functions work under the hood as it is often easier to create an htmlwidgets package (covered in the next chapter). Custom shiny outputs are akin to custom shiny inputs which are not covered in this book but are extensively discussed in David Granjon's book on [Outstanding User Interfaces with Shiny](https://divadnojnarg.github.io/outstanding-shiny-ui/shiny-input-system.html).
-
+In this chapter we create a custom shiny output, in practical terms, custom `render*` and `*Output` functions to use in Shiny. Note that this is destined for the curious who want to grasp some understanding of how these functions work under the hood as it is __often easier to create an htmlwidgets package__
 We will demonstrate by creating a wrapper for [lena.js](https://github.com/davidsonfellipe/lena.js), a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs, there are much easier ways to apply such filters ina shiny application (e.g.: CSS). 
 
 ## Inner-workings {-}
@@ -51,9 +50,9 @@ Let us take a look at an example of lena.js. The library reads the original imag
 </html>
 ```
 
-![Demo of lena.js](images/lena-demo.png)
+![Demo of lena.js - inverted colors](images/lena-demo.png)
 
-Therefore, there should be a `lenaOutput` that creates the `<canvas>`, a `renderLena` function that renders the output of `lena` which itself accepts the id of the image to filter as well as the filter to apply. Finally, there will be a "output binding" which will include the JavaScript code included in the `<script>` tags above.
+Therefore, there should be a `lenaOutput` function that creates the `<canvas>`, a `renderLena` function that sends the output of `lena` which itself accepts the id of the image to filter as well as the filter to apply. Finally, there will be a "output binding" which will include the JavaScript code included in the `<script>` tags above.
 
 ## Setup {-}
 
@@ -101,7 +100,7 @@ We can then create the `lenaOutput` function. This function should return an HTM
 
 ```r
 # the id is used as id to the element
-shiny::plotOutput("myPlotId")
+shiny::plotOutput(id = "myPlotId")
 ```
 
 ```{r, echo=FALSE}
@@ -129,7 +128,7 @@ lenaOutput <- function(id){
   deps <- list(
     htmltools::htmlDependency(
       name = "lena",
-      version = "1.0",
+      version = "0.2.0",
       src = c(file = path),
       script = c("lena.min.js", "custom.js")
     )
@@ -200,7 +199,7 @@ $.extend(lenaBinding, {
 });
 ```
 
-One might then want to use the `getId`, a method to return the `id` of the element, by default, as can be seen in the [source code](https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js), shiny looks for the id as the `data-input-id` attribute and if that is not found it looks for the element's `id`.
+One might then want to use the `getId`, a method to return the `id` of the element, by default, as can be seen in the [source code](https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js) (below), shiny looks for the id as the `data-input-id` attribute and if that is not found it looks for the element's `id`.
 
 ```js
 // getId default
@@ -209,8 +208,38 @@ this.getId = function(el) {
 }
 ```
 
-Since we use the element id, this can be skipped entirely and last crucial method: `renderValue`.
+Since we use the element id the default will work and this can be skipped entirely. Next, one needs to implement the `renderValue` function which is the very function that generates the output based on data used in `lena` and sent to the front-end with `renderLena`. The `renderValue` accepts two arguments, first `el` the element where the output should be generated, this is effectively the output of `lenaOutput` which the binding found using `find` and `getId`. Second, `data`, this is the output of `lena` sent by `renderLena`.
+ 
+```js
+// custom.js
+var lenaBinding = new Shiny.OutputBinding();
 
+$.extend(lenaBinding, {
+  find: function(scope) {
+    return $(scope).find(".lena");
+  },
+  renderValue: function(el, data) {
+
+    $(document).ready(function(){
+      // Get the image
+      var originalImage = document.getElementById(data.img_id);
+      // The canvas where the processed image will be rendered (With filter)
+      var filteredImageCanvas = document.getElementById(el.id);
+
+      // Filter to apply, in this case the red filter
+      var filter = LenaJS[data.filter];
+
+      // Apply the filter
+      LenaJS.filterImage(filteredImageCanvas, filter, originalImage);
+    });
+  
+  }
+});
+``` 
+
+Finally, the output binding is registered with shiny. Note that it uses a unique string identifier, the [documentation](https://shiny.rstudio.com/articles/building-outputs.html) states:
+
+> At the moment it is unused but future features may depend on it.
 
 ```js
 // custom.js
@@ -238,5 +267,42 @@ $.extend(lenaBinding, {
   }
 });
 
-Shiny.outputBindings.register(lenaBinding, "johnCoene.lenaBinding");
+Shiny.outputBindings.register(lenaBinding, "lenaPackage.lenaBinding");
 ```
+
+## Test
+
+In order to test the package, an image needs to be downloaded in order to test it otherwise a Cross-Origin Resource Sharing (CORS) error will occur. Below we create a directory for the static files and download the R logo to test lena.
+
+```r
+dir.create("www")
+download.file("https://www.r-project.org/Rlogo.png", "www/r-logo.png")
+```
+
+After running `devtools::document` and `devtools::install` one is ready to test the package.
+
+```r
+library(lena)
+library(shiny)
+
+shiny::addResourcePath("www", "www")
+
+ui <- fluidPage(
+  tags$img(src = "www/r-logo.png", id = "toFilter"),
+  lenaOutput("filtered")
+)
+
+server <- function(input, output){
+
+  output$filtered <- renderLena({
+    lena("toFilter", "invert")
+  })
+
+}
+
+shinyApp(ui, server)
+```
+
+![Lena test with R logo](images/lena-test.png)
+
+As mentioned at the start of this chapter, this was really intended as a learning experience. There are great limitations to the package created, namely it cannot be used outside of shiny (when it should). As will be demonstrated in the following chapters, using htmlwidgets with lena would be far easier.

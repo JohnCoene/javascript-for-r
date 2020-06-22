@@ -11,7 +11,7 @@ ui <- fluidPage(
 server <- function(input, output){
 
   output$filtered <- renderLena({
-    lena("toFilter", "roberts")
+    lena("toFilter", "invert")
   })
 
 }

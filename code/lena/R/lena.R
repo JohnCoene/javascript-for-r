@@ -22,7 +22,7 @@ lenaOutput <- function(id){
   deps <- list(
     htmltools::htmlDependency(
       name = "lena",
-      version = "1.0",
+      version = "0.2.0",
       src = c(file = path),
       script = c("lena.min.js", "custom.js")
     )
