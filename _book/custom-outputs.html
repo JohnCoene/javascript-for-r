@@ -215,6 +215,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6" data-path="custom-outputs.html"><a href="custom-outputs.html"><i class="fa fa-check"></i><b>6</b> Custom Outputs</a>
 <ul>
 <li class="chapter" data-level="" data-path="custom-outputs.html"><a href="custom-outputs.html#inner-workings"><i class="fa fa-check"></i>Inner-workings</a></li>
+<li class="chapter" data-level="6.1" data-path="custom-outputs.html"><a href="custom-outputs.html#discover-lena.js"><i class="fa fa-check"></i><b>6.1</b> Discover Lena.js</a></li>
 <li class="chapter" data-level="" data-path="custom-outputs.html"><a href="custom-outputs.html#setup"><i class="fa fa-check"></i>Setup</a></li>
 <li class="chapter" data-level="" data-path="custom-outputs.html"><a href="custom-outputs.html#output"><i class="fa fa-check"></i>Output</a></li>
 <li class="chapter" data-level="" data-path="custom-outputs.html"><a href="custom-outputs.html#render"><i class="fa fa-check"></i>Render</a></li>
@@ -305,27 +306,68 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="custom-outputs" class="section level1" number="6">
 <h1><span class="header-section-number">Chapter 6</span> Custom Outputs</h1>
 <p>In this chapter we create a custom shiny output, in practical terms, custom <code>render*</code> and <code>*Output</code> functions to use in Shiny. Note that this is destined for the curious who want to grasp some understanding of how these functions work under the hood as it is often easier to create an htmlwidgets package (covered in the next chapter). Custom shiny outputs are akin to custom shiny inputs which are not covered in this book but are extensively discussed in David Granjon’s book on <a href="https://divadnojnarg.github.io/outstanding-shiny-ui/shiny-input-system.html">Outstanding User Interfaces with Shiny</a>.</p>
-<p>We will demonstrate by creating a wrapper for <a href="https://github.com/davidsonfellipe/lena.js">lena.js</a>, a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs, there are much easier ways to apply such filters (e.g.: CSS).</p>
+<p>We will demonstrate by creating a wrapper for <a href="https://github.com/davidsonfellipe/lena.js">lena.js</a>, a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs, there are much easier ways to apply such filters ina shiny application (e.g.: CSS).</p>
 <div id="inner-workings" class="section level2 unnumbered" number="">
 <h2>Inner-workings</h2>
-<p>At the core, this consists in creating a <code>lena</code>, <code>renderLena</code> and <code>lenaOutput</code> functions (analogous to <code>plot</code>, <code>renderPlot</code>, <code>plotOutput</code>) which are linked by an “output binding” in JavaScript. The latter function essentially creates an HTML element (e.g.: <code>&lt;div&gt;</code>) with its dependencies attached. Previous work with shiny and JavaScript covered in this book had no dedicated “output” element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: <code>usejBox</code>). However, since this is not the case here the dependencies can be attached together with the output.</p>
-<p>Then the <code>render*</code> function will be very simple as, unlike previously, the data does not need to be sent to the front-end using <code>session$sendCustomMessage</code> as this is handled by shiny itself under the hood.</p>
-<p>Finally, the two R functions are “bound” JavaScript-side with an “output binding” that matches the data from the <code>render*</code> function with its output.</p>
+<p>At the core, this consists in creating a <code>lena</code>, <code>renderLena</code> and <code>lenaOutput</code> functions (analogous to <code>plot</code>, <code>renderPlot</code>, <code>plotOutput</code>) which are linked by an “output binding” in JavaScript. The latter function essentially creates an HTML element (e.g.: <code>&lt;div&gt;</code>) with its dependencies attached, the former <code>render*</code> rather straightforward, unlike previous examples, the data does not need to be explicitly sent to the front-end using <code>session$sendCustomMessage</code> as this is handled by shiny itself under the hood.</p>
+<p>Previous work with shiny and JavaScript covered in this book had no dedicated “output” element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: <code>usejBox</code>). However, since this is not the case here the dependencies can be attached together with the output.</p>
+<p>Finally, the two R functions are “bound” JavaScript-side with an “output binding” that renders the data from the <code>render*</code> function with its <code>*output</code>.</p>
+</div>
+<div id="discover-lena.js" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> Discover Lena.js</h2>
+<p>Let us take a look at an example of lena.js. The library reads the original image and outputs the filtered image in a <code>&lt;canvas&gt;</code>. There are many filters to chose from.</p>
+<div class="sourceCode" id="cb170"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb170-1"><a href="custom-outputs.html#cb170-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
+<span id="cb170-2"><a href="custom-outputs.html#cb170-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb170-3"><a href="custom-outputs.html#cb170-3"></a></span>
+<span id="cb170-4"><a href="custom-outputs.html#cb170-4"></a><span class="kw">&lt;head&gt;</span></span>
+<span id="cb170-5"><a href="custom-outputs.html#cb170-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
+<span id="cb170-6"><a href="custom-outputs.html#cb170-6"></a>  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;lena.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb170-7"><a href="custom-outputs.html#cb170-7"></a><span class="kw">&lt;/head&gt;</span></span>
+<span id="cb170-8"><a href="custom-outputs.html#cb170-8"></a></span>
+<span id="cb170-9"><a href="custom-outputs.html#cb170-9"></a><span class="kw">&lt;body&gt;</span></span>
+<span id="cb170-10"><a href="custom-outputs.html#cb170-10"></a>  <span class="co">&lt;!-- Image to apply filter --&gt;</span></span>
+<span id="cb170-11"><a href="custom-outputs.html#cb170-11"></a>  <span class="kw">&lt;img</span><span class="ot"> id=</span><span class="st">&quot;original-image&quot;</span><span class="ot"> src=</span><span class="st">&quot;./image.png&quot;</span> <span class="kw">/&gt;</span></span>
+<span id="cb170-12"><a href="custom-outputs.html#cb170-12"></a></span>
+<span id="cb170-13"><a href="custom-outputs.html#cb170-13"></a>  <span class="co">&lt;!-- div to hold visualisation --&gt;</span></span>
+<span id="cb170-14"><a href="custom-outputs.html#cb170-14"></a>  <span class="kw">&lt;canvas</span><span class="ot"> id=</span><span class="st">&quot;lena&quot;</span><span class="kw">&gt;&lt;/canvas&gt;</span></span>
+<span id="cb170-15"><a href="custom-outputs.html#cb170-15"></a></span>
+<span id="cb170-16"><a href="custom-outputs.html#cb170-16"></a>  <span class="co">&lt;!-- Script to create visualisation --&gt;</span></span>
+<span id="cb170-17"><a href="custom-outputs.html#cb170-17"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb170-18"><a href="custom-outputs.html#cb170-18"></a>    <span class="co">// Get the image</span></span>
+<span id="cb170-19"><a href="custom-outputs.html#cb170-19"></a>    <span class="kw">var</span> originalImage <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&quot;original-image&quot;</span>)<span class="op">;</span></span>
+<span id="cb170-20"><a href="custom-outputs.html#cb170-20"></a></span>
+<span id="cb170-21"><a href="custom-outputs.html#cb170-21"></a>    <span class="co">// The canvas where the processed image will be rendered (With filter)</span></span>
+<span id="cb170-22"><a href="custom-outputs.html#cb170-22"></a>    <span class="kw">var</span> filteredImageCanvas <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&quot;lena&quot;</span>)<span class="op">;</span></span>
+<span id="cb170-23"><a href="custom-outputs.html#cb170-23"></a></span>
+<span id="cb170-24"><a href="custom-outputs.html#cb170-24"></a>    <span class="co">// Filter to apply, in this case the red filter</span></span>
+<span id="cb170-25"><a href="custom-outputs.html#cb170-25"></a>    <span class="kw">var</span> filter <span class="op">=</span> LenaJS[<span class="st">&quot;red&quot;</span>]<span class="op">;</span></span>
+<span id="cb170-26"><a href="custom-outputs.html#cb170-26"></a></span>
+<span id="cb170-27"><a href="custom-outputs.html#cb170-27"></a>    <span class="co">// Apply the filter</span></span>
+<span id="cb170-28"><a href="custom-outputs.html#cb170-28"></a>    <span class="va">LenaJS</span>.<span class="at">filterImage</span>(filteredImageCanvas<span class="op">,</span> filter<span class="op">,</span> originalImage)<span class="op">;</span></span>
+<span id="cb170-29"><a href="custom-outputs.html#cb170-29"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb170-30"><a href="custom-outputs.html#cb170-30"></a><span class="kw">&lt;/body&gt;</span></span>
+<span id="cb170-31"><a href="custom-outputs.html#cb170-31"></a></span>
+<span id="cb170-32"><a href="custom-outputs.html#cb170-32"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="figure">
+<img src="images/lena-demo.png" alt="" />
+<p class="caption">Demo of lena.js</p>
+</div>
+<p>Therefore, there should be a <code>lenaOutput</code> that creates the <code>&lt;canvas&gt;</code>, a <code>renderLena</code> function that renders the output of <code>lena</code> which itself accepts the id of the image to filter as well as the filter to apply. Finally, there will be a “output binding” which will include the JavaScript code included in the <code>&lt;script&gt;</code> tags above.</p>
 </div>
 <div id="setup" class="section level2 unnumbered" number="">
 <h2>Setup</h2>
 <p>Start by creating a package called “lena.”</p>
-<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="custom-outputs.html#cb170-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;lena&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="custom-outputs.html#cb171-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;lena&quot;</span>)</span></code></pre></div>
 <p>Then, from the root of the package, create the <code>inst</code> directory and <code>assets</code> subdirectory then download and place the <code>lena.js</code> dependency within it.</p>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="custom-outputs.html#cb171-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;inst/assets&quot;</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb171-2"><a href="custom-outputs.html#cb171-2"></a></span>
-<span id="cb171-3"><a href="custom-outputs.html#cb171-3"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb171-4"><a href="custom-outputs.html#cb171-4"></a>  <span class="st">&quot;https://raw.githubusercontent.com/davidsonfellipe/&quot;</span>,</span>
-<span id="cb171-5"><a href="custom-outputs.html#cb171-5"></a>  <span class="st">&quot;lena.js/master/dist/lena.min.js&quot;</span></span>
-<span id="cb171-6"><a href="custom-outputs.html#cb171-6"></a>)</span>
-<span id="cb171-7"><a href="custom-outputs.html#cb171-7"></a><span class="kw">download.file</span>(url, <span class="st">&quot;inst/assets/lena.min.js&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="custom-outputs.html#cb172-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;inst/assets&quot;</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb172-2"><a href="custom-outputs.html#cb172-2"></a></span>
+<span id="cb172-3"><a href="custom-outputs.html#cb172-3"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb172-4"><a href="custom-outputs.html#cb172-4"></a>  <span class="st">&quot;https://raw.githubusercontent.com/davidsonfellipe/&quot;</span>,</span>
+<span id="cb172-5"><a href="custom-outputs.html#cb172-5"></a>  <span class="st">&quot;lena.js/master/dist/lena.min.js&quot;</span></span>
+<span id="cb172-6"><a href="custom-outputs.html#cb172-6"></a>)</span>
+<span id="cb172-7"><a href="custom-outputs.html#cb172-7"></a><span class="kw">download.file</span>(url, <span class="st">&quot;inst/assets/lena.min.js&quot;</span>)</span></code></pre></div>
 <p>We also need to create a JavaScript file that will include the custom JavaScript code that will eventually generate the custom output.</p>
-<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="custom-outputs.html#cb172-1"></a><span class="kw">file.create</span>(<span class="st">&quot;inst/assets/custom.js&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="custom-outputs.html#cb173-1"></a><span class="kw">file.create</span>(<span class="st">&quot;inst/assets/custom.js&quot;</span>)</span></code></pre></div>
 <p>At this point one should have a package directory looking like the tree below.</p>
 <pre><code>.
 ├── DESCRIPTION
@@ -339,19 +381,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="output" class="section level2 unnumbered" number="">
 <h2>Output</h2>
-<p>Then we create the <code>zzz.R</code> file in the <code>R</code> directory that will serve the assets previously created at the <code>/lena-assets</code> path.</p>
-<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="custom-outputs.html#cb174-1"></a><span class="co"># zzz.R</span></span>
-<span id="cb174-2"><a href="custom-outputs.html#cb174-2"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname) {</span>
-<span id="cb174-3"><a href="custom-outputs.html#cb174-3"></a>  shiny<span class="op">::</span><span class="kw">addResourcePath</span>(</span>
-<span id="cb174-4"><a href="custom-outputs.html#cb174-4"></a>    <span class="st">&quot;lena-assets&quot;</span>,</span>
-<span id="cb174-5"><a href="custom-outputs.html#cb174-5"></a>    <span class="kw">system.file</span>(<span class="st">&quot;assets&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;lena&quot;</span>)</span>
-<span id="cb174-6"><a href="custom-outputs.html#cb174-6"></a>  )</span>
-<span id="cb174-7"><a href="custom-outputs.html#cb174-7"></a>}</span></code></pre></div>
-<p>Then we can create the <code>lenaOutput</code> function. This function should return an HTML tag which bears at least an <code>id</code> and a <code>class</code>. The first is to be used by the user of the function in Shiny just like any other such outputs. For instance, <code>plotOutput</code> creates a <code>&lt;div&gt;</code> the <code>id</code> of which is actually the <code>id</code> used in the <code>plotOutput</code> function.</p>
+<p>We can then create the <code>lenaOutput</code> function. This function should return an HTML tag which bears an <code>id</code>, or a <code>data-input-id</code> attribute (more on that later) and a <code>class</code>. The first is to be used by the user of the function in Shiny just like any other such outputs. For instance, <code>plotOutput</code> creates a <code>&lt;div&gt;</code> the <code>id</code> of which is actually the <code>id</code> used in the <code>plotOutput</code> function.</p>
 <div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="custom-outputs.html#cb175-1"></a><span class="co"># the id is used as id to the element</span></span>
 <span id="cb175-2"><a href="custom-outputs.html#cb175-2"></a>shiny<span class="op">::</span><span class="kw">plotOutput</span>(<span class="st">&quot;myPlotId&quot;</span>)</span></code></pre></div>
 <pre><code>## &lt;div id=&quot;myPlotId&quot; class=&quot;shiny-plot-output&quot; style=&quot;width: 100% ; height: 400px&quot;&gt;&lt;/div&gt;</code></pre>
-<p>Note that the above also includes a <code>class</code>, this is used JavaScript-side to “find” the outputs in the DOM (document object model) and generate the output. This by no means has to be a class, it can other attributes. The function <code>lenaOutput</code> could thus use like below, the <code>id</code> is passed along to the <code>&lt;canvas&gt;</code> which is created with a <code>lena</code> class that will be used in the output binding to find that element and generate the output within it.</p>
+<p>The <code>class</code> is used JavaScript-side to “find” the outputs in the DOM (document object model) and generate the output. The function <code>lenaOutput</code> could thus be as shown below, the <code>id</code> is passed along to the <code>&lt;canvas&gt;</code> which is created with a <code>lena</code> class that will be used in the output binding to find that element and generate the output within that very canvas.</p>
 <div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="custom-outputs.html#cb177-1"></a><span class="co">#&#39; @export</span></span>
 <span id="cb177-2"><a href="custom-outputs.html#cb177-2"></a>lenaOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
 <span id="cb177-3"><a href="custom-outputs.html#cb177-3"></a>  tags<span class="op">$</span><span class="kw">canvas</span>(<span class="dt">id =</span> id, <span class="dt">class =</span> <span class="st">&quot;lena&quot;</span>)</span>
@@ -378,19 +412,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="render" class="section level2 unnumbered" number="">
 <h2>Render</h2>
-<p>Onto coding the server-side functions that will work server-side, we first define a function called “lena” which takes two arguments and return them as a list (which will eventually be used in JavaScript). First, the id of the image to apply the filter to and second the name of the filter to apply. Again, were we not creating a custom output we could use <code>session$sendCustomMessage</code> to send that list of options JavaScript directly. Here we do not as it will be indirectly handled by the <code>render</code> function we are creating next.</p>
+<p>Onto coding the server-side functions, we first define a function called “lena” which takes two arguments and return them as a list (which will eventually be used in JavaScript). First, the id of the image to apply the filter to and second the name of the filter to apply. Again, were we not creating a custom output we could use <code>session$sendCustomMessage</code> to send that list of options JavaScript directly. Here we do not as it will be indirectly handled by the <code>render</code> function we are creating next.</p>
 <div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="custom-outputs.html#cb179-1"></a><span class="co">#&#39; @export</span></span>
 <span id="cb179-2"><a href="custom-outputs.html#cb179-2"></a>lena &lt;-<span class="st"> </span><span class="cf">function</span>(img_id, <span class="dt">filter =</span> <span class="st">&quot;red&quot;</span>){</span>
 <span id="cb179-3"><a href="custom-outputs.html#cb179-3"></a>  <span class="kw">list</span>(<span class="dt">img_id =</span> img_id, <span class="dt">filter =</span> filter)</span>
 <span id="cb179-4"><a href="custom-outputs.html#cb179-4"></a>}</span></code></pre></div>
-<p>The function <code>renderLena</code> should accept an expression, like other such <code>render*</code> function. For instance in the example below the <code>renderPlot</code> function does accept an expression which uses the <code>plot</code> function, not only the <code>plot</code> function.</p>
+<p>The function <code>renderLena</code> should accept an expression, like other such <code>render*</code> function. For instance in the example below the <code>renderPlot</code> function does accept an expression which uses, amongst other functions, <code>plot</code>.</p>
 <div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="custom-outputs.html#cb180-1"></a>output<span class="op">$</span>myPlot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
 <span id="cb180-2"><a href="custom-outputs.html#cb180-2"></a>  <span class="co"># this is an expression</span></span>
 <span id="cb180-3"><a href="custom-outputs.html#cb180-3"></a>  cars <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb180-4"><a href="custom-outputs.html#cb180-4"></a><span class="st">    </span><span class="kw">head</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb180-5"><a href="custom-outputs.html#cb180-5"></a><span class="st">    </span><span class="kw">plot</span>()</span>
 <span id="cb180-6"><a href="custom-outputs.html#cb180-6"></a>})</span></code></pre></div>
-<p>The function <code>renderLena</code> takes an expression and other arguments that are passed to <code>shiny::exprToFunction</code> this does pretty much what it says on the tin. It returns a function from an expression (unless that expression is a function, in which case it returns the expression). This function must be further wrapped in another as the render function must itself return a function.</p>
+<p>The function <code>renderLena</code> takes an expression and other arguments that are passed to <code>shiny::exprToFunction</code> this does pretty much what it says on the tin: it returns a function from an expression (unless that expression is a function, in which case it returns the expression). This function must be further wrapped in another as the render function must itself return a function.</p>
 <div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="custom-outputs.html#cb181-1"></a><span class="co">#&#39; @export</span></span>
 <span id="cb181-2"><a href="custom-outputs.html#cb181-2"></a>renderLena &lt;-<span class="st"> </span><span class="cf">function</span>(expr, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), <span class="dt">quoted =</span> <span class="ot">FALSE</span>) {</span>
 <span id="cb181-3"><a href="custom-outputs.html#cb181-3"></a>  <span class="co"># Convert the expression + environment into a function</span></span>

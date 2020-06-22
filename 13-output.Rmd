@@ -12,6 +12,49 @@ Previous work with shiny and JavaScript covered in this book had no dedicated "o
 
 Finally, the two R functions are "bound" JavaScript-side with an "output binding" that renders the data from the `render*` function with its `*output`.
 
+## Discover Lena.js
+
+Let us take a look at an example of lena.js. The library reads the original image and outputs the filtered image in a `<canvas>`. There are many filters to chose from.
+
+```html
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <!-- Import library -->
+  <script src="lena.js"></script>
+</head>
+
+<body>
+  <!-- Image to apply filter -->
+  <img id="original-image" src="./image.png" />
+
+  <!-- div to hold visualisation -->
+  <canvas id="lena"></canvas>
+
+  <!-- Script to create visualisation -->
+  <script>
+    // Get the image
+    var originalImage = document.getElementById("original-image");
+
+    // The canvas where the processed image will be rendered (With filter)
+    var filteredImageCanvas = document.getElementById("lena");
+
+    // Filter to apply, in this case the red filter
+    var filter = LenaJS["red"];
+
+    // Apply the filter
+    LenaJS.filterImage(filteredImageCanvas, filter, originalImage);
+  </script>
+</body>
+
+</html>
+```
+
+![Demo of lena.js](images/lena-demo.png)
+
+Therefore, there should be a `lenaOutput` that creates the `<canvas>`, a `renderLena` function that renders the output of `lena` which itself accepts the id of the image to filter as well as the filter to apply. Finally, there will be a "output binding" which will include the JavaScript code included in the `<script>` tags above.
+
 ## Setup {-}
 
 Start by creating a package called "lena."
@@ -65,7 +108,7 @@ shiny::plotOutput("myPlotId")
 cat(as.character(shiny::plotOutput("myPlotId")))
 ```
 
-Note that the above also includes a `class`, this is used JavaScript-side to "find" the outputs in the DOM (document object model) and generate the output. This by no means has to be a class, it can other attributes. The function `lenaOutput` could thus use like below, the `id` is passed along to the `<canvas>` which is created with a `lena` class that will be used in the output binding to find that element and generate the output within it.
+The `class` is used JavaScript-side to "find" the outputs in the DOM (document object model) and generate the output. The function `lenaOutput` could thus be as shown below, the `id` is passed along to the `<canvas>` which is created with a `lena` class that will be used in the output binding to find that element and generate the output within that very canvas.
 
 ```r
 #' @export
@@ -99,7 +142,7 @@ lenaOutput <- function(id){
 
 ## Render {-}
 
-Onto coding the server-side functions that will work server-side, we first define a function called "lena" which takes two arguments and return them as a list (which will eventually be used in JavaScript). First, the id of the image to apply the filter to and second the name of the filter to apply. Again, were we not creating a custom output we could use `session$sendCustomMessage` to send that list of options JavaScript directly. Here we do not as it will be indirectly handled by the `render` function we are creating next. 
+Onto coding the server-side functions, we first define a function called "lena" which takes two arguments and return them as a list (which will eventually be used in JavaScript). First, the id of the image to apply the filter to and second the name of the filter to apply. Again, were we not creating a custom output we could use `session$sendCustomMessage` to send that list of options JavaScript directly. Here we do not as it will be indirectly handled by the `render` function we are creating next. 
 
 ```r
 #' @export
@@ -108,7 +151,7 @@ lena <- function(img_id, filter = "red"){
 }
 ```
 
-The function `renderLena` should accept an expression, like other such `render*` function. For instance in the example below the `renderPlot` function does accept an expression which uses the `plot` function, not only the `plot` function.
+The function `renderLena` should accept an expression, like other such `render*` function. For instance in the example below the `renderPlot` function does accept an expression which uses, amongst other functions, `plot`.
 
 ```r
 output$myPlot <- renderPlot({
@@ -119,7 +162,7 @@ output$myPlot <- renderPlot({
 })
 ```
 
-The function `renderLena` takes an expression and other arguments that are passed to `shiny::exprToFunction` this does pretty much what it says on the tin. It returns a function from an expression (unless that expression is a function, in which case it returns the expression). This function must be further wrapped in another as the render function must itself return a function.
+The function `renderLena` takes an expression and other arguments that are passed to `shiny::exprToFunction` this does pretty much what it says on the tin: it returns a function from an expression (unless that expression is a function, in which case it returns the expression). This function must be further wrapped in another as the render function must itself return a function.
 
 ```r
 #' @export
