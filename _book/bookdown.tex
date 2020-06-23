@@ -206,6 +206,8 @@ The R programming language has seen the integration of many programming language
 
 The ultimate aim of this work is to put the reader at ease with inviting JavaScript in their data science workflow. In that respect the book is not teaching one JavaScript but rather we show how little JavaScript can greatly support and enhance R code. Therefore focus is on integrating external JavaScript libraries and no prior knowledge of JavaScript is required.
 
+Throughout the book several R packages are built as examples, all of these, along with the code for the entire book can be found on the Github repository: \href{https://github.com/JohnCoene/javascript-for-r}{github.com/JohnCoene/javascript-for-r}.
+
 \hypertarget{disclaimer}{%
 \section*{Disclaimer}\label{disclaimer}}
 
@@ -994,7 +996,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Tue Jun 23 2020 19:05:09 GMT+0200 (Central European Summer Time)"
+## [1] "Tue Jun 23 2020 19:37:59 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1004,7 +1006,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Tue Jun 23 2020 19:05:09 GMT+0200 (Central European Summer Time)"
+## [1] "Tue Jun 23 2020 19:37:59 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -1013,7 +1015,37 @@ Finally, one can run code interactively rather than as strings by calling the co
 \section*{External Libraries}\label{external-libraries}}
 
 
-V8 is actually quite bare in and of itself, there is for instance no functionalities built-in to read or write files from disk, it thus becomes truly interesting when you can use it JavaScript libraries. We do so with the \texttt{source} method which takes a \texttt{file} argument that will accept a path or URL to a JavaScript file to source. We'll demonstrate this using \href{https://fusejs.io/}{fuse.js} a fuzzy-search library.
+V8 is actually quite bare in and of itself, there is for instance no functionalities built-in to read or write files from disk, it thus becomes truly interesting when you can use it JavaScript libraries. We'll demonstrate this using \href{https://fusejs.io/}{fuse.js} a fuzzy-search library.
+
+The very first step of integrating any external library is to look at the code, often examples, to grasp an idea of what is to be achieved from R. Below is an example from the official documentation. First, an array of two \texttt{books} is defined, this is later used to test the search. Then another array of options is defined, this should at the very least include the key(s) that should be searched, here it is set to search through the title and authors. Then, the fuse object is initialised based on the array of books and the options. Finally, the \texttt{search} method is used to retrieve all books, the title or author of which, partially match the term \texttt{tion}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// books to search through}
+\KeywordTok{var}\NormalTok{ books }\OperatorTok{=}\NormalTok{ [}\OperatorTok{\{}
+  \StringTok{\textquotesingle{}ISBN\textquotesingle{}}\OperatorTok{:} \StringTok{\textquotesingle{}A\textquotesingle{}}\OperatorTok{,}
+  \StringTok{\textquotesingle{}title\textquotesingle{}}\OperatorTok{:} \StringTok{"Old Man\textquotesingle{}s War"}\OperatorTok{,}
+  \StringTok{\textquotesingle{}author\textquotesingle{}}\OperatorTok{:} \StringTok{\textquotesingle{}John Scalzi\textquotesingle{}}
+\OperatorTok{\},} \OperatorTok{\{}
+  \StringTok{\textquotesingle{}ISBN\textquotesingle{}}\OperatorTok{:} \StringTok{\textquotesingle{}B\textquotesingle{}}\OperatorTok{,}
+  \StringTok{\textquotesingle{}title\textquotesingle{}}\OperatorTok{:} \StringTok{\textquotesingle{}The Lock Artist\textquotesingle{}}\OperatorTok{,}
+  \StringTok{\textquotesingle{}author\textquotesingle{}}\OperatorTok{:} \StringTok{\textquotesingle{}Steve Hamilton\textquotesingle{}}
+\OperatorTok{\}}\NormalTok{]}
+
+\KeywordTok{const}\NormalTok{ options }\OperatorTok{=} \OperatorTok{\{}
+  \CommentTok{// Search in \textasciigrave{}author\textasciigrave{} and in \textasciigrave{}title\textasciigrave{} array}
+  \DataTypeTok{keys}\OperatorTok{:}\NormalTok{ [}\StringTok{\textquotesingle{}author\textquotesingle{}}\OperatorTok{,} \StringTok{\textquotesingle{}title\textquotesingle{}}\NormalTok{]}
+\OperatorTok{\}}
+
+\CommentTok{// initialise}
+\KeywordTok{const}\NormalTok{ fuse }\OperatorTok{=} \KeywordTok{new} \AttributeTok{Fuse}\NormalTok{(list}\OperatorTok{,}\NormalTok{ options)}
+
+\CommentTok{// search \textquotesingle{}tion\textquotesingle{} in authors and titles}
+\KeywordTok{const}\NormalTok{ result }\OperatorTok{=} \VariableTok{fuse}\NormalTok{.}\AttributeTok{search}\NormalTok{(}\StringTok{\textquotesingle{}tion\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+With some understanding of what is to be reproduced in R we can import the library with the \texttt{source} method which takes a \texttt{file} argument that will accept a path or URL to a JavaScript file to source, below we use the handy CDN (Content Delivery Network) so as to avoid downloading a file.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1040,7 +1072,7 @@ You can think of it as using the \texttt{script} tag in HTML to source (\texttt{
 \end{Highlighting}
 \end{Shaded}
 
-With the library imported we can use its functionalities. We'll replicate an example from fuse.js official website where it executes a search on an object that contains books and looks like JSON below.
+With the library imported its functions can accessed via V8. We'll replicate an example from fuse.js official website where it executes a search on an object that contains books and looks like JSON below.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1169,7 +1201,7 @@ You can install browserify globally with the following command from the terminal
 \end{Highlighting}
 \end{Shaded}
 
-We can now browserify an npm package. To demonstrate we will use \href{https://github.com/zeit/ms}{ms} which converts various time formats to milliseconds. First we install the package.
+We can now browserify an npm package. To demonstrate we will use \href{https://github.com/zeit/ms}{ms} which converts various time formats to milliseconds. First we install the npm package.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1186,7 +1218,7 @@ Then we browserify it. From the terminal, the first line creates a file called \
 \end{Highlighting}
 \end{Shaded}
 
-We can now source \texttt{ms.js} with v8.
+We can now source \texttt{ms.js} with v8, before we do so we ought to look at example code to see what has to be reproduced using V8. Luckily the library is very straightforward: it includes a single function for all conversions, e.g.: \texttt{ms(\textquotesingle{}2\ days\textquotesingle{})} to convert 2 days in milliseconds.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1197,7 +1229,7 @@ We can now source \texttt{ms.js} with v8.
 \end{Highlighting}
 \end{Shaded}
 
-Then use the library.
+Then using the library simply consists of using \texttt{eval} or preferably \texttt{call} (for cleaner code and data interpretation to R).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1211,12 +1243,12 @@ Then use the library.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{ms}\OperatorTok{$}\KeywordTok{eval}\NormalTok{(}\StringTok{"ms(\textquotesingle{}1y\textquotesingle{})"}\NormalTok{)}
+\NormalTok{ms}\OperatorTok{$}\KeywordTok{call}\NormalTok{(}\StringTok{"ms"}\NormalTok{, }\StringTok{"1y"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "31557600000"
+## [1] 3.156e+10
 \end{verbatim}
 
 \hypertarget{use-in-packages}{%
