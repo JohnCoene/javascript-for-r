@@ -37,7 +37,7 @@ install.packages("V8")
 
 V8 provides a reference class via [R6](https://github.com/r-lib/R6) [@R-R6], which pertains to object-oriented programming, hence it might look unconventional to many R users. It's nonetheless easy to grasp. If one wants to learn more about the R6's reference class system Hadley Wickham has a very good chapter on it in his [Advanced R](https://adv-r.hadley.nz/r6.html) book.
 
-Let's explore the basic functionalities of the package. First, load the library and use the function `v8` to instantiate a class.
+Let's explore the basic functionalities of the package. First, load the library and use the function `v8` to instantiate a class, this effectively returns an execution environment, every such environment is independent of another.
 
 ```{r v8-baisc-load}
 library(V8)
@@ -45,7 +45,7 @@ library(V8)
 engine <- v8()
 ```
 
-The `eval` method allows running JavaScript code from R and retrive the results.
+The `eval` method allows running JavaScript code from R ~and retrieve the results.~
 
 ```{r}
 engine$eval("var x = 3 + 4;") # this is evealuated in R
@@ -68,7 +68,7 @@ engine$assign("vehicles", cars[1:3, ])
 engine$get("vehicles")
 ```
 
-All of the conversion is handled by V8 internally with jsonlite as demonstrated in the previous chapter. We can confirm that the data frame was converted to a list rowwise; using `JSON.stringify` to display how the object is store in V8.
+All of the conversion is handled by V8 internally with jsonlite as demonstrated in the previous chapter. We can confirm that the data frame was converted to a list rowwise; using `JSON.stringify` to display how the object is stored in V8.
 
 ```{r}
 cat(engine$eval("JSON.stringify(vehicles, null, 2);"))
@@ -192,7 +192,7 @@ We can now browserify an npm package. To demonstrate we will use [ms](https://gi
 npm install ms
 ```
 
-Then we browserify it. The first line creates a file called `in.js` which contains `global.ms = require('ms');` we then call browserify on that file specifying `ms.js` as output file.
+Then we browserify it. From the terminal, the first line creates a file called `in.js` which contains `global.ms = require('ms');` we then call browserify on that file specifying `ms.js` as output file.
 
 ```bash
 echo "global.ms = require('ms');" > in.js
@@ -221,14 +221,28 @@ In this section we detail how one should go about using V8 in an R package, if y
 
 Create a package however you usually do, using usethis, devtools or the RStudio IDE interface. Below we create a package called "ms" that will hold functionalities we explored in the previous section on npm packages.
 
-```bash
-R -e "usethis::create_package('ms')"
-cd ./ms
+```r
+usethis::create_package('ms')
 ```
 
-The package is going to rely on V8 so you can add it under `Imports` in the `DESCRIPTION`. We are going to need to instantiate the class at some point (`engine <- v8()`). 
+The package is going to rely on V8 so it needs to be added under `Imports` in the `DESCRIPTION` file, then again this can be done with usethis as shown below.
 
-One could perhaps require the user to do create such an object but it would not be convenient. Instead we can use `.onLoad`. You can read more about this function Hadley Wickham's [Advanced R book](http://r-pkgs.had.co.nz/r.html). The Python integration of R, [reticulate](https://rstudio.github.io/reticulate) [@R-reticulate] also advises [this method](https://rstudio.github.io/reticulate/articles/package.html) to import modules too. We often see this function placed in a `zzz.R` file.
+```r
+# add V8 to DESCRIPTION
+usethis::use_package("V8")
+```
+
+The package should also include the external library `ms.js` browserified from the npm package which should be placed it in the `inst` directory. Create it and place the `ms.js` file within the latter.
+
+```r
+dir.create("inst")
+```
+
+As explored, the core the V8 package is the execution environment(s) that are spawned using the `v8` function. One could perhaps provide a function that returns the class created by `v8` but it would not be convenient. This function would need to be called explicitly by the users of the package and the output of it would need to be passed to every subsequent functions. Thankfully there is a better way.
+
+Instead we can use the function `.onLoad`, to create the execution environment and import the dependency when the package is loaded by the user.
+
+You can read more about this function Hadley Wickham's [Advanced R book](http://r-pkgs.had.co.nz/r.html). The Python integration of R, [reticulate](https://rstudio.github.io/reticulate) [@R-reticulate] also advises using [this method](https://rstudio.github.io/reticulate/articles/package.html) to import modules too. We often see this function placed in a `zzz.R` file.
 
 ```r
 # zzz.R
@@ -239,22 +253,19 @@ ms <- NULL
 }
 ```
 
-Our package should also include the external library `ms.js` we built from the npm package. We should place it in the `inst` directory. Create it and place the `ms.js` file within the latter.
+At this stage one should obtain a directory structure similar to the tree below.
 
 ```bash
-mkdir -p inst
+.
+├── DESCRIPTION
+├── NAMESPACE
+├── R
+│   └── zzz.R
+└── inst
+    └── ms.js
 ```
 
-This should give a directory similar to this, for brevity we exclude `DESCRIPTION`, `NAMESPACE`, and other files that make up a package.
-
-```bash
-R/
-| zzz.R
-inst/
-| -- ms.js
-```
-
-Now the dependency can be sourced in the `.onLoad` function. We can access the files in the `inst` directory with the `system.file` function. When using the `.onLoad` function it is good practice to clean up with `.onUnload`.
+Now the dependency can be sourced in the `.onLoad` function. We can locate the files in the `inst` directory with the `system.file` function.
 
 ```r
 # zzz.R
@@ -263,32 +274,23 @@ ms <- NULL
 .onLoad <- function(libname, pkgname){
   ms <<- V8::v8()
 
+  # locate dependency file
   dep <- system.file("ms.js", package = "ms")
   ms$source(dep)
 }
-
-.onUnload <- function(libpath){
-  ms$reset()
-}
 ```
 
-We can then create a `to_ms` function, it will have access the `ms` object we instantiated in `.onLoad`.
+We can then create a `to_ms` function, it will have access the `ms` object we instantiated in `.onLoad`. 
 
 ```{r}
-#' Convert To Millisecond
-#' 
-#' Convert to milliseconds to various formats.
-#' 
-#' @param string String to convert.
-#' 
 #' @export
 to_ms <- function(string){
   ms$call("ms", string)
 }
 ```
 
-After running `devtools::document()` and `devtools::load_all()` the call `to_ms("2 days")` will return `172800000`. Finally,, remember to add V8 as dependency.
+After running `devtools::document()` and `devtools::load_all()` the package can be used. 
 
-```r
-usethis::use_package("V8")
+```{r}
+ms::to_ms("2 days")
 ```

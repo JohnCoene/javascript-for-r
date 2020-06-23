@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-06-22" />
+<meta name="date" content="2020-06-23" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -323,11 +323,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="basics" class="section level2 unnumbered" number="">
 <h2>Basics</h2>
 <p>V8 provides a reference class via <a href="https://github.com/r-lib/R6">R6</a> <span class="citation">(Chang <a href="#ref-R-R6" role="doc-biblioref">2019</a>)</span>, which pertains to object-oriented programming, hence it might look unconventional to many R users. It’s nonetheless easy to grasp. If one wants to learn more about the R6’s reference class system Hadley Wickham has a very good chapter on it in his <a href="https://adv-r.hadley.nz/r6.html">Advanced R</a> book.</p>
-<p>Let’s explore the basic functionalities of the package. First, load the library and use the function <code>v8</code> to instantiate a class.</p>
+<p>Let’s explore the basic functionalities of the package. First, load the library and use the function <code>v8</code> to instantiate a class, this effectively returns an execution environment, every such environment is independent of another.</p>
 <div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="the-v8-engine.html#cb56-1"></a><span class="kw">library</span>(V8)</span>
 <span id="cb56-2"><a href="the-v8-engine.html#cb56-2"></a></span>
 <span id="cb56-3"><a href="the-v8-engine.html#cb56-3"></a>engine &lt;-<span class="st"> </span><span class="kw">v8</span>()</span></code></pre></div>
-<p>The <code>eval</code> method allows running JavaScript code from R and retrive the results.</p>
+<p>The <code>eval</code> method allows running JavaScript code from R ~and retrieve the results.~</p>
 <div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="the-v8-engine.html#cb57-1"></a>engine<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;var x = 3 + 4;&quot;</span>) <span class="co"># this is evealuated in R</span></span>
 <span id="cb57-2"><a href="the-v8-engine.html#cb57-2"></a>engine<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;x&quot;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;7&quot;</code></pre>
@@ -345,7 +345,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 1     4    2
 ## 2     4   10
 ## 3     7    4</code></pre>
-<p>All of the conversion is handled by V8 internally with jsonlite as demonstrated in the previous chapter. We can confirm that the data frame was converted to a list rowwise; using <code>JSON.stringify</code> to display how the object is store in V8.</p>
+<p>All of the conversion is handled by V8 internally with jsonlite as demonstrated in the previous chapter. We can confirm that the data frame was converted to a list rowwise; using <code>JSON.stringify</code> to display how the object is stored in V8.</p>
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="the-v8-engine.html#cb65-1"></a><span class="kw">cat</span>(engine<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;JSON.stringify(vehicles, null, 2);&quot;</span>))</span></code></pre></div>
 <pre><code>## [
 ##   {
@@ -363,9 +363,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## ]</code></pre>
 <p>However the cyclical loop of 1) creating a variable in JavaScript to 2) run a function on the aforementioned object 3) get the results back in R, can be tedious. So V8 also allows calling JavaScript functions on R objects directly with the <code>call</code> method and obtain the results back in R.</p>
 <div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="the-v8-engine.html#cb67-1"></a>engine<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;new Date();&quot;</span>) <span class="co"># using eval</span></span></code></pre></div>
-<pre><code>## [1] &quot;Mon Jun 22 2020 23:29:30 GMT+0200 (Central European Summer Time)&quot;</code></pre>
+<pre><code>## [1] &quot;Tue Jun 23 2020 18:42:36 GMT+0200 (Central European Summer Time)&quot;</code></pre>
 <div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="the-v8-engine.html#cb69-1"></a>engine<span class="op">$</span><span class="kw">call</span>(<span class="st">&quot;Date&quot;</span>, <span class="kw">Sys.Date</span>()) <span class="co"># using call</span></span></code></pre></div>
-<pre><code>## [1] &quot;Mon Jun 22 2020 23:29:30 GMT+0200 (Central European Summer Time)&quot;</code></pre>
+<pre><code>## [1] &quot;Tue Jun 23 2020 18:42:36 GMT+0200 (Central European Summer Time)&quot;</code></pre>
 <p>Finally, one can run code interactively rather than as strings by calling the console from the engine with <code>engine$console()</code> you can then exit the console by typing <code>exit</code> or hitting the <kbd>ESC</kbd> key.</p>
 </div>
 <div id="external-libraries" class="section level2 unnumbered" number="">
@@ -472,50 +472,48 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2>Use in Packages</h2>
 <p>In this section we detail how one should go about using V8 in an R package, if you are not familiar with package development you can skip ahead.</p>
 <p>Create a package however you usually do, using usethis, devtools or the RStudio IDE interface. Below we create a package called “ms” that will hold functionalities we explored in the previous section on npm packages.</p>
-<div class="sourceCode" id="cb92"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb92-1"><a href="the-v8-engine.html#cb92-1"></a><span class="ex">R</span> -e <span class="st">&quot;usethis::create_package(&#39;ms&#39;)&quot;</span></span>
-<span id="cb92-2"><a href="the-v8-engine.html#cb92-2"></a><span class="bu">cd</span> ./ms</span></code></pre></div>
-<p>The package is going to rely on V8 so you can add it under <code>Imports</code> in the <code>DESCRIPTION</code>. We are going to need to instantiate the class at some point (<code>engine &lt;- v8()</code>).</p>
-<p>One could perhaps require the user to do create such an object but it would not be convenient. Instead we can use <code>.onLoad</code>. You can read more about this function Hadley Wickham’s <a href="http://r-pkgs.had.co.nz/r.html">Advanced R book</a>. The Python integration of R, <a href="https://rstudio.github.io/reticulate">reticulate</a> <span class="citation">(Ushey, Allaire, and Tang <a href="#ref-R-reticulate" role="doc-biblioref">2020</a>)</span> also advises <a href="https://rstudio.github.io/reticulate/articles/package.html">this method</a> to import modules too. We often see this function placed in a <code>zzz.R</code> file.</p>
-<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="the-v8-engine.html#cb93-1"></a><span class="co"># zzz.R</span></span>
-<span id="cb93-2"><a href="the-v8-engine.html#cb93-2"></a>ms &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb93-3"><a href="the-v8-engine.html#cb93-3"></a></span>
-<span id="cb93-4"><a href="the-v8-engine.html#cb93-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
-<span id="cb93-5"><a href="the-v8-engine.html#cb93-5"></a>  ms &lt;&lt;-<span class="st"> </span><span class="kw">v8</span>()</span>
-<span id="cb93-6"><a href="the-v8-engine.html#cb93-6"></a>}</span></code></pre></div>
-<p>Our package should also include the external library <code>ms.js</code> we built from the npm package. We should place it in the <code>inst</code> directory. Create it and place the <code>ms.js</code> file within the latter.</p>
-<div class="sourceCode" id="cb94"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb94-1"><a href="the-v8-engine.html#cb94-1"></a><span class="fu">mkdir</span> -p inst</span></code></pre></div>
-<p>This should give a directory similar to this, for brevity we exclude <code>DESCRIPTION</code>, <code>NAMESPACE</code>, and other files that make up a package.</p>
-<div class="sourceCode" id="cb95"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb95-1"><a href="the-v8-engine.html#cb95-1"></a><span class="ex">R/</span></span>
-<span id="cb95-2"><a href="the-v8-engine.html#cb95-2"></a><span class="kw">|</span> <span class="ex">zzz.R</span></span>
-<span id="cb95-3"><a href="the-v8-engine.html#cb95-3"></a><span class="ex">inst/</span></span>
-<span id="cb95-4"><a href="the-v8-engine.html#cb95-4"></a><span class="kw">|</span> <span class="ex">--</span> ms.js</span></code></pre></div>
-<p>Now the dependency can be sourced in the <code>.onLoad</code> function. We can access the files in the <code>inst</code> directory with the <code>system.file</code> function. When using the <code>.onLoad</code> function it is good practice to clean up with <code>.onUnload</code>.</p>
-<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="the-v8-engine.html#cb96-1"></a><span class="co"># zzz.R</span></span>
-<span id="cb96-2"><a href="the-v8-engine.html#cb96-2"></a>ms &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb96-3"><a href="the-v8-engine.html#cb96-3"></a></span>
-<span id="cb96-4"><a href="the-v8-engine.html#cb96-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
-<span id="cb96-5"><a href="the-v8-engine.html#cb96-5"></a>  ms &lt;&lt;-<span class="st"> </span>V8<span class="op">::</span><span class="kw">v8</span>()</span>
-<span id="cb96-6"><a href="the-v8-engine.html#cb96-6"></a></span>
-<span id="cb96-7"><a href="the-v8-engine.html#cb96-7"></a>  dep &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ms.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;ms&quot;</span>)</span>
-<span id="cb96-8"><a href="the-v8-engine.html#cb96-8"></a>  ms<span class="op">$</span><span class="kw">source</span>(dep)</span>
-<span id="cb96-9"><a href="the-v8-engine.html#cb96-9"></a>}</span>
-<span id="cb96-10"><a href="the-v8-engine.html#cb96-10"></a></span>
-<span id="cb96-11"><a href="the-v8-engine.html#cb96-11"></a>.onUnload &lt;-<span class="st"> </span><span class="cf">function</span>(libpath){</span>
-<span id="cb96-12"><a href="the-v8-engine.html#cb96-12"></a>  ms<span class="op">$</span><span class="kw">reset</span>()</span>
-<span id="cb96-13"><a href="the-v8-engine.html#cb96-13"></a>}</span></code></pre></div>
-<p>We can then create a <code>to_ms</code> function, it will have access the <code>ms</code> object we instantiated in <code>.onLoad</code>.</p>
-<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="the-v8-engine.html#cb97-1"></a><span class="co">#&#39; Convert To Millisecond</span></span>
-<span id="cb97-2"><a href="the-v8-engine.html#cb97-2"></a><span class="co">#&#39; </span></span>
-<span id="cb97-3"><a href="the-v8-engine.html#cb97-3"></a><span class="co">#&#39; Convert to milliseconds to various formats.</span></span>
-<span id="cb97-4"><a href="the-v8-engine.html#cb97-4"></a><span class="co">#&#39; </span></span>
-<span id="cb97-5"><a href="the-v8-engine.html#cb97-5"></a><span class="co">#&#39; @param string String to convert.</span></span>
-<span id="cb97-6"><a href="the-v8-engine.html#cb97-6"></a><span class="co">#&#39; </span></span>
-<span id="cb97-7"><a href="the-v8-engine.html#cb97-7"></a><span class="co">#&#39; @export</span></span>
-<span id="cb97-8"><a href="the-v8-engine.html#cb97-8"></a>to_ms &lt;-<span class="st"> </span><span class="cf">function</span>(string){</span>
-<span id="cb97-9"><a href="the-v8-engine.html#cb97-9"></a>  ms<span class="op">$</span><span class="kw">call</span>(<span class="st">&quot;ms&quot;</span>, string)</span>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="the-v8-engine.html#cb92-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&#39;ms&#39;</span>)</span></code></pre></div>
+<p>The package is going to rely on V8 so it needs to be added under <code>Imports</code> in the <code>DESCRIPTION</code> file, then again this can be done with usethis as shown below.</p>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="the-v8-engine.html#cb93-1"></a><span class="co"># add V8 to DESCRIPTION</span></span>
+<span id="cb93-2"><a href="the-v8-engine.html#cb93-2"></a>usethis<span class="op">::</span><span class="kw">use_package</span>(<span class="st">&quot;V8&quot;</span>)</span></code></pre></div>
+<p>The package should also include the external library <code>ms.js</code> browserified from the npm package which should be placed it in the <code>inst</code> directory. Create it and place the <code>ms.js</code> file within the latter.</p>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="the-v8-engine.html#cb94-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;inst&quot;</span>)</span></code></pre></div>
+<p>As explored, the core the V8 package is the execution environment(s) that are spawned using the <code>v8</code> function. One could perhaps provide a function that returns the class created by <code>v8</code> but it would not be convenient. This function would need to be called explicitly by the users of the package and the output of it would need to be passed to every subsequent functions. Thankfully there is a better way.</p>
+<p>Instead we can use the function <code>.onLoad</code>, to create the execution environment and import the dependency when the package is loaded by the user.</p>
+<p>You can read more about this function Hadley Wickham’s <a href="http://r-pkgs.had.co.nz/r.html">Advanced R book</a>. The Python integration of R, <a href="https://rstudio.github.io/reticulate">reticulate</a> <span class="citation">(Ushey, Allaire, and Tang <a href="#ref-R-reticulate" role="doc-biblioref">2020</a>)</span> also advises using <a href="https://rstudio.github.io/reticulate/articles/package.html">this method</a> to import modules too. We often see this function placed in a <code>zzz.R</code> file.</p>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="the-v8-engine.html#cb95-1"></a><span class="co"># zzz.R</span></span>
+<span id="cb95-2"><a href="the-v8-engine.html#cb95-2"></a>ms &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb95-3"><a href="the-v8-engine.html#cb95-3"></a></span>
+<span id="cb95-4"><a href="the-v8-engine.html#cb95-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
+<span id="cb95-5"><a href="the-v8-engine.html#cb95-5"></a>  ms &lt;&lt;-<span class="st"> </span><span class="kw">v8</span>()</span>
+<span id="cb95-6"><a href="the-v8-engine.html#cb95-6"></a>}</span></code></pre></div>
+<p>At this stage one should obtain a directory structure similar to the tree below.</p>
+<div class="sourceCode" id="cb96"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb96-1"><a href="the-v8-engine.html#cb96-1"></a><span class="ex">.</span></span>
+<span id="cb96-2"><a href="the-v8-engine.html#cb96-2"></a>├── <span class="ex">DESCRIPTION</span></span>
+<span id="cb96-3"><a href="the-v8-engine.html#cb96-3"></a>├── <span class="ex">NAMESPACE</span></span>
+<span id="cb96-4"><a href="the-v8-engine.html#cb96-4"></a>├── <span class="ex">R</span></span>
+<span id="cb96-5"><a href="the-v8-engine.html#cb96-5"></a>│   └── <span class="ex">zzz.R</span></span>
+<span id="cb96-6"><a href="the-v8-engine.html#cb96-6"></a>└── <span class="ex">inst</span></span>
+<span id="cb96-7"><a href="the-v8-engine.html#cb96-7"></a>    └── <span class="ex">ms.js</span></span></code></pre></div>
+<p>Now the dependency can be sourced in the <code>.onLoad</code> function. We can locate the files in the <code>inst</code> directory with the <code>system.file</code> function.</p>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="the-v8-engine.html#cb97-1"></a><span class="co"># zzz.R</span></span>
+<span id="cb97-2"><a href="the-v8-engine.html#cb97-2"></a>ms &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb97-3"><a href="the-v8-engine.html#cb97-3"></a></span>
+<span id="cb97-4"><a href="the-v8-engine.html#cb97-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
+<span id="cb97-5"><a href="the-v8-engine.html#cb97-5"></a>  ms &lt;&lt;-<span class="st"> </span>V8<span class="op">::</span><span class="kw">v8</span>()</span>
+<span id="cb97-6"><a href="the-v8-engine.html#cb97-6"></a></span>
+<span id="cb97-7"><a href="the-v8-engine.html#cb97-7"></a>  <span class="co"># locate dependency file</span></span>
+<span id="cb97-8"><a href="the-v8-engine.html#cb97-8"></a>  dep &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ms.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;ms&quot;</span>)</span>
+<span id="cb97-9"><a href="the-v8-engine.html#cb97-9"></a>  ms<span class="op">$</span><span class="kw">source</span>(dep)</span>
 <span id="cb97-10"><a href="the-v8-engine.html#cb97-10"></a>}</span></code></pre></div>
-<p>After running <code>devtools::document()</code> and <code>devtools::load_all()</code> the call <code>to_ms("2 days")</code> will return <code>172800000</code>. Finally,, remember to add V8 as dependency.</p>
-<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="the-v8-engine.html#cb98-1"></a>usethis<span class="op">::</span><span class="kw">use_package</span>(<span class="st">&quot;V8&quot;</span>)</span></code></pre></div>
+<p>We can then create a <code>to_ms</code> function, it will have access the <code>ms</code> object we instantiated in <code>.onLoad</code>.</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="the-v8-engine.html#cb98-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb98-2"><a href="the-v8-engine.html#cb98-2"></a>to_ms &lt;-<span class="st"> </span><span class="cf">function</span>(string){</span>
+<span id="cb98-3"><a href="the-v8-engine.html#cb98-3"></a>  ms<span class="op">$</span><span class="kw">call</span>(<span class="st">&quot;ms&quot;</span>, string)</span>
+<span id="cb98-4"><a href="the-v8-engine.html#cb98-4"></a>}</span></code></pre></div>
+<p>After running <code>devtools::document()</code> and <code>devtools::load_all()</code> the package can be used.</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="the-v8-engine.html#cb99-1"></a>ms<span class="op">::</span><span class="kw">to_ms</span>(<span class="st">&quot;2 days&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] 172800000</code></pre>
 
 </div>
 </div>
