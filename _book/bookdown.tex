@@ -169,7 +169,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2020-06-23}
+\date{2020-06-24}
 
 \begin{document}
 \maketitle
@@ -996,7 +996,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Tue Jun 23 2020 19:49:53 GMT+0200 (Central European Summer Time)"
+## [1] "Wed Jun 24 2020 20:39:41 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1006,7 +1006,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Tue Jun 23 2020 19:49:53 GMT+0200 (Central European Summer Time)"
+## [1] "Wed Jun 24 2020 20:39:41 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -1356,6 +1356,8 @@ After running \texttt{devtools::document()} and \texttt{devtools::load\_all()} t
 \hypertarget{node}{%
 \chapter{Node.js with Bubble}\label{node}}
 
+\textbf{This chapter is incomplete because a core dependency of \{bubble\} was removed from CRAN, this chapter will likely be removed entirely}
+
 A more recent R package called bubble allows running node.js code from R, the package comes with an REPL and an R markdown engine. As it is still under heavy development it is not yet available on CRAN, it can be installed from Github using either the devtools or \href{https://remotes.r-lib.org/}{remotes package} \citep{R-remotes}.
 
 \begin{Shaded}
@@ -1494,9 +1496,9 @@ The packages can then be imported in the node session and interacted with.
 \hypertarget{introduction-1}{%
 \chapter{Introduction}\label{introduction-1}}
 
-Shiny is by far most popular, if not the only, web framework for the R programming language. Since JavaScript and Shiny both run in web browsers it follows that they can run alongside one another as one can include JavaScript in such applications. Yet, often disregarded is the ability for Shiny's R server to communicate with JavaScript and vice versa. This collection of chapters aims to remedy to this. In this first part, we brush up on the essentials so we understand how to include JavaScript in shiny applications.
+Shiny is the web framework of choice for the R programming language. Since JavaScript and Shiny both run in web browsers it follows that they can run alongside one another as one can include JavaScript in such applications. Yet, often disregarded is the ability for Shiny's R server to communicate to the front-end and vice versa. This collection of chapters aims to remedy to this. In this first part, we brush up on the essentials so we understand how to include JavaScript in shiny applications.
 
-Then again, the goal is not to write a lot of convoluted JavaScript, on the contrary, with little knowledge of the language, the aim is to write as little as possible but demonstrate to the reader that it is often enough to greatly improve the user experience of shiny applications.
+Then again, the goal is not to write a lot of convoluted JavaScript, on the contrary, with little knowledge of the language the aim is to write as little as possible but demonstrate to the reader that it is often enough to greatly improve the user experience of shiny applications.
 
 \hypertarget{static-files}{%
 \section*{Static Files}\label{static-files}}
@@ -5606,6 +5608,345 @@ Finally, we load the package's functions using devtools to test the input.
 \end{Highlighting}
 \end{Shaded}
 
+\hypertarget{image-classifier}{%
+\chapter{Image Classifier}\label{image-classifier}}
+
+In this example we bring \href{https://learn.ml5js.org/}{ml5.js} to R using Shiny, more specifically its classifier using \href{https://arxiv.org/abs/1704.04861}{mobileNet}. Using shiny and JavaScript the model can run in the client's browser and the result can be sent back to the server. This means the model uses the client's computing power to run the prediction rather than the server, thereby alleviating computation on the server and bypassing limitations on concurrent users.
+
+Then again the journey starts by exploring ml5.js and the classifier we are going to use. One starts by instantiating an image classifer, specifying the model to use (ml5.js comes with a few out of the box and allows using custom models), then the classifier is used on an image present in the DOM.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DataTypeTok{<!DOCTYPE }\NormalTok{html}\DataTypeTok{>}
+\KeywordTok{<html}\OtherTok{ xmlns=}\StringTok{"http://www.w3.org/1999/xhtml"}\OtherTok{ lang=}\StringTok{""}\OtherTok{ xml:lang=}\StringTok{""}\KeywordTok{>}
+
+\KeywordTok{<head>}
+  \CommentTok{<!{-}{-} Import library {-}{-}>}
+  \KeywordTok{<script}\OtherTok{ src=}\StringTok{"https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"}\KeywordTok{></script>}
+\KeywordTok{</head>}
+
+\KeywordTok{<body>}
+  \CommentTok{<!{-}{-} image to classify {-}{-}>}
+  \KeywordTok{<img}\OtherTok{ id=}\StringTok{"dog"}\OtherTok{ src=}\StringTok{"www/doge.jpg"}\KeywordTok{/>}
+
+  \CommentTok{<!{-}{-} Script to run classifer {-}{-}>}
+  \KeywordTok{<script>}
+    \CommentTok{// Initialize the Image Classifier method with MobileNet}
+    \KeywordTok{const}\NormalTok{ classifier }\OperatorTok{=} \VariableTok{ml5}\NormalTok{.}\AttributeTok{imageClassifier}\NormalTok{(}\StringTok{\textquotesingle{}MobileNet\textquotesingle{}}\OperatorTok{,}\NormalTok{ modelLoaded)}\OperatorTok{;}
+
+    \CommentTok{// When the model is loaded}
+    \KeywordTok{function} \AttributeTok{modelLoaded}\NormalTok{() }\OperatorTok{\{}
+      \VariableTok{console}\NormalTok{.}\AttributeTok{log}\NormalTok{(}\StringTok{\textquotesingle{}Model Loaded!\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+    \OperatorTok{\}}
+
+    \CommentTok{// Make a prediction with a selected image}
+    \VariableTok{classifier}\NormalTok{.}\AttributeTok{classify}\NormalTok{(}\VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\StringTok{\textquotesingle{}dog\textquotesingle{}}\NormalTok{)}\OperatorTok{,}\NormalTok{ (err}\OperatorTok{,}\NormalTok{ results) }\KeywordTok{=>} \OperatorTok{\{}
+      \VariableTok{console}\NormalTok{.}\AttributeTok{log}\NormalTok{(results)}\OperatorTok{;}
+    \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+  \KeywordTok{</script>}
+\KeywordTok{</body>}
+
+\KeywordTok{</html>}
+\end{Highlighting}
+\end{Shaded}
+
+In shiny, we would need to pass the id of the image (\texttt{dog} above) to be sent from the server and the callback function to return the results to R. The projects starts from an empty directory, before creating actual application let us create the directory of static files that will contain the JavaScript file (\texttt{classify.js}) and the images to classify. Feel free download whichever images you want, below we download images of birds from Wikipedia.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# static files}
+\KeywordTok{dir.create}\NormalTok{(}\StringTok{"www"}\NormalTok{)}
+\KeywordTok{file.create}\NormalTok{(}\StringTok{"www/classify.js"}\NormalTok{)}
+
+\CommentTok{\# flamingo}
+\NormalTok{fl <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(}
+  \StringTok{"https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/American\_flamingo"}\NormalTok{,}
+  \StringTok{"\_\%28Phoenicopterus\_ruber\%29.JPG/256px{-}American\_flamingo\_\%28Phoenicopterus\_ruber\%29.JPG"}
+\NormalTok{)}
+
+\CommentTok{\# lorikeet}
+\NormalTok{lo <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(}
+  \StringTok{"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Rainbow\_lorikeet.jpg/"}\NormalTok{,}
+  \StringTok{"256px{-}Rainbow\_lorikeet.jpg"}
+\NormalTok{)}
+
+\CommentTok{\# download}
+\KeywordTok{download.file}\NormalTok{(fl, }\DataTypeTok{destfile =} \StringTok{"www/flamingo.jpg"}\NormalTok{)}
+\KeywordTok{download.file}\NormalTok{(lo, }\DataTypeTok{destfile =} \StringTok{"www/lorikeet.jpg"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Once images are downloaded we can build the basic skeleton of the app. We import ml5.js from the CDN, create a select input to switch between the two images of birds that were downloaded and use \texttt{renderUI} to dynamically render the selected image. Finally, we create a button to trigger the classification, though it currently sends an empty list to a message handler that we are yet to create.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{"shiny"}\NormalTok{)}
+
+\KeywordTok{addResourcePath}\NormalTok{(}\StringTok{"www"}\NormalTok{, }\StringTok{"www"}\NormalTok{)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+\NormalTok{  tags}\OperatorTok{$}\KeywordTok{head}\NormalTok{(}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{script}\NormalTok{(}\DataTypeTok{src =} \StringTok{"https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"}\NormalTok{)}
+\NormalTok{  ),}
+  \KeywordTok{fluidRow}\NormalTok{(}
+    \KeywordTok{column}\NormalTok{(}
+      \DecValTok{2}\NormalTok{,}
+      \KeywordTok{selectInput}\NormalTok{(}
+        \StringTok{"select"}\NormalTok{, }\StringTok{"Select an image to classify"}\NormalTok{,}
+        \DataTypeTok{choices =} \KeywordTok{c}\NormalTok{(}\StringTok{"lorikeet"}\NormalTok{, }\StringTok{"flamingo"}\NormalTok{)}
+\NormalTok{      )}
+\NormalTok{    ),}
+    \KeywordTok{column}\NormalTok{(}
+      \DecValTok{2}\NormalTok{, }\KeywordTok{br}\NormalTok{(), }\KeywordTok{actionButton}\NormalTok{(}\StringTok{"classify"}\NormalTok{, }\StringTok{"Classify"}\NormalTok{, }\DataTypeTok{icon =} \KeywordTok{icon}\NormalTok{(}\StringTok{"search"}\NormalTok{))}
+\NormalTok{    )}
+\NormalTok{  ),}
+  \KeywordTok{uiOutput}\NormalTok{(}\StringTok{"img"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output, session)\{}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{img <{-}}\StringTok{ }\KeywordTok{renderUI}\NormalTok{(\{}
+\NormalTok{    path <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(}\StringTok{"www/"}\NormalTok{, input}\OperatorTok{$}\NormalTok{select, }\StringTok{".jpg"}\NormalTok{)}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{img}\NormalTok{(}\DataTypeTok{src =}\NormalTok{ path, }\DataTypeTok{id =} \StringTok{"bird"}\NormalTok{)}
+\NormalTok{  \})}
+
+  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{classify, \{}
+\NormalTok{    session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\StringTok{\textquotesingle{}classify\textquotesingle{}}\NormalTok{, }\KeywordTok{list}\NormalTok{())}
+\NormalTok{  \})}
+
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/ml5-init.png}
+\caption{Classifier skeleton}
+\end{figure}
+
+With this in place one can start thinking about the JavaScript, when the ``classify'' button is clicked the classification must be triggered in the client and the result sent back. To do so we need to define the message handler called ``classify'' to which the data is sent.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// classify.js}
+
+\CommentTok{// Initialize }
+\KeywordTok{const}\NormalTok{ classifier }\OperatorTok{=} \VariableTok{ml5}\NormalTok{.}\AttributeTok{imageClassifier}\NormalTok{(}\StringTok{\textquotesingle{}MobileNet\textquotesingle{}}\OperatorTok{,}\NormalTok{ modelLoaded)}\OperatorTok{;}
+
+\KeywordTok{function} \AttributeTok{modelLoaded}\NormalTok{() }\OperatorTok{\{}
+  \VariableTok{console}\NormalTok{.}\AttributeTok{log}\NormalTok{(}\StringTok{\textquotesingle{}Model Loaded!\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\OperatorTok{\}}
+
+\VariableTok{Shiny}\NormalTok{.}\AttributeTok{addCustomMessageHandler}\NormalTok{(}\StringTok{\textquotesingle{}classify\textquotesingle{}}\OperatorTok{,} \KeywordTok{function}\NormalTok{(data)}\OperatorTok{\{}
+  \CommentTok{// Make a prediction with a selected image}
+  \VariableTok{classifier}\NormalTok{.}\AttributeTok{classify}\NormalTok{(}\VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\StringTok{"bird"}\NormalTok{)}\OperatorTok{,}\NormalTok{ (err}\OperatorTok{,}\NormalTok{ results) }\KeywordTok{=>} \OperatorTok{\{}
+    \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\StringTok{"classification"}\OperatorTok{,}\NormalTok{ results)}\OperatorTok{;}
+  \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+A few things to note on the above. The classifier is created outside of the message handler as this only has to be done once and not every time the ``classify'' button is clicked. While the message handler accepts the \texttt{data} objects it does not make use of it, which is fine, the argument must nonetheless be specified. In the aforementioned callback function the input ``classification'' is defined.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{"shiny"}\NormalTok{)}
+
+\KeywordTok{addResourcePath}\NormalTok{(}\StringTok{"www"}\NormalTok{, }\StringTok{"www"}\NormalTok{)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+\NormalTok{  tags}\OperatorTok{$}\KeywordTok{head}\NormalTok{(}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{script}\NormalTok{(}\DataTypeTok{src =} \StringTok{"https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"}\NormalTok{),}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{script}\NormalTok{(}\DataTypeTok{src =} \StringTok{"www/classify.js"}\NormalTok{)}
+\NormalTok{  ),}
+  \KeywordTok{fluidRow}\NormalTok{(}
+    \KeywordTok{column}\NormalTok{(}
+      \DecValTok{2}\NormalTok{,}
+      \KeywordTok{selectInput}\NormalTok{(}
+        \StringTok{"select"}\NormalTok{, }\StringTok{"Select an image to classify"}\NormalTok{,}
+        \DataTypeTok{choices =} \KeywordTok{c}\NormalTok{(}\StringTok{"lorikeet"}\NormalTok{, }\StringTok{"flamingo"}\NormalTok{)}
+\NormalTok{      )}
+\NormalTok{    ),}
+    \KeywordTok{column}\NormalTok{(}
+      \DecValTok{2}\NormalTok{, }\KeywordTok{br}\NormalTok{(), }\KeywordTok{actionButton}\NormalTok{(}\StringTok{"classify"}\NormalTok{, }\StringTok{"Classify"}\NormalTok{, }\DataTypeTok{icon =} \KeywordTok{icon}\NormalTok{(}\StringTok{"search"}\NormalTok{))}
+\NormalTok{    )}
+\NormalTok{  ),}
+  \KeywordTok{uiOutput}\NormalTok{(}\StringTok{"img"}\NormalTok{),}
+  \KeywordTok{verbatimTextOutput}\NormalTok{(}\StringTok{"results"}\NormalTok{) }\CommentTok{\# print output}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output, session)\{}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{img <{-}}\StringTok{ }\KeywordTok{renderUI}\NormalTok{(\{}
+\NormalTok{    path <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(}\StringTok{"www/"}\NormalTok{, input}\OperatorTok{$}\NormalTok{select, }\StringTok{".jpg"}\NormalTok{)}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{img}\NormalTok{(}\DataTypeTok{src =}\NormalTok{ path, }\DataTypeTok{id =} \StringTok{"bird"}\NormalTok{)}
+\NormalTok{  \})}
+
+  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{classify, \{}
+\NormalTok{    session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\StringTok{\textquotesingle{}classify\textquotesingle{}}\NormalTok{, }\KeywordTok{list}\NormalTok{())}
+\NormalTok{  \})}
+
+  \CommentTok{\# render classification}
+\NormalTok{  output}\OperatorTok{$}\NormalTok{results <{-}}\StringTok{ }\KeywordTok{renderPrint}\NormalTok{(\{}
+\NormalTok{    input}\OperatorTok{$}\NormalTok{classification}
+\NormalTok{  \})}
+
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/ml5-output.png}
+\caption{Classifier output}
+\end{figure}
+
+This returns three results, the label (classification) and the confidence, which could be improved, we ought to build an input handler to transform that into a readable table. Below we add the input handler and register it with shiny. Do not forget to use it in the message handler in JavaScript like so: \texttt{Shiny.setInputValue("classification:class",\ results);}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{"shiny"}\NormalTok{)}
+
+\KeywordTok{addResourcePath}\NormalTok{(}\StringTok{"www"}\NormalTok{, }\StringTok{"www"}\NormalTok{)}
+
+\CommentTok{\# create handler}
+\NormalTok{handler <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, ...)\{}
+\NormalTok{  purrr}\OperatorTok{::}\KeywordTok{map\_dfr}\NormalTok{(data, as.data.frame)}
+\NormalTok{\}}
+
+\CommentTok{\# register handler}
+\NormalTok{shiny}\OperatorTok{::}\KeywordTok{registerInputHandler}\NormalTok{(}\StringTok{"class"}\NormalTok{, handler)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+\NormalTok{  tags}\OperatorTok{$}\KeywordTok{head}\NormalTok{(}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{script}\NormalTok{(}\DataTypeTok{src =} \StringTok{"https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"}\NormalTok{),}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{script}\NormalTok{(}\DataTypeTok{src =} \StringTok{"www/classify.js"}\NormalTok{)}
+\NormalTok{  ),}
+  \KeywordTok{fluidRow}\NormalTok{(}
+    \KeywordTok{column}\NormalTok{(}
+      \DecValTok{2}\NormalTok{,}
+      \KeywordTok{selectInput}\NormalTok{(}
+        \StringTok{"select"}\NormalTok{, }\StringTok{"Select an image to classify"}\NormalTok{,}
+        \DataTypeTok{choices =} \KeywordTok{c}\NormalTok{(}\StringTok{"lorikeet"}\NormalTok{, }\StringTok{"flamingo"}\NormalTok{)}
+\NormalTok{      )}
+\NormalTok{    ),}
+    \KeywordTok{column}\NormalTok{(}
+      \DecValTok{2}\NormalTok{, }\KeywordTok{br}\NormalTok{(), }\KeywordTok{actionButton}\NormalTok{(}\StringTok{"classify"}\NormalTok{, }\StringTok{"Classify"}\NormalTok{, }\DataTypeTok{icon =} \KeywordTok{icon}\NormalTok{(}\StringTok{"search"}\NormalTok{))}
+\NormalTok{    )}
+\NormalTok{  ),}
+  \KeywordTok{uiOutput}\NormalTok{(}\StringTok{"img"}\NormalTok{),}
+  \KeywordTok{verbatimTextOutput}\NormalTok{(}\StringTok{"results"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output, session)\{}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{img <{-}}\StringTok{ }\KeywordTok{renderUI}\NormalTok{(\{}
+\NormalTok{    path <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(}\StringTok{"www/"}\NormalTok{, input}\OperatorTok{$}\NormalTok{select, }\StringTok{".jpg"}\NormalTok{)}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{img}\NormalTok{(}\DataTypeTok{src =}\NormalTok{ path, }\DataTypeTok{id =} \StringTok{"bird"}\NormalTok{)}
+\NormalTok{  \})}
+
+  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{classify, \{}
+\NormalTok{    session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\StringTok{\textquotesingle{}classify\textquotesingle{}}\NormalTok{, }\KeywordTok{list}\NormalTok{())}
+\NormalTok{  \})}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{results <{-}}\StringTok{ }\KeywordTok{renderPrint}\NormalTok{(\{}
+\NormalTok{    input}\OperatorTok{$}\NormalTok{classification}
+\NormalTok{  \})}
+
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/ml5-table.png}
+\caption{Classifier table output}
+\end{figure}
+
+\hypertarget{math-evaluator}{%
+\chapter{Math Evaluator}\label{math-evaluator}}
+
+In this short example we wrap the JavaScript library \href{https://github.com/5anthosh/fcal}{fcal.js} with R using V8.
+
+\begin{quote}
+Fcaljs is an extensive math expression evaluator library for JavaScript and Node.js. Using fcal, you can perform basic arithmetic, percentage operations with precision. It features a flexible expression parser with a large set of built-in units, functions and constants.
+\end{quote}
+
+The library can be explored in its \href{https://github.com/5anthosh/fcal}{READMe} available on Github, the library is very straightforward it consists of instantiating a class and use the \texttt{evaluate} method to evaluate mathematical expressions.
+
+We start by loading V8 and sourcing fcal.js from the CDN.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(V8)}
+
+\CommentTok{\# initialise}
+\NormalTok{engine <{-}}\StringTok{ }\KeywordTok{v8}\NormalTok{()}
+
+\NormalTok{engine}\OperatorTok{$}\KeywordTok{source}\NormalTok{(}\StringTok{"https://cdn.jsdelivr.net/npm/fcal/dist/fcal.js"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Then one needs to initialise the class.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{engine}\OperatorTok{$}\KeywordTok{eval}\NormalTok{(}\StringTok{"const calc = new fcal.Fcal();"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Finally, it's simply about using the one method to evaluate expressions.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{engine}\OperatorTok{$}\KeywordTok{call}\NormalTok{(}\StringTok{"calc.evaluate"}\NormalTok{, }\StringTok{"23 C add 123 F"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $n
+## [1] "196.40000000000004"
+## 
+## $ns
+## $ns$name
+## [1] "Decimal"
+## 
+## 
+## $lf
+## [1] FALSE
+## 
+## $unit
+## $unit$id
+## [1] "TEMPERATURE"
+## 
+## $unit$r
+## [1] "0.55555555555555555556"
+## 
+## $unit$b
+## [1] "255.3722222222222"
+## 
+## $unit$unitType
+## [1] "°F"
+## 
+## $unit$plural
+## [1] "°F"
+## 
+## $unit$singular
+## [1] "°F"
+## 
+## 
+## $TYPE
+## [1] 1
+## 
+## $TYPE_RANK
+## [1] 2
+\end{verbatim}
 
   \bibliography{book.bib,packages.bib}
 

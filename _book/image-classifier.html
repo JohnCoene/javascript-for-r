@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 14 Image Classifier | JavaScript for R</title>
+  <meta name="description" content="Invite JavaScript into your Data Science workflow." />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 14 Image Classifier | JavaScript for R" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Invite JavaScript into your Data Science workflow." />
+  <meta name="github-repo" content="yihui/bookdown-crc" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 14 Image Classifier | JavaScript for R" />
+  
+  <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
+  
+
+<meta name="author" content="John Coene" />
+
+
+<meta name="date" content="2020-06-24" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="ploty.html"/>
+<link rel="next" href="math-evaluator.html"/>
+<script src="libs/header-attrs/header-attrs.js"></script>
+<script src="libs/jquery/jquery.min.js"></script>
+<link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<script src="libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="libs/plotly-binding/plotly.js"></script>
+<script src="libs/typedarray/typedarray.min.js"></script>
+<link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main/plotly-latest.min.js"></script>
+<script src="libs/core-js/shim.min.js"></script>
+<script src="libs/react/react.min.js"></script>
+<script src="libs/react/react-dom.min.js"></script>
+<script src="libs/reactwidget/react-tools.js"></script>
+<script src="libs/reactable-binding/reactable.js"></script>
+<script src="libs/r2d3-render/r2d3-render.js"></script>
+<script src="libs/webcomponents/webcomponents.js"></script>
+<script src="libs/r2d3-binding/r2d3.js"></script>
+<script src="libs/d3v5/d3.min.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">R and JavaScript</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i>Disclaimer</a></li>
+</ul></li>
+<li class="part"><span><b>I Basics &amp; Roadmap</b></span></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#rationale"><i class="fa fa-check"></i>Rationale</a></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#prerequisites"><i class="fa fa-check"></i>Prerequisites</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#package-development"><i class="fa fa-check"></i>Package Development</a></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#json"><i class="fa fa-check"></i>JSON</a></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#javascript"><i class="fa fa-check"></i>JavaScript</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#methods"><i class="fa fa-check"></i>Methods</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#v8"><i class="fa fa-check"></i>V8</a></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#htmlwidgets"><i class="fa fa-check"></i>htmlwidgets</a></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#shiny"><i class="fa fa-check"></i>Shiny</a></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#reactr"><i class="fa fa-check"></i>reactR</a></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#bubble"><i class="fa fa-check"></i>bubble</a></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#r2d3"><i class="fa fa-check"></i>r2d3</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>II JavaScript for Computations</b></span></li>
+<li class="chapter" data-level="2" data-path="the-v8-engine.html"><a href="the-v8-engine.html"><i class="fa fa-check"></i><b>2</b> The V8 Engine</a>
+<ul>
+<li class="chapter" data-level="" data-path="the-v8-engine.html"><a href="the-v8-engine.html#installation"><i class="fa fa-check"></i>Installation</a></li>
+<li class="chapter" data-level="" data-path="the-v8-engine.html"><a href="the-v8-engine.html#basics"><i class="fa fa-check"></i>Basics</a></li>
+<li class="chapter" data-level="" data-path="the-v8-engine.html"><a href="the-v8-engine.html#external-libraries"><i class="fa fa-check"></i>External Libraries</a></li>
+<li class="chapter" data-level="" data-path="the-v8-engine.html"><a href="the-v8-engine.html#with-npm"><i class="fa fa-check"></i>With Npm</a></li>
+<li class="chapter" data-level="" data-path="the-v8-engine.html"><a href="the-v8-engine.html#use-in-packages"><i class="fa fa-check"></i>Use in Packages</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="node.html"><a href="node.html"><i class="fa fa-check"></i><b>3</b> Node.js with Bubble</a>
+<ul>
+<li class="chapter" data-level="" data-path="node.html"><a href="node.html#basics-1"><i class="fa fa-check"></i>Basics</a></li>
+<li class="chapter" data-level="" data-path="node.html"><a href="node.html#r-markdown-engine"><i class="fa fa-check"></i>R Markdown Engine</a></li>
+<li class="chapter" data-level="" data-path="node.html"><a href="node.html#npm"><i class="fa fa-check"></i>Npm</a></li>
+</ul></li>
+<li class="part"><span><b>III Web Development with Shiny</b></span></li>
+<li class="chapter" data-level="4" data-path="introduction-1.html"><a href="introduction-1.html"><i class="fa fa-check"></i><b>4</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction-1.html"><a href="introduction-1.html#static-files"><i class="fa fa-check"></i>Static Files</a></li>
+<li class="chapter" data-level="" data-path="introduction-1.html"><a href="introduction-1.html#example---alerts"><i class="fa fa-check"></i>Example - Alerts</a></li>
+<li class="chapter" data-level="" data-path="introduction-1.html"><a href="introduction-1.html#from-r-to-javascript"><i class="fa fa-check"></i>From R to JavaScript</a></li>
+<li class="chapter" data-level="" data-path="introduction-1.html"><a href="introduction-1.html#from-javascript-to-r"><i class="fa fa-check"></i>From JavaScript to R</a></li>
+<li class="chapter" data-level="" data-path="introduction-1.html"><a href="introduction-1.html#deserialise"><i class="fa fa-check"></i>Deserialise</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="a-complete-integration.html"><a href="a-complete-integration.html"><i class="fa fa-check"></i><b>5</b> A Complete Integration</a>
+<ul>
+<li class="chapter" data-level="" data-path="a-complete-integration.html"><a href="a-complete-integration.html#serialisation"><i class="fa fa-check"></i>Serialisation</a></li>
+<li class="chapter" data-level="" data-path="a-complete-integration.html"><a href="a-complete-integration.html#events-callbacks"><i class="fa fa-check"></i>Events &amp; Callbacks</a></li>
+<li class="chapter" data-level="" data-path="a-complete-integration.html"><a href="a-complete-integration.html#as-a-package"><i class="fa fa-check"></i>As a Package</a>
+<ul>
+<li class="chapter" data-level="" data-path="a-complete-integration.html"><a href="a-complete-integration.html#dependencies"><i class="fa fa-check"></i>Dependencies</a></li>
+<li class="chapter" data-level="" data-path="a-complete-integration.html"><a href="a-complete-integration.html#r-code"><i class="fa fa-check"></i>R Code</a></li>
+<li class="chapter" data-level="" data-path="a-complete-integration.html"><a href="a-complete-integration.html#javascript-code"><i class="fa fa-check"></i>JavaScript Code</a></li>
+<li class="chapter" data-level="" data-path="a-complete-integration.html"><a href="a-complete-integration.html#input-handler"><i class="fa fa-check"></i>Input Handler</a></li>
+<li class="chapter" data-level="" data-path="a-complete-integration.html"><a href="a-complete-integration.html#wrapping-up"><i class="fa fa-check"></i>Wrapping up</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="a-complete-integration.html"><a href="a-complete-integration.html#exercises"><i class="fa fa-check"></i>Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="custom-outputs.html"><a href="custom-outputs.html"><i class="fa fa-check"></i><b>6</b> Custom Outputs</a>
+<ul>
+<li class="chapter" data-level="" data-path="custom-outputs.html"><a href="custom-outputs.html#inner-workings"><i class="fa fa-check"></i>Inner-workings</a></li>
+<li class="chapter" data-level="6.1" data-path="custom-outputs.html"><a href="custom-outputs.html#discover-lena.js"><i class="fa fa-check"></i><b>6.1</b> Discover Lena.js</a></li>
+<li class="chapter" data-level="" data-path="custom-outputs.html"><a href="custom-outputs.html#setup"><i class="fa fa-check"></i>Setup</a></li>
+<li class="chapter" data-level="" data-path="custom-outputs.html"><a href="custom-outputs.html#output"><i class="fa fa-check"></i>Output</a></li>
+<li class="chapter" data-level="" data-path="custom-outputs.html"><a href="custom-outputs.html#render"><i class="fa fa-check"></i>Render</a></li>
+<li class="chapter" data-level="" data-path="custom-outputs.html"><a href="custom-outputs.html#javascript-binding"><i class="fa fa-check"></i>JavaScript Binding</a></li>
+<li class="chapter" data-level="" data-path="custom-outputs.html"><a href="custom-outputs.html#test"><i class="fa fa-check"></i>Test</a></li>
+</ul></li>
+<li class="part"><span><b>IV Data Visualisation</b></span></li>
+<li class="chapter" data-level="7" data-path="introduction-2.html"><a href="introduction-2.html"><i class="fa fa-check"></i><b>7</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction-2.html"><a href="introduction-2.html#candidate-libraries"><i class="fa fa-check"></i>Candidate Libraries</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction-2.html"><a href="introduction-2.html#plotly"><i class="fa fa-check"></i>Plotly</a></li>
+<li class="chapter" data-level="" data-path="introduction-2.html"><a href="introduction-2.html#highchart.js"><i class="fa fa-check"></i>Highchart.js</a></li>
+<li class="chapter" data-level="" data-path="introduction-2.html"><a href="introduction-2.html#chart.js"><i class="fa fa-check"></i>Chart.js</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="introduction-2.html"><a href="introduction-2.html#how-it-works"><i class="fa fa-check"></i>How it works</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="your-first-widget.html"><a href="your-first-widget.html"><i class="fa fa-check"></i><b>8</b> Your First Widget</a>
+<ul>
+<li class="chapter" data-level="" data-path="your-first-widget.html"><a href="your-first-widget.html#the-scaffold"><i class="fa fa-check"></i>The Scaffold</a></li>
+<li class="chapter" data-level="" data-path="your-first-widget.html"><a href="your-first-widget.html#the-output"><i class="fa fa-check"></i>The Output</a></li>
+<li class="chapter" data-level="" data-path="your-first-widget.html"><a href="your-first-widget.html#javascript-side"><i class="fa fa-check"></i>JavaScript-side</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="a-realistic-widget.html"><a href="a-realistic-widget.html"><i class="fa fa-check"></i><b>9</b> A Realistic Widget</a>
+<ul>
+<li class="chapter" data-level="" data-path="a-realistic-widget.html"><a href="a-realistic-widget.html#dependency"><i class="fa fa-check"></i>Dependency</a></li>
+<li class="chapter" data-level="" data-path="a-realistic-widget.html"><a href="a-realistic-widget.html#javascript-1"><i class="fa fa-check"></i>JavaScript</a></li>
+<li class="chapter" data-level="" data-path="a-realistic-widget.html"><a href="a-realistic-widget.html#html-element"><i class="fa fa-check"></i>HTML Element</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="the-full-monty.html"><a href="the-full-monty.html"><i class="fa fa-check"></i><b>10</b> The Full Monty</a>
+<ul>
+<li class="chapter" data-level="" data-path="the-full-monty.html"><a href="the-full-monty.html#dependencies-1"><i class="fa fa-check"></i>Dependencies</a></li>
+<li class="chapter" data-level="" data-path="the-full-monty.html"><a href="the-full-monty.html#javascript-2"><i class="fa fa-check"></i>JavaScript</a></li>
+<li class="chapter" data-level="" data-path="the-full-monty.html"><a href="the-full-monty.html#working-with-data"><i class="fa fa-check"></i>Working with Data</a></li>
+<li class="chapter" data-level="" data-path="the-full-monty.html"><a href="the-full-monty.html#transforming-data"><i class="fa fa-check"></i>Transforming Data</a>
+<ul>
+<li class="chapter" data-level="" data-path="the-full-monty.html"><a href="the-full-monty.html#in-javascript"><i class="fa fa-check"></i>In JavaScript</a></li>
+<li class="chapter" data-level="" data-path="the-full-monty.html"><a href="the-full-monty.html#in-r"><i class="fa fa-check"></i>In R</a></li>
+<li class="chapter" data-level="" data-path="the-full-monty.html"><a href="the-full-monty.html#pros-cons"><i class="fa fa-check"></i>Pros &amp; Cons</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="the-full-monty.html"><a href="the-full-monty.html#on-print"><i class="fa fa-check"></i>On Print</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="advanced-topics.html"><a href="advanced-topics.html"><i class="fa fa-check"></i><b>11</b> Advanced Topics</a>
+<ul>
+<li class="chapter" data-level="" data-path="advanced-topics.html"><a href="advanced-topics.html#shared-variables"><i class="fa fa-check"></i>Shared Variables</a></li>
+<li class="chapter" data-level="" data-path="advanced-topics.html"><a href="advanced-topics.html#sizing"><i class="fa fa-check"></i>Sizing</a></li>
+<li class="chapter" data-level="" data-path="advanced-topics.html"><a href="advanced-topics.html#sizing-policy"><i class="fa fa-check"></i>Sizing Policy</a></li>
+<li class="chapter" data-level="" data-path="advanced-topics.html"><a href="advanced-topics.html#resizing"><i class="fa fa-check"></i>Resizing</a></li>
+<li class="chapter" data-level="" data-path="advanced-topics.html"><a href="advanced-topics.html#pre-render-hooks-security"><i class="fa fa-check"></i>Pre Render Hooks &amp; Security</a></li>
+<li class="chapter" data-level="" data-path="advanced-topics.html"><a href="advanced-topics.html#javascript-code-1"><i class="fa fa-check"></i>JavaScript Code</a></li>
+<li class="chapter" data-level="" data-path="advanced-topics.html"><a href="advanced-topics.html#prepend-append-content"><i class="fa fa-check"></i>Prepend &amp; Append Content</a></li>
+<li class="chapter" data-level="" data-path="advanced-topics.html"><a href="advanced-topics.html#dependencies-2"><i class="fa fa-check"></i>Dependencies</a></li>
+<li class="chapter" data-level="" data-path="advanced-topics.html"><a href="advanced-topics.html#compatibility"><i class="fa fa-check"></i>Compatibility</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="working-with-shiny.html"><a href="working-with-shiny.html"><i class="fa fa-check"></i><b>12</b> Working with Shiny</a>
+<ul>
+<li class="chapter" data-level="" data-path="working-with-shiny.html"><a href="working-with-shiny.html#javascript-to-r"><i class="fa fa-check"></i>JavaScript to R</a></li>
+<li class="chapter" data-level="" data-path="working-with-shiny.html"><a href="working-with-shiny.html#input-handler-1"><i class="fa fa-check"></i>Input Handler</a></li>
+<li class="chapter" data-level="" data-path="working-with-shiny.html"><a href="working-with-shiny.html#r-to-javascript"><i class="fa fa-check"></i>R to JavaScript</a>
+<ul>
+<li class="chapter" data-level="" data-path="working-with-shiny.html"><a href="working-with-shiny.html#send-data"><i class="fa fa-check"></i>Send Data</a></li>
+<li class="chapter" data-level="" data-path="working-with-shiny.html"><a href="working-with-shiny.html#retrieve-widget-instance"><i class="fa fa-check"></i>Retrieve Widget Instance</a></li>
+<li class="chapter" data-level="" data-path="working-with-shiny.html"><a href="working-with-shiny.html#handle-data"><i class="fa fa-check"></i>Handle Data</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>V Examples</b></span></li>
+<li class="chapter" data-level="13" data-path="ploty.html"><a href="ploty.html"><i class="fa fa-check"></i><b>13</b> Ploty</a>
+<ul>
+<li class="chapter" data-level="" data-path="ploty.html"><a href="ploty.html#callback"><i class="fa fa-check"></i>Callback</a></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="image-classifier.html"><a href="image-classifier.html"><i class="fa fa-check"></i><b>14</b> Image Classifier</a></li>
+<li class="chapter" data-level="15" data-path="math-evaluator.html"><a href="math-evaluator.html"><i class="fa fa-check"></i><b>15</b> Math Evaluator</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">JavaScript for R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="image-classifier" class="section level1" number="14">
+<h1><span class="header-section-number">Chapter 14</span> Image Classifier</h1>
+<p>In this example we bring <a href="https://learn.ml5js.org/">ml5.js</a> to R using Shiny, more specifically its classifier using <a href="https://arxiv.org/abs/1704.04861">mobileNet</a>. Using shiny and JavaScript the model can run in the client’s browser and the result can be sent back to the server. This means the model uses the client’s computing power to run the prediction rather than the server, thereby alleviating computation on the server and bypassing limitations on concurrent users.</p>
+<p>Then again the journey starts by exploring ml5.js and the classifier we are going to use. One starts by instantiating an image classifer, specifying the model to use (ml5.js comes with a few out of the box and allows using custom models), then the classifier is used on an image present in the DOM.</p>
+<div class="sourceCode" id="cb328"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb328-1"><a href="image-classifier.html#cb328-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
+<span id="cb328-2"><a href="image-classifier.html#cb328-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb328-3"><a href="image-classifier.html#cb328-3"></a></span>
+<span id="cb328-4"><a href="image-classifier.html#cb328-4"></a><span class="kw">&lt;head&gt;</span></span>
+<span id="cb328-5"><a href="image-classifier.html#cb328-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
+<span id="cb328-6"><a href="image-classifier.html#cb328-6"></a>  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;https://unpkg.com/ml5@0.4.3/dist/ml5.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb328-7"><a href="image-classifier.html#cb328-7"></a><span class="kw">&lt;/head&gt;</span></span>
+<span id="cb328-8"><a href="image-classifier.html#cb328-8"></a></span>
+<span id="cb328-9"><a href="image-classifier.html#cb328-9"></a><span class="kw">&lt;body&gt;</span></span>
+<span id="cb328-10"><a href="image-classifier.html#cb328-10"></a>  <span class="co">&lt;!-- image to classify --&gt;</span></span>
+<span id="cb328-11"><a href="image-classifier.html#cb328-11"></a>  <span class="kw">&lt;img</span><span class="ot"> id=</span><span class="st">&quot;dog&quot;</span><span class="ot"> src=</span><span class="st">&quot;www/doge.jpg&quot;</span><span class="kw">/&gt;</span></span>
+<span id="cb328-12"><a href="image-classifier.html#cb328-12"></a></span>
+<span id="cb328-13"><a href="image-classifier.html#cb328-13"></a>  <span class="co">&lt;!-- Script to run classifer --&gt;</span></span>
+<span id="cb328-14"><a href="image-classifier.html#cb328-14"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb328-15"><a href="image-classifier.html#cb328-15"></a>    <span class="co">// Initialize the Image Classifier method with MobileNet</span></span>
+<span id="cb328-16"><a href="image-classifier.html#cb328-16"></a>    <span class="kw">const</span> classifier <span class="op">=</span> <span class="va">ml5</span>.<span class="at">imageClassifier</span>(<span class="st">&#39;MobileNet&#39;</span><span class="op">,</span> modelLoaded)<span class="op">;</span></span>
+<span id="cb328-17"><a href="image-classifier.html#cb328-17"></a></span>
+<span id="cb328-18"><a href="image-classifier.html#cb328-18"></a>    <span class="co">// When the model is loaded</span></span>
+<span id="cb328-19"><a href="image-classifier.html#cb328-19"></a>    <span class="kw">function</span> <span class="at">modelLoaded</span>() <span class="op">{</span></span>
+<span id="cb328-20"><a href="image-classifier.html#cb328-20"></a>      <span class="va">console</span>.<span class="at">log</span>(<span class="st">&#39;Model Loaded!&#39;</span>)<span class="op">;</span></span>
+<span id="cb328-21"><a href="image-classifier.html#cb328-21"></a>    <span class="op">}</span></span>
+<span id="cb328-22"><a href="image-classifier.html#cb328-22"></a></span>
+<span id="cb328-23"><a href="image-classifier.html#cb328-23"></a>    <span class="co">// Make a prediction with a selected image</span></span>
+<span id="cb328-24"><a href="image-classifier.html#cb328-24"></a>    <span class="va">classifier</span>.<span class="at">classify</span>(<span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&#39;dog&#39;</span>)<span class="op">,</span> (err<span class="op">,</span> results) <span class="kw">=&gt;</span> <span class="op">{</span></span>
+<span id="cb328-25"><a href="image-classifier.html#cb328-25"></a>      <span class="va">console</span>.<span class="at">log</span>(results)<span class="op">;</span></span>
+<span id="cb328-26"><a href="image-classifier.html#cb328-26"></a>    <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb328-27"><a href="image-classifier.html#cb328-27"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb328-28"><a href="image-classifier.html#cb328-28"></a><span class="kw">&lt;/body&gt;</span></span>
+<span id="cb328-29"><a href="image-classifier.html#cb328-29"></a></span>
+<span id="cb328-30"><a href="image-classifier.html#cb328-30"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<p>In shiny, we would need to pass the id of the image (<code>dog</code> above) to be sent from the server and the callback function to return the results to R. The projects starts from an empty directory, before creating actual application let us create the directory of static files that will contain the JavaScript file (<code>classify.js</code>) and the images to classify. Feel free download whichever images you want, below we download images of birds from Wikipedia.</p>
+<div class="sourceCode" id="cb329"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb329-1"><a href="image-classifier.html#cb329-1"></a><span class="co"># static files</span></span>
+<span id="cb329-2"><a href="image-classifier.html#cb329-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
+<span id="cb329-3"><a href="image-classifier.html#cb329-3"></a><span class="kw">file.create</span>(<span class="st">&quot;www/classify.js&quot;</span>)</span>
+<span id="cb329-4"><a href="image-classifier.html#cb329-4"></a></span>
+<span id="cb329-5"><a href="image-classifier.html#cb329-5"></a><span class="co"># flamingo</span></span>
+<span id="cb329-6"><a href="image-classifier.html#cb329-6"></a>fl &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb329-7"><a href="image-classifier.html#cb329-7"></a>  <span class="st">&quot;https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/American_flamingo&quot;</span>,</span>
+<span id="cb329-8"><a href="image-classifier.html#cb329-8"></a>  <span class="st">&quot;_%28Phoenicopterus_ruber%29.JPG/256px-American_flamingo_%28Phoenicopterus_ruber%29.JPG&quot;</span></span>
+<span id="cb329-9"><a href="image-classifier.html#cb329-9"></a>)</span>
+<span id="cb329-10"><a href="image-classifier.html#cb329-10"></a></span>
+<span id="cb329-11"><a href="image-classifier.html#cb329-11"></a><span class="co"># lorikeet</span></span>
+<span id="cb329-12"><a href="image-classifier.html#cb329-12"></a>lo &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb329-13"><a href="image-classifier.html#cb329-13"></a>  <span class="st">&quot;https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Rainbow_lorikeet.jpg/&quot;</span>,</span>
+<span id="cb329-14"><a href="image-classifier.html#cb329-14"></a>  <span class="st">&quot;256px-Rainbow_lorikeet.jpg&quot;</span></span>
+<span id="cb329-15"><a href="image-classifier.html#cb329-15"></a>)</span>
+<span id="cb329-16"><a href="image-classifier.html#cb329-16"></a></span>
+<span id="cb329-17"><a href="image-classifier.html#cb329-17"></a><span class="co"># download</span></span>
+<span id="cb329-18"><a href="image-classifier.html#cb329-18"></a><span class="kw">download.file</span>(fl, <span class="dt">destfile =</span> <span class="st">&quot;www/flamingo.jpg&quot;</span>)</span>
+<span id="cb329-19"><a href="image-classifier.html#cb329-19"></a><span class="kw">download.file</span>(lo, <span class="dt">destfile =</span> <span class="st">&quot;www/lorikeet.jpg&quot;</span>)</span></code></pre></div>
+<p>Once images are downloaded we can build the basic skeleton of the app. We import ml5.js from the CDN, create a select input to switch between the two images of birds that were downloaded and use <code>renderUI</code> to dynamically render the selected image. Finally, we create a button to trigger the classification, though it currently sends an empty list to a message handler that we are yet to create.</p>
+<div class="sourceCode" id="cb330"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb330-1"><a href="image-classifier.html#cb330-1"></a><span class="kw">library</span>(<span class="st">&quot;shiny&quot;</span>)</span>
+<span id="cb330-2"><a href="image-classifier.html#cb330-2"></a></span>
+<span id="cb330-3"><a href="image-classifier.html#cb330-3"></a><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb330-4"><a href="image-classifier.html#cb330-4"></a></span>
+<span id="cb330-5"><a href="image-classifier.html#cb330-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb330-6"><a href="image-classifier.html#cb330-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb330-7"><a href="image-classifier.html#cb330-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/ml5@0.4.3/dist/ml5.min.js&quot;</span>)</span>
+<span id="cb330-8"><a href="image-classifier.html#cb330-8"></a>  ),</span>
+<span id="cb330-9"><a href="image-classifier.html#cb330-9"></a>  <span class="kw">fluidRow</span>(</span>
+<span id="cb330-10"><a href="image-classifier.html#cb330-10"></a>    <span class="kw">column</span>(</span>
+<span id="cb330-11"><a href="image-classifier.html#cb330-11"></a>      <span class="dv">2</span>,</span>
+<span id="cb330-12"><a href="image-classifier.html#cb330-12"></a>      <span class="kw">selectInput</span>(</span>
+<span id="cb330-13"><a href="image-classifier.html#cb330-13"></a>        <span class="st">&quot;select&quot;</span>, <span class="st">&quot;Select an image to classify&quot;</span>,</span>
+<span id="cb330-14"><a href="image-classifier.html#cb330-14"></a>        <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;lorikeet&quot;</span>, <span class="st">&quot;flamingo&quot;</span>)</span>
+<span id="cb330-15"><a href="image-classifier.html#cb330-15"></a>      )</span>
+<span id="cb330-16"><a href="image-classifier.html#cb330-16"></a>    ),</span>
+<span id="cb330-17"><a href="image-classifier.html#cb330-17"></a>    <span class="kw">column</span>(</span>
+<span id="cb330-18"><a href="image-classifier.html#cb330-18"></a>      <span class="dv">2</span>, <span class="kw">br</span>(), <span class="kw">actionButton</span>(<span class="st">&quot;classify&quot;</span>, <span class="st">&quot;Classify&quot;</span>, <span class="dt">icon =</span> <span class="kw">icon</span>(<span class="st">&quot;search&quot;</span>))</span>
+<span id="cb330-19"><a href="image-classifier.html#cb330-19"></a>    )</span>
+<span id="cb330-20"><a href="image-classifier.html#cb330-20"></a>  ),</span>
+<span id="cb330-21"><a href="image-classifier.html#cb330-21"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;img&quot;</span>)</span>
+<span id="cb330-22"><a href="image-classifier.html#cb330-22"></a>)</span>
+<span id="cb330-23"><a href="image-classifier.html#cb330-23"></a></span>
+<span id="cb330-24"><a href="image-classifier.html#cb330-24"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb330-25"><a href="image-classifier.html#cb330-25"></a></span>
+<span id="cb330-26"><a href="image-classifier.html#cb330-26"></a>  output<span class="op">$</span>img &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
+<span id="cb330-27"><a href="image-classifier.html#cb330-27"></a>    path &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;www/&quot;</span>, input<span class="op">$</span>select, <span class="st">&quot;.jpg&quot;</span>)</span>
+<span id="cb330-28"><a href="image-classifier.html#cb330-28"></a>    tags<span class="op">$</span><span class="kw">img</span>(<span class="dt">src =</span> path, <span class="dt">id =</span> <span class="st">&quot;bird&quot;</span>)</span>
+<span id="cb330-29"><a href="image-classifier.html#cb330-29"></a>  })</span>
+<span id="cb330-30"><a href="image-classifier.html#cb330-30"></a></span>
+<span id="cb330-31"><a href="image-classifier.html#cb330-31"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>classify, {</span>
+<span id="cb330-32"><a href="image-classifier.html#cb330-32"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;classify&#39;</span>, <span class="kw">list</span>())</span>
+<span id="cb330-33"><a href="image-classifier.html#cb330-33"></a>  })</span>
+<span id="cb330-34"><a href="image-classifier.html#cb330-34"></a></span>
+<span id="cb330-35"><a href="image-classifier.html#cb330-35"></a>}</span>
+<span id="cb330-36"><a href="image-classifier.html#cb330-36"></a></span>
+<span id="cb330-37"><a href="image-classifier.html#cb330-37"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="figure">
+<img src="images/ml5-init.png" alt="" />
+<p class="caption">Classifier skeleton</p>
+</div>
+<p>With this in place one can start thinking about the JavaScript, when the “classify” button is clicked the classification must be triggered in the client and the result sent back. To do so we need to define the message handler called “classify” to which the data is sent.</p>
+<div class="sourceCode" id="cb331"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb331-1"><a href="image-classifier.html#cb331-1"></a><span class="co">// classify.js</span></span>
+<span id="cb331-2"><a href="image-classifier.html#cb331-2"></a></span>
+<span id="cb331-3"><a href="image-classifier.html#cb331-3"></a><span class="co">// Initialize </span></span>
+<span id="cb331-4"><a href="image-classifier.html#cb331-4"></a><span class="kw">const</span> classifier <span class="op">=</span> <span class="va">ml5</span>.<span class="at">imageClassifier</span>(<span class="st">&#39;MobileNet&#39;</span><span class="op">,</span> modelLoaded)<span class="op">;</span></span>
+<span id="cb331-5"><a href="image-classifier.html#cb331-5"></a></span>
+<span id="cb331-6"><a href="image-classifier.html#cb331-6"></a><span class="kw">function</span> <span class="at">modelLoaded</span>() <span class="op">{</span></span>
+<span id="cb331-7"><a href="image-classifier.html#cb331-7"></a>  <span class="va">console</span>.<span class="at">log</span>(<span class="st">&#39;Model Loaded!&#39;</span>)<span class="op">;</span></span>
+<span id="cb331-8"><a href="image-classifier.html#cb331-8"></a><span class="op">}</span></span>
+<span id="cb331-9"><a href="image-classifier.html#cb331-9"></a></span>
+<span id="cb331-10"><a href="image-classifier.html#cb331-10"></a><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;classify&#39;</span><span class="op">,</span> <span class="kw">function</span>(data)<span class="op">{</span></span>
+<span id="cb331-11"><a href="image-classifier.html#cb331-11"></a>  <span class="co">// Make a prediction with a selected image</span></span>
+<span id="cb331-12"><a href="image-classifier.html#cb331-12"></a>  <span class="va">classifier</span>.<span class="at">classify</span>(<span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&quot;bird&quot;</span>)<span class="op">,</span> (err<span class="op">,</span> results) <span class="kw">=&gt;</span> <span class="op">{</span></span>
+<span id="cb331-13"><a href="image-classifier.html#cb331-13"></a>    <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&quot;classification&quot;</span><span class="op">,</span> results)<span class="op">;</span></span>
+<span id="cb331-14"><a href="image-classifier.html#cb331-14"></a>  <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb331-15"><a href="image-classifier.html#cb331-15"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<p>A few things to note on the above. The classifier is created outside of the message handler as this only has to be done once and not every time the “classify” button is clicked. While the message handler accepts the <code>data</code> objects it does not make use of it, which is fine, the argument must nonetheless be specified. In the aforementioned callback function the input “classification” is defined.</p>
+<div class="sourceCode" id="cb332"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb332-1"><a href="image-classifier.html#cb332-1"></a><span class="kw">library</span>(<span class="st">&quot;shiny&quot;</span>)</span>
+<span id="cb332-2"><a href="image-classifier.html#cb332-2"></a></span>
+<span id="cb332-3"><a href="image-classifier.html#cb332-3"></a><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb332-4"><a href="image-classifier.html#cb332-4"></a></span>
+<span id="cb332-5"><a href="image-classifier.html#cb332-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb332-6"><a href="image-classifier.html#cb332-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb332-7"><a href="image-classifier.html#cb332-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/ml5@0.4.3/dist/ml5.min.js&quot;</span>),</span>
+<span id="cb332-8"><a href="image-classifier.html#cb332-8"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/classify.js&quot;</span>)</span>
+<span id="cb332-9"><a href="image-classifier.html#cb332-9"></a>  ),</span>
+<span id="cb332-10"><a href="image-classifier.html#cb332-10"></a>  <span class="kw">fluidRow</span>(</span>
+<span id="cb332-11"><a href="image-classifier.html#cb332-11"></a>    <span class="kw">column</span>(</span>
+<span id="cb332-12"><a href="image-classifier.html#cb332-12"></a>      <span class="dv">2</span>,</span>
+<span id="cb332-13"><a href="image-classifier.html#cb332-13"></a>      <span class="kw">selectInput</span>(</span>
+<span id="cb332-14"><a href="image-classifier.html#cb332-14"></a>        <span class="st">&quot;select&quot;</span>, <span class="st">&quot;Select an image to classify&quot;</span>,</span>
+<span id="cb332-15"><a href="image-classifier.html#cb332-15"></a>        <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;lorikeet&quot;</span>, <span class="st">&quot;flamingo&quot;</span>)</span>
+<span id="cb332-16"><a href="image-classifier.html#cb332-16"></a>      )</span>
+<span id="cb332-17"><a href="image-classifier.html#cb332-17"></a>    ),</span>
+<span id="cb332-18"><a href="image-classifier.html#cb332-18"></a>    <span class="kw">column</span>(</span>
+<span id="cb332-19"><a href="image-classifier.html#cb332-19"></a>      <span class="dv">2</span>, <span class="kw">br</span>(), <span class="kw">actionButton</span>(<span class="st">&quot;classify&quot;</span>, <span class="st">&quot;Classify&quot;</span>, <span class="dt">icon =</span> <span class="kw">icon</span>(<span class="st">&quot;search&quot;</span>))</span>
+<span id="cb332-20"><a href="image-classifier.html#cb332-20"></a>    )</span>
+<span id="cb332-21"><a href="image-classifier.html#cb332-21"></a>  ),</span>
+<span id="cb332-22"><a href="image-classifier.html#cb332-22"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;img&quot;</span>),</span>
+<span id="cb332-23"><a href="image-classifier.html#cb332-23"></a>  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;results&quot;</span>) <span class="co"># print output</span></span>
+<span id="cb332-24"><a href="image-classifier.html#cb332-24"></a>)</span>
+<span id="cb332-25"><a href="image-classifier.html#cb332-25"></a></span>
+<span id="cb332-26"><a href="image-classifier.html#cb332-26"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb332-27"><a href="image-classifier.html#cb332-27"></a></span>
+<span id="cb332-28"><a href="image-classifier.html#cb332-28"></a>  output<span class="op">$</span>img &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
+<span id="cb332-29"><a href="image-classifier.html#cb332-29"></a>    path &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;www/&quot;</span>, input<span class="op">$</span>select, <span class="st">&quot;.jpg&quot;</span>)</span>
+<span id="cb332-30"><a href="image-classifier.html#cb332-30"></a>    tags<span class="op">$</span><span class="kw">img</span>(<span class="dt">src =</span> path, <span class="dt">id =</span> <span class="st">&quot;bird&quot;</span>)</span>
+<span id="cb332-31"><a href="image-classifier.html#cb332-31"></a>  })</span>
+<span id="cb332-32"><a href="image-classifier.html#cb332-32"></a></span>
+<span id="cb332-33"><a href="image-classifier.html#cb332-33"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>classify, {</span>
+<span id="cb332-34"><a href="image-classifier.html#cb332-34"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;classify&#39;</span>, <span class="kw">list</span>())</span>
+<span id="cb332-35"><a href="image-classifier.html#cb332-35"></a>  })</span>
+<span id="cb332-36"><a href="image-classifier.html#cb332-36"></a></span>
+<span id="cb332-37"><a href="image-classifier.html#cb332-37"></a>  <span class="co"># render classification</span></span>
+<span id="cb332-38"><a href="image-classifier.html#cb332-38"></a>  output<span class="op">$</span>results &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb332-39"><a href="image-classifier.html#cb332-39"></a>    input<span class="op">$</span>classification</span>
+<span id="cb332-40"><a href="image-classifier.html#cb332-40"></a>  })</span>
+<span id="cb332-41"><a href="image-classifier.html#cb332-41"></a></span>
+<span id="cb332-42"><a href="image-classifier.html#cb332-42"></a>}</span>
+<span id="cb332-43"><a href="image-classifier.html#cb332-43"></a></span>
+<span id="cb332-44"><a href="image-classifier.html#cb332-44"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="figure">
+<img src="images/ml5-output.png" alt="" />
+<p class="caption">Classifier output</p>
+</div>
+<p>This returns three results, the label (classification) and the confidence, which could be improved, we ought to build an input handler to transform that into a readable table. Below we add the input handler and register it with shiny. Do not forget to use it in the message handler in JavaScript like so: <code>Shiny.setInputValue("classification:class", results);</code>.</p>
+<div class="sourceCode" id="cb333"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb333-1"><a href="image-classifier.html#cb333-1"></a><span class="kw">library</span>(<span class="st">&quot;shiny&quot;</span>)</span>
+<span id="cb333-2"><a href="image-classifier.html#cb333-2"></a></span>
+<span id="cb333-3"><a href="image-classifier.html#cb333-3"></a><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb333-4"><a href="image-classifier.html#cb333-4"></a></span>
+<span id="cb333-5"><a href="image-classifier.html#cb333-5"></a><span class="co"># create handler</span></span>
+<span id="cb333-6"><a href="image-classifier.html#cb333-6"></a>handler &lt;-<span class="st"> </span><span class="cf">function</span>(data, ...){</span>
+<span id="cb333-7"><a href="image-classifier.html#cb333-7"></a>  purrr<span class="op">::</span><span class="kw">map_dfr</span>(data, as.data.frame)</span>
+<span id="cb333-8"><a href="image-classifier.html#cb333-8"></a>}</span>
+<span id="cb333-9"><a href="image-classifier.html#cb333-9"></a></span>
+<span id="cb333-10"><a href="image-classifier.html#cb333-10"></a><span class="co"># register handler</span></span>
+<span id="cb333-11"><a href="image-classifier.html#cb333-11"></a>shiny<span class="op">::</span><span class="kw">registerInputHandler</span>(<span class="st">&quot;class&quot;</span>, handler)</span>
+<span id="cb333-12"><a href="image-classifier.html#cb333-12"></a></span>
+<span id="cb333-13"><a href="image-classifier.html#cb333-13"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb333-14"><a href="image-classifier.html#cb333-14"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb333-15"><a href="image-classifier.html#cb333-15"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/ml5@0.4.3/dist/ml5.min.js&quot;</span>),</span>
+<span id="cb333-16"><a href="image-classifier.html#cb333-16"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/classify.js&quot;</span>)</span>
+<span id="cb333-17"><a href="image-classifier.html#cb333-17"></a>  ),</span>
+<span id="cb333-18"><a href="image-classifier.html#cb333-18"></a>  <span class="kw">fluidRow</span>(</span>
+<span id="cb333-19"><a href="image-classifier.html#cb333-19"></a>    <span class="kw">column</span>(</span>
+<span id="cb333-20"><a href="image-classifier.html#cb333-20"></a>      <span class="dv">2</span>,</span>
+<span id="cb333-21"><a href="image-classifier.html#cb333-21"></a>      <span class="kw">selectInput</span>(</span>
+<span id="cb333-22"><a href="image-classifier.html#cb333-22"></a>        <span class="st">&quot;select&quot;</span>, <span class="st">&quot;Select an image to classify&quot;</span>,</span>
+<span id="cb333-23"><a href="image-classifier.html#cb333-23"></a>        <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;lorikeet&quot;</span>, <span class="st">&quot;flamingo&quot;</span>)</span>
+<span id="cb333-24"><a href="image-classifier.html#cb333-24"></a>      )</span>
+<span id="cb333-25"><a href="image-classifier.html#cb333-25"></a>    ),</span>
+<span id="cb333-26"><a href="image-classifier.html#cb333-26"></a>    <span class="kw">column</span>(</span>
+<span id="cb333-27"><a href="image-classifier.html#cb333-27"></a>      <span class="dv">2</span>, <span class="kw">br</span>(), <span class="kw">actionButton</span>(<span class="st">&quot;classify&quot;</span>, <span class="st">&quot;Classify&quot;</span>, <span class="dt">icon =</span> <span class="kw">icon</span>(<span class="st">&quot;search&quot;</span>))</span>
+<span id="cb333-28"><a href="image-classifier.html#cb333-28"></a>    )</span>
+<span id="cb333-29"><a href="image-classifier.html#cb333-29"></a>  ),</span>
+<span id="cb333-30"><a href="image-classifier.html#cb333-30"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;img&quot;</span>),</span>
+<span id="cb333-31"><a href="image-classifier.html#cb333-31"></a>  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;results&quot;</span>)</span>
+<span id="cb333-32"><a href="image-classifier.html#cb333-32"></a>)</span>
+<span id="cb333-33"><a href="image-classifier.html#cb333-33"></a></span>
+<span id="cb333-34"><a href="image-classifier.html#cb333-34"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb333-35"><a href="image-classifier.html#cb333-35"></a></span>
+<span id="cb333-36"><a href="image-classifier.html#cb333-36"></a>  output<span class="op">$</span>img &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
+<span id="cb333-37"><a href="image-classifier.html#cb333-37"></a>    path &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;www/&quot;</span>, input<span class="op">$</span>select, <span class="st">&quot;.jpg&quot;</span>)</span>
+<span id="cb333-38"><a href="image-classifier.html#cb333-38"></a>    tags<span class="op">$</span><span class="kw">img</span>(<span class="dt">src =</span> path, <span class="dt">id =</span> <span class="st">&quot;bird&quot;</span>)</span>
+<span id="cb333-39"><a href="image-classifier.html#cb333-39"></a>  })</span>
+<span id="cb333-40"><a href="image-classifier.html#cb333-40"></a></span>
+<span id="cb333-41"><a href="image-classifier.html#cb333-41"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>classify, {</span>
+<span id="cb333-42"><a href="image-classifier.html#cb333-42"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;classify&#39;</span>, <span class="kw">list</span>())</span>
+<span id="cb333-43"><a href="image-classifier.html#cb333-43"></a>  })</span>
+<span id="cb333-44"><a href="image-classifier.html#cb333-44"></a></span>
+<span id="cb333-45"><a href="image-classifier.html#cb333-45"></a>  output<span class="op">$</span>results &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb333-46"><a href="image-classifier.html#cb333-46"></a>    input<span class="op">$</span>classification</span>
+<span id="cb333-47"><a href="image-classifier.html#cb333-47"></a>  })</span>
+<span id="cb333-48"><a href="image-classifier.html#cb333-48"></a></span>
+<span id="cb333-49"><a href="image-classifier.html#cb333-49"></a>}</span>
+<span id="cb333-50"><a href="image-classifier.html#cb333-50"></a></span>
+<span id="cb333-51"><a href="image-classifier.html#cb333-51"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="figure">
+<img src="images/ml5-table.png" alt="" />
+<p class="caption">Classifier table output</p>
+</div>
+
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="ploty.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="math-evaluator.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook/js/app.min.js"></script>
+<script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/clipboard.min.js"></script>
+<script src="libs/gitbook/js/plugin-search.js"></script>
+<script src="libs/gitbook/js/plugin-sharing.js"></script>
+<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook/js/jquery.highlight.js"></script>
+<script src="libs/gitbook/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": {}
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/31-examples-ml5.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": {},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
