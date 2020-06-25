@@ -456,7 +456,95 @@ server <- function(input, output){
       data <- arcs1
     else
       data <- arcs2
+    
     gio_send_data("globe", data)
+  })
+
+}
+
+shinyApp(ui, server)
+```
+
+## Proxy Function {-}
+
+While the function `gio_send_data` created in the previous function works it can be improved upon as currently users will undergo a repetitive pattern: having to pass the id of the visualisation to send the data to every time, for every such function (we only implemented `addData` but many more can be added, e.g.: `setStyle` to change style on the fly).
+
+This can be remedied to by creating what is often referred to as a "proxy." A proxy is a representation of the graph, or pragmatically, an object that contains the id of the visualisation. This object can subsequently be piped to other functions thereby providing not only a cleaner but also a more consistent API. The point being, every such function will require the `id` of the chart and the shiny `session`, these can be further abstracted (don't repeat yourself - DRY principle).
+
+```r
+#' @export
+gio_proxy <- function(id, session = shiny::getDefaultReactiveDomain()){
+  list(id = id, session = session)
+}
+```
+
+Above we create a function called `gio_proxy` which takes the `id` of the chart one wants to build a proxy off, as well as the shiny `session`, there are returned in the form of a list. Next, we should adapt the `gio_send_data` so that it accepts the output of `gioProxy`.
+
+```r
+#' @export
+gio_send_data <- function(proxy, data){
+  message <- list(id = proxy$id, data = apply(data, 1, as.list))
+  proxy$session$sendCustomMessage("send-data", message)
+  return(proxy)
+}
+```
+
+## Example {-}
+
+In this short section we hammer in what was covered in this chapter by creating another function that sends data directly to JavaScript, namely `setStyle` so one can change the style.
+
+```r
+library(gio)
+library(shiny)
+
+# two phoney datasets
+arcs1 <- data.frame(
+  e = c("US", "CN", "RU"),
+  i = c("CN", "RU", "US"),
+  v = c(100, 120, 130)
+)
+
+arcs2 <- data.frame(
+  e = c("CN", "CN", "JP"),
+  i = c("IN", "JP", "US"),
+  v = c(100, 120, 130)
+)
+
+ui <- fluidRow(
+  selectInput(
+    "dataset", 
+    "Select a dataset", 
+    choices = c("First", "Second")
+  ),
+  selectInput(
+    "style", 
+    "Select a style", 
+    choices = c("blueInk", "earlySpring")
+  ),
+  gioOutput("globe")
+)
+
+server <- function(input, output){
+
+  reactive_arcs <- reactive({
+    if(input$dataset == "First") 
+      return(arcs1)
+    return(arcs2)
+  })
+
+  output$globe <- renderGio({
+    gio(arcs1)
+  })
+
+  observeEvent(input$dataset, {
+    if(input$dataset == "First")
+      data <- arcs1
+    else
+      data <- arcs2
+    
+    gio_proxy("globe") %>% 
+      gio_send_data(data) %>% 
+      gio_send_style(input$style)
   })
 
 }
