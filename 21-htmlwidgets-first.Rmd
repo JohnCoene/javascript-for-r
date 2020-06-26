@@ -1,6 +1,6 @@
 # Your First Widget
 
-The previous chapter gave some indication as to how how widgets work but this is overall probably still shrouded in mystery. This chapter aims at demystifying what remains confusing. This is done by building a very basic widget with the aim of rummaging through its components to observe how they interact and ultimately grasp a greater understanding of how such interactive outputs are actually produced. 
+The previous chapter gave some indication as to how widgets work but this is overall probably still shrouded in mystery. This chapter aims at demystifying what remains confusing. This is done by building a very basic widget with the aim of rummaging through its components to observe how they interact and ultimately grasp a greater understanding of how such interactive outputs are actually produced. 
 
 ## The Scaffold {-}
 
@@ -23,7 +23,7 @@ devtools::document()
 devtools::load_all()
 ```
 
-It might be hard to believe, but at this stage one already has a fully functioning widget ready to use after documenting, and building the package. Indeed, the `play.R` file that that was created contains a function named "play" ẁhich takes, amongst other arguments, a message.  
+It might be hard to believe, but at this stage one already has a fully functioning widget ready to use after documenting, and building the package. Indeed, the `play.R` file that was created contains a function named "play" ẁhich takes, amongst other arguments, a message.  
 
 ```r
 play(message = "This is a widget!")
@@ -31,7 +31,7 @@ play(message = "This is a widget!")
 
 ![First HTML widget](images/playground-1.png)
 
-This displays the message in the RStudio "Viewer," or the your default browser which indicates that the function does indeed create an HTML output. One can use the the ![](images/open-in-browser.png) button located in the top right of the RStudio "Viewer" to open the message in web browser which can prove very useful to look under the hood of the widgets for debugging.
+This displays the message in the RStudio "Viewer," or the your default browser which indicates that the function does indeed create an HTML output. One can use the ![](images/open-in-browser.png) button located in the top right of the RStudio "Viewer" to open the message in web browser which can prove very useful to look under the hood of the widgets for debugging.
 
 ## The Output {-}
 
@@ -57,7 +57,7 @@ Below is a part of the `<body>` of the output of `play("This is a widget!")` obt
 <script type="application/json" data-for="htmlwidget-c21cca0e76e520b46fc7">{"x":{"message":"This is a widget!"},"evals":[],"jsHooks":[]}</script>
 ```
 
-One thing the source code of the rendered output reveals is the element (`div`) created by the htmlwidgets package to hold the message (the class name is identical to that of the widget (`play`), as well as, below it, in the `<script>` tag, the JSON object which includes the `x` variable used in the `play` function. The `div` created bears a randomly generated `id` which one can define when creating the widget using the `elementId` argument.
+One thing the source code of the rendered output reveals is the element (`<div>`) created by the htmlwidgets package to hold the message (the class name is identical to that of the widget, `play`), as well as, below it, in the `<script>` tag, the JSON object which includes the `x` variable used in the `play` function. The `div` created bears a randomly generated `id` which one can define when creating the widget using the `elementId` argument.
 
 ```r
 # specify the id
@@ -135,7 +135,7 @@ htmlwidgets::createWidget(
 
 This is so htmlwidgets can internally match the output of `createWidget` to its JavaScript function.
 
-The `factory` function returns two functions, `resize`, and `renderValue`. The first is used to dynamically resize the output, it is not relevant to this widget is thus tackled later in this book. Let us focus on `renderValue`, the function that actually renders the output. It takes an object `x` from which is accesses the "message" variable that it uses as text for object `el` (`el.innerText`). The object `x` passed to this function is actually the list of the same name that was build in the R function `play`! While in R one would access the `message` in list `x` with `x$message` in JavaScript to access the `message` in the JSON `x` one writes `x.message`, only changing the dollar sign to a dot. Let's show this perhaps more clearly by printing the content of `x`.
+The `factory` function returns two functions, `resize`, and `renderValue`. The first is used to dynamically resize the output, it is not relevant to this widget is thus tackled later on. Let us focus on `renderValue`, the function that actually renders the output. It takes an object `x` from which the "message" variable is used as text for object `el` (`el.innerText`). The object `x` passed to this function is actually the list of the same name that was build in the R function `play`! While in R one would access the `message` in list `x` with `x$message` in JavaScript to access the `message` in the JSON `x` one writes `x.message`, only changing the dollar sign to a dot. Let's show this perhaps more clearly by printing the content of `x`.
 
 ```js
 console.log(x);
@@ -146,7 +146,7 @@ We place `console.log` to print the content of `x` in the console, reload the pa
 
 ![Console tab output](images/playground-console-x.png)
 
-This displays the JSON object containing the message: it looks eerily similar to the list that was created in R (`x = list(message = "This is a widget!")`). What one should take away from this is that data that needs to be communicated from R to the JavaScript function should be placed in the R list `x`. This list is serialised to JSON and placed in the HTML output in a `script` tag with a `data-for` attribute. This attribute indicates which widget the data is destined for. This effectively enables htmlwidgets to match the serialised data with the output elements: data in `<script data-for='viz'>` is to be used to create a visualisation in `<div id='viz'>`.
+This displays the JSON object containing the message: it looks eerily similar to the list that was created in R (`x = list(message = "This is a widget!")`). What one should take away from this is that data that needs to be communicated from R to the JavaScript function should be placed in the R list `x`. This list is serialised to JSON and placed in the HTML output in a `script` tag with a `data-for` attribute that indicates which widget the data is destined for. This effectively enables htmlwidgets to match the serialised data with the output elements: data in `<script data-for='viz'>` is to be used to create a visualisation in `<div id='viz'>`.
 
 Before we move on to other things one should also grasp a better understanding of the `el` object, which can also be logged in the console.
 
@@ -158,7 +158,7 @@ el.innerText = x.message;
 
 ![Console tab output](images/playground-console-el.png)
 
-This displays the HTML element created by htmlwidgets that is meant to hold the visualisation, or in this case, the message. If you are familiar with JavaScript, this is the element that would be returned by `document.getElementById`. This object allows manipulating the element in pretty much any way imaginable, change its position, its colour, its size, or, as done here, to insert some text in its place. What's more one can access attributes of the object just like a JSON array. Therefore one can log the `id` of the element.
+This displays the HTML element created by htmlwidgets that is meant to hold the visualisation, or in this case, the message. If you are familiar with JavaScript, this is the element that would be returned by `document.getElementById`. This object allows manipulating the element in pretty much any way imaginable, change its position, its colour, its size, or, as done here, to insert some text within it. What's more one can access attributes of the object just like a JSON array. Therefore one can log the `id` of the element.
 
 ```js
 // print the id of the element

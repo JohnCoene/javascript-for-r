@@ -411,7 +411,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb227-9"><a href="a-realistic-widget.html#cb227-9"></a></span>
 <span id="cb227-10"><a href="a-realistic-widget.html#cb227-10"></a>}</span>
 <span id="cb227-11"><a href="a-realistic-widget.html#cb227-11"></a><span class="op">...</span></span></code></pre></div>
-<p>This should now work, run <code>devtools::load_all</code> followed by <code>typed("whatever")</code> and the JavaScript animated text will appear! It’s not of any use just yet as the options, included the text being typed is predefined: the package is currently not making any use the of the inputs passed from R. Below change the default strings to <code>x.message</code>.</p>
+<p>This should now work, run <code>devtools::load_all</code> followed by <code>typed("whatever")</code> and the JavaScript animated text will appear! It’s not of any use just yet as the options, including the text being typed is predefined: the package is currently not making any use the of the inputs passed from R. This can be changed by using <code>x.message</code> passed from R instead of the default strings.</p>
 <div class="sourceCode" id="cb228"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb228-1"><a href="a-realistic-widget.html#cb228-1"></a><span class="co">// typed.js</span></span>
 <span id="cb228-2"><a href="a-realistic-widget.html#cb228-2"></a><span class="op">...</span></span>
 <span id="cb228-3"><a href="a-realistic-widget.html#cb228-3"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) {</span>
@@ -423,7 +423,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb228-9"><a href="a-realistic-widget.html#cb228-9"></a></span>
 <span id="cb228-10"><a href="a-realistic-widget.html#cb228-10"></a>}</span>
 <span id="cb228-11"><a href="a-realistic-widget.html#cb228-11"></a><span class="op">...</span></span></code></pre></div>
-<p>This, however, will cause issues as the <code>strings</code> options expects and array (vector) and not a single string. This is something often forgotten when working with R, there is no scalar values, in R a scalar is vector of length 1.</p>
+<p>This, however, will cause issues as the <code>strings</code> options expects and array (vector) and not a single string.</p>
 <div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="a-realistic-widget.html#cb229-1"></a><span class="kw">typed</span>(<span class="st">&quot;does not work&quot;</span>) <span class="co"># length =  1</span></span>
 <span id="cb229-2"><a href="a-realistic-widget.html#cb229-2"></a><span class="kw">typed</span>(<span class="kw">c</span>(<span class="st">&quot;This&quot;</span>, <span class="st">&quot;will&quot;</span>, <span class="st">&quot;work&quot;</span>)) <span class="co"># length &gt; 1</span></span></code></pre></div>
 <p>One solution is to force the input into a list.</p>
@@ -431,7 +431,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb230-2"><a href="a-realistic-widget.html#cb230-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
 <span id="cb230-3"><a href="a-realistic-widget.html#cb230-3"></a>  <span class="dt">message =</span> <span class="kw">as.list</span>(message)</span>
 <span id="cb230-4"><a href="a-realistic-widget.html#cb230-4"></a>)</span></code></pre></div>
-<p>At this juncture the package works but there is a salient issue with the way it handles options. Why build a list in R to reconstruct it in JavaScript manually. Since the options are serialised in R to JSON and that typed.js expects a JSON of options it is actually cleaner and more convenient to construct an R list that mirrors the JSON array so one can use is as-is in JavaScript.</p>
+<p>At this juncture the package works but there is a salient issue with the way it handles options. Why build a list in R to reconstruct it in JavaScript manually. Since the options are serialised in R to JSON and that typed.js expects a JSON of options it is actually cleaner and more convenient to construct an R list that mirrors the JSON array so one can use it as-is in JavaScript.</p>
 <p>In fact, renaming the <code>message</code> to <code>strings</code> effectively does this.</p>
 <div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="a-realistic-widget.html#cb231-1"></a><span class="co"># typed.R</span></span>
 <span id="cb231-2"><a href="a-realistic-widget.html#cb231-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
@@ -473,6 +473,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb234-1"><a href="a-realistic-widget.html#cb234-1"></a>typed_html &lt;-<span class="st"> </span><span class="cf">function</span>(...){</span>
 <span id="cb234-2"><a href="a-realistic-widget.html#cb234-2"></a>  htmltools<span class="op">::</span>tags<span class="op">$</span><span class="kw">span</span>(...)</span>
 <span id="cb234-3"><a href="a-realistic-widget.html#cb234-3"></a>}</span></code></pre></div>
+<p>Note that this can also be used to force certain attributes onto the element. For instance we could use the code below to force all output to use a red font.</p>
+<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="a-realistic-widget.html#cb235-1"></a>typed_html &lt;-<span class="st"> </span><span class="cf">function</span>(...){</span>
+<span id="cb235-2"><a href="a-realistic-widget.html#cb235-2"></a>  htmltools<span class="op">::</span>tags<span class="op">$</span><span class="kw">span</span>(..., <span class="dt">style =</span> <span class="st">&quot;color:red;&quot;</span>)</span>
+<span id="cb235-3"><a href="a-realistic-widget.html#cb235-3"></a>}</span></code></pre></div>
 <p>We shall leave it at that and move on to building another widget but completing the package makes for an interesting exercise.</p>
 
 </div>
