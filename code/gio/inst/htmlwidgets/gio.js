@@ -70,10 +70,10 @@ if (HTMLWidgets.shinyMode){
     controller.addData(message.data);
   });
 
-  // send-style message handler
-  Shiny.addCustomMessageHandler(type = 'send-style', function(message) {
+  // clear data message handler
+  Shiny.addCustomMessageHandler(type = 'clear-data', function(message) {
     var controller = get_gio(message.id);
-    controller.setStyle(message.style);
+    controller.clearData();
   });
 
 }

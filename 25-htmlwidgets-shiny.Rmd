@@ -491,60 +491,62 @@ gio_send_data <- function(proxy, data){
 
 ## Example {-}
 
-In this short section we hammer in what was covered in this chapter by creating another function that sends data directly to JavaScript, namely `setStyle` so one can change the style.
+In order to actively demonstrate the advantage of the "proxy" function as well as to hammer home how such functions work, we shall build another which removes all data from the globe. In JavaScript it's as simple as `controller.clearData();`.
+
+The journey starts in R where we create a new function that sends a message to clear the data, the message only needs to contain the id of the visualisation from which data needs to be cleared, it will be used to retrieve the `controller` from which the `clearData` method is available. 
+
+```r
+#' @export
+gio_clear_data <- function(proxy){
+  message <- list(id = proxy$id)
+  proxy$session$sendCustomMessage("clear-data", message)
+  return(proxy)
+}
+```
+
+The message being sent from R, all that is missing the JavaScript code to catch that message and actually clear the data from the globe. That function is very similar to what was previously shown, the only difference is the name of the message handler and the method used (`clearData`).
+
+```js
+// gio.js
+Shiny.addCustomMessageHandler(type = 'clear-data', function(message) {
+  var controller = get_gio(message.id);
+  controller.clearData();
+});
+```
+
+Then one can build an application to test that new function. We build a shiny application with a button to add the data to the visualisation and another to clear data from it.
 
 ```r
 library(gio)
 library(shiny)
 
-# two phoney datasets
-arcs1 <- data.frame(
+# phoney dataset
+arcs <- data.frame(
   e = c("US", "CN", "RU"),
   i = c("CN", "RU", "US"),
   v = c(100, 120, 130)
 )
 
-arcs2 <- data.frame(
-  e = c("CN", "CN", "JP"),
-  i = c("IN", "JP", "US"),
-  v = c(100, 120, 130)
-)
-
 ui <- fluidRow(
-  selectInput(
-    "dataset", 
-    "Select a dataset", 
-    choices = c("First", "Second")
-  ),
-  selectInput(
-    "style", 
-    "Select a style", 
-    choices = c("blueInk", "earlySpring")
-  ),
+  actionButton("load", "Load data"),
+  actionButton("clear", "Clear data"),
   gioOutput("globe")
 )
 
 server <- function(input, output){
 
-  reactive_arcs <- reactive({
-    if(input$dataset == "First") 
-      return(arcs1)
-    return(arcs2)
-  })
-
   output$globe <- renderGio({
-    gio(arcs1)
+    gio(arcs)
   })
 
-  observeEvent(input$dataset, {
-    if(input$dataset == "First")
-      data <- arcs1
-    else
-      data <- arcs2
-    
+  observeEvent(input$load, {
     gio_proxy("globe") %>% 
-      gio_send_style(input$style) %>% 
-      gio_send_data(data)
+      gio_send_data(arcs)
+  })
+
+  observeEvent(input$clear, {
+    gio_proxy("globe") %>% 
+      gio_clear_data()
   })
 
 }

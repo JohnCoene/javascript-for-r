@@ -11,8 +11,8 @@ gio_send_data <- function(proxy, data){
 }
 
 #' @export
-gio_send_style <- function(proxy, style){
-  message <- list(id = proxy$id, style = style)
-  proxy$session$sendCustomMessage("send-style", message)
+gio_clear_data <- function(proxy){
+  message <- list(id = proxy$id)
+  proxy$session$sendCustomMessage("clear-data", message)
   return(proxy)
 }
