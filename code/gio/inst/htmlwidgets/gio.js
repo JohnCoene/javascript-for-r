@@ -76,4 +76,11 @@ if (HTMLWidgets.shinyMode){
     controller.clearData();
   });
 
+  // set style message handler
+  Shiny.addCustomMessageHandler(type = 'set-style', function(message) {
+    var controller = get_gio(message.id);
+    controller.setStyle(message.style);
+    controller.update();
+  });
+
 }

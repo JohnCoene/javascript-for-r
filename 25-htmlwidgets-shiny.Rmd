@@ -60,7 +60,7 @@ url <- paste0(
 )
 arcs <- jsonlite::fromJSON(url)
 
-ui <- fluidRow(
+ui <- fluidPage(
   gioOutput("globe"),
   fluidRow(
     column(6, verbatimTextOutput("selectedCountry")),
@@ -137,7 +137,7 @@ url <- paste0(
 )
 arcs <- jsonlite::fromJSON(url)
 
-ui <- fluidRow(
+ui <- fluidPage(
   gioOutput("globe"),
   DTOutput("relatedCountries")
 )
@@ -183,7 +183,7 @@ arcs2 <- data.frame(
   v = c(100, 120, 130)
 )
 
-ui <- fluidRow(
+ui <- fluidPage(
   selectInput(
     "dataset", 
     "Select a dataset", 
@@ -430,7 +430,7 @@ arcs2 <- data.frame(
   v = c(100, 120, 130)
 )
 
-ui <- fluidRow(
+ui <- fluidPage(
   selectInput(
     "dataset", 
     "Select a dataset", 
@@ -527,7 +527,7 @@ arcs <- data.frame(
   v = c(100, 120, 130)
 )
 
-ui <- fluidRow(
+ui <- fluidPage(
   actionButton("load", "Load data"),
   actionButton("clear", "Clear data"),
   gioOutput("globe")
@@ -553,3 +553,75 @@ server <- function(input, output){
 
 shinyApp(ui, server)
 ```
+
+![Gio with clear data proxy](images/gio-shiny-clear.png)
+
+## Update
+
+The previous proxies defined worked for reason unbeknownst to the author of this book. It will not work with all methods. The reason it will not work is one that is likely to occur with many other visualisation libraries. For instance, one can attempt to develop a function to dynamically change style (theme) without having to redraw the entire getGlobe, starting again with the R function.
+
+```r
+#' @export
+gio_set_style <- function(proxy, style){
+  message <- list(id = proxy$id, style = style)
+  proxy$session$sendCustomMessage("set-style", message)
+  return(proxy)
+}
+```
+
+Then add the JavaScript handler.
+
+```js
+Shiny.addCustomMessageHandler(type = 'set-style', function(message) {
+  var controller = get_gio(message.id);
+  controller.setStyle(message.style);
+});
+```
+
+At this stage one can try the function in a shiny application but it will not work reason being that most such methods that change underlying aspects of a visualisation will not be reflected in real time. Gio.js, and many other libraries, will require one to explicitly call a method to update the chart. This has multiple advantages, one can stack multiple visual changes to execute them at the same time, and one can manage the load on the front-end. Therefore JavaScript visualisation libraries will often provide an "update" method.
+
+```js
+Shiny.addCustomMessageHandler(type = 'set-style', function(message) {
+  var controller = get_gio(message.id);
+  controller.setStyle(message.style);
+  controller.update(); // force update the visualisation
+});
+```
+
+This forces the chart to update, applying the new style.
+
+```r
+library(gio)
+library(shiny)
+
+# two phoney datasets
+arcs <- data.frame(
+  e = c("US", "CN", "RU"),
+  i = c("CN", "RU", "US"),
+  v = c(100, 120, 130)
+)
+
+ui <- fluidPage(
+  selectInput(
+    "style", 
+    "Select a style", 
+    choices = c("blueInk", "earlySpring")
+  ),
+  gioOutput("globe")
+)
+
+server <- function(input, output){
+  output$globe <- renderGio({
+    gio(arcs1)
+  })
+
+  observeEvent(input$style, {
+    gio_proxy("globe") %>% 
+      gio_set_style(input$style)
+  })
+
+}
+shinyApp(ui, server)
+```
+
+![Gio with dynamic style](images/gio-shiny-style.png)

@@ -169,7 +169,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2020-06-29}
+\date{2020-06-30}
 
 \begin{document}
 \maketitle
@@ -996,7 +996,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Mon Jun 29 2020 22:31:54 GMT+0200 (Central European Summer Time)"
+## [1] "Tue Jun 30 2020 00:18:25 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1006,7 +1006,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Mon Jun 29 2020 22:31:54 GMT+0200 (Central European Summer Time)"
+## [1] "Tue Jun 30 2020 00:18:25 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -4856,7 +4856,7 @@ The package can then be installed with \texttt{devtools::install} so we can test
 \NormalTok{)}
 \NormalTok{arcs <{-}}\StringTok{ }\NormalTok{jsonlite}\OperatorTok{::}\KeywordTok{fromJSON}\NormalTok{(url)}
 
-\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidRow}\NormalTok{(}
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
   \KeywordTok{gioOutput}\NormalTok{(}\StringTok{"globe"}\NormalTok{),}
   \KeywordTok{fluidRow}\NormalTok{(}
     \KeywordTok{column}\NormalTok{(}\DecValTok{6}\NormalTok{, }\KeywordTok{verbatimTextOutput}\NormalTok{(}\StringTok{"selectedCountry"}\NormalTok{)),}
@@ -4943,7 +4943,7 @@ Finally, we can reinstall the package with \texttt{devtools::install} and create
 \NormalTok{)}
 \NormalTok{arcs <{-}}\StringTok{ }\NormalTok{jsonlite}\OperatorTok{::}\KeywordTok{fromJSON}\NormalTok{(url)}
 
-\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidRow}\NormalTok{(}
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
   \KeywordTok{gioOutput}\NormalTok{(}\StringTok{"globe"}\NormalTok{),}
   \KeywordTok{DTOutput}\NormalTok{(}\StringTok{"relatedCountries"}\NormalTok{)}
 \NormalTok{)}
@@ -4997,7 +4997,7 @@ Before we look into the implementation, let us create a shiny application which 
   \DataTypeTok{v =} \KeywordTok{c}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{120}\NormalTok{, }\DecValTok{130}\NormalTok{)}
 \NormalTok{)}
 
-\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidRow}\NormalTok{(}
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
   \KeywordTok{selectInput}\NormalTok{(}
     \StringTok{"dataset"}\NormalTok{, }
     \StringTok{"Select a dataset"}\NormalTok{, }
@@ -5272,7 +5272,7 @@ We can then build a shiny application to test the new functionality.
   \DataTypeTok{v =} \KeywordTok{c}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{120}\NormalTok{, }\DecValTok{130}\NormalTok{)}
 \NormalTok{)}
 
-\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidRow}\NormalTok{(}
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
   \KeywordTok{selectInput}\NormalTok{(}
     \StringTok{"dataset"}\NormalTok{, }
     \StringTok{"Select a dataset"}\NormalTok{, }
@@ -5383,7 +5383,7 @@ Then one can build an application to test that new function. We build a shiny ap
   \DataTypeTok{v =} \KeywordTok{c}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{120}\NormalTok{, }\DecValTok{130}\NormalTok{)}
 \NormalTok{)}
 
-\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidRow}\NormalTok{(}
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
   \KeywordTok{actionButton}\NormalTok{(}\StringTok{"load"}\NormalTok{, }\StringTok{"Load data"}\NormalTok{),}
   \KeywordTok{actionButton}\NormalTok{(}\StringTok{"clear"}\NormalTok{, }\StringTok{"Clear data"}\NormalTok{),}
   \KeywordTok{gioOutput}\NormalTok{(}\StringTok{"globe"}\NormalTok{)}
@@ -5410,6 +5410,95 @@ Then one can build an application to test that new function. We build a shiny ap
 \KeywordTok{shinyApp}\NormalTok{(ui, server)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/gio-shiny-clear.png}
+\caption{Gio with clear data proxy}
+\end{figure}
+
+\hypertarget{update}{%
+\section{Update}\label{update}}
+
+The previous proxies defined worked for reason unbeknownst to the author of this book. It will not work with all methods. The reason it will not work is one that is likely to occur with many other visualisation libraries. For instance, one can attempt to develop a function to dynamically change style (theme) without having to redraw the entire getGlobe, starting again with the R function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export}
+\NormalTok{gio\_set\_style <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(proxy, style)\{}
+\NormalTok{  message <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ proxy}\OperatorTok{$}\NormalTok{id, }\DataTypeTok{style =}\NormalTok{ style)}
+\NormalTok{  proxy}\OperatorTok{$}\NormalTok{session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\StringTok{"set{-}style"}\NormalTok{, message)}
+  \KeywordTok{return}\NormalTok{(proxy)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Then add the JavaScript handler.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{Shiny}\NormalTok{.}\AttributeTok{addCustomMessageHandler}\NormalTok{(type }\OperatorTok{=} \StringTok{\textquotesingle{}set{-}style\textquotesingle{}}\OperatorTok{,} \KeywordTok{function}\NormalTok{(message) }\OperatorTok{\{}
+  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \AttributeTok{get\_gio}\NormalTok{(}\VariableTok{message}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
+  \VariableTok{controller}\NormalTok{.}\AttributeTok{setStyle}\NormalTok{(}\VariableTok{message}\NormalTok{.}\AttributeTok{style}\NormalTok{)}\OperatorTok{;}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+At this stage one can try the function in a shiny application but it will not work reason being that most such methods that change underlying aspects of a visualisation will not be reflected in real time. Gio.js, and many other libraries, will require one to explicitly call a method to update the chart. This has multiple advantages, one can stack multiple visual changes to execute them at the same time, and one can manage the load on the front-end. Therefore JavaScript visualisation libraries will often provide an ``update'' method.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{Shiny}\NormalTok{.}\AttributeTok{addCustomMessageHandler}\NormalTok{(type }\OperatorTok{=} \StringTok{\textquotesingle{}set{-}style\textquotesingle{}}\OperatorTok{,} \KeywordTok{function}\NormalTok{(message) }\OperatorTok{\{}
+  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \AttributeTok{get\_gio}\NormalTok{(}\VariableTok{message}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
+  \VariableTok{controller}\NormalTok{.}\AttributeTok{setStyle}\NormalTok{(}\VariableTok{message}\NormalTok{.}\AttributeTok{style}\NormalTok{)}\OperatorTok{;}
+  \VariableTok{controller}\NormalTok{.}\AttributeTok{update}\NormalTok{()}\OperatorTok{;} \CommentTok{// force update the visualisation}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+This forces the chart to update, applying the new style.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(gio)}
+\KeywordTok{library}\NormalTok{(shiny)}
+
+\CommentTok{\# two phoney datasets}
+\NormalTok{arcs <{-}}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}
+  \DataTypeTok{e =} \KeywordTok{c}\NormalTok{(}\StringTok{"US"}\NormalTok{, }\StringTok{"CN"}\NormalTok{, }\StringTok{"RU"}\NormalTok{),}
+  \DataTypeTok{i =} \KeywordTok{c}\NormalTok{(}\StringTok{"CN"}\NormalTok{, }\StringTok{"RU"}\NormalTok{, }\StringTok{"US"}\NormalTok{),}
+  \DataTypeTok{v =} \KeywordTok{c}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{120}\NormalTok{, }\DecValTok{130}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+  \KeywordTok{selectInput}\NormalTok{(}
+    \StringTok{"style"}\NormalTok{, }
+    \StringTok{"Select a style"}\NormalTok{, }
+    \DataTypeTok{choices =} \KeywordTok{c}\NormalTok{(}\StringTok{"blueInk"}\NormalTok{, }\StringTok{"earlySpring"}\NormalTok{)}
+\NormalTok{  ),}
+  \KeywordTok{gioOutput}\NormalTok{(}\StringTok{"globe"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
+\NormalTok{  output}\OperatorTok{$}\NormalTok{globe <{-}}\StringTok{ }\KeywordTok{renderGio}\NormalTok{(\{}
+    \KeywordTok{gio}\NormalTok{(arcs1)}
+\NormalTok{  \})}
+
+  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{style, \{}
+    \KeywordTok{gio\_proxy}\NormalTok{(}\StringTok{"globe"}\NormalTok{) }\OperatorTok{\%>\%}\StringTok{ }
+\StringTok{      }\KeywordTok{gio\_set\_style}\NormalTok{(input}\OperatorTok{$}\NormalTok{style)}
+\NormalTok{  \})}
+
+\NormalTok{\}}
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/gio-shiny-style.png}
+\caption{Gio with dynamic style}
+\end{figure}
 
 \hypertarget{part-examples}{%
 \part{Examples}\label{part-examples}}
