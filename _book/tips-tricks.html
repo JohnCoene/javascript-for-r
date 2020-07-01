@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 16 Math Evaluator | JavaScript for R</title>
+  <title>Chapter 6 Tips &amp; Tricks | JavaScript for R</title>
   <meta name="description" content="Invite JavaScript into your Data Science workflow." />
   <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 16 Math Evaluator | JavaScript for R" />
+  <meta property="og:title" content="Chapter 6 Tips &amp; Tricks | JavaScript for R" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="yihui/bookdown-crc" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 16 Math Evaluator | JavaScript for R" />
+  <meta name="twitter:title" content="Chapter 6 Tips &amp; Tricks | JavaScript for R" />
   
   <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="image-classifier.html"/>
-<link rel="next" href="references.html"/>
+<link rel="prev" href="a-complete-integration.html"/>
+<link rel="next" href="custom-outputs.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -309,69 +309,101 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="math-evaluator" class="section level1" number="16">
-<h1><span class="header-section-number">Chapter 16</span> Math Evaluator</h1>
-<p>In this short example we wrap the JavaScript library <a href="https://github.com/5anthosh/fcal">fcal.js</a> with R using V8.</p>
-<blockquote>
-<p>Fcaljs is an extensive math expression evaluator library for JavaScript and Node.js. Using fcal, you can perform basic arithmetic, percentage operations with precision. It features a flexible expression parser with a large set of built-in units, functions and constants.</p>
-</blockquote>
-<p>The library can be explored in its <a href="https://github.com/5anthosh/fcal">README</a> available on Github, the library is very straightforward it consists of instantiating a class and use the <code>evaluate</code> method to evaluate mathematical expressions.</p>
-<p>We start by loading V8 and sourcing fcal.js from the CDN.</p>
-<div class="sourceCode" id="cb348"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb348-1"><a href="math-evaluator.html#cb348-1"></a><span class="kw">library</span>(V8)</span>
-<span id="cb348-2"><a href="math-evaluator.html#cb348-2"></a></span>
-<span id="cb348-3"><a href="math-evaluator.html#cb348-3"></a><span class="co"># initialise</span></span>
-<span id="cb348-4"><a href="math-evaluator.html#cb348-4"></a>engine &lt;-<span class="st"> </span><span class="kw">v8</span>()</span>
-<span id="cb348-5"><a href="math-evaluator.html#cb348-5"></a></span>
-<span id="cb348-6"><a href="math-evaluator.html#cb348-6"></a>engine<span class="op">$</span><span class="kw">source</span>(<span class="st">&quot;https://cdn.jsdelivr.net/npm/fcal/dist/fcal.js&quot;</span>)</span></code></pre></div>
-<p>Then one needs to initialise the class.</p>
-<div class="sourceCode" id="cb349"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb349-1"><a href="math-evaluator.html#cb349-1"></a>engine<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;const calc = new fcal.Fcal();&quot;</span>)</span></code></pre></div>
-<p>Finally, it’s simply about using the one method to evaluate expressions.</p>
-<div class="sourceCode" id="cb350"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb350-1"><a href="math-evaluator.html#cb350-1"></a>engine<span class="op">$</span><span class="kw">call</span>(<span class="st">&quot;calc.evaluate&quot;</span>, <span class="st">&quot;23 C add 123 F&quot;</span>)</span></code></pre></div>
-<pre><code>## $n
-## [1] &quot;196.40000000000004&quot;
-## 
-## $ns
-## $ns$name
-## [1] &quot;Decimal&quot;
-## 
-## 
-## $lf
-## [1] FALSE
-## 
-## $unit
-## $unit$id
-## [1] &quot;TEMPERATURE&quot;
-## 
-## $unit$r
-## [1] &quot;0.55555555555555555556&quot;
-## 
-## $unit$b
-## [1] &quot;255.3722222222222&quot;
-## 
-## $unit$unitType
-## [1] &quot;°F&quot;
-## 
-## $unit$plural
-## [1] &quot;°F&quot;
-## 
-## $unit$singular
-## [1] &quot;°F&quot;
-## 
-## 
-## $TYPE
-## [1] 1
-## 
-## $TYPE_RANK
-## [1] 2</code></pre>
+<div id="tips-tricks" class="section level1" number="6">
+<h1><span class="header-section-number">Chapter 6</span> Tips &amp; Tricks</h1>
+<p>While previous chapters on working with Shiny made use of external libraries and build packages that brought new functionalities previously not available in shiny. One does not have to go to this length to take advantage of the learnings contained in those pages.</p>
+<div id="table-buttons" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> Table Buttons</h2>
+<p>For instance, using what was learned previously one can place buttons inside a shiny table and observe server-side which is clicked. Starting with a basic application that only includes a table to which we want to add a column containing a button on each row. The idea is that each button sets a different value (e.g.: an id) to an input using <code>shiny.setInputValue</code>.</p>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="tips-tricks.html#cb171-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb171-2"><a href="tips-tricks.html#cb171-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb171-3"><a href="tips-tricks.html#cb171-3"></a></span>
+<span id="cb171-4"><a href="tips-tricks.html#cb171-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb171-5"><a href="tips-tricks.html#cb171-5"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>)</span>
+<span id="cb171-6"><a href="tips-tricks.html#cb171-6"></a>)</span>
+<span id="cb171-7"><a href="tips-tricks.html#cb171-7"></a></span>
+<span id="cb171-8"><a href="tips-tricks.html#cb171-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
+<span id="cb171-9"><a href="tips-tricks.html#cb171-9"></a></span>
+<span id="cb171-10"><a href="tips-tricks.html#cb171-10"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
+<span id="cb171-11"><a href="tips-tricks.html#cb171-11"></a>    <span class="kw">datatable</span>(mtcars, <span class="dt">escape =</span> <span class="ot">FALSE</span>, <span class="dt">selection =</span> <span class="st">&quot;none&quot;</span>, <span class="dt">rownames =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb171-12"><a href="tips-tricks.html#cb171-12"></a>  })</span>
+<span id="cb171-13"><a href="tips-tricks.html#cb171-13"></a></span>
+<span id="cb171-14"><a href="tips-tricks.html#cb171-14"></a>}</span>
+<span id="cb171-15"><a href="tips-tricks.html#cb171-15"></a></span>
+<span id="cb171-16"><a href="tips-tricks.html#cb171-16"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>We start by creating the on-click functions (character strings) for each row of the <code>mtcars</code> dataset. This is the function that will be triggered when buttons are clicked.</p>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="tips-tricks.html#cb172-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb172-2"><a href="tips-tricks.html#cb172-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb172-3"><a href="tips-tricks.html#cb172-3"></a></span>
+<span id="cb172-4"><a href="tips-tricks.html#cb172-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb172-5"><a href="tips-tricks.html#cb172-5"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>)</span>
+<span id="cb172-6"><a href="tips-tricks.html#cb172-6"></a>)</span>
+<span id="cb172-7"><a href="tips-tricks.html#cb172-7"></a></span>
+<span id="cb172-8"><a href="tips-tricks.html#cb172-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
+<span id="cb172-9"><a href="tips-tricks.html#cb172-9"></a></span>
+<span id="cb172-10"><a href="tips-tricks.html#cb172-10"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
+<span id="cb172-11"><a href="tips-tricks.html#cb172-11"></a>    onclick &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Shiny.setInputValue(&#39;click&#39;, &#39;&quot;</span>, <span class="kw">rownames</span>(mtcars), <span class="st">&quot;&#39;)&quot;</span>)</span>
+<span id="cb172-12"><a href="tips-tricks.html#cb172-12"></a>    <span class="kw">datatable</span>(mtcars, <span class="dt">escape =</span> <span class="ot">FALSE</span>, <span class="dt">selection =</span> <span class="st">&quot;none&quot;</span>, <span class="dt">rownames =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb172-13"><a href="tips-tricks.html#cb172-13"></a>  })</span>
+<span id="cb172-14"><a href="tips-tricks.html#cb172-14"></a></span>
+<span id="cb172-15"><a href="tips-tricks.html#cb172-15"></a>}</span>
+<span id="cb172-16"><a href="tips-tricks.html#cb172-16"></a></span>
+<span id="cb172-17"><a href="tips-tricks.html#cb172-17"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>Next we create the buttons for each row and set the JavaScript functions previously created as the <code>onClick</code> attributes. The JavaScript code passed to the <code>onClick</code> attribute will be executed every time the button is clicked.</p>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="tips-tricks.html#cb173-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb173-2"><a href="tips-tricks.html#cb173-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb173-3"><a href="tips-tricks.html#cb173-3"></a></span>
+<span id="cb173-4"><a href="tips-tricks.html#cb173-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb173-5"><a href="tips-tricks.html#cb173-5"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>)</span>
+<span id="cb173-6"><a href="tips-tricks.html#cb173-6"></a>)</span>
+<span id="cb173-7"><a href="tips-tricks.html#cb173-7"></a></span>
+<span id="cb173-8"><a href="tips-tricks.html#cb173-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
+<span id="cb173-9"><a href="tips-tricks.html#cb173-9"></a></span>
+<span id="cb173-10"><a href="tips-tricks.html#cb173-10"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
+<span id="cb173-11"><a href="tips-tricks.html#cb173-11"></a>    onclick &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Shiny.setInputValue(&#39;click&#39;, &#39;&quot;</span>, <span class="kw">rownames</span>(mtcars), <span class="st">&quot;&#39;)&quot;</span>)</span>
+<span id="cb173-12"><a href="tips-tricks.html#cb173-12"></a>    button &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;&lt;a class=&#39;btn btn-primary&#39; onClick=</span><span class="ch">\&quot;</span><span class="st">&quot;</span>, onclick, <span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">&gt;Click me&lt;/a&gt;&quot;</span>)</span>
+<span id="cb173-13"><a href="tips-tricks.html#cb173-13"></a>    mtcars<span class="op">$</span>button &lt;-<span class="st"> </span>button</span>
+<span id="cb173-14"><a href="tips-tricks.html#cb173-14"></a>    <span class="kw">datatable</span>(mtcars, <span class="dt">escape =</span> <span class="ot">FALSE</span>, <span class="dt">selection =</span> <span class="st">&quot;none&quot;</span>, <span class="dt">rownames =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb173-15"><a href="tips-tricks.html#cb173-15"></a>  })</span>
+<span id="cb173-16"><a href="tips-tricks.html#cb173-16"></a></span>
+<span id="cb173-17"><a href="tips-tricks.html#cb173-17"></a>}</span>
+<span id="cb173-18"><a href="tips-tricks.html#cb173-18"></a></span>
+<span id="cb173-19"><a href="tips-tricks.html#cb173-19"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>We can then observe the <code>click</code> input and, to demonstrate, render it’s value in the UI.</p>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="tips-tricks.html#cb174-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb174-2"><a href="tips-tricks.html#cb174-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb174-3"><a href="tips-tricks.html#cb174-3"></a></span>
+<span id="cb174-4"><a href="tips-tricks.html#cb174-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb174-5"><a href="tips-tricks.html#cb174-5"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>),</span>
+<span id="cb174-6"><a href="tips-tricks.html#cb174-6"></a>  <span class="kw">strong</span>(<span class="st">&quot;Clicked Model:&quot;</span>),</span>
+<span id="cb174-7"><a href="tips-tricks.html#cb174-7"></a>  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;model&quot;</span>)</span>
+<span id="cb174-8"><a href="tips-tricks.html#cb174-8"></a>)</span>
+<span id="cb174-9"><a href="tips-tricks.html#cb174-9"></a></span>
+<span id="cb174-10"><a href="tips-tricks.html#cb174-10"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
+<span id="cb174-11"><a href="tips-tricks.html#cb174-11"></a></span>
+<span id="cb174-12"><a href="tips-tricks.html#cb174-12"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
+<span id="cb174-13"><a href="tips-tricks.html#cb174-13"></a>    onclick &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Shiny.setInputValue(&#39;click&#39;, &#39;&quot;</span>, <span class="kw">rownames</span>(mtcars), <span class="st">&quot;&#39;)&quot;</span>)</span>
+<span id="cb174-14"><a href="tips-tricks.html#cb174-14"></a>    button &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;&lt;a class=&#39;btn btn-primary&#39; onClick=</span><span class="ch">\&quot;</span><span class="st">&quot;</span>, onclick, <span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">&gt;Click me&lt;/a&gt;&quot;</span>)</span>
+<span id="cb174-15"><a href="tips-tricks.html#cb174-15"></a>    mtcars<span class="op">$</span>button &lt;-<span class="st"> </span>button</span>
+<span id="cb174-16"><a href="tips-tricks.html#cb174-16"></a>    <span class="kw">datatable</span>(mtcars, <span class="dt">escape =</span> <span class="ot">FALSE</span>, <span class="dt">selection =</span> <span class="st">&quot;none&quot;</span>, <span class="dt">rownames =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb174-17"><a href="tips-tricks.html#cb174-17"></a>  })</span>
+<span id="cb174-18"><a href="tips-tricks.html#cb174-18"></a></span>
+<span id="cb174-19"><a href="tips-tricks.html#cb174-19"></a>  output<span class="op">$</span>model &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb174-20"><a href="tips-tricks.html#cb174-20"></a>    <span class="kw">print</span>(input<span class="op">$</span>click)</span>
+<span id="cb174-21"><a href="tips-tricks.html#cb174-21"></a>  })</span>
+<span id="cb174-22"><a href="tips-tricks.html#cb174-22"></a>}</span>
+<span id="cb174-23"><a href="tips-tricks.html#cb174-23"></a></span>
+<span id="cb174-24"><a href="tips-tricks.html#cb174-24"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="image-classifier.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="a-complete-integration.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="custom-outputs.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -402,7 +434,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/32-examples-fcal.Rmd",
+"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/13-shiny-tips.Rmd",
 "text": "Edit"
 },
 "history": {
