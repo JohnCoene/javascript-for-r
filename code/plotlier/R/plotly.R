@@ -21,7 +21,10 @@ plotly <- function(data, width = NULL, height = NULL, elementId = NULL) {
     height = height,
     package = 'plotlier',
     elementId = elementId,
-    preRenderHook = render_plotlier
+    preRenderHook = render_plotlier,
+    sizingPolicy = sizingPolicy(
+      defaultWidth = "100%"
+    )
   )
 }
 
@@ -56,4 +59,13 @@ plotlyOutput <- function(outputId, width = '100%', height = '400px'){
 renderPlotly <- function(expr, env = parent.frame(), quoted = FALSE) {
   if (!quoted) { expr <- substitute(expr) } # force quoted
   htmlwidgets::shinyRenderWidget(expr, plotlyOutput, env, quoted = TRUE)
+}
+
+#' @rdname plotly-shiny
+#' @export
+plotlyProxy <- function(id, session = shiny::getDefaultReactiveDomain()){
+  list(
+    id = id,
+    session = session
+  )
 }

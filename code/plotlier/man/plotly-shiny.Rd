@@ -4,11 +4,14 @@
 \alias{plotly-shiny}
 \alias{plotlyOutput}
 \alias{renderPlotly}
+\alias{plotlyProxy}
 \title{Shiny bindings for plotly}
 \usage{
 plotlyOutput(outputId, width = "100\%", height = "400px")
 
 renderPlotly(expr, env = parent.frame(), quoted = FALSE)
+
+plotlyProxy(id, session = shiny::getDefaultReactiveDomain())
 }
 \arguments{
 \item{outputId}{output variable to read from}

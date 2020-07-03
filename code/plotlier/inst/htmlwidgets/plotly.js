@@ -26,9 +26,18 @@ HTMLWidgets.widget({
       resize: function(width, height) {
 
         // TODO: code to re-render the widget with a new size
+        Plotly.relayout(el.id, {width: width, height: height});
 
       }
 
     };
   }
 });
+
+if(HTMLWidgets.shinyMode){
+
+  Shiny.addCustomMessageHandler(type = 'add-traces', function(msg){
+    Plotly.addTraces(msg.id, msg.data);
+  })
+
+}

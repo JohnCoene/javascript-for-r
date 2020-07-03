@@ -286,10 +286,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="" data-path="working-with-shiny.html"><a href="working-with-shiny.html#proxy-function"><i class="fa fa-check"></i>Proxy Function</a></li>
 <li class="chapter" data-level="" data-path="working-with-shiny.html"><a href="working-with-shiny.html#example"><i class="fa fa-check"></i>Example</a></li>
-<li class="chapter" data-level="13.1" data-path="working-with-shiny.html"><a href="working-with-shiny.html#update"><i class="fa fa-check"></i><b>13.1</b> Update</a></li>
+<li class="chapter" data-level="" data-path="working-with-shiny.html"><a href="working-with-shiny.html#update"><i class="fa fa-check"></i>Update</a></li>
 </ul></li>
 <li class="part"><span><b>V Examples</b></span></li>
-<li class="chapter" data-level="14" data-path="ploty.html"><a href="ploty.html"><i class="fa fa-check"></i><b>14</b> Ploty</a></li>
+<li class="chapter" data-level="14" data-path="ploty.html"><a href="ploty.html"><i class="fa fa-check"></i><b>14</b> Ploty</a>
+<ul>
+<li class="chapter" data-level="" data-path="ploty.html"><a href="ploty.html#javascript-to-r-1"><i class="fa fa-check"></i>JavaScript to R</a></li>
+<li class="chapter" data-level="" data-path="ploty.html"><a href="ploty.html#r-to-javascript-1"><i class="fa fa-check"></i>R to JavaScript</a></li>
+<li class="chapter" data-level="" data-path="ploty.html"><a href="ploty.html#performance-security"><i class="fa fa-check"></i>Performance &amp; Security</a></li>
+</ul></li>
 <li class="chapter" data-level="15" data-path="image-classifier.html"><a href="image-classifier.html"><i class="fa fa-check"></i><b>15</b> Image Classifier</a></li>
 <li class="chapter" data-level="16" data-path="math-evaluator.html"><a href="math-evaluator.html"><i class="fa fa-check"></i><b>16</b> Math Evaluator</a></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
@@ -365,7 +370,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb333-3"><a href="ploty.html#cb333-3"></a><span class="at">   </span><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.54.2</span></span>
 <span id="cb333-4"><a href="ploty.html#cb333-4"></a><span class="at">   </span><span class="fu">src</span><span class="kw">:</span><span class="at"> htmlwidgets/plotly</span></span>
 <span id="cb333-5"><a href="ploty.html#cb333-5"></a><span class="at">   </span><span class="fu">script</span><span class="kw">:</span><span class="at"> plotly.min.js</span></span></code></pre></div>
-<p>We start by editing the <code>plotly</code> function to accept a data frame which will be stored in the <code>x</code> object. This will not be passed to JavaScript, we only need the data to pull the x and y data later down the pipe (<code>%&gt;%</code>). Therefore we also add a pre render hook which removes that data.</p>
+<p>We start by editing the <code>plotly</code> function to accept a data frame which will be stored in the <code>x</code> object.</p>
 <div class="sourceCode" id="cb334"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb334-1"><a href="ploty.html#cb334-1"></a><span class="co">#&#39; @export</span></span>
 <span id="cb334-2"><a href="ploty.html#cb334-2"></a>plotly &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
 <span id="cb334-3"><a href="ploty.html#cb334-3"></a></span>
@@ -382,15 +387,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb334-14"><a href="ploty.html#cb334-14"></a>    <span class="dt">width =</span> width,</span>
 <span id="cb334-15"><a href="ploty.html#cb334-15"></a>    <span class="dt">height =</span> height,</span>
 <span id="cb334-16"><a href="ploty.html#cb334-16"></a>    <span class="dt">package =</span> <span class="st">&#39;plotlier&#39;</span>,</span>
-<span id="cb334-17"><a href="ploty.html#cb334-17"></a>    <span class="dt">elementId =</span> elementId,</span>
-<span id="cb334-18"><a href="ploty.html#cb334-18"></a>    <span class="dt">preRenderHook =</span> render_plotlier</span>
-<span id="cb334-19"><a href="ploty.html#cb334-19"></a>  )</span>
-<span id="cb334-20"><a href="ploty.html#cb334-20"></a>}</span>
-<span id="cb334-21"><a href="ploty.html#cb334-21"></a></span>
-<span id="cb334-22"><a href="ploty.html#cb334-22"></a>render_plotlier &lt;-<span class="st"> </span><span class="cf">function</span>(p){</span>
-<span id="cb334-23"><a href="ploty.html#cb334-23"></a>  p<span class="op">$</span>x<span class="op">$</span>data &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb334-24"><a href="ploty.html#cb334-24"></a>  <span class="kw">return</span>(p)</span>
-<span id="cb334-25"><a href="ploty.html#cb334-25"></a>}</span></code></pre></div>
+<span id="cb334-17"><a href="ploty.html#cb334-17"></a>    <span class="dt">elementId =</span> elementId</span>
+<span id="cb334-18"><a href="ploty.html#cb334-18"></a>  )</span>
+<span id="cb334-19"><a href="ploty.html#cb334-19"></a>}</span></code></pre></div>
 <p>The JavaScript would look like the code below. Declaring a shared <code>plot</code> variable that is assigned the plotly output created from the <code>options</code>.</p>
 <div class="sourceCode" id="cb335"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb335-1"><a href="ploty.html#cb335-1"></a>HTMLWidgets<span class="op">.</span><span class="fu">widget</span>({</span>
 <span id="cb335-2"><a href="ploty.html#cb335-2"></a></span>
@@ -460,6 +459,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <img src="images/plotlier-scatter.png" alt="" />
 <p class="caption">Plotlier Scatter plot</p>
 </div>
+<div id="javascript-to-r-1" class="section level2 unnumbered" number="">
+<h2>JavaScript to R</h2>
 <p>We can now look up plotly’s documentation on <a href="https://plotly.com/javascript/plotlyjs-events/">callback</a> to send data to the R server when a point is clicked.</p>
 <div class="sourceCode" id="cb340"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb340-1"><a href="ploty.html#cb340-1"></a><span class="op">...</span></span>
 <span id="cb340-2"><a href="ploty.html#cb340-2"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) {</span>
@@ -497,7 +498,128 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb341-20"><a href="ploty.html#cb341-20"></a>}</span>
 <span id="cb341-21"><a href="ploty.html#cb341-21"></a></span>
 <span id="cb341-22"><a href="ploty.html#cb341-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+</div>
+<div id="r-to-javascript-1" class="section level2 unnumbered" number="">
+<h2>R to JavaScript</h2>
+<p>Here we implement an example of passing data from R to JavaScript, name the JavaScript <code>addTraces</code> function which allows dynamically adding traces to the chart without redrawing it in its entirety.</p>
+<p>The JavaScript <code>addTraces</code> function takes the id of the chart to add the trace to and a JSON object that defines the trace.</p>
+<div class="sourceCode" id="cb342"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb342-1"><a href="ploty.html#cb342-1"></a><span class="co">// addTraces example</span></span>
+<span id="cb342-2"><a href="ploty.html#cb342-2"></a>Plotly<span class="op">.</span><span class="fu">addTraces</span>(<span class="st">&#39;plot&#39;</span><span class="op">,</span> {<span class="dt">y</span><span class="op">:</span> [<span class="dv">2</span><span class="op">,</span><span class="dv">1</span><span class="op">,</span><span class="dv">2</span>]})<span class="op">;</span></span></code></pre></div>
+<p>We start, as done previously, by defining a “proxy,” a function that returns an object containing information necessary to add traces to the chart, namely the <code>id</code> of the chart to apply to and the <code>session</code> object which will be used to send the data.</p>
+<div class="sourceCode" id="cb343"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb343-1"><a href="ploty.html#cb343-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb343-2"><a href="ploty.html#cb343-2"></a>plotlyProxy &lt;-<span class="st"> </span><span class="cf">function</span>(id, <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</span>
+<span id="cb343-3"><a href="ploty.html#cb343-3"></a>  <span class="kw">list</span>(</span>
+<span id="cb343-4"><a href="ploty.html#cb343-4"></a>    <span class="dt">id =</span> id,</span>
+<span id="cb343-5"><a href="ploty.html#cb343-5"></a>    <span class="dt">session =</span> session</span>
+<span id="cb343-6"><a href="ploty.html#cb343-6"></a>  )</span>
+<span id="cb343-7"><a href="ploty.html#cb343-7"></a>}</span></code></pre></div>
+<p>We then create a function that creates the trace and sends that data, together with the plot <code>id</code>, to JavaScript as a message of type “add-traces.”</p>
+<div class="sourceCode" id="cb344"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb344-1"><a href="ploty.html#cb344-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb344-2"><a href="ploty.html#cb344-2"></a>plot_add_marker &lt;-<span class="st"> </span><span class="cf">function</span>(proxy, data, x, y){</span>
+<span id="cb344-3"><a href="ploty.html#cb344-3"></a>  data &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb344-4"><a href="ploty.html#cb344-4"></a>    <span class="dt">x =</span> data[[x]],</span>
+<span id="cb344-5"><a href="ploty.html#cb344-5"></a>    <span class="dt">y =</span> data[[y]],</span>
+<span id="cb344-6"><a href="ploty.html#cb344-6"></a>    <span class="dt">type =</span> <span class="st">&quot;scatter&quot;</span>,</span>
+<span id="cb344-7"><a href="ploty.html#cb344-7"></a>    <span class="dt">mode =</span> <span class="st">&quot;markers&quot;</span></span>
+<span id="cb344-8"><a href="ploty.html#cb344-8"></a>  )</span>
+<span id="cb344-9"><a href="ploty.html#cb344-9"></a></span>
+<span id="cb344-10"><a href="ploty.html#cb344-10"></a>  msg &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">id =</span> proxy<span class="op">$</span>id, <span class="dt">data =</span> data)</span>
+<span id="cb344-11"><a href="ploty.html#cb344-11"></a>  proxy<span class="op">$</span>session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;add-traces&quot;</span>, msg)</span>
+<span id="cb344-12"><a href="ploty.html#cb344-12"></a>  <span class="kw">return</span>(proxy)</span>
+<span id="cb344-13"><a href="ploty.html#cb344-13"></a>}</span></code></pre></div>
+<p>Finally, we add a message handler to handle the data sent to <code>add-traces</code> and use the JavaScript method <code>addTraces</code> to add a trace to the plot.</p>
+<div class="sourceCode" id="cb345"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb345-1"><a href="ploty.html#cb345-1"></a><span class="cf">if</span>(HTMLWidgets<span class="op">.</span><span class="at">shinyMode</span>){</span>
+<span id="cb345-2"><a href="ploty.html#cb345-2"></a></span>
+<span id="cb345-3"><a href="ploty.html#cb345-3"></a>  Shiny<span class="op">.</span><span class="fu">addCustomMessageHandler</span>(type <span class="op">=</span> <span class="st">&#39;add-traces&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg){</span>
+<span id="cb345-4"><a href="ploty.html#cb345-4"></a>    Plotly<span class="op">.</span><span class="fu">addTraces</span>(msg<span class="op">.</span><span class="at">id</span><span class="op">,</span> msg<span class="op">.</span><span class="at">data</span>)<span class="op">;</span></span>
+<span id="cb345-5"><a href="ploty.html#cb345-5"></a>  })</span>
+<span id="cb345-6"><a href="ploty.html#cb345-6"></a></span>
+<span id="cb345-7"><a href="ploty.html#cb345-7"></a>}</span></code></pre></div>
+<p>After installing the package, one can use the new proxy function in a shiny application, below we provide a button that adds a trace of random data to the chart.</p>
+<div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb346-1"><a href="ploty.html#cb346-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb346-2"><a href="ploty.html#cb346-2"></a><span class="kw">library</span>(plotlier)</span>
+<span id="cb346-3"><a href="ploty.html#cb346-3"></a></span>
+<span id="cb346-4"><a href="ploty.html#cb346-4"></a>df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">y =</span> <span class="kw">runif</span>(<span class="dv">10</span>))</span>
+<span id="cb346-5"><a href="ploty.html#cb346-5"></a></span>
+<span id="cb346-6"><a href="ploty.html#cb346-6"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb346-7"><a href="ploty.html#cb346-7"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;add&quot;</span>, <span class="st">&quot;Add random trace&quot;</span>),</span>
+<span id="cb346-8"><a href="ploty.html#cb346-8"></a>  <span class="kw">plotlyOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb346-9"><a href="ploty.html#cb346-9"></a>)</span>
+<span id="cb346-10"><a href="ploty.html#cb346-10"></a></span>
+<span id="cb346-11"><a href="ploty.html#cb346-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb346-12"><a href="ploty.html#cb346-12"></a></span>
+<span id="cb346-13"><a href="ploty.html#cb346-13"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlotly</span>({</span>
+<span id="cb346-14"><a href="ploty.html#cb346-14"></a>    df <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb346-15"><a href="ploty.html#cb346-15"></a><span class="st">      </span><span class="kw">plotly</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb346-16"><a href="ploty.html#cb346-16"></a><span class="st">      </span><span class="kw">plot_line</span>(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>)</span>
+<span id="cb346-17"><a href="ploty.html#cb346-17"></a>  })</span>
+<span id="cb346-18"><a href="ploty.html#cb346-18"></a></span>
+<span id="cb346-19"><a href="ploty.html#cb346-19"></a>  proxy &lt;-<span class="st"> </span><span class="kw">plotlyProxy</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb346-20"><a href="ploty.html#cb346-20"></a></span>
+<span id="cb346-21"><a href="ploty.html#cb346-21"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>add, {</span>
+<span id="cb346-22"><a href="ploty.html#cb346-22"></a>    random &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(<span class="dv">10</span>, <span class="dv">1</span>, <span class="dv">10</span>), <span class="dt">y =</span> <span class="kw">runif</span>(<span class="dv">10</span>))</span>
+<span id="cb346-23"><a href="ploty.html#cb346-23"></a>    </span>
+<span id="cb346-24"><a href="ploty.html#cb346-24"></a>    <span class="kw">plot_add_marker</span>(</span>
+<span id="cb346-25"><a href="ploty.html#cb346-25"></a>      proxy,</span>
+<span id="cb346-26"><a href="ploty.html#cb346-26"></a>      random,</span>
+<span id="cb346-27"><a href="ploty.html#cb346-27"></a>      <span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span></span>
+<span id="cb346-28"><a href="ploty.html#cb346-28"></a>    )</span>
+<span id="cb346-29"><a href="ploty.html#cb346-29"></a>  })</span>
+<span id="cb346-30"><a href="ploty.html#cb346-30"></a></span>
+<span id="cb346-31"><a href="ploty.html#cb346-31"></a>}</span>
+<span id="cb346-32"><a href="ploty.html#cb346-32"></a></span>
+<span id="cb346-33"><a href="ploty.html#cb346-33"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="figure">
+<img src="images/plotlier-add.png" alt="" />
+<p class="caption">Plotly with dynamic traces</p>
+</div>
+<p>## Size &amp; Resize {-}</p>
+<p>At this stage the plotlier package does yet provide responsive visualisation: resizing the screen does not resize the visualisation. In order to ensure that it is we have to define a default width that is not defined in pixel but percentage (such as 100%) and implement the resize method.</p>
+<p>As mentioned in a previous chapter, the default size can be changed with the <code>sizingPolicy</code> function, below we set it to <code>100%</code>.</p>
+<div class="sourceCode" id="cb347"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb347-1"><a href="ploty.html#cb347-1"></a><span class="co"># create widget</span></span>
+<span id="cb347-2"><a href="ploty.html#cb347-2"></a>htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
+<span id="cb347-3"><a href="ploty.html#cb347-3"></a>  <span class="dt">name =</span> <span class="st">&#39;plotly&#39;</span>,</span>
+<span id="cb347-4"><a href="ploty.html#cb347-4"></a>  x,</span>
+<span id="cb347-5"><a href="ploty.html#cb347-5"></a>  <span class="dt">width =</span> width,</span>
+<span id="cb347-6"><a href="ploty.html#cb347-6"></a>  <span class="dt">height =</span> height,</span>
+<span id="cb347-7"><a href="ploty.html#cb347-7"></a>  <span class="dt">package =</span> <span class="st">&#39;plotlier&#39;</span>,</span>
+<span id="cb347-8"><a href="ploty.html#cb347-8"></a>  <span class="dt">elementId =</span> elementId,</span>
+<span id="cb347-9"><a href="ploty.html#cb347-9"></a>  <span class="dt">preRenderHook =</span> render_plotlier,</span>
+<span id="cb347-10"><a href="ploty.html#cb347-10"></a>  <span class="dt">sizingPolicy =</span> <span class="kw">sizingPolicy</span>(</span>
+<span id="cb347-11"><a href="ploty.html#cb347-11"></a>    <span class="dt">defaultWidth =</span> <span class="st">&quot;100%&quot;</span></span>
+<span id="cb347-12"><a href="ploty.html#cb347-12"></a>  )</span>
+<span id="cb347-13"><a href="ploty.html#cb347-13"></a>)</span></code></pre></div>
+<p>Next we can use the plotly function <code>relayout</code> to resize the visualisation when the size of its container changes.</p>
+<div class="sourceCode" id="cb348"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb348-1"><a href="ploty.html#cb348-1"></a>resize<span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) {</span>
+<span id="cb348-2"><a href="ploty.html#cb348-2"></a>  Plotly<span class="op">.</span><span class="fu">relayout</span>(el<span class="op">.</span><span class="at">id</span><span class="op">,</span> {<span class="dt">width</span><span class="op">:</span> width<span class="op">,</span> <span class="dt">height</span><span class="op">:</span> height})<span class="op">;</span></span>
+<span id="cb348-3"><a href="ploty.html#cb348-3"></a>}</span></code></pre></div>
+<p>One can test this by resizing the browser or RStudio viewer window.</p>
+<div class="sourceCode" id="cb349"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb349-1"><a href="ploty.html#cb349-1"></a><span class="kw">plotly</span>(cars) <span class="op">%&gt;%</span><span class="st">  </span></span>
+<span id="cb349-2"><a href="ploty.html#cb349-2"></a><span class="st">      </span><span class="kw">plot_marker</span>(<span class="st">&quot;dist&quot;</span>, <span class="st">&quot;speed&quot;</span>)</span></code></pre></div>
+<div class="figure">
+<img src="images/plotlier-responsive.png" alt="" />
+<p class="caption">Responsive plotly output</p>
+</div>
+</div>
+<div id="performance-security" class="section level2 unnumbered" number="">
+<h2>Performance &amp; Security</h2>
+<p>The package stores the data passed to the <code>plotly</code> function in the widget object, however, as explained in a previous chapter this is insecure and a drain on performances. First, this data serialised to JSON but not used in JavaScript and thus leads to unnecessary computations. Second, this data is visible on the resulting visualisation which may cause security concerns given the user may not deliberately use all the data in the visualisation. This can be remedied to by use the <code>preRenderHook</code>.</p>
+<div class="sourceCode" id="cb350"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb350-1"><a href="ploty.html#cb350-1"></a>render_plotlier &lt;-<span class="st"> </span><span class="cf">function</span>(p){</span>
+<span id="cb350-2"><a href="ploty.html#cb350-2"></a>  p<span class="op">$</span>x<span class="op">$</span>data &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb350-3"><a href="ploty.html#cb350-3"></a>  <span class="kw">return</span>(p)</span>
+<span id="cb350-4"><a href="ploty.html#cb350-4"></a>}</span></code></pre></div>
+<p>The function define above can then be used in the <code>htmlwidgets::createWidget</code> function so it is run just before the visualisation renders.</p>
+<div class="sourceCode" id="cb351"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb351-1"><a href="ploty.html#cb351-1"></a>htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
+<span id="cb351-2"><a href="ploty.html#cb351-2"></a>  <span class="dt">name =</span> <span class="st">&#39;plotly&#39;</span>,</span>
+<span id="cb351-3"><a href="ploty.html#cb351-3"></a>  x,</span>
+<span id="cb351-4"><a href="ploty.html#cb351-4"></a>  <span class="dt">width =</span> width,</span>
+<span id="cb351-5"><a href="ploty.html#cb351-5"></a>  <span class="dt">height =</span> height,</span>
+<span id="cb351-6"><a href="ploty.html#cb351-6"></a>  <span class="dt">package =</span> <span class="st">&#39;plotlier&#39;</span>,</span>
+<span id="cb351-7"><a href="ploty.html#cb351-7"></a>  <span class="dt">elementId =</span> elementId,</span>
+<span id="cb351-8"><a href="ploty.html#cb351-8"></a>  <span class="dt">preRenderHook =</span> render_plotlier</span>
+<span id="cb351-9"><a href="ploty.html#cb351-9"></a>)</span></code></pre></div>
 
+</div>
 </div>
 <h3>References</h3>
 <div id="refs" class="references">

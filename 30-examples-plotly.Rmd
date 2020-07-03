@@ -74,7 +74,7 @@ dependencies:
    script: plotly.min.js
 ```
 
-We start by editing the `plotly` function to accept a data frame which will be stored in the `x` object. This will not be passed to JavaScript, we only need the data to pull the x and y data later down the pipe (`%>%`). Therefore we also add a pre render hook which removes that data.
+We start by editing the `plotly` function to accept a data frame which will be stored in the `x` object. 
 
 ```r
 #' @export
@@ -93,14 +93,8 @@ plotly <- function(data, width = NULL, height = NULL, elementId = NULL) {
     width = width,
     height = height,
     package = 'plotlier',
-    elementId = elementId,
-    preRenderHook = render_plotlier
+    elementId = elementId
   )
-}
-
-render_plotlier <- function(p){
-  p$x$data <- NULL
-  return(p)
 }
 ```
 
@@ -175,6 +169,8 @@ plotly(cars) %>%
 
 ![Plotlier Scatter plot](images/plotlier-scatter.png)
 
+## JavaScript to R {-}
+
 We can now look up plotly's documentation on [callback](https://plotly.com/javascript/plotlyjs-events/) to send data to the R server when a point is clicked.
 
 ```js
@@ -220,4 +216,159 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
+## R to JavaScript {-}
 
+Here we implement an example of passing data from R to JavaScript, name the JavaScript `addTraces` function which allows dynamically adding traces to the chart without redrawing it in its entirety.
+
+The JavaScript `addTraces` function takes the id of the chart to add the trace to and a JSON object that defines the trace.
+
+```js
+// addTraces example
+Plotly.addTraces('plot', {y: [2,1,2]});
+```
+
+We start, as done previously, by defining a "proxy," a function that returns an object containing information necessary to add traces to the chart, namely the `id` of the chart to apply to and the `session` object which will be used to send the data.
+
+```r
+#' @export
+plotlyProxy <- function(id, session = shiny::getDefaultReactiveDomain()){
+  list(
+    id = id,
+    session = session
+  )
+}
+```
+
+We then create a function that creates the trace and sends that data, together with the plot `id`, to JavaScript as a message of type "add-traces."
+
+```r
+#' @export
+plot_add_marker <- function(proxy, data, x, y){
+  data <- list(
+    x = data[[x]],
+    y = data[[y]],
+    type = "scatter",
+    mode = "markers"
+  )
+
+  msg <- list(id = proxy$id, data = data)
+  proxy$session$sendCustomMessage("add-traces", msg)
+  return(proxy)
+}
+```
+
+Finally, we add a message handler to handle the data sent to `add-traces` and use the JavaScript method `addTraces` to add a trace to the plot.
+
+```js
+if(HTMLWidgets.shinyMode){
+
+  Shiny.addCustomMessageHandler(type = 'add-traces', function(msg){
+    Plotly.addTraces(msg.id, msg.data);
+  })
+
+}
+```
+
+After installing the package, one can use the new proxy function in a shiny application, below we provide a button that adds a trace of random data to the chart.
+
+```r
+library(shiny)
+library(plotlier)
+
+df <- data.frame(x = 1:10, y = runif(10))
+
+ui <- fluidPage(
+  actionButton("add", "Add random trace"),
+  plotlyOutput("plot")
+)
+
+server <- function(input, output){
+
+  output$plot <- renderPlotly({
+    df %>% 
+      plotly() %>% 
+      plot_line("x", "y")
+  })
+
+  proxy <- plotlyProxy("plot")
+
+  observeEvent(input$add, {
+    random <- data.frame(x = runif(10, 1, 10), y = runif(10))
+    
+    plot_add_marker(
+      proxy,
+      random,
+      "x", "y"
+    )
+  })
+
+}
+
+shinyApp(ui, server)
+```
+
+![Plotly with dynamic traces](images/plotlier-add.png)
+
+## Size & Resize {-}
+
+At this stage the plotlier package does yet provide responsive visualisation: resizing the screen does not resize the visualisation. In order to ensure that it is we have to define a default width that is not defined in pixel but percentage (such as 100%) and implement the resize method.
+
+As mentioned in a previous chapter, the default size can be changed with the `sizingPolicy` function, below we set it to `100%`.
+
+```r
+# create widget
+htmlwidgets::createWidget(
+  name = 'plotly',
+  x,
+  width = width,
+  height = height,
+  package = 'plotlier',
+  elementId = elementId,
+  preRenderHook = render_plotlier,
+  sizingPolicy = sizingPolicy(
+    defaultWidth = "100%"
+  )
+)
+```
+
+Next we can use the plotly function `relayout` to resize the visualisation when the size of its container changes.
+
+```js
+resize: function(width, height) {
+  Plotly.relayout(el.id, {width: width, height: height});
+}
+```
+
+One can test this by resizing the browser or RStudio viewer window.
+
+```r
+plotly(cars) %>%  
+      plot_marker("dist", "speed")
+```
+
+![Responsive plotly output](images/plotlier-responsive.png)
+
+## Performance & Security {-}
+
+The package stores the data passed to the `plotly` function in the widget object, however, as explained in a previous chapter this is insecure and a drain on performances. First, this data serialised to JSON but not used in JavaScript and thus leads to unnecessary computations. Second, this data is visible on the resulting visualisation which may cause security concerns given the user may not deliberately use all the data in the visualisation. This can be remedied to by use the `preRenderHook`.
+
+```r
+render_plotlier <- function(p){
+  p$x$data <- NULL
+  return(p)
+}
+```
+
+The function define above can then be used in the `htmlwidgets::createWidget` function so it is run just before the visualisation renders.
+
+```r
+htmlwidgets::createWidget(
+  name = 'plotly',
+  x,
+  width = width,
+  height = height,
+  package = 'plotlier',
+  elementId = elementId,
+  preRenderHook = render_plotlier
+)
+```
