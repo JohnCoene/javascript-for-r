@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 8 Introduction | JavaScript for R</title>
+  <title>Events | JavaScript for R</title>
   <meta name="description" content="Invite JavaScript into your Data Science workflow." />
   <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 8 Introduction | JavaScript for R" />
+  <meta property="og:title" content="Events | JavaScript for R" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="yihui/bookdown-crc" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 8 Introduction | JavaScript for R" />
+  <meta name="twitter:title" content="Events | JavaScript for R" />
   
   <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="custom-outputs.html"/>
-<link rel="next" href="your-first-widget.html"/>
+<link rel="prev" href="progress-bar.html"/>
+<link rel="next" href="math-evaluator.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -323,135 +323,58 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="introduction-2" class="section level1" number="8">
-<h1><span class="header-section-number">Chapter 8</span> Introduction</h1>
-<p>This part of the book explores the integration of JavaScript with R using the htmlwidgets package which focuses on libraries that produce a visual output, it is often used for data visualisation but is not limited to it.</p>
-<p>As in previous parts of this book we mainly learn through examples, building multiple widgets of increasing complexity as we progress through the chapter. Before writing the first widget, we explore JavaScript libraries that make great candidates for htmlwidgets and attempt to understand how they work to grasp what is expected from the developer in order to integrate them with R. Finally, we build up on the previous chapter to improve how HTML widgets work with shiny.</p>
-<div id="candidate-libraries" class="section level2 unnumbered" number="">
-<h2>Candidate Libraries</h2>
-<p>Before going down the rabbit hole it is good to take a look at the types of libraries one will work with. As htmlwidgets’ main clients are JavaScript visualisation libraries let us take a look at some such popular libraries and briefly analyse at how they work and what they have in common. This will greatly help conceptualise what one is trying to achieve in this chapter.</p>
-<div id="plotly" class="section level3 unnumbered" number="">
-<h3>Plotly</h3>
-<p><a href="https://plotly.com/javascript/">Plotly.js</a> is probably one of the more popular out there, it provides over 40 fully customiseable chart types, many of which are very sophisticated. This is indeed the JavaScript library used by the R package of the same name: plotly.</p>
-<p>Looking at the code presented in the “Get Started” guide reveals just how convenient the library is. One must import plotly, of course, then have a <code>&lt;div&gt;</code> where the visualisation will be placed, then, using <code>Plotly.newPlot</code>, create the actual visualisation by passing it first the element previously mentioned and a JSON of options that describe the chart.</p>
-<div class="sourceCode" id="cb199"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb199-1"><a href="introduction-2.html#cb199-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
-<span id="cb199-2"><a href="introduction-2.html#cb199-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb199-3"><a href="introduction-2.html#cb199-3"></a></span>
-<span id="cb199-4"><a href="introduction-2.html#cb199-4"></a><span class="kw">&lt;head&gt;</span></span>
-<span id="cb199-5"><a href="introduction-2.html#cb199-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
-<span id="cb199-6"><a href="introduction-2.html#cb199-6"></a>  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;plotly-latest.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb199-7"><a href="introduction-2.html#cb199-7"></a><span class="kw">&lt;/head&gt;</span></span>
-<span id="cb199-8"><a href="introduction-2.html#cb199-8"></a></span>
-<span id="cb199-9"><a href="introduction-2.html#cb199-9"></a><span class="kw">&lt;body&gt;</span></span>
-<span id="cb199-10"><a href="introduction-2.html#cb199-10"></a>  <span class="co">&lt;!-- div to hold visualisation --&gt;</span></span>
-<span id="cb199-11"><a href="introduction-2.html#cb199-11"></a>  <span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&quot;chart&quot;</span><span class="ot"> style=</span><span class="st">&quot;width:600px;height:250px;&quot;</span><span class="kw">&gt;&lt;/div&gt;</span></span>
-<span id="cb199-12"><a href="introduction-2.html#cb199-12"></a></span>
-<span id="cb199-13"><a href="introduction-2.html#cb199-13"></a>  <span class="co">&lt;!-- Script to create visualisation --&gt;</span></span>
-<span id="cb199-14"><a href="introduction-2.html#cb199-14"></a>  <span class="kw">&lt;script&gt;</span></span>
-<span id="cb199-15"><a href="introduction-2.html#cb199-15"></a>    el <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&#39;chart&#39;</span>)<span class="op">;</span></span>
-<span id="cb199-16"><a href="introduction-2.html#cb199-16"></a>    <span class="va">Plotly</span>.<span class="at">newPlot</span>(el<span class="op">,</span> [<span class="op">{</span></span>
-<span id="cb199-17"><a href="introduction-2.html#cb199-17"></a>      <span class="dt">x</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">5</span>]<span class="op">,</span></span>
-<span id="cb199-18"><a href="introduction-2.html#cb199-18"></a>      <span class="dt">y</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">8</span><span class="op">,</span> <span class="dv">16</span>] <span class="op">}</span>]</span>
-<span id="cb199-19"><a href="introduction-2.html#cb199-19"></a>    )<span class="op">;</span></span>
-<span id="cb199-20"><a href="introduction-2.html#cb199-20"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb199-21"><a href="introduction-2.html#cb199-21"></a><span class="kw">&lt;/body&gt;</span></span>
-<span id="cb199-22"><a href="introduction-2.html#cb199-22"></a></span>
-<span id="cb199-23"><a href="introduction-2.html#cb199-23"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
-<p>Now let’s look at how another popular library does it.</p>
-</div>
-<div id="highchart.js" class="section level3 unnumbered" number="">
-<h3>Highchart.js</h3>
-<p><a href="https://www.highcharts.com/">Highcharts</a> is another library which allows creating gorgeous visualisation, maps, and more, it’s also very popular albeit not being entirely open-source.</p>
-<div class="sourceCode" id="cb200"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb200-1"><a href="introduction-2.html#cb200-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
-<span id="cb200-2"><a href="introduction-2.html#cb200-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb200-3"><a href="introduction-2.html#cb200-3"></a></span>
-<span id="cb200-4"><a href="introduction-2.html#cb200-4"></a><span class="kw">&lt;head&gt;</span></span>
-<span id="cb200-5"><a href="introduction-2.html#cb200-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
-<span id="cb200-6"><a href="introduction-2.html#cb200-6"></a>  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;highcharts.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb200-7"><a href="introduction-2.html#cb200-7"></a><span class="kw">&lt;/head&gt;</span></span>
-<span id="cb200-8"><a href="introduction-2.html#cb200-8"></a></span>
-<span id="cb200-9"><a href="introduction-2.html#cb200-9"></a><span class="kw">&lt;body&gt;</span></span>
-<span id="cb200-10"><a href="introduction-2.html#cb200-10"></a>  <span class="co">&lt;!-- div to hold visualisation --&gt;</span></span>
-<span id="cb200-11"><a href="introduction-2.html#cb200-11"></a>  <span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&quot;chart&quot;</span><span class="ot"> style=</span><span class="st">&quot;width:100%; height:400px;&quot;</span><span class="kw">&gt;&lt;/div&gt;</span></span>
-<span id="cb200-12"><a href="introduction-2.html#cb200-12"></a></span>
-<span id="cb200-13"><a href="introduction-2.html#cb200-13"></a>  <span class="co">&lt;!-- Script to create visualisation --&gt;</span></span>
-<span id="cb200-14"><a href="introduction-2.html#cb200-14"></a>  <span class="kw">&lt;script&gt;</span></span>
-<span id="cb200-15"><a href="introduction-2.html#cb200-15"></a>    <span class="kw">var</span> myChart <span class="op">=</span> <span class="va">Highcharts</span>.<span class="at">chart</span>(<span class="st">&#39;chart&#39;</span><span class="op">,</span> <span class="op">{</span></span>
-<span id="cb200-16"><a href="introduction-2.html#cb200-16"></a>        <span class="dt">xAxis</span><span class="op">:</span> <span class="op">{</span></span>
-<span id="cb200-17"><a href="introduction-2.html#cb200-17"></a>            <span class="dt">categories</span><span class="op">:</span> [<span class="st">&#39;Apples&#39;</span><span class="op">,</span> <span class="st">&#39;Bananas&#39;</span><span class="op">,</span> <span class="st">&#39;Oranges&#39;</span>]</span>
-<span id="cb200-18"><a href="introduction-2.html#cb200-18"></a>        <span class="op">},</span></span>
-<span id="cb200-19"><a href="introduction-2.html#cb200-19"></a>        <span class="dt">series</span><span class="op">:</span> [<span class="op">{</span></span>
-<span id="cb200-20"><a href="introduction-2.html#cb200-20"></a>            <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;Jane&#39;</span><span class="op">,</span></span>
-<span id="cb200-21"><a href="introduction-2.html#cb200-21"></a>            <span class="dt">data</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">4</span>]</span>
-<span id="cb200-22"><a href="introduction-2.html#cb200-22"></a>        <span class="op">},</span> <span class="op">{</span></span>
-<span id="cb200-23"><a href="introduction-2.html#cb200-23"></a>            <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;John&#39;</span><span class="op">,</span></span>
-<span id="cb200-24"><a href="introduction-2.html#cb200-24"></a>            <span class="dt">data</span><span class="op">:</span> [<span class="dv">5</span><span class="op">,</span> <span class="dv">7</span><span class="op">,</span> <span class="dv">3</span>]</span>
-<span id="cb200-25"><a href="introduction-2.html#cb200-25"></a>        <span class="op">}</span>]</span>
-<span id="cb200-26"><a href="introduction-2.html#cb200-26"></a>    <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb200-27"><a href="introduction-2.html#cb200-27"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb200-28"><a href="introduction-2.html#cb200-28"></a><span class="kw">&lt;/body&gt;</span></span>
-<span id="cb200-29"><a href="introduction-2.html#cb200-29"></a></span>
-<span id="cb200-30"><a href="introduction-2.html#cb200-30"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
-<p>The above is very similar to what plotly.js requires: import libraries, create a <code>&lt;div&gt;</code> where to put the visualisation, and, to create the chart, run a function which also takes the id of the div where to place the chart and a JSON of options defining the actual chart, including the data.</p>
-</div>
-<div id="chart.js" class="section level3 unnumbered" number="">
-<h3>Chart.js</h3>
-<p><a href="https://www.chartjs.org/">Chart.js</a> is yet another library which to draw standard charts popular for its permissive license and convenient API.</p>
-<div class="sourceCode" id="cb201"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb201-1"><a href="introduction-2.html#cb201-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
-<span id="cb201-2"><a href="introduction-2.html#cb201-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb201-3"><a href="introduction-2.html#cb201-3"></a></span>
-<span id="cb201-4"><a href="introduction-2.html#cb201-4"></a><span class="kw">&lt;head&gt;</span></span>
-<span id="cb201-5"><a href="introduction-2.html#cb201-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
-<span id="cb201-6"><a href="introduction-2.html#cb201-6"></a>  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;Chart.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb201-7"><a href="introduction-2.html#cb201-7"></a><span class="kw">&lt;/head&gt;</span></span>
-<span id="cb201-8"><a href="introduction-2.html#cb201-8"></a></span>
-<span id="cb201-9"><a href="introduction-2.html#cb201-9"></a><span class="kw">&lt;body&gt;</span></span>
-<span id="cb201-10"><a href="introduction-2.html#cb201-10"></a>  <span class="co">&lt;!-- canvas to hold visualisation --&gt;</span></span>
-<span id="cb201-11"><a href="introduction-2.html#cb201-11"></a>  <span class="kw">&lt;canvas</span><span class="ot"> id=</span><span class="st">&quot;chart&quot;</span><span class="ot"> width=</span><span class="st">&quot;400&quot;</span><span class="ot"> height=</span><span class="st">&quot;400&quot;</span><span class="kw">&gt;&lt;/canvas&gt;</span></span>
-<span id="cb201-12"><a href="introduction-2.html#cb201-12"></a></span>
-<span id="cb201-13"><a href="introduction-2.html#cb201-13"></a>  <span class="co">&lt;!-- Script to create visualisation --&gt;</span></span>
-<span id="cb201-14"><a href="introduction-2.html#cb201-14"></a>  <span class="kw">&lt;script&gt;</span></span>
-<span id="cb201-15"><a href="introduction-2.html#cb201-15"></a>    <span class="kw">var</span> el <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&#39;chart&#39;</span>).<span class="at">getContext</span>(<span class="st">&#39;2d&#39;</span>)<span class="op">;</span>    </span>
-<span id="cb201-16"><a href="introduction-2.html#cb201-16"></a>    <span class="kw">var</span> myChart <span class="op">=</span> <span class="kw">new</span> <span class="at">Chart</span>(el<span class="op">,</span> <span class="op">{</span></span>
-<span id="cb201-17"><a href="introduction-2.html#cb201-17"></a>      <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;bar&#39;</span><span class="op">,</span></span>
-<span id="cb201-18"><a href="introduction-2.html#cb201-18"></a>      <span class="dt">data</span><span class="op">:</span> <span class="op">{</span></span>
-<span id="cb201-19"><a href="introduction-2.html#cb201-19"></a>        <span class="dt">labels</span><span class="op">:</span> [<span class="st">&#39;Red&#39;</span><span class="op">,</span> <span class="st">&#39;Blue&#39;</span><span class="op">,</span> <span class="st">&#39;Yellow&#39;</span><span class="op">,</span> <span class="st">&#39;Green&#39;</span><span class="op">,</span> <span class="st">&#39;Purple&#39;</span><span class="op">,</span> <span class="st">&#39;Orange&#39;</span>]<span class="op">,</span></span>
-<span id="cb201-20"><a href="introduction-2.html#cb201-20"></a>        <span class="dt">datasets</span><span class="op">:</span> [<span class="op">{</span></span>
-<span id="cb201-21"><a href="introduction-2.html#cb201-21"></a>          <span class="dt">label</span><span class="op">:</span> <span class="st">&#39;# of Votes&#39;</span><span class="op">,</span></span>
-<span id="cb201-22"><a href="introduction-2.html#cb201-22"></a>          <span class="dt">data</span><span class="op">:</span> [<span class="dv">12</span><span class="op">,</span> <span class="dv">19</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">5</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span>]</span>
-<span id="cb201-23"><a href="introduction-2.html#cb201-23"></a>        <span class="op">}</span>]</span>
-<span id="cb201-24"><a href="introduction-2.html#cb201-24"></a>      <span class="op">}</span></span>
-<span id="cb201-25"><a href="introduction-2.html#cb201-25"></a>    <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb201-26"><a href="introduction-2.html#cb201-26"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb201-27"><a href="introduction-2.html#cb201-27"></a><span class="kw">&lt;/body&gt;</span></span>
-<span id="cb201-28"><a href="introduction-2.html#cb201-28"></a></span>
-<span id="cb201-29"><a href="introduction-2.html#cb201-29"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
-<p>We again observe a very similar structure as with previous libraries. The library is imported, instead of a <code>div</code> chart.js uses a <code>canvas</code>, and the visualisation is also created from a single function which takes the canvas as first argument and a JSON of options as second.</p>
-<p>Hopefully this reveals the repeating structure such libraries tend to follow and also hints at what should be reproduced, to some extent at least, using R.</p>
-</div>
-</div>
-<div id="how-it-works" class="section level2 unnumbered" number="">
-<h2>How it works</h2>
-<p>Imagine there is no such package as htmlwidgets to help create interactive visualisations from R: how would one attempt to go about it?</p>
-<p>As observed, an interactive visualisation using JavaScript will be contained within an HTML document, therefore it would probably have to be created first. Secondly, the visualisation that is yet to be created likely relies on external libraries, these would need to be imported in the document. The document should also include an HTML element (e.g.: <code>&lt;div&gt;</code>) to host said visualisation. Then data would have to be serialised in R and embedded into the document where it should be read by JavaScript code that uses it to create the visualisation. Finally all should be managed to work seamlessly across R markdown, shiny, and other environments.</p>
-<p>Thankfully the htmlwidgets package is there to handle most of this. Nonetheless, it is important to understand that these operations are undertaken (to some degree) by htmlwidgets.</p>
-<p>Must remember when building HTML widgets:</p>
-<ul>
-<li>Import dependencies</li>
-<li>Create an html element to hold visualisation</li>
-<li>Serialise R data to JSON</li>
-<li>Handle JSON data to produce visualisation</li>
-</ul>
+<div id="events-1" class="section level1 unnumbered" number="">
+<h1>Events</h1>
+<p>The way rsup is set up is interesting in that the loading bar is shown or hidden from the R server. One could set it up differently however. Perhaps, instead of having to trigger the loading bar from the server it could all be handled automatically: showing the bar when the server is computing or redrawing things and hiding it when the server becomes idle again.</p>
+<div class="sourceCode" id="cb369"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb369-1"><a href="events-1.html#cb369-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb369-2"><a href="events-1.html#cb369-2"></a></span>
+<span id="cb369-3"><a href="events-1.html#cb369-3"></a>shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb369-4"><a href="events-1.html#cb369-4"></a></span>
+<span id="cb369-5"><a href="events-1.html#cb369-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb369-6"><a href="events-1.html#cb369-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb369-7"><a href="events-1.html#cb369-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/rsup-progress&quot;</span>),</span>
+<span id="cb369-8"><a href="events-1.html#cb369-8"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/auto.js&quot;</span>)</span>
+<span id="cb369-9"><a href="events-1.html#cb369-9"></a>  ),</span>
+<span id="cb369-10"><a href="events-1.html#cb369-10"></a>  <span class="kw">br</span>(),</span>
+<span id="cb369-11"><a href="events-1.html#cb369-11"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;render&quot;</span>, <span class="st">&quot;render&quot;</span>),</span>
+<span id="cb369-12"><a href="events-1.html#cb369-12"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb369-13"><a href="events-1.html#cb369-13"></a>)</span>
+<span id="cb369-14"><a href="events-1.html#cb369-14"></a></span>
+<span id="cb369-15"><a href="events-1.html#cb369-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb369-16"><a href="events-1.html#cb369-16"></a></span>
+<span id="cb369-17"><a href="events-1.html#cb369-17"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb369-18"><a href="events-1.html#cb369-18"></a>    input<span class="op">$</span>render</span>
+<span id="cb369-19"><a href="events-1.html#cb369-19"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">2</span>)</span>
+<span id="cb369-20"><a href="events-1.html#cb369-20"></a>    <span class="kw">hist</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>))</span>
+<span id="cb369-21"><a href="events-1.html#cb369-21"></a>  })</span>
+<span id="cb369-22"><a href="events-1.html#cb369-22"></a></span>
+<span id="cb369-23"><a href="events-1.html#cb369-23"></a>}</span>
+<span id="cb369-24"><a href="events-1.html#cb369-24"></a></span>
+<span id="cb369-25"><a href="events-1.html#cb369-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>Below we declare the progress variable that will hold the Rsup-progress object. This is declared before it is created as this object needs to be accessible in various contexts.</p>
+<div class="sourceCode" id="cb370"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb370-1"><a href="events-1.html#cb370-1"></a><span class="co">// auto.js</span></span>
+<span id="cb370-2"><a href="events-1.html#cb370-2"></a><span class="kw">var</span> progress<span class="op">;</span></span></code></pre></div>
+<p>We can then observe for the <code>shiny:busy</code> and <code>shiny:idle</code> events to show and hide the progress bar automatically.</p>
+<div class="sourceCode" id="cb371"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb371-1"><a href="events-1.html#cb371-1"></a><span class="co">// auto.js</span></span>
+<span id="cb371-2"><a href="events-1.html#cb371-2"></a><span class="kw">var</span> progress<span class="op">;</span></span>
+<span id="cb371-3"><a href="events-1.html#cb371-3"></a></span>
+<span id="cb371-4"><a href="events-1.html#cb371-4"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:busy&#39;</span><span class="op">,</span> <span class="kw">function</span>(event)<span class="op">{</span></span>
+<span id="cb371-5"><a href="events-1.html#cb371-5"></a>  progress <span class="op">=</span> <span class="kw">new</span> <span class="at">RsupProgress</span>()<span class="op">;</span></span>
+<span id="cb371-6"><a href="events-1.html#cb371-6"></a>  <span class="va">progress</span>.<span class="at">start</span>()<span class="op">;</span></span>
+<span id="cb371-7"><a href="events-1.html#cb371-7"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb371-8"><a href="events-1.html#cb371-8"></a></span>
+<span id="cb371-9"><a href="events-1.html#cb371-9"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:idle&#39;</span><span class="op">,</span> <span class="kw">function</span>(event)<span class="op">{</span></span>
+<span id="cb371-10"><a href="events-1.html#cb371-10"></a>  <span class="va">progress</span>.<span class="at">end</span>()<span class="op">;</span></span>
+<span id="cb371-11"><a href="events-1.html#cb371-11"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 
-</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="custom-outputs.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="your-first-widget.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="progress-bar.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="math-evaluator.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -482,7 +405,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/20-htmlwidgets-basic.Rmd",
+"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/32-rsup.Rmd",
 "text": "Edit"
 },
 "history": {

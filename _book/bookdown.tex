@@ -996,7 +996,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Jul 04 2020 22:50:43 GMT+0200 (Central European Summer Time)"
+## [1] "Sat Jul 04 2020 23:12:18 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1006,7 +1006,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Jul 04 2020 22:50:43 GMT+0200 (Central European Summer Time)"
+## [1] "Sat Jul 04 2020 23:12:18 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -6624,6 +6624,71 @@ The message handlers themselves are rather bare since only the \texttt{setOption
 \includegraphics{images/rsup.png}
 \caption{Example of Rsup-progress in shiny}
 \end{figure}
+
+Then again, there are many more options and methods that we do not implement here but would make for a great exercise and even a great R package.
+
+\hypertarget{events-1}{%
+\chapter*{Events}\label{events-1}}
+
+
+The way rsup is set up is interesting in that the loading bar is shown or hidden from the R server. One could set it up differently however. Perhaps, instead of having to trigger the loading bar from the server it could all be handled automatically: showing the bar when the server is computing or redrawing things and hiding it when the server becomes idle again.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(shiny)}
+
+\NormalTok{shiny}\OperatorTok{::}\KeywordTok{addResourcePath}\NormalTok{(}\StringTok{"www"}\NormalTok{, }\StringTok{"www"}\NormalTok{)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+\NormalTok{  tags}\OperatorTok{$}\KeywordTok{head}\NormalTok{(}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{script}\NormalTok{(}\DataTypeTok{src =} \StringTok{"https://unpkg.com/rsup{-}progress"}\NormalTok{),}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{script}\NormalTok{(}\DataTypeTok{src =} \StringTok{"www/auto.js"}\NormalTok{)}
+\NormalTok{  ),}
+  \KeywordTok{br}\NormalTok{(),}
+  \KeywordTok{actionButton}\NormalTok{(}\StringTok{"render"}\NormalTok{, }\StringTok{"render"}\NormalTok{),}
+  \KeywordTok{plotOutput}\NormalTok{(}\StringTok{"plot"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{plot <{-}}\StringTok{ }\KeywordTok{renderPlot}\NormalTok{(\{}
+\NormalTok{    input}\OperatorTok{$}\NormalTok{render}
+    \KeywordTok{Sys.sleep}\NormalTok{(}\DecValTok{2}\NormalTok{)}
+    \KeywordTok{hist}\NormalTok{(}\KeywordTok{rnorm}\NormalTok{(}\DecValTok{100}\NormalTok{))}
+\NormalTok{  \})}
+
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+Below we declare the progress variable that will hold the Rsup-progress object. This is declared before it is created as this object needs to be accessible in various contexts.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// auto.js}
+\KeywordTok{var}\NormalTok{ progress}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+We can then observe for the \texttt{shiny:busy} and \texttt{shiny:idle} events to show and hide the progress bar automatically.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// auto.js}
+\KeywordTok{var}\NormalTok{ progress}\OperatorTok{;}
+
+\AttributeTok{$}\NormalTok{(document).}\AttributeTok{on}\NormalTok{(}\StringTok{\textquotesingle{}shiny:busy\textquotesingle{}}\OperatorTok{,} \KeywordTok{function}\NormalTok{(event)}\OperatorTok{\{}
+\NormalTok{  progress }\OperatorTok{=} \KeywordTok{new} \AttributeTok{RsupProgress}\NormalTok{()}\OperatorTok{;}
+  \VariableTok{progress}\NormalTok{.}\AttributeTok{start}\NormalTok{()}\OperatorTok{;}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+
+\AttributeTok{$}\NormalTok{(document).}\AttributeTok{on}\NormalTok{(}\StringTok{\textquotesingle{}shiny:idle\textquotesingle{}}\OperatorTok{,} \KeywordTok{function}\NormalTok{(event)}\OperatorTok{\{}
+  \VariableTok{progress}\NormalTok{.}\AttributeTok{end}\NormalTok{()}\OperatorTok{;}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{math-evaluator}{%
 \chapter{Math Evaluator}\label{math-evaluator}}
