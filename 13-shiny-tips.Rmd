@@ -6,7 +6,7 @@ While previous chapters on working with Shiny made use of external libraries and
 
 There is a wee bit of documentation tucked away on the [shiny website](https://shiny.rstudio.com/articles/js-events.html) that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when shiny connects, when an element become visible, etc. To demonstrate how to use those events and how handy they can be we will create an signal which displays on the application to indicate that the server is busy running computations. This could be as fancy as ever but for simplicity's sake we limit the demonstration to showing and hiding a gif.
 
-First, we create the directories and file necessary, we'll be using a rather well-known gif in the R community to indicate the server is busy.
+First, we create the directories and file necessary, and to indicate the server is busy we'll be using a gif rather well-known in the R community.
 
 ```r
 dir.create("www")
@@ -22,7 +22,7 @@ gif <- paste0(
 download.file(gif, "www/typing.gif")
 ```
 
-Then we create an application that draws and redraws a plot at the click of a button. 
+Then we create an application that draws and redraws a plot at the click of a button. Note that we give the gif an id as we will need to be able to retrieve this element JavaScript side and an `id` makes for an ideal selector.
 
 ```r
 # app.R
@@ -31,16 +31,23 @@ library(shiny)
 shiny::addResourcePath("www", "www")
 
 ui <- fluidPage(
-  tags$script(src = "www/script.js"),
-  h1("Is is recalculating?", id = "color"),
+  # import dependencies
+  tags$head(
+    tags$link(href = "www/style.css", rel = "stylesheet"),
+    tags$script(src = "www/script.js")
+  ),
+  # gif indicator
+  tags$img(src = "www/typing.gif", id = "loading")
   plotOutput("plot"),
   actionButton("render", "render")
 )
 
 server <- function(input, output, session) {
   output$plot <- renderPlot({
-    input$render
-    Sys.sleep(2)
+    input$render # redraw on click
+
+    # simulate time consuming computations
+    Sys.sleep(2) 
     plot(cars)
   })
 }
@@ -48,7 +55,7 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-The app displays the gif but it should only be visible when the server is busy, this can be solved with CSS. The code below hides the gif with `visibility: hidden`, and repositions it, floating on top of the rest of the content in the top right of the page.
+The gif should only be visible when the server is busy, unlike now, whether it is visible will be controlled in JavaScript. In the meantime, this should be initialised as hidden using CSS. The code below hides the gif with `visibility: hidden`, and repositions it, floating on top of the rest of the content in the top right of the page.
 
 ```css
 /* style.css */
@@ -62,7 +69,7 @@ The app displays the gif but it should only be visible when the server is busy, 
 }
 ```
 
-We can then use the shiny events to dynamically show and hide the gif when the user is busy. Below we use observe the event `shiny:busy` on the entire page, when the event is triggered retrieve the gif and make it visible by changing the CSS `visibility` property.
+We can then use the shiny events to dynamically show and hide the gif when the server is busy. Below we observe the event `shiny:busy` on the entire page (`document`), when the event is triggered the gif is retrieved using its `id` and then made visible by changing its CSS `visibility` property to `visible`.
 
 ```js
 // script.js

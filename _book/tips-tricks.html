@@ -323,7 +323,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="events" class="section level2 unnumbered" number="">
 <h2>Events</h2>
 <p>There is a wee bit of documentation tucked away on the <a href="https://shiny.rstudio.com/articles/js-events.html">shiny website</a> that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when shiny connects, when an element become visible, etc. To demonstrate how to use those events and how handy they can be we will create an signal which displays on the application to indicate that the server is busy running computations. This could be as fancy as ever but for simplicity’s sake we limit the demonstration to showing and hiding a gif.</p>
-<p>First, we create the directories and file necessary, we’ll be using a rather well-known gif in the R community to indicate the server is busy.</p>
+<p>First, we create the directories and file necessary, and to indicate the server is busy we’ll be using a gif rather well-known in the R community.</p>
 <div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="tips-tricks.html#cb171-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
 <span id="cb171-2"><a href="tips-tricks.html#cb171-2"></a><span class="kw">file.create</span>(<span class="st">&quot;www/script.js&quot;</span>)</span>
 <span id="cb171-3"><a href="tips-tricks.html#cb171-3"></a><span class="kw">file.create</span>(<span class="st">&quot;www/style.css&quot;</span>)</span>
@@ -335,29 +335,36 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb171-9"><a href="tips-tricks.html#cb171-9"></a>  <span class="st">&quot;itemid=11365139&quot;</span></span>
 <span id="cb171-10"><a href="tips-tricks.html#cb171-10"></a>)</span>
 <span id="cb171-11"><a href="tips-tricks.html#cb171-11"></a><span class="kw">download.file</span>(gif, <span class="st">&quot;www/typing.gif&quot;</span>)</span></code></pre></div>
-<p>Then we create an application that draws and redraws a plot at the click of a button.</p>
+<p>Then we create an application that draws and redraws a plot at the click of a button. Note that we give the gif an id as we will need to be able to retrieve this element JavaScript side and an <code>id</code> makes for an ideal selector.</p>
 <div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="tips-tricks.html#cb172-1"></a><span class="co"># app.R</span></span>
 <span id="cb172-2"><a href="tips-tricks.html#cb172-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb172-3"><a href="tips-tricks.html#cb172-3"></a></span>
 <span id="cb172-4"><a href="tips-tricks.html#cb172-4"></a>shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
 <span id="cb172-5"><a href="tips-tricks.html#cb172-5"></a></span>
 <span id="cb172-6"><a href="tips-tricks.html#cb172-6"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb172-7"><a href="tips-tricks.html#cb172-7"></a>  tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/script.js&quot;</span>),</span>
-<span id="cb172-8"><a href="tips-tricks.html#cb172-8"></a>  <span class="kw">h1</span>(<span class="st">&quot;Is is recalculating?&quot;</span>, <span class="dt">id =</span> <span class="st">&quot;color&quot;</span>),</span>
-<span id="cb172-9"><a href="tips-tricks.html#cb172-9"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>),</span>
-<span id="cb172-10"><a href="tips-tricks.html#cb172-10"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;render&quot;</span>, <span class="st">&quot;render&quot;</span>)</span>
-<span id="cb172-11"><a href="tips-tricks.html#cb172-11"></a>)</span>
-<span id="cb172-12"><a href="tips-tricks.html#cb172-12"></a></span>
-<span id="cb172-13"><a href="tips-tricks.html#cb172-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb172-14"><a href="tips-tricks.html#cb172-14"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb172-15"><a href="tips-tricks.html#cb172-15"></a>    input<span class="op">$</span>render</span>
-<span id="cb172-16"><a href="tips-tricks.html#cb172-16"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">2</span>)</span>
-<span id="cb172-17"><a href="tips-tricks.html#cb172-17"></a>    <span class="kw">plot</span>(cars)</span>
-<span id="cb172-18"><a href="tips-tricks.html#cb172-18"></a>  })</span>
-<span id="cb172-19"><a href="tips-tricks.html#cb172-19"></a>}</span>
-<span id="cb172-20"><a href="tips-tricks.html#cb172-20"></a></span>
-<span id="cb172-21"><a href="tips-tricks.html#cb172-21"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>The app displays the gif but it should only be visible when the server is busy, this can be solved with CSS. The code below hides the gif with <code>visibility: hidden</code>, and repositions it, floating on top of the rest of the content in the top right of the page.</p>
+<span id="cb172-7"><a href="tips-tricks.html#cb172-7"></a>  <span class="co"># import dependencies</span></span>
+<span id="cb172-8"><a href="tips-tricks.html#cb172-8"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb172-9"><a href="tips-tricks.html#cb172-9"></a>    tags<span class="op">$</span><span class="kw">link</span>(<span class="dt">href =</span> <span class="st">&quot;www/style.css&quot;</span>, <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>),</span>
+<span id="cb172-10"><a href="tips-tricks.html#cb172-10"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/script.js&quot;</span>)</span>
+<span id="cb172-11"><a href="tips-tricks.html#cb172-11"></a>  ),</span>
+<span id="cb172-12"><a href="tips-tricks.html#cb172-12"></a>  <span class="co"># gif indicator</span></span>
+<span id="cb172-13"><a href="tips-tricks.html#cb172-13"></a>  tags<span class="op">$</span><span class="kw">img</span>(<span class="dt">src =</span> <span class="st">&quot;www/typing.gif&quot;</span>, <span class="dt">id =</span> <span class="st">&quot;loading&quot;</span>)</span>
+<span id="cb172-14"><a href="tips-tricks.html#cb172-14"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>),</span>
+<span id="cb172-15"><a href="tips-tricks.html#cb172-15"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;render&quot;</span>, <span class="st">&quot;render&quot;</span>)</span>
+<span id="cb172-16"><a href="tips-tricks.html#cb172-16"></a>)</span>
+<span id="cb172-17"><a href="tips-tricks.html#cb172-17"></a></span>
+<span id="cb172-18"><a href="tips-tricks.html#cb172-18"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb172-19"><a href="tips-tricks.html#cb172-19"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb172-20"><a href="tips-tricks.html#cb172-20"></a>    input<span class="op">$</span>render <span class="co"># redraw on click</span></span>
+<span id="cb172-21"><a href="tips-tricks.html#cb172-21"></a></span>
+<span id="cb172-22"><a href="tips-tricks.html#cb172-22"></a>    <span class="co"># simulate time consuming computations</span></span>
+<span id="cb172-23"><a href="tips-tricks.html#cb172-23"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">2</span>) </span>
+<span id="cb172-24"><a href="tips-tricks.html#cb172-24"></a>    <span class="kw">plot</span>(cars)</span>
+<span id="cb172-25"><a href="tips-tricks.html#cb172-25"></a>  })</span>
+<span id="cb172-26"><a href="tips-tricks.html#cb172-26"></a>}</span>
+<span id="cb172-27"><a href="tips-tricks.html#cb172-27"></a></span>
+<span id="cb172-28"><a href="tips-tricks.html#cb172-28"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>The gif should only be visible when the server is busy, unlike now, whether it is visible will be controlled in JavaScript. In the meantime, this should be initialised as hidden using CSS. The code below hides the gif with <code>visibility: hidden</code>, and repositions it, floating on top of the rest of the content in the top right of the page.</p>
 <div class="sourceCode" id="cb173"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb173-1"><a href="tips-tricks.html#cb173-1"></a><span class="co">/* style.css */</span></span>
 <span id="cb173-2"><a href="tips-tricks.html#cb173-2"></a><span class="pp">#loading</span>{</span>
 <span id="cb173-3"><a href="tips-tricks.html#cb173-3"></a>  <span class="kw">top</span>: <span class="dv">20</span><span class="dt">px</span><span class="op">;</span></span>
@@ -367,7 +374,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb173-7"><a href="tips-tricks.html#cb173-7"></a>  <span class="kw">position</span>: <span class="dv">absolute</span><span class="op">;</span></span>
 <span id="cb173-8"><a href="tips-tricks.html#cb173-8"></a>  <span class="kw">visibility</span>: <span class="dv">hidden</span><span class="op">;</span></span>
 <span id="cb173-9"><a href="tips-tricks.html#cb173-9"></a>}</span></code></pre></div>
-<p>We can then use the shiny events to dynamically show and hide the gif when the user is busy. Below we use observe the event <code>shiny:busy</code> on the entire page, when the event is triggered retrieve the gif and make it visible by changing the CSS <code>visibility</code> property.</p>
+<p>We can then use the shiny events to dynamically show and hide the gif when the server is busy. Below we observe the event <code>shiny:busy</code> on the entire page (<code>document</code>), when the event is triggered the gif is retrieved using its <code>id</code> and then made visible by changing its CSS <code>visibility</code> property to <code>visible</code>.</p>
 <div class="sourceCode" id="cb174"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb174-1"><a href="tips-tricks.html#cb174-1"></a><span class="co">// script.js</span></span>
 <span id="cb174-2"><a href="tips-tricks.html#cb174-2"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:busy&#39;</span><span class="op">,</span> <span class="kw">function</span>(event) <span class="op">{</span></span>
 <span id="cb174-3"><a href="tips-tricks.html#cb174-3"></a>  <span class="co">// retrieve the gif</span></span>
