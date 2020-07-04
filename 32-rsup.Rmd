@@ -1,0 +1,115 @@
+# Progress Bar
+
+In this chapter we implement a loading bar via [Rsup-progress](https://github.com/skt-t1-byungi/rsup-progress) that can be programmatically triggered from the server. The library can be customised to great lengths but the code remains very straightforward for simple use cases.
+
+```js
+// initialise
+const progress = new RsupProgress();
+
+// customise
+progress.setOptions({color: 'blue'});
+
+// start
+progress.start();
+
+// end
+progress.end();
+```
+
+## R code {-}
+
+Rsup-progress is hosted on a CDN so the dependency does not need to be downloaded, a file to hold the custom message handlers is however necessary.  
+
+```r
+dir.create("www")
+file.create("www/script.js")
+```
+
+We then create the skeleton of the application, leaving the sever function empty for now. 
+
+```r
+library(shiny)
+
+shiny::addResourcePath("www", "www")
+
+ui <- fluidPage(
+  tags$head(
+    tags$script(src = "https://unpkg.com/rsup-progress"),
+    tags$script(src = "www/script.js")
+  ),
+  br(),
+  actionButton("start", "start"),
+  actionButton("end", "end")
+)
+
+server <- function(input, output, session){
+
+}
+
+shinyApp(ui, server)
+```
+
+Then one can start designing the server; the buttons have to start/show and end/hide the loading bar. We also want to include a call to customise the loading bar from the server.
+
+```r
+library(shiny)
+
+shiny::addResourcePath("www", "www")
+
+ui <- fluidPage(
+  tags$head(
+    tags$script(src = "https://unpkg.com/rsup-progress"),
+    tags$script(src = "www/script.js")
+  ),
+  br(),
+  actionButton("start", "start"),
+  actionButton("end", "end")
+)
+
+server <- function(input, output, session){
+
+  session$sendCustomMessage('rsup-options', list(color = "red"))
+
+  observeEvent(input$start, {
+    session$sendCustomMessage('rsup-start', list())
+  })
+
+  observeEvent(input$end, {
+    session$sendCustomMessage('rsup-end', list())
+  })
+
+}
+
+shinyApp(ui, server)
+```
+
+## JavaScript code {-}
+
+Before one can implement the JavaScript message handlers, the progress bar needs to be initialised
+
+```js
+// script.js
+const progress = new RsupProgress();
+```
+
+The message handlers themselves are rather bare since only the `setOptions` method takes arguments.
+
+```js
+// script.js
+const progress = new RsupProgress();
+
+Shiny.addCustomMessageHandler('rsup-options', function(msg){
+  progress.setOptions(msg);
+});
+
+Shiny.addCustomMessageHandler('rsup-start', function(msg){
+  progress.start();
+});
+
+Shiny.addCustomMessageHandler('rsup-end', function(msg){
+  progress.end();
+});
+```
+
+![Example of Rsup-progress in shiny](images/rsup.png)
+

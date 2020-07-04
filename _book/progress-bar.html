@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 3 Node.js with Bubble | JavaScript for R</title>
+  <title>Chapter 16 Progress Bar | JavaScript for R</title>
   <meta name="description" content="Invite JavaScript into your Data Science workflow." />
   <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 3 Node.js with Bubble | JavaScript for R" />
+  <meta property="og:title" content="Chapter 16 Progress Bar | JavaScript for R" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="yihui/bookdown-crc" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 3 Node.js with Bubble | JavaScript for R" />
+  <meta name="twitter:title" content="Chapter 16 Progress Bar | JavaScript for R" />
   
   <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="the-v8-engine.html"/>
-<link rel="next" href="introduction-1.html"/>
+<link rel="prev" href="image-classifier.html"/>
+<link rel="next" href="math-evaluator.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -322,64 +322,101 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="node" class="section level1" number="3">
-<h1><span class="header-section-number">Chapter 3</span> Node.js with Bubble</h1>
-<p><strong>This chapter is incomplete because a core dependency of {bubble} was removed from CRAN, this chapter will likely be removed entirely</strong></p>
-<p>A more recent R package called bubble allows running node.js code from R, the package comes with an REPL and an R markdown engine. As it is still under heavy development it is not yet available on CRAN, it can be installed from Github using either the devtools or <a href="https://remotes.r-lib.org/">remotes package</a> <span class="citation">(Hester et al. <a href="#ref-R-remotes" role="doc-biblioref">2020</a>)</span>.</p>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="node.html#cb102-1"></a><span class="co"># install.packages(&quot;remotes&quot;)</span></span>
-<span id="cb102-2"><a href="node.html#cb102-2"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;ColinFay/bubble&quot;</span>)</span></code></pre></div>
-<div id="basics-1" class="section level2 unnumbered" number="">
-<h2>Basics</h2>
-<p>bubble is very similar to V8, it’s also a reference class and the name of the methods are identical.</p>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="node.html#cb103-1"></a><span class="kw">library</span>(bubble)</span>
-<span id="cb103-2"><a href="node.html#cb103-2"></a></span>
-<span id="cb103-3"><a href="node.html#cb103-3"></a>n &lt;-<span class="st"> </span>NodeSession<span class="op">$</span><span class="kw">new</span>()</span>
-<span id="cb103-4"><a href="node.html#cb103-4"></a>n<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;2 + 2;&quot;</span>)</span></code></pre></div>
-<pre><code>## 4</code></pre>
-<p>You can also assign and get variables, just like with v8.</p>
-<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="node.html#cb105-1"></a>n<span class="op">$</span><span class="kw">assign</span>(vehicles, cars[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ])</span></code></pre></div>
-<pre><code>## ℹ Importing fs module as fs object</code></pre>
-<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="node.html#cb107-1"></a>n<span class="op">$</span><span class="kw">get</span>(vehicles)</span></code></pre></div>
-<pre><code>##   speed dist
-## 1     4    2
-## 2     4   10</code></pre>
-<p>Bubble also comes with an REPL terminal (read-eval-print loop), which can be launched with <code>bubble::node_repl()</code>.</p>
+<div id="progress-bar" class="section level1" number="16">
+<h1><span class="header-section-number">Chapter 16</span> Progress Bar</h1>
+<p>In this chapter we implement a loading bar via <a href="https://github.com/skt-t1-byungi/rsup-progress">Rsup-progress</a> that can be programmatically triggered from the server. The library can be customised to great lengths but the code remains very straightforward for simple use cases.</p>
+<div class="sourceCode" id="cb363"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb363-1"><a href="progress-bar.html#cb363-1"></a><span class="co">// initialise</span></span>
+<span id="cb363-2"><a href="progress-bar.html#cb363-2"></a><span class="kw">const</span> progress <span class="op">=</span> <span class="kw">new</span> <span class="at">RsupProgress</span>()<span class="op">;</span></span>
+<span id="cb363-3"><a href="progress-bar.html#cb363-3"></a></span>
+<span id="cb363-4"><a href="progress-bar.html#cb363-4"></a><span class="co">// customise</span></span>
+<span id="cb363-5"><a href="progress-bar.html#cb363-5"></a><span class="va">progress</span>.<span class="at">setOptions</span>(<span class="op">{</span><span class="dt">color</span><span class="op">:</span> <span class="st">&#39;blue&#39;</span><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb363-6"><a href="progress-bar.html#cb363-6"></a></span>
+<span id="cb363-7"><a href="progress-bar.html#cb363-7"></a><span class="co">// start</span></span>
+<span id="cb363-8"><a href="progress-bar.html#cb363-8"></a><span class="va">progress</span>.<span class="at">start</span>()<span class="op">;</span></span>
+<span id="cb363-9"><a href="progress-bar.html#cb363-9"></a></span>
+<span id="cb363-10"><a href="progress-bar.html#cb363-10"></a><span class="co">// end</span></span>
+<span id="cb363-11"><a href="progress-bar.html#cb363-11"></a><span class="va">progress</span>.<span class="at">end</span>()<span class="op">;</span></span></code></pre></div>
+<div id="r-code-1" class="section level2 unnumbered" number="">
+<h2>R code</h2>
+<p>Rsup-progress is hosted on a CDN so the dependency does not need to be downloaded, a file to hold the custom message handlers is however necessary.</p>
+<div class="sourceCode" id="cb364"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb364-1"><a href="progress-bar.html#cb364-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
+<span id="cb364-2"><a href="progress-bar.html#cb364-2"></a><span class="kw">file.create</span>(<span class="st">&quot;www/script.js&quot;</span>)</span></code></pre></div>
+<p>We then create the skeleton of the application, leaving the sever function empty for now.</p>
+<div class="sourceCode" id="cb365"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb365-1"><a href="progress-bar.html#cb365-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb365-2"><a href="progress-bar.html#cb365-2"></a></span>
+<span id="cb365-3"><a href="progress-bar.html#cb365-3"></a>shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb365-4"><a href="progress-bar.html#cb365-4"></a></span>
+<span id="cb365-5"><a href="progress-bar.html#cb365-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb365-6"><a href="progress-bar.html#cb365-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb365-7"><a href="progress-bar.html#cb365-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/rsup-progress&quot;</span>),</span>
+<span id="cb365-8"><a href="progress-bar.html#cb365-8"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/script.js&quot;</span>)</span>
+<span id="cb365-9"><a href="progress-bar.html#cb365-9"></a>  ),</span>
+<span id="cb365-10"><a href="progress-bar.html#cb365-10"></a>  <span class="kw">br</span>(),</span>
+<span id="cb365-11"><a href="progress-bar.html#cb365-11"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;start&quot;</span>, <span class="st">&quot;start&quot;</span>),</span>
+<span id="cb365-12"><a href="progress-bar.html#cb365-12"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;end&quot;</span>, <span class="st">&quot;end&quot;</span>)</span>
+<span id="cb365-13"><a href="progress-bar.html#cb365-13"></a>)</span>
+<span id="cb365-14"><a href="progress-bar.html#cb365-14"></a></span>
+<span id="cb365-15"><a href="progress-bar.html#cb365-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb365-16"><a href="progress-bar.html#cb365-16"></a></span>
+<span id="cb365-17"><a href="progress-bar.html#cb365-17"></a>}</span>
+<span id="cb365-18"><a href="progress-bar.html#cb365-18"></a></span>
+<span id="cb365-19"><a href="progress-bar.html#cb365-19"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>Then one can start designing the server; the buttons have to start/show and end/hide the loading bar. We also want to include a call to customise the loading bar from the server.</p>
+<div class="sourceCode" id="cb366"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb366-1"><a href="progress-bar.html#cb366-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb366-2"><a href="progress-bar.html#cb366-2"></a></span>
+<span id="cb366-3"><a href="progress-bar.html#cb366-3"></a>shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb366-4"><a href="progress-bar.html#cb366-4"></a></span>
+<span id="cb366-5"><a href="progress-bar.html#cb366-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb366-6"><a href="progress-bar.html#cb366-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb366-7"><a href="progress-bar.html#cb366-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/rsup-progress&quot;</span>),</span>
+<span id="cb366-8"><a href="progress-bar.html#cb366-8"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/script.js&quot;</span>)</span>
+<span id="cb366-9"><a href="progress-bar.html#cb366-9"></a>  ),</span>
+<span id="cb366-10"><a href="progress-bar.html#cb366-10"></a>  <span class="kw">br</span>(),</span>
+<span id="cb366-11"><a href="progress-bar.html#cb366-11"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;start&quot;</span>, <span class="st">&quot;start&quot;</span>),</span>
+<span id="cb366-12"><a href="progress-bar.html#cb366-12"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;end&quot;</span>, <span class="st">&quot;end&quot;</span>)</span>
+<span id="cb366-13"><a href="progress-bar.html#cb366-13"></a>)</span>
+<span id="cb366-14"><a href="progress-bar.html#cb366-14"></a></span>
+<span id="cb366-15"><a href="progress-bar.html#cb366-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb366-16"><a href="progress-bar.html#cb366-16"></a></span>
+<span id="cb366-17"><a href="progress-bar.html#cb366-17"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;rsup-options&#39;</span>, <span class="kw">list</span>(<span class="dt">color =</span> <span class="st">&quot;red&quot;</span>))</span>
+<span id="cb366-18"><a href="progress-bar.html#cb366-18"></a></span>
+<span id="cb366-19"><a href="progress-bar.html#cb366-19"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>start, {</span>
+<span id="cb366-20"><a href="progress-bar.html#cb366-20"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;rsup-start&#39;</span>, <span class="kw">list</span>())</span>
+<span id="cb366-21"><a href="progress-bar.html#cb366-21"></a>  })</span>
+<span id="cb366-22"><a href="progress-bar.html#cb366-22"></a></span>
+<span id="cb366-23"><a href="progress-bar.html#cb366-23"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>end, {</span>
+<span id="cb366-24"><a href="progress-bar.html#cb366-24"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;rsup-end&#39;</span>, <span class="kw">list</span>())</span>
+<span id="cb366-25"><a href="progress-bar.html#cb366-25"></a>  })</span>
+<span id="cb366-26"><a href="progress-bar.html#cb366-26"></a></span>
+<span id="cb366-27"><a href="progress-bar.html#cb366-27"></a>}</span>
+<span id="cb366-28"><a href="progress-bar.html#cb366-28"></a></span>
+<span id="cb366-29"><a href="progress-bar.html#cb366-29"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
-<div id="r-markdown-engine" class="section level2 unnumbered" number="">
-<h2>R Markdown Engine</h2>
-<p>Bubble comes with an R markdown engine so JavaScript code can be evaluated in node from an R markdown document such as this one. To do so we simply need to place <code>bubble::set_node_engine()</code> at the top of the document, subsequent <code>node</code> chunks will be evaluated in a node session.</p>
-<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="node.html#cb109-1"></a>bubble<span class="op">::</span><span class="kw">set_node_engine</span>()</span></code></pre></div>
-<p>Once set we can run node code.</p>
-<div class="sourceCode" id="cb110"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb110-1"><a href="node.html#cb110-1"></a><span class="va">console</span>.<span class="at">log</span>(<span class="dv">2</span> <span class="op">+</span> <span class="dv">3</span>)<span class="op">;</span></span></code></pre></div>
-<pre><code>## 5
-## undefined</code></pre>
+<div id="javascript-code-2" class="section level2 unnumbered" number="">
+<h2>JavaScript code</h2>
+<p>Before one can implement the JavaScript message handlers, the progress bar needs to be initialised</p>
+<div class="sourceCode" id="cb367"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb367-1"><a href="progress-bar.html#cb367-1"></a><span class="co">// script.js</span></span>
+<span id="cb367-2"><a href="progress-bar.html#cb367-2"></a><span class="kw">const</span> progress <span class="op">=</span> <span class="kw">new</span> <span class="at">RsupProgress</span>()<span class="op">;</span></span></code></pre></div>
+<p>The message handlers themselves are rather bare since only the <code>setOptions</code> method takes arguments.</p>
+<div class="sourceCode" id="cb368"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb368-1"><a href="progress-bar.html#cb368-1"></a><span class="co">// script.js</span></span>
+<span id="cb368-2"><a href="progress-bar.html#cb368-2"></a><span class="kw">const</span> progress <span class="op">=</span> <span class="kw">new</span> <span class="at">RsupProgress</span>()<span class="op">;</span></span>
+<span id="cb368-3"><a href="progress-bar.html#cb368-3"></a></span>
+<span id="cb368-4"><a href="progress-bar.html#cb368-4"></a><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;rsup-options&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg)<span class="op">{</span></span>
+<span id="cb368-5"><a href="progress-bar.html#cb368-5"></a>  <span class="va">progress</span>.<span class="at">setOptions</span>(msg)<span class="op">;</span></span>
+<span id="cb368-6"><a href="progress-bar.html#cb368-6"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb368-7"><a href="progress-bar.html#cb368-7"></a></span>
+<span id="cb368-8"><a href="progress-bar.html#cb368-8"></a><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;rsup-start&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg)<span class="op">{</span></span>
+<span id="cb368-9"><a href="progress-bar.html#cb368-9"></a>  <span class="va">progress</span>.<span class="at">start</span>()<span class="op">;</span></span>
+<span id="cb368-10"><a href="progress-bar.html#cb368-10"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb368-11"><a href="progress-bar.html#cb368-11"></a></span>
+<span id="cb368-12"><a href="progress-bar.html#cb368-12"></a><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;rsup-end&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg)<span class="op">{</span></span>
+<span id="cb368-13"><a href="progress-bar.html#cb368-13"></a>  <span class="va">progress</span>.<span class="at">end</span>()<span class="op">;</span></span>
+<span id="cb368-14"><a href="progress-bar.html#cb368-14"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<div class="figure">
+<img src="images/rsup.png" alt="" />
+<p class="caption">Example of Rsup-progress in shiny</p>
 </div>
-<div id="npm" class="section level2 unnumbered" number="">
-<h2>Npm</h2>
-<p>Npm is to node.js what CRAN is to R; a repository of packages that can be conveniently installed. Such packages can be installed using another Reference class called <code>NPM</code>. While with V8 one needs to “browserify” npm packages in hope that they work, with bubble, since it interacts with node js directly, there is no need for to “browserify” packages and we can be assured that they work.</p>
-<p>Let us demonstrate with the <a href="https://github.com/NaturalNode/natural">natural</a> package which provides general natural language facility.</p>
-<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="node.html#cb112-1"></a><span class="co"># initialise and install</span></span>
-<span id="cb112-2"><a href="node.html#cb112-2"></a>npm &lt;-<span class="st"> </span>Npm<span class="op">$</span><span class="kw">new</span>()<span class="op">$</span><span class="kw">install</span>(<span class="st">&quot;natural&quot;</span>)</span></code></pre></div>
-<pre><code>## ❯ Add `node_modules` to .gitignore</code></pre>
-<p>The above snippet initialises npm, which creates the pacakge.json file and a node_modules directory. The first is a DESCRIPTION file for node projects so to speak, the latter is a directory to hold dependencies installed.</p>
-<p>The packages can then be imported in the node session and interacted with.</p>
-<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="node.html#cb114-1"></a>n<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;const natural = require(&#39;natural&#39;)&quot;</span>)</span></code></pre></div>
-<pre><code>## undefined</code></pre>
-<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="node.html#cb116-1"></a>n<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;var tokenizer = new natural.WordTokenizer();&quot;</span>)</span></code></pre></div>
-<pre><code>## undefined</code></pre>
-<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="node.html#cb118-1"></a>n<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;tokenizer.tokenize(&#39;Using nodejs from R with npm.&#39;)&quot;</span>)</span></code></pre></div>
-<pre><code>## [ &#39;Using&#39;, &#39;nodejs&#39;, &#39;from&#39;, &#39;R&#39;, &#39;with&#39;, &#39;npm&#39; ]</code></pre>
 
-</div>
-</div>
-
-
-
-</div>
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-R-remotes">
-<p>Hester, Jim, Gábor Csárdi, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2020. <em>Remotes: R Package Installation from Remote Repositories, Including ’Github’</em>. <a href="https://CRAN.R-project.org/package=remotes">https://CRAN.R-project.org/package=remotes</a>.</p>
 </div>
 </div>
             </section>
@@ -387,8 +424,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="the-v8-engine.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="introduction-1.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="image-classifier.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="math-evaluator.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -419,7 +456,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/03-node.Rmd",
+"link": "https://github.com/JohnCoene/r-and-javascript/edit/master/32-rsup.Rmd",
 "text": "Edit"
 },
 "history": {
