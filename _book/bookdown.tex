@@ -996,7 +996,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jul 05 2020 12:53:10 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Jul 05 2020 15:27:24 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1006,7 +1006,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jul 05 2020 12:53:10 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Jul 05 2020 15:27:24 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -1294,7 +1294,7 @@ You can read more about this function Hadley Wickham's \href{http://r-pkgs.had.c
 \NormalTok{ms <{-}}\StringTok{ }\OtherTok{NULL}
 
 \NormalTok{.onLoad <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(libname, pkgname)\{}
-\NormalTok{  ms <<{-}}\StringTok{ }\KeywordTok{v8}\NormalTok{()}
+\NormalTok{  ms <<{-}}\StringTok{ }\NormalTok{V8}\OperatorTok{::}\KeywordTok{v8}\NormalTok{()}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
@@ -6785,6 +6785,210 @@ Finally, it's simply about using the one method to evaluate expressions.
 ## 
 ## $TYPE_RANK
 ## [1] 2
+\end{verbatim}
+
+\hypertarget{machine-learning}{%
+\chapter{Machine Learning}\label{machine-learning}}
+
+In this chapter we build a package that, via V8, wraps \href{https://github.com/mljs/ml}{ml.js}, a library which brings machine learning to JavaScript. It covers quite a few models, in this chapter we only include one: the linear regression.
+
+\hypertarget{dependency-1}{%
+\section*{Dependency}\label{dependency-1}}
+
+
+We start by creating a package and add the V8 package as dependency.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{create\_package}\NormalTok{(}\StringTok{"ml"}\NormalTok{)}
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use\_package}\NormalTok{(}\StringTok{"V8"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Then we create the \texttt{inst} directory in which we place the ml.js file downloaded from the CDN.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dir.create}\NormalTok{(}\StringTok{"inst"}\NormalTok{)}
+\KeywordTok{download.file}\NormalTok{(}\StringTok{"https://www.lactame.com/lib/ml/4.0.0/ml.min.js"}\NormalTok{, }\StringTok{"inst/ml.min.js"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+With the dependency downloaded one can start working on the R code. First, a new V8 context needs to be created and the ml.js file need to be imported in it.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# zzz.R}
+\NormalTok{ml <{-}}\StringTok{ }\OtherTok{NULL}
+
+\NormalTok{.onLoad <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(libname, pkgname)\{}
+\NormalTok{  ml <<{-}}\StringTok{ }\NormalTok{V8}\OperatorTok{::}\KeywordTok{v8}\NormalTok{()}
+\NormalTok{  mljs <{-}}\StringTok{ }\KeywordTok{system.file}\NormalTok{(}\StringTok{"ml.min.js"}\NormalTok{, }\DataTypeTok{package =} \StringTok{"ml"}\NormalTok{)}
+\NormalTok{  ml}\OperatorTok{$}\KeywordTok{source}\NormalTok{(mljs)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{simple-regression}{%
+\section*{Simple Regression}\label{simple-regression}}
+
+
+First model we make available is the \href{https://github.com/mljs/regression-simple-linear}{``simple linear regression''}, which consists of a simple function that takes two arrays. We can thus create a function that takes two vectors, \texttt{x}, and \texttt{y}, and runs the regression.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export }
+\NormalTok{ml\_simple\_lm <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(y, x)\{}
+  \CommentTok{\# assign x and y}
+\NormalTok{  ml}\OperatorTok{$}\KeywordTok{assign}\NormalTok{(}\StringTok{"x"}\NormalTok{, x)}
+\NormalTok{  ml}\OperatorTok{$}\KeywordTok{assign}\NormalTok{(}\StringTok{"y"}\NormalTok{, y)}
+
+  \CommentTok{\# run regression}
+\NormalTok{  ml}\OperatorTok{$}\KeywordTok{eval}\NormalTok{(}\StringTok{"var regression = new ML.SimpleLinearRegression(x, y);"}\NormalTok{)}
+  
+  \CommentTok{\# return results}
+\NormalTok{  ml}\OperatorTok{$}\KeywordTok{get}\NormalTok{(}\StringTok{"regression"}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Then we can document and load the model to the function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ml\_simple\_lm}\NormalTok{(cars}\OperatorTok{$}\NormalTok{speed, cars}\OperatorTok{$}\NormalTok{dist)}
+\CommentTok{\#\# $name}
+\CommentTok{\#\# [1] "simpleLinearRegression"}
+\CommentTok{\#\# }
+\CommentTok{\#\# $slope}
+\CommentTok{\#\# [1] 0.1655676}
+\CommentTok{\#\# }
+\CommentTok{\#\# $intercept}
+\CommentTok{\#\# [1] 8.283906}
+\end{Highlighting}
+\end{Shaded}
+
+This works but has a few issues, namely running two or more regression internally will override the variable \texttt{regression} in the V8 context. Let us demonstrate by implementing a function to predict.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export}
+\NormalTok{ml\_predict <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x)\{}
+\NormalTok{  ml}\OperatorTok{$}\KeywordTok{call}\NormalTok{(}\StringTok{"regression.predict"}\NormalTok{, x)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+We then document and load the functions to then run two regressions in a row and observe the issue. Unlike R the model we created only exists in JavaScript, unlike the \texttt{lm}, the function \texttt{ml\_simple\_lm} does not return the model. Therefore, \texttt{ml\_simple\_lm} does not distinguish between models, unlike \texttt{predict} which takes the model as first argument and runs the prediction on it.
+
+This implementation of ml.js is indeed very dangerous.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# first model}
+\KeywordTok{ml\_simple\_lm}\NormalTok{(cars}\OperatorTok{$}\NormalTok{speed, cars}\OperatorTok{$}\NormalTok{dist)}
+\KeywordTok{ml\_predict}\NormalTok{(}\DecValTok{15}\NormalTok{)}
+\CommentTok{\#\# 25.18405}
+
+\CommentTok{\# overrides model}
+\KeywordTok{ml\_simple\_lm}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{, }\KeywordTok{runif}\NormalTok{(}\DecValTok{10}\NormalTok{))}
+
+\CommentTok{\# produces different predictions}
+\KeywordTok{ml\_predict}\NormalTok{(}\DecValTok{15}\NormalTok{)}
+\CommentTok{\#\# 10.76742}
+\end{Highlighting}
+\end{Shaded}
+
+The package ml currently under construction should emulate R in that respect, the \texttt{ml\_simple\_lm} should return the model which should be usable with the \texttt{predict} function. In order to do we are going to need to track regressions internally in V8 so the \texttt{ml\_simple\_lm} return a proxy of the model that \texttt{predict} can use to predict on the intended model.
+
+In order to track and store regressions internally we are going to declare an empty array when the package is loaded.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# zzz.R}
+\NormalTok{ml <{-}}\StringTok{ }\OtherTok{NULL}
+
+\NormalTok{.onLoad <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(libname, pkgname)\{}
+\NormalTok{  ml <<{-}}\StringTok{ }\NormalTok{V8}\OperatorTok{::}\KeywordTok{v8}\NormalTok{()}
+\NormalTok{  mljs <{-}}\StringTok{ }\KeywordTok{system.file}\NormalTok{(}\StringTok{"ml.min.js"}\NormalTok{, }\DataTypeTok{package =} \StringTok{"ml"}\NormalTok{)}
+\NormalTok{  ml}\OperatorTok{$}\KeywordTok{source}\NormalTok{(mljs)}
+\NormalTok{  ml}\OperatorTok{$}\KeywordTok{eval}\NormalTok{(}\StringTok{"var regressions = [];"}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Then, one can track regressions by creating an R object which is incremented every time \texttt{ml\_simple\_lm} runs, this can be used as variable name in the JavaScript \texttt{regressions} array declare in \texttt{.onLoad}. This variable name must be stored in the object we intend to return so the \texttt{predict} method we will create later on can access the model and run predictions. Finally, in order to declare a new method on the \texttt{predict} function we need to return an object bearing a unique class, below we use \texttt{mlSimpleRegression}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{counter <{-}}\StringTok{ }\KeywordTok{new.env}\NormalTok{(}\DataTypeTok{parent =} \KeywordTok{emptyenv}\NormalTok{())}
+\NormalTok{counter}\OperatorTok{$}\NormalTok{regressions <{-}}\StringTok{ }\DecValTok{0}
+
+\CommentTok{\#\textquotesingle{} @export }
+\NormalTok{ml\_simple\_lm <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(y, x)\{}
+\NormalTok{  counter}\OperatorTok{$}\NormalTok{regressions <{-}}\StringTok{ }\NormalTok{counter}\OperatorTok{$}\NormalTok{regressions }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+
+  \CommentTok{\# assign variables}
+\NormalTok{  ml}\OperatorTok{$}\KeywordTok{assign}\NormalTok{(}\StringTok{"x"}\NormalTok{, x)}
+\NormalTok{  ml}\OperatorTok{$}\KeywordTok{assign}\NormalTok{(}\StringTok{"y"}\NormalTok{, y)}
+
+  \CommentTok{\# address}
+\NormalTok{  address <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(}\StringTok{"regressions[\textquotesingle{}"}\NormalTok{, counter}\OperatorTok{$}\NormalTok{regressions, }\StringTok{"\textquotesingle{}]"}\NormalTok{)}
+
+  \CommentTok{\# create regression}
+\NormalTok{  code <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(address, }\StringTok{" = new ML.SimpleLinearRegression(x, y);"}\NormalTok{)}
+\NormalTok{  ml}\OperatorTok{$}\KeywordTok{eval}\NormalTok{(code)}
+
+  \CommentTok{\# retrieve and append address}
+\NormalTok{  regression <{-}}\StringTok{ }\NormalTok{ml}\OperatorTok{$}\KeywordTok{get}\NormalTok{(address)}
+\NormalTok{  regression}\OperatorTok{$}\NormalTok{address <{-}}\StringTok{ }\NormalTok{address}
+
+  \CommentTok{\# create object of new class}
+  \KeywordTok{structure}\NormalTok{(regression, }\DataTypeTok{class =} \KeywordTok{c}\NormalTok{(}\StringTok{"mlSimpleRegression"}\NormalTok{, }\KeywordTok{class}\NormalTok{(regression)))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Then on can implement the \texttt{predict} method for \texttt{mlSimpleRegression}. The function uses the \texttt{address} of the model to run the JavaScript \texttt{predict} method on that object.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export }
+\NormalTok{predict.mlSimpleRegression <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(object, newdata, ...)\{}
+\NormalTok{  code <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(object}\OperatorTok{$}\NormalTok{address, }\StringTok{".predict"}\NormalTok{)}
+\NormalTok{  ml}\OperatorTok{$}\KeywordTok{call}\NormalTok{(code, newdata)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+We can then build and load the package to it in action.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(ml)}
+
+\CommentTok{\# first modelq}
+\NormalTok{model\_cars <{-}}\StringTok{ }\KeywordTok{ml\_simple\_lm}\NormalTok{(cars}\OperatorTok{$}\NormalTok{speed, cars}\OperatorTok{$}\NormalTok{dist)}
+
+\CommentTok{\# second model}
+\NormalTok{model\_random <{-}}\StringTok{ }\KeywordTok{ml\_simple\_lm}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{, }\KeywordTok{runif}\NormalTok{(}\DecValTok{10}\NormalTok{))}
+
+\KeywordTok{predict}\NormalTok{(model\_random, }\DecValTok{15}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 67.74
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{predict}\NormalTok{(model\_cars, }\DecValTok{15}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 10.77
 \end{verbatim}
 
   \bibliography{book.bib,packages.bib}
