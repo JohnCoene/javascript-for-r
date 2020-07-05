@@ -32,7 +32,7 @@
   
   
 <link rel="prev" href="image-classifier.html"/>
-<link rel="next" href="events-1.html"/>
+<link rel="next" href="math-evaluator.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -302,8 +302,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li class="chapter" data-level="" data-path="progress-bar.html"><a href="progress-bar.html#r-code-1"><i class="fa fa-check"></i>R code</a></li>
 <li class="chapter" data-level="" data-path="progress-bar.html"><a href="progress-bar.html#javascript-code-2"><i class="fa fa-check"></i>JavaScript code</a></li>
+<li class="chapter" data-level="" data-path="progress-bar.html"><a href="progress-bar.html#events-1"><i class="fa fa-check"></i>Events</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="events-1.html"><a href="events-1.html"><i class="fa fa-check"></i>Events</a></li>
 <li class="chapter" data-level="17" data-path="math-evaluator.html"><a href="math-evaluator.html"><i class="fa fa-check"></i><b>17</b> Math Evaluator</a></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 </ul>
@@ -419,6 +419,51 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>Then again, there are many more options and methods that we do not implement here but would make for a great exercise and even a great R package.</p>
 </div>
+<div id="events-1" class="section level2 unnumbered" number="">
+<h2>Events</h2>
+<p>The way rsup is set up is interesting in that the loading bar is shown or hidden from the R server. One could set it up differently however. Perhaps, instead of having to trigger the loading bar from the server it could all be handled automatically: showing the bar when the server is computing or redrawing things and hiding it when the server becomes idle again.</p>
+<div class="sourceCode" id="cb369"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb369-1"><a href="progress-bar.html#cb369-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb369-2"><a href="progress-bar.html#cb369-2"></a></span>
+<span id="cb369-3"><a href="progress-bar.html#cb369-3"></a>shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb369-4"><a href="progress-bar.html#cb369-4"></a></span>
+<span id="cb369-5"><a href="progress-bar.html#cb369-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb369-6"><a href="progress-bar.html#cb369-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb369-7"><a href="progress-bar.html#cb369-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/rsup-progress&quot;</span>),</span>
+<span id="cb369-8"><a href="progress-bar.html#cb369-8"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/auto.js&quot;</span>)</span>
+<span id="cb369-9"><a href="progress-bar.html#cb369-9"></a>  ),</span>
+<span id="cb369-10"><a href="progress-bar.html#cb369-10"></a>  <span class="kw">br</span>(),</span>
+<span id="cb369-11"><a href="progress-bar.html#cb369-11"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;render&quot;</span>, <span class="st">&quot;render&quot;</span>),</span>
+<span id="cb369-12"><a href="progress-bar.html#cb369-12"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb369-13"><a href="progress-bar.html#cb369-13"></a>)</span>
+<span id="cb369-14"><a href="progress-bar.html#cb369-14"></a></span>
+<span id="cb369-15"><a href="progress-bar.html#cb369-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb369-16"><a href="progress-bar.html#cb369-16"></a></span>
+<span id="cb369-17"><a href="progress-bar.html#cb369-17"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb369-18"><a href="progress-bar.html#cb369-18"></a>    input<span class="op">$</span>render</span>
+<span id="cb369-19"><a href="progress-bar.html#cb369-19"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">2</span>)</span>
+<span id="cb369-20"><a href="progress-bar.html#cb369-20"></a>    <span class="kw">hist</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>))</span>
+<span id="cb369-21"><a href="progress-bar.html#cb369-21"></a>  })</span>
+<span id="cb369-22"><a href="progress-bar.html#cb369-22"></a></span>
+<span id="cb369-23"><a href="progress-bar.html#cb369-23"></a>}</span>
+<span id="cb369-24"><a href="progress-bar.html#cb369-24"></a></span>
+<span id="cb369-25"><a href="progress-bar.html#cb369-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>Below we declare the progress variable that will hold the Rsup-progress object. This is declared before it is created as this object needs to be accessible in various contexts.</p>
+<div class="sourceCode" id="cb370"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb370-1"><a href="progress-bar.html#cb370-1"></a><span class="co">// auto.js</span></span>
+<span id="cb370-2"><a href="progress-bar.html#cb370-2"></a><span class="kw">var</span> progress<span class="op">;</span></span></code></pre></div>
+<p>We can then observe for the <code>shiny:busy</code> and <code>shiny:idle</code> events to show and hide the progress bar automatically.</p>
+<div class="sourceCode" id="cb371"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb371-1"><a href="progress-bar.html#cb371-1"></a><span class="co">// auto.js</span></span>
+<span id="cb371-2"><a href="progress-bar.html#cb371-2"></a><span class="kw">var</span> progress<span class="op">;</span></span>
+<span id="cb371-3"><a href="progress-bar.html#cb371-3"></a></span>
+<span id="cb371-4"><a href="progress-bar.html#cb371-4"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:busy&#39;</span><span class="op">,</span> <span class="kw">function</span>(event)<span class="op">{</span></span>
+<span id="cb371-5"><a href="progress-bar.html#cb371-5"></a>  progress <span class="op">=</span> <span class="kw">new</span> <span class="at">RsupProgress</span>()<span class="op">;</span></span>
+<span id="cb371-6"><a href="progress-bar.html#cb371-6"></a>  <span class="va">progress</span>.<span class="at">start</span>()<span class="op">;</span></span>
+<span id="cb371-7"><a href="progress-bar.html#cb371-7"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb371-8"><a href="progress-bar.html#cb371-8"></a></span>
+<span id="cb371-9"><a href="progress-bar.html#cb371-9"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:idle&#39;</span><span class="op">,</span> <span class="kw">function</span>(event)<span class="op">{</span></span>
+<span id="cb371-10"><a href="progress-bar.html#cb371-10"></a>  <span class="va">progress</span>.<span class="at">end</span>()<span class="op">;</span></span>
+<span id="cb371-11"><a href="progress-bar.html#cb371-11"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+
+</div>
 </div>
             </section>
 
@@ -426,7 +471,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
         </div>
       </div>
 <a href="image-classifier.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="events-1.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="math-evaluator.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
