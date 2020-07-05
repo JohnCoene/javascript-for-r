@@ -4,9 +4,9 @@ While previous chapters on working with Shiny made use of external libraries and
 
 ## Events {-}
 
-There is a wee bit of documentation tucked away on the [shiny website](https://shiny.rstudio.com/articles/js-events.html) that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when shiny connects, when an element become visible, etc. To demonstrate how to use those events and how handy they can be we will create an signal which displays on the application to indicate that the server is busy running computations. This could be as fancy as ever but for simplicity's sake we limit the demonstration to showing and hiding a gif.
+There is a wee bit of documentation tucked away on the [shiny website](https://shiny.rstudio.com/articles/js-events.html) that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when shiny connects, when an element become visible, and more. To demonstrate how to use those events and how handy they can be we will create a signal which displays on the application to indicate that the server is busy running computations. This could be as fancy as ever but for simplicity's sake we limit the demonstration to showing and hiding a gif.
 
-First, we create the directories and file necessary, and to indicate the server is busy we'll be using a gif rather well-known in the R community.
+First, we create the directories and necessary files, and to indicate the server is busy we'll be using a gif that is rather well-known in the R community. Note that we will be using some CSS, hence the `style.css` file.
 
 ```r
 dir.create("www")
@@ -15,14 +15,13 @@ file.create("www/style.css")
 
 # gif
 gif <- paste0(
-  "https://media1.tenor.com/images/",
-  "cb27704982766b4f02691ea975d9a259/tenor.gif?",
-  "itemid=11365139"
+  "https://github.com/JohnCoene/javascript-for-r/",
+  "raw/master/code/events/www/typing.gif"
 )
 download.file(gif, "www/typing.gif")
 ```
 
-Then we create an application that draws and redraws a plot at the click of a button. Note that we give the gif an id as we will need to be able to retrieve this element JavaScript side and an `id` makes for an ideal selector.
+Then we create an application that draws and redraws a plot at the click of a button. Note that we give the gif an id as we will need to be able to retrieve this element JavaScript side (to dynamically show and hide it) and an `id` makes for an ideal selector.
 
 ```r
 # app.R
@@ -55,7 +54,7 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-The gif should only be visible when the server is busy, unlike now, whether it is visible will be controlled in JavaScript. In the meantime, this should be initialised as hidden using CSS. The code below hides the gif with `visibility: hidden`, and repositions it, floating on top of the rest of the content in the top right of the page.
+The gif should only be visible when the server is busy, unlike now. Whether it is visible will be controlled in JavaScript so this should be initialised as hidden using CSS. The code below hides the gif with `visibility: hidden`, and repositions it, floating on top of the rest of the content in the top right of the page, the `z-index` ensures the gif appears on top of other elements.
 
 ```css
 /* style.css */
@@ -102,11 +101,13 @@ $(document).on('shiny:idle', function(event) {
 });
 ```
 
+The application will then display the gif when the server is busy running computations.
+
 ![Shiny with a busy indicator](images/shiny-events.png)
 
 ## Table Buttons {-}
 
-For instance, using what was learned previously one can place buttons inside a shiny table and observe server-side which is clicked. Starting with a basic application that only includes a basic table to which we ultimately want to add a column containing a button on each row. Here we achieve this by having each button set a different value (e.g.: an id) to an input using `shiny.setInputValue` but one could very well create different input names for each button.
+For instance, using what was learned previously one can place buttons inside a shiny table and observe server-side which is clicked. Starting with a basic application that only includes a table to which we ultimately want to add a column containing a button on each row. Here we achieve this by having each button set a different value (e.g.: an id) to an input using `shiny.setInputValue` but one could very well create different input names for each button.
 
 ```r
 library(DT)
@@ -133,7 +134,7 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-Note that in the above we pass some parameters to `datatable` not all are necessary at the exception of `escape` which is set to `FALSE` as we will ultimately place HTML code the table and we need to render rather than show said code as a  string.
+Note that in the above we pass some parameters to `datatable` not all are necessary at the exception of `escape` which is set to `FALSE` as we will ultimately place HTML code the table which should appear rendered rather than show said code as a string.
 
 We start by creating the on-click functions as R character strings for each row of the `mtcars` dataset. This is the function that will be triggered when buttons are clicked. This should look familiar, we use `Shiny.setInputValue` to define an input named `click` which is set to a different value for every row of the table.
 

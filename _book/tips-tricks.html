@@ -333,20 +333,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>While previous chapters on working with Shiny made use of external libraries and built packages that brought new functionalities previously not available in shiny, one does not have to go to this length to take advantage of the learnings contained in those pages. Moreover there are a few interesting things that have not yet been explored.</p>
 <div id="events" class="section level2 unnumbered" number="">
 <h2>Events</h2>
-<p>There is a wee bit of documentation tucked away on the <a href="https://shiny.rstudio.com/articles/js-events.html">shiny website</a> that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when shiny connects, when an element become visible, etc. To demonstrate how to use those events and how handy they can be we will create an signal which displays on the application to indicate that the server is busy running computations. This could be as fancy as ever but for simplicity’s sake we limit the demonstration to showing and hiding a gif.</p>
-<p>First, we create the directories and file necessary, and to indicate the server is busy we’ll be using a gif rather well-known in the R community.</p>
+<p>There is a wee bit of documentation tucked away on the <a href="https://shiny.rstudio.com/articles/js-events.html">shiny website</a> that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when shiny connects, when an element become visible, and more. To demonstrate how to use those events and how handy they can be we will create a signal which displays on the application to indicate that the server is busy running computations. This could be as fancy as ever but for simplicity’s sake we limit the demonstration to showing and hiding a gif.</p>
+<p>First, we create the directories and necessary files, and to indicate the server is busy we’ll be using a gif that is rather well-known in the R community. Note that we will be using some CSS, hence the <code>style.css</code> file.</p>
 <div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="tips-tricks.html#cb171-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
 <span id="cb171-2"><a href="tips-tricks.html#cb171-2"></a><span class="kw">file.create</span>(<span class="st">&quot;www/script.js&quot;</span>)</span>
 <span id="cb171-3"><a href="tips-tricks.html#cb171-3"></a><span class="kw">file.create</span>(<span class="st">&quot;www/style.css&quot;</span>)</span>
 <span id="cb171-4"><a href="tips-tricks.html#cb171-4"></a></span>
 <span id="cb171-5"><a href="tips-tricks.html#cb171-5"></a><span class="co"># gif</span></span>
 <span id="cb171-6"><a href="tips-tricks.html#cb171-6"></a>gif &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb171-7"><a href="tips-tricks.html#cb171-7"></a>  <span class="st">&quot;https://media1.tenor.com/images/&quot;</span>,</span>
-<span id="cb171-8"><a href="tips-tricks.html#cb171-8"></a>  <span class="st">&quot;cb27704982766b4f02691ea975d9a259/tenor.gif?&quot;</span>,</span>
-<span id="cb171-9"><a href="tips-tricks.html#cb171-9"></a>  <span class="st">&quot;itemid=11365139&quot;</span></span>
-<span id="cb171-10"><a href="tips-tricks.html#cb171-10"></a>)</span>
-<span id="cb171-11"><a href="tips-tricks.html#cb171-11"></a><span class="kw">download.file</span>(gif, <span class="st">&quot;www/typing.gif&quot;</span>)</span></code></pre></div>
-<p>Then we create an application that draws and redraws a plot at the click of a button. Note that we give the gif an id as we will need to be able to retrieve this element JavaScript side and an <code>id</code> makes for an ideal selector.</p>
+<span id="cb171-7"><a href="tips-tricks.html#cb171-7"></a>  <span class="st">&quot;https://github.com/JohnCoene/javascript-for-r/&quot;</span>,</span>
+<span id="cb171-8"><a href="tips-tricks.html#cb171-8"></a>  <span class="st">&quot;raw/master/code/events/www/typing.gif&quot;</span></span>
+<span id="cb171-9"><a href="tips-tricks.html#cb171-9"></a>)</span>
+<span id="cb171-10"><a href="tips-tricks.html#cb171-10"></a><span class="kw">download.file</span>(gif, <span class="st">&quot;www/typing.gif&quot;</span>)</span></code></pre></div>
+<p>Then we create an application that draws and redraws a plot at the click of a button. Note that we give the gif an id as we will need to be able to retrieve this element JavaScript side (to dynamically show and hide it) and an <code>id</code> makes for an ideal selector.</p>
 <div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="tips-tricks.html#cb172-1"></a><span class="co"># app.R</span></span>
 <span id="cb172-2"><a href="tips-tricks.html#cb172-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb172-3"><a href="tips-tricks.html#cb172-3"></a></span>
@@ -375,7 +374,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb172-26"><a href="tips-tricks.html#cb172-26"></a>}</span>
 <span id="cb172-27"><a href="tips-tricks.html#cb172-27"></a></span>
 <span id="cb172-28"><a href="tips-tricks.html#cb172-28"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>The gif should only be visible when the server is busy, unlike now, whether it is visible will be controlled in JavaScript. In the meantime, this should be initialised as hidden using CSS. The code below hides the gif with <code>visibility: hidden</code>, and repositions it, floating on top of the rest of the content in the top right of the page.</p>
+<p>The gif should only be visible when the server is busy, unlike now. Whether it is visible will be controlled in JavaScript so this should be initialised as hidden using CSS. The code below hides the gif with <code>visibility: hidden</code>, and repositions it, floating on top of the rest of the content in the top right of the page, the <code>z-index</code> ensures the gif appears on top of other elements.</p>
 <div class="sourceCode" id="cb173"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb173-1"><a href="tips-tricks.html#cb173-1"></a><span class="co">/* style.css */</span></span>
 <span id="cb173-2"><a href="tips-tricks.html#cb173-2"></a><span class="pp">#loading</span>{</span>
 <span id="cb173-3"><a href="tips-tricks.html#cb173-3"></a>  <span class="kw">top</span>: <span class="dv">20</span><span class="dt">px</span><span class="op">;</span></span>
@@ -410,6 +409,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb175-13"><a href="tips-tricks.html#cb175-13"></a>  <span class="co">// hide gif</span></span>
 <span id="cb175-14"><a href="tips-tricks.html#cb175-14"></a>  <span class="va">gif</span>.<span class="va">style</span>.<span class="at">visibility</span> <span class="op">=</span> <span class="st">&quot;hidden&quot;</span><span class="op">;</span></span>
 <span id="cb175-15"><a href="tips-tricks.html#cb175-15"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<p>The application will then display the gif when the server is busy running computations.</p>
 <div class="figure">
 <img src="images/shiny-events.png" alt="" />
 <p class="caption">Shiny with a busy indicator</p>
@@ -417,7 +417,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="table-buttons" class="section level2 unnumbered" number="">
 <h2>Table Buttons</h2>
-<p>For instance, using what was learned previously one can place buttons inside a shiny table and observe server-side which is clicked. Starting with a basic application that only includes a basic table to which we ultimately want to add a column containing a button on each row. Here we achieve this by having each button set a different value (e.g.: an id) to an input using <code>shiny.setInputValue</code> but one could very well create different input names for each button.</p>
+<p>For instance, using what was learned previously one can place buttons inside a shiny table and observe server-side which is clicked. Starting with a basic application that only includes a table to which we ultimately want to add a column containing a button on each row. Here we achieve this by having each button set a different value (e.g.: an id) to an input using <code>shiny.setInputValue</code> but one could very well create different input names for each button.</p>
 <div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="tips-tricks.html#cb176-1"></a><span class="kw">library</span>(DT)</span>
 <span id="cb176-2"><a href="tips-tricks.html#cb176-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb176-3"><a href="tips-tricks.html#cb176-3"></a></span>
@@ -440,7 +440,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb176-20"><a href="tips-tricks.html#cb176-20"></a>}</span>
 <span id="cb176-21"><a href="tips-tricks.html#cb176-21"></a></span>
 <span id="cb176-22"><a href="tips-tricks.html#cb176-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>Note that in the above we pass some parameters to <code>datatable</code> not all are necessary at the exception of <code>escape</code> which is set to <code>FALSE</code> as we will ultimately place HTML code the table and we need to render rather than show said code as a string.</p>
+<p>Note that in the above we pass some parameters to <code>datatable</code> not all are necessary at the exception of <code>escape</code> which is set to <code>FALSE</code> as we will ultimately place HTML code the table which should appear rendered rather than show said code as a string.</p>
 <p>We start by creating the on-click functions as R character strings for each row of the <code>mtcars</code> dataset. This is the function that will be triggered when buttons are clicked. This should look familiar, we use <code>Shiny.setInputValue</code> to define an input named <code>click</code> which is set to a different value for every row of the table.</p>
 <div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="tips-tricks.html#cb177-1"></a><span class="kw">library</span>(DT)</span>
 <span id="cb177-2"><a href="tips-tricks.html#cb177-2"></a><span class="kw">library</span>(shiny)</span>

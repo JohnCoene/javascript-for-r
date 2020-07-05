@@ -996,7 +996,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jul 05 2020 15:35:08 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Jul 05 2020 16:53:49 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1006,7 +1006,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jul 05 2020 15:35:08 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Jul 05 2020 16:53:49 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -2516,9 +2516,9 @@ While previous chapters on working with Shiny made use of external libraries and
 \section*{Events}\label{events}}
 
 
-There is a wee bit of documentation tucked away on the \href{https://shiny.rstudio.com/articles/js-events.html}{shiny website} that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when shiny connects, when an element become visible, etc. To demonstrate how to use those events and how handy they can be we will create an signal which displays on the application to indicate that the server is busy running computations. This could be as fancy as ever but for simplicity's sake we limit the demonstration to showing and hiding a gif.
+There is a wee bit of documentation tucked away on the \href{https://shiny.rstudio.com/articles/js-events.html}{shiny website} that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when shiny connects, when an element become visible, and more. To demonstrate how to use those events and how handy they can be we will create a signal which displays on the application to indicate that the server is busy running computations. This could be as fancy as ever but for simplicity's sake we limit the demonstration to showing and hiding a gif.
 
-First, we create the directories and file necessary, and to indicate the server is busy we'll be using a gif rather well-known in the R community.
+First, we create the directories and necessary files, and to indicate the server is busy we'll be using a gif that is rather well-known in the R community. Note that we will be using some CSS, hence the \texttt{style.css} file.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2528,15 +2528,14 @@ First, we create the directories and file necessary, and to indicate the server 
 
 \CommentTok{\# gif}
 \NormalTok{gif <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(}
-  \StringTok{"https://media1.tenor.com/images/"}\NormalTok{,}
-  \StringTok{"cb27704982766b4f02691ea975d9a259/tenor.gif?"}\NormalTok{,}
-  \StringTok{"itemid=11365139"}
+  \StringTok{"https://github.com/JohnCoene/javascript{-}for{-}r/"}\NormalTok{,}
+  \StringTok{"raw/master/code/events/www/typing.gif"}
 \NormalTok{)}
 \KeywordTok{download.file}\NormalTok{(gif, }\StringTok{"www/typing.gif"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-Then we create an application that draws and redraws a plot at the click of a button. Note that we give the gif an id as we will need to be able to retrieve this element JavaScript side and an \texttt{id} makes for an ideal selector.
+Then we create an application that draws and redraws a plot at the click of a button. Note that we give the gif an id as we will need to be able to retrieve this element JavaScript side (to dynamically show and hide it) and an \texttt{id} makes for an ideal selector.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2571,7 +2570,7 @@ Then we create an application that draws and redraws a plot at the click of a bu
 \end{Highlighting}
 \end{Shaded}
 
-The gif should only be visible when the server is busy, unlike now, whether it is visible will be controlled in JavaScript. In the meantime, this should be initialised as hidden using CSS. The code below hides the gif with \texttt{visibility:\ hidden}, and repositions it, floating on top of the rest of the content in the top right of the page.
+The gif should only be visible when the server is busy, unlike now. Whether it is visible will be controlled in JavaScript so this should be initialised as hidden using CSS. The code below hides the gif with \texttt{visibility:\ hidden}, and repositions it, floating on top of the rest of the content in the top right of the page, the \texttt{z-index} ensures the gif appears on top of other elements.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2624,6 +2623,8 @@ We then need to hide the gif when the server goes from busy to idle, using the \
 \end{Highlighting}
 \end{Shaded}
 
+The application will then display the gif when the server is busy running computations.
+
 \begin{figure}
 \centering
 \includegraphics{images/shiny-events.png}
@@ -2634,7 +2635,7 @@ We then need to hide the gif when the server goes from busy to idle, using the \
 \section*{Table Buttons}\label{table-buttons}}
 
 
-For instance, using what was learned previously one can place buttons inside a shiny table and observe server-side which is clicked. Starting with a basic application that only includes a basic table to which we ultimately want to add a column containing a button on each row. Here we achieve this by having each button set a different value (e.g.: an id) to an input using \texttt{shiny.setInputValue} but one could very well create different input names for each button.
+For instance, using what was learned previously one can place buttons inside a shiny table and observe server-side which is clicked. Starting with a basic application that only includes a table to which we ultimately want to add a column containing a button on each row. Here we achieve this by having each button set a different value (e.g.: an id) to an input using \texttt{shiny.setInputValue} but one could very well create different input names for each button.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2663,7 +2664,7 @@ For instance, using what was learned previously one can place buttons inside a s
 \end{Highlighting}
 \end{Shaded}
 
-Note that in the above we pass some parameters to \texttt{datatable} not all are necessary at the exception of \texttt{escape} which is set to \texttt{FALSE} as we will ultimately place HTML code the table and we need to render rather than show said code as a string.
+Note that in the above we pass some parameters to \texttt{datatable} not all are necessary at the exception of \texttt{escape} which is set to \texttt{FALSE} as we will ultimately place HTML code the table which should appear rendered rather than show said code as a string.
 
 We start by creating the on-click functions as R character strings for each row of the \texttt{mtcars} dataset. This is the function that will be triggered when buttons are clicked. This should look familiar, we use \texttt{Shiny.setInputValue} to define an input named \texttt{click} which is set to a different value for every row of the table.
 
@@ -6790,7 +6791,16 @@ Finally, it's simply about using the one method to evaluate expressions.
 \hypertarget{machine-learning}{%
 \chapter{Machine Learning}\label{machine-learning}}
 
-In this chapter we build a package that, via V8, wraps \href{https://github.com/mljs/ml}{ml.js}, a library which brings machine learning to JavaScript. It covers quite a few models, in this chapter we only include one: the linear regression.
+In this chapter we build a package that, via V8, wraps \href{https://github.com/mljs/ml}{ml.js}, a library which brings machine learning to JavaScript. It covers quite a few models, in this chapter we only include one: the linear regression. This is an interesting example because it reveals some proceedings that one is likely to run into when creating packages using V8.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{const}\NormalTok{ x }\OperatorTok{=}\NormalTok{ [}\FloatTok{0.5}\OperatorTok{,} \DecValTok{1}\OperatorTok{,} \FloatTok{1.5}\OperatorTok{,} \DecValTok{2}\OperatorTok{,} \FloatTok{2.5}\NormalTok{]}\OperatorTok{;}
+\KeywordTok{const}\NormalTok{ y }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\OperatorTok{,} \DecValTok{1}\OperatorTok{,} \DecValTok{2}\OperatorTok{,} \DecValTok{3}\OperatorTok{,} \DecValTok{4}\NormalTok{]}\OperatorTok{;}
+
+\KeywordTok{const}\NormalTok{ regression }\OperatorTok{=} \KeywordTok{new} \VariableTok{ml}\NormalTok{.}\AttributeTok{SimpleLinearRegression}\NormalTok{(x}\OperatorTok{,}\NormalTok{ y)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{dependency-1}{%
 \section*{Dependency}\label{dependency-1}}
@@ -6978,7 +6988,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] -40.63
+## [1] 11.86
 \end{verbatim}
 
 \begin{Shaded}
