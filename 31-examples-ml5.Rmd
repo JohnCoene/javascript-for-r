@@ -2,7 +2,9 @@
 
 In this example we bring [ml5.js](https://learn.ml5js.org/) to R using Shiny, more specifically its classifier using [mobileNet](https://arxiv.org/abs/1704.04861). Using shiny and JavaScript the model can run in the client's browser and the result can be sent back to the server. This means the model uses the client's computing power to run the prediction rather than the server, thereby alleviating computation on the server and bypassing limitations on concurrent users.
 
-Then again the journey starts by exploring ml5.js and the classifier we are going to use. One starts by instantiating an image classifer, specifying the model to use (ml5.js comes with a few out of the box and allows using custom models), then the classifier is used on an image present in the DOM.
+## Discover {-}
+
+Then again the journey starts by exploring ml5.js and the classifier we are going to use. One starts by instantiating an image classifier, specifying the model to use (ml5.js comes with a few out of the box and allows using custom models), then the classifier is used on an image present in the DOM.
 
 ```html
 <!DOCTYPE html>
@@ -17,7 +19,7 @@ Then again the journey starts by exploring ml5.js and the classifier we are goin
   <!-- image to classify -->
   <img id="dog" src="www/doge.jpg"/>
 
-  <!-- Script to run classifer -->
+  <!-- Script to run classifier -->
   <script>
     // Initialize the Image Classifier method with MobileNet
     const classifier = ml5.imageClassifier('MobileNet', modelLoaded);
@@ -36,6 +38,8 @@ Then again the journey starts by exploring ml5.js and the classifier we are goin
 
 </html>
 ```
+
+## Setup {-}
 
 In shiny, we would need to pass the id of the image (`dog` above) to be sent from the server and the callback function to return the results to R. The projects starts from an empty directory, before creating actual application let us create the directory of static files that will contain the JavaScript file (`classify.js`) and the images to classify. Feel free download whichever images you want, below we download images of birds from Wikipedia.
 
@@ -105,6 +109,8 @@ shinyApp(ui, server)
 
 ![Classifier skeleton](images/ml5-init.png)
 
+## JavaScript {-}
+
 With this in place one can start thinking about the JavaScript, when the "classify" button is clicked the classification must be triggered in the client and the result sent back. To do so we need to define the message handler called "classify" to which the data is sent.
 
 ```js
@@ -126,6 +132,10 @@ Shiny.addCustomMessageHandler('classify', function(data){
 ```
 
 A few things to note on the above. The classifier is created outside of the message handler as this only has to be done once and not every time the "classify" button is clicked. While the message handler accepts the `data` objects it does not make use of it, which is fine, the argument must nonetheless be specified. In the aforementioned callback function the input "classification" is defined.
+
+## Input Handler {-}
+
+We can then proceed to running the shiny application and observe the classifier in action.
 
 ```r
 library("shiny")
