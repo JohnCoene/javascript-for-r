@@ -6,7 +6,7 @@ To demonstrate how to integrate these functionalities in widgets we shall implem
 
 ## JavaScript to R {-}
 
-JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. Gio.js provides a callback that is fired when a country is selected on the globe, this callback function accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). These could sent back to the R server where it could be used for many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
+JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. Gio.js provides a callback that is fired when a country is selected on the globe, this callback function accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). These could send back to the R server where they could be used for many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
 
 The [documentation of gio.js](https://giojs.org/html/docs/callbackPicked.html) gives the following example callback function.
 
@@ -21,7 +21,18 @@ function callback (selectedCountry, relatedCountries) {
 controller.onCountryPicked(callback);
 ```
 
-This defines a function named `callback` which takes the two aforementioned objects and logs them in the JavaScript console. Then the function is passed to the `controller` which will run it every time a country is picked (selected). This can be incorporated into the widget. Instead of logging the data in the console it is used to define two different shiny inputs. Note the use of the widget identifier to define the input name.
+This defines a function named `callback` which takes the two aforementioned objects and logs them in the JavaScript console. Then the function is passed to the `controller` which will run it every time a country is picked (selected). This can be incorporated into the widget where instead of logging the data in the console it could be used to define two different shiny inputs. 
+
+```js
+// gio.js
+// define callback function
+function callback (selectedCountry, relatedCountries) {
+  Shiny.setInputValue('selected', selectedCountry);
+  Shiny.setInputValue('related', relatedCountries);
+}
+```
+
+However, this will generate an issue experienced in a previous chapter; multiple gio visualisations in a single shiny application would be defining the values of a single input. This can be remedied to by using the id of the visualisation to dynamically generate the input name.
 
 ```js
 renderValue: function(x) {
@@ -85,9 +96,28 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-The data is sent from the client to the server whether the inputs are used or not, though this likely will not negatively impact gio it can reduce performances if the callback function is triggered too frequently. For instance an input value set when the user hovers a scatter plot might lead to the event being fired very frequently and too much data being sent to the server, slowing things down and providing a poor experience.
+![Gio input data](images/gio-shiny-input-no-handler.png)
 
-Therefore one might consider making the capture of such event optional so the web browser is not strained unless explicitly asked by the developer of the application. You can also consider not sending back all the data. For instance, gio returns the coordinates of the selected country where from arcs connect; this is might be considered unnecessary. The code below only sets the input to the ISO code of the country selected.
+One thing to note before moving on, the data is sent from the client to the server whether the inputs are used or not, though this likely will not negatively impact gio it can reduce performances if the callback function is triggered too frequently. For instance an input value set when the user hovers a scatter plot might lead to the event being fired very frequently and too much data being sent to the server, slowing things down and providing a poor experience.
+
+Therefore one might consider making the capture of such event optional so the web browser is not strained unless explicitly asked by the developer of the application. This could be implemented with a simple function that sets a simple logical variable in the `x` object that is used in JavaScript to check whether to implement the callback function.
+
+```r
+#' @export
+gio_capture_events <- function(g) {
+  g$x$capture_events <- TRUE
+  return(g)
+}
+```
+
+Then this could be used in JavaScript with an if statement.
+
+```js
+if(x.capture_events)
+  controller.onCountryPicked(callback);
+```
+
+You can also consider not sending back all the data. For instance, gio returns the coordinates of the selected country where from arcs connect; this is might be considered unnecessary. The code below only sets the input to the ISO code of the country selected.
 
 ```js
 function callback (selectedCountry, relatedCountries) {
@@ -97,21 +127,21 @@ function callback (selectedCountry, relatedCountries) {
 
 ## Input Handler {-}
 
-While input handlers were explored previously we found limited use for them as the inputs were set to simple boolean values. It can be useful in this case as the inputs return more data where preprocessing is relevant. Namely the input returning data on the related countries, it is deserialised to a list but could be reshaped to a data frame of arcs.
+While input handlers were explored previously we found limited use for them as these were set to simple boolean values where preprocessing made little sense. It can be useful in this case as the inputs return more data where preprocessing is relevant. Namely the input returning data on the related countries, it is deserialised to a list but could be reshaped to a data frame of arcs (looking like `gio`'s input data).
 
 Below we create a handler that is going to loop over the list (over each arc) and return a data frame.
 
 ```r
-# R/zzz.R
+# handler.R
 related_countries_handler <- function(x, session, inputname){
   purrr::map_dfr(x, as.data.frame)
 }
 ```
 
-Then the handler must be registered with shiny, since handler can only be registered once a good place to put it is in the `.onLoad` function of the package.
+Then the handler must be registered with shiny, since handlers can only be registered once a good place to put it this is in the `.onLoad` function of the package.
 
 ```r
-# R/zzz.R
+# zzz.R
 related_countries_handler <- function(x, session, inputname){
   purrr::map_dfr(x, as.data.frame)
 }
@@ -155,13 +185,13 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-![Input transformed to data frame](images/gio-input-handler.png)
+![Gio input data transformed to a data frame](images/gio-input-handler.png)
 
 ## R to JavaScript {-}
 
 This book previously explored how to send data to the from the shiny server to the front-end, this section applies this to htmlwidgets. Currently, using gio in shiny consists of generating the globe with the `renderGio` and complimentary `gioOutput` functions. This generates the entire visualisation, it creates the HTML element where it places the globe, draws the arcs based on the data, sets the style, etc.
 
-Now imagine that only one of the elements of the globe needs changing say the data, or the style, given the functions currently at hand one would have to redraw the entire visualisation, only changing the data or the style. However, most JavaScript visualisation libraries, including gio.js, will enable changing only certain aspects of the output.
+Now imagine that only one of the elements of the globe needs changing say the data, or the style, given the functions currently at hand one would have to redraw the entire visualisation, only this time changing the data or the style. However, most JavaScript visualisation libraries, including gio.js, will enable changing only certain aspects of the output without having to redraw it all from scratch.
 
 Before we look into the implementation, let us create a shiny application which would benefit from such a feature. The shiny application below provides a drop-down menu to select between two datasets to draw on the globe, running it reveals an issue with gio though. Upon selecting a dataset with the drop down a second globe appears underneath the original one. This is because internally gio.js creates a new element (`<canvas>`) within the `<div>` created by `htmlwidgets` when running `init`, regardless of whether one was already created. Note that most visualisation libraries will not have that issue, they will detect the existing output and override it instead.
 
@@ -206,6 +236,8 @@ server <- function(input, output){
 
 shinyApp(ui, server)
 ```
+
+![Gio shiny](images/gio-shiny-error.png)
 
 A solution to this is to ensure the div created by htmlwidgets is empty before create the visualisation. Incidentally this can be executed with a JavaScript method previously used in this book: `innerHTML`. This can be used on the `container` before it is used to create an instance of gio.
 
