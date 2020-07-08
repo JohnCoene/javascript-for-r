@@ -350,80 +350,80 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2>Events</h2>
 <p>There is a wee bit of documentation tucked away on the <a href="https://shiny.rstudio.com/articles/js-events.html">shiny website</a> that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when shiny connects, when an element become visible, and more. To demonstrate how to use those events and how handy they can be we will create a notification which appears to indicate that the server is busy running computations. This could be as fancy as ever but for simplicity’s sake we limit the demonstration to showing and hiding a gif.</p>
 <p>First, we create the directories and necessary files, and to indicate the server is busy we’ll be using a gif that is rather well-known in the R community. Note that we will be using some CSS, hence the <code>style.css</code> file.</p>
-<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="tips-tricks.html#cb183-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
-<span id="cb183-2"><a href="tips-tricks.html#cb183-2"></a><span class="kw">file.create</span>(<span class="st">&quot;www/script.js&quot;</span>)</span>
-<span id="cb183-3"><a href="tips-tricks.html#cb183-3"></a><span class="kw">file.create</span>(<span class="st">&quot;www/style.css&quot;</span>)</span>
-<span id="cb183-4"><a href="tips-tricks.html#cb183-4"></a></span>
-<span id="cb183-5"><a href="tips-tricks.html#cb183-5"></a><span class="co"># gif</span></span>
-<span id="cb183-6"><a href="tips-tricks.html#cb183-6"></a>gif &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb183-7"><a href="tips-tricks.html#cb183-7"></a>  <span class="st">&quot;https://github.com/JohnCoene/javascript-for-r/&quot;</span>,</span>
-<span id="cb183-8"><a href="tips-tricks.html#cb183-8"></a>  <span class="st">&quot;raw/master/code/events/www/typing.gif&quot;</span></span>
-<span id="cb183-9"><a href="tips-tricks.html#cb183-9"></a>)</span>
-<span id="cb183-10"><a href="tips-tricks.html#cb183-10"></a><span class="kw">download.file</span>(gif, <span class="st">&quot;www/typing.gif&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="tips-tricks.html#cb184-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
+<span id="cb184-2"><a href="tips-tricks.html#cb184-2"></a><span class="kw">file.create</span>(<span class="st">&quot;www/script.js&quot;</span>)</span>
+<span id="cb184-3"><a href="tips-tricks.html#cb184-3"></a><span class="kw">file.create</span>(<span class="st">&quot;www/style.css&quot;</span>)</span>
+<span id="cb184-4"><a href="tips-tricks.html#cb184-4"></a></span>
+<span id="cb184-5"><a href="tips-tricks.html#cb184-5"></a><span class="co"># gif</span></span>
+<span id="cb184-6"><a href="tips-tricks.html#cb184-6"></a>gif &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb184-7"><a href="tips-tricks.html#cb184-7"></a>  <span class="st">&quot;https://github.com/JohnCoene/javascript-for-r/&quot;</span>,</span>
+<span id="cb184-8"><a href="tips-tricks.html#cb184-8"></a>  <span class="st">&quot;raw/master/code/events/www/typing.gif&quot;</span></span>
+<span id="cb184-9"><a href="tips-tricks.html#cb184-9"></a>)</span>
+<span id="cb184-10"><a href="tips-tricks.html#cb184-10"></a><span class="kw">download.file</span>(gif, <span class="st">&quot;www/typing.gif&quot;</span>)</span></code></pre></div>
 <p>Then we create an application that draws and redraws a plot at the click of a button. Note that we give the gif an id as we will need to be able to retrieve this element JavaScript side (to dynamically show and hide it) and an <code>id</code> makes for an ideal selector.</p>
-<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="tips-tricks.html#cb184-1"></a><span class="co"># app.R</span></span>
-<span id="cb184-2"><a href="tips-tricks.html#cb184-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb184-3"><a href="tips-tricks.html#cb184-3"></a></span>
-<span id="cb184-4"><a href="tips-tricks.html#cb184-4"></a>shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
-<span id="cb184-5"><a href="tips-tricks.html#cb184-5"></a></span>
-<span id="cb184-6"><a href="tips-tricks.html#cb184-6"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb184-7"><a href="tips-tricks.html#cb184-7"></a>  <span class="co"># import dependencies</span></span>
-<span id="cb184-8"><a href="tips-tricks.html#cb184-8"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb184-9"><a href="tips-tricks.html#cb184-9"></a>    tags<span class="op">$</span><span class="kw">link</span>(<span class="dt">href =</span> <span class="st">&quot;www/style.css&quot;</span>, <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>),</span>
-<span id="cb184-10"><a href="tips-tricks.html#cb184-10"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/script.js&quot;</span>)</span>
-<span id="cb184-11"><a href="tips-tricks.html#cb184-11"></a>  ),</span>
-<span id="cb184-12"><a href="tips-tricks.html#cb184-12"></a>  <span class="co"># gif indicator</span></span>
-<span id="cb184-13"><a href="tips-tricks.html#cb184-13"></a>  tags<span class="op">$</span><span class="kw">img</span>(<span class="dt">src =</span> <span class="st">&quot;www/typing.gif&quot;</span>, <span class="dt">id =</span> <span class="st">&quot;loading&quot;</span>)</span>
-<span id="cb184-14"><a href="tips-tricks.html#cb184-14"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>),</span>
-<span id="cb184-15"><a href="tips-tricks.html#cb184-15"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;render&quot;</span>, <span class="st">&quot;render&quot;</span>)</span>
-<span id="cb184-16"><a href="tips-tricks.html#cb184-16"></a>)</span>
-<span id="cb184-17"><a href="tips-tricks.html#cb184-17"></a></span>
-<span id="cb184-18"><a href="tips-tricks.html#cb184-18"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb184-19"><a href="tips-tricks.html#cb184-19"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb184-20"><a href="tips-tricks.html#cb184-20"></a>    input<span class="op">$</span>render <span class="co"># redraw on click</span></span>
-<span id="cb184-21"><a href="tips-tricks.html#cb184-21"></a></span>
-<span id="cb184-22"><a href="tips-tricks.html#cb184-22"></a>    <span class="co"># simulate time consuming computations</span></span>
-<span id="cb184-23"><a href="tips-tricks.html#cb184-23"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">2</span>) </span>
-<span id="cb184-24"><a href="tips-tricks.html#cb184-24"></a>    <span class="kw">plot</span>(cars)</span>
-<span id="cb184-25"><a href="tips-tricks.html#cb184-25"></a>  })</span>
-<span id="cb184-26"><a href="tips-tricks.html#cb184-26"></a>}</span>
-<span id="cb184-27"><a href="tips-tricks.html#cb184-27"></a></span>
-<span id="cb184-28"><a href="tips-tricks.html#cb184-28"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="tips-tricks.html#cb185-1"></a><span class="co"># app.R</span></span>
+<span id="cb185-2"><a href="tips-tricks.html#cb185-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb185-3"><a href="tips-tricks.html#cb185-3"></a></span>
+<span id="cb185-4"><a href="tips-tricks.html#cb185-4"></a>shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb185-5"><a href="tips-tricks.html#cb185-5"></a></span>
+<span id="cb185-6"><a href="tips-tricks.html#cb185-6"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb185-7"><a href="tips-tricks.html#cb185-7"></a>  <span class="co"># import dependencies</span></span>
+<span id="cb185-8"><a href="tips-tricks.html#cb185-8"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb185-9"><a href="tips-tricks.html#cb185-9"></a>    tags<span class="op">$</span><span class="kw">link</span>(<span class="dt">href =</span> <span class="st">&quot;www/style.css&quot;</span>, <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>),</span>
+<span id="cb185-10"><a href="tips-tricks.html#cb185-10"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/script.js&quot;</span>)</span>
+<span id="cb185-11"><a href="tips-tricks.html#cb185-11"></a>  ),</span>
+<span id="cb185-12"><a href="tips-tricks.html#cb185-12"></a>  <span class="co"># gif indicator</span></span>
+<span id="cb185-13"><a href="tips-tricks.html#cb185-13"></a>  tags<span class="op">$</span><span class="kw">img</span>(<span class="dt">src =</span> <span class="st">&quot;www/typing.gif&quot;</span>, <span class="dt">id =</span> <span class="st">&quot;loading&quot;</span>)</span>
+<span id="cb185-14"><a href="tips-tricks.html#cb185-14"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>),</span>
+<span id="cb185-15"><a href="tips-tricks.html#cb185-15"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;render&quot;</span>, <span class="st">&quot;render&quot;</span>)</span>
+<span id="cb185-16"><a href="tips-tricks.html#cb185-16"></a>)</span>
+<span id="cb185-17"><a href="tips-tricks.html#cb185-17"></a></span>
+<span id="cb185-18"><a href="tips-tricks.html#cb185-18"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb185-19"><a href="tips-tricks.html#cb185-19"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb185-20"><a href="tips-tricks.html#cb185-20"></a>    input<span class="op">$</span>render <span class="co"># redraw on click</span></span>
+<span id="cb185-21"><a href="tips-tricks.html#cb185-21"></a></span>
+<span id="cb185-22"><a href="tips-tricks.html#cb185-22"></a>    <span class="co"># simulate time consuming computations</span></span>
+<span id="cb185-23"><a href="tips-tricks.html#cb185-23"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">2</span>) </span>
+<span id="cb185-24"><a href="tips-tricks.html#cb185-24"></a>    <span class="kw">plot</span>(cars)</span>
+<span id="cb185-25"><a href="tips-tricks.html#cb185-25"></a>  })</span>
+<span id="cb185-26"><a href="tips-tricks.html#cb185-26"></a>}</span>
+<span id="cb185-27"><a href="tips-tricks.html#cb185-27"></a></span>
+<span id="cb185-28"><a href="tips-tricks.html#cb185-28"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>The gif should only be visible when the server is busy, unlike now. Whether it is visible will be controlled in JavaScript so this should be initialised as hidden using CSS. The code below hides the gif with <code>visibility: hidden</code>, and repositions it, floating on top of the rest of the content in the top right of the page, the <code>z-index</code> ensures the gif appears on top of other elements.</p>
-<div class="sourceCode" id="cb185"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb185-1"><a href="tips-tricks.html#cb185-1"></a><span class="co">/* style.css */</span></span>
-<span id="cb185-2"><a href="tips-tricks.html#cb185-2"></a><span class="pp">#loading</span>{</span>
-<span id="cb185-3"><a href="tips-tricks.html#cb185-3"></a>  <span class="kw">top</span>: <span class="dv">20</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb185-4"><a href="tips-tricks.html#cb185-4"></a>  <span class="kw">right</span>: <span class="dv">20</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb185-5"><a href="tips-tricks.html#cb185-5"></a>  <span class="kw">height</span>: <span class="dv">200</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb185-6"><a href="tips-tricks.html#cb185-6"></a>  <span class="kw">z-index</span>: <span class="dv">9999</span><span class="op">;</span></span>
-<span id="cb185-7"><a href="tips-tricks.html#cb185-7"></a>  <span class="kw">position</span>: <span class="dv">absolute</span><span class="op">;</span></span>
-<span id="cb185-8"><a href="tips-tricks.html#cb185-8"></a>  <span class="kw">visibility</span>: <span class="dv">hidden</span><span class="op">;</span></span>
-<span id="cb185-9"><a href="tips-tricks.html#cb185-9"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb186"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb186-1"><a href="tips-tricks.html#cb186-1"></a><span class="co">/* style.css */</span></span>
+<span id="cb186-2"><a href="tips-tricks.html#cb186-2"></a><span class="pp">#loading</span>{</span>
+<span id="cb186-3"><a href="tips-tricks.html#cb186-3"></a>  <span class="kw">top</span>: <span class="dv">20</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb186-4"><a href="tips-tricks.html#cb186-4"></a>  <span class="kw">right</span>: <span class="dv">20</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb186-5"><a href="tips-tricks.html#cb186-5"></a>  <span class="kw">height</span>: <span class="dv">200</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb186-6"><a href="tips-tricks.html#cb186-6"></a>  <span class="kw">z-index</span>: <span class="dv">9999</span><span class="op">;</span></span>
+<span id="cb186-7"><a href="tips-tricks.html#cb186-7"></a>  <span class="kw">position</span>: <span class="dv">absolute</span><span class="op">;</span></span>
+<span id="cb186-8"><a href="tips-tricks.html#cb186-8"></a>  <span class="kw">visibility</span>: <span class="dv">hidden</span><span class="op">;</span></span>
+<span id="cb186-9"><a href="tips-tricks.html#cb186-9"></a>}</span></code></pre></div>
 <p>We can then use the shiny events to dynamically show and hide the gif when the server is busy. Below we observe the event <code>shiny:busy</code> on the entire page (<code>document</code>), when the event is triggered the gif is retrieved using its <code>id</code> and then made visible by changing its CSS <code>visibility</code> property to <code>visible</code>.</p>
-<div class="sourceCode" id="cb186"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb186-1"><a href="tips-tricks.html#cb186-1"></a><span class="co">// script.js</span></span>
-<span id="cb186-2"><a href="tips-tricks.html#cb186-2"></a>$(<span class="bu">document</span>)<span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;shiny:busy&#39;</span><span class="op">,</span> <span class="kw">function</span>(<span class="bu">event</span>) {</span>
-<span id="cb186-3"><a href="tips-tricks.html#cb186-3"></a>  <span class="co">// retrieve the gif</span></span>
-<span id="cb186-4"><a href="tips-tricks.html#cb186-4"></a>  <span class="kw">var</span> title <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;loading&quot;</span>)<span class="op">;</span></span>
-<span id="cb186-5"><a href="tips-tricks.html#cb186-5"></a></span>
-<span id="cb186-6"><a href="tips-tricks.html#cb186-6"></a>  <span class="co">// make it visible</span></span>
-<span id="cb186-7"><a href="tips-tricks.html#cb186-7"></a>  title<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">visibility</span> <span class="op">=</span> <span class="st">&quot;visible&quot;</span><span class="op">;</span></span>
-<span id="cb186-8"><a href="tips-tricks.html#cb186-8"></a>})<span class="op">;</span></span></code></pre></div>
-<p>We then need to hide the gif when the server goes from busy to idle, using the <code>shiny:idle</code> event we can change the visibility of the gif back to <code>hidden</code>.</p>
 <div class="sourceCode" id="cb187"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb187-1"><a href="tips-tricks.html#cb187-1"></a><span class="co">// script.js</span></span>
 <span id="cb187-2"><a href="tips-tricks.html#cb187-2"></a>$(<span class="bu">document</span>)<span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;shiny:busy&#39;</span><span class="op">,</span> <span class="kw">function</span>(<span class="bu">event</span>) {</span>
 <span id="cb187-3"><a href="tips-tricks.html#cb187-3"></a>  <span class="co">// retrieve the gif</span></span>
-<span id="cb187-4"><a href="tips-tricks.html#cb187-4"></a>  <span class="kw">var</span> gif <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;loading&quot;</span>)<span class="op">;</span></span>
+<span id="cb187-4"><a href="tips-tricks.html#cb187-4"></a>  <span class="kw">var</span> title <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;loading&quot;</span>)<span class="op">;</span></span>
 <span id="cb187-5"><a href="tips-tricks.html#cb187-5"></a></span>
-<span id="cb187-6"><a href="tips-tricks.html#cb187-6"></a>  <span class="co">// make gif visible</span></span>
-<span id="cb187-7"><a href="tips-tricks.html#cb187-7"></a>  gif<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">visibility</span> <span class="op">=</span> <span class="st">&quot;visible&quot;</span><span class="op">;</span></span>
-<span id="cb187-8"><a href="tips-tricks.html#cb187-8"></a>})<span class="op">;</span></span>
-<span id="cb187-9"><a href="tips-tricks.html#cb187-9"></a></span>
-<span id="cb187-10"><a href="tips-tricks.html#cb187-10"></a>$(<span class="bu">document</span>)<span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;shiny:idle&#39;</span><span class="op">,</span> <span class="kw">function</span>(<span class="bu">event</span>) {</span>
-<span id="cb187-11"><a href="tips-tricks.html#cb187-11"></a>  <span class="kw">var</span> gif <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;loading&quot;</span>)<span class="op">;</span></span>
-<span id="cb187-12"><a href="tips-tricks.html#cb187-12"></a></span>
-<span id="cb187-13"><a href="tips-tricks.html#cb187-13"></a>  <span class="co">// hide gif</span></span>
-<span id="cb187-14"><a href="tips-tricks.html#cb187-14"></a>  gif<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">visibility</span> <span class="op">=</span> <span class="st">&quot;hidden&quot;</span><span class="op">;</span></span>
-<span id="cb187-15"><a href="tips-tricks.html#cb187-15"></a>})<span class="op">;</span></span></code></pre></div>
+<span id="cb187-6"><a href="tips-tricks.html#cb187-6"></a>  <span class="co">// make it visible</span></span>
+<span id="cb187-7"><a href="tips-tricks.html#cb187-7"></a>  title<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">visibility</span> <span class="op">=</span> <span class="st">&quot;visible&quot;</span><span class="op">;</span></span>
+<span id="cb187-8"><a href="tips-tricks.html#cb187-8"></a>})<span class="op">;</span></span></code></pre></div>
+<p>We then need to hide the gif when the server goes from busy to idle, using the <code>shiny:idle</code> event we can change the visibility of the gif back to <code>hidden</code>.</p>
+<div class="sourceCode" id="cb188"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb188-1"><a href="tips-tricks.html#cb188-1"></a><span class="co">// script.js</span></span>
+<span id="cb188-2"><a href="tips-tricks.html#cb188-2"></a>$(<span class="bu">document</span>)<span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;shiny:busy&#39;</span><span class="op">,</span> <span class="kw">function</span>(<span class="bu">event</span>) {</span>
+<span id="cb188-3"><a href="tips-tricks.html#cb188-3"></a>  <span class="co">// retrieve the gif</span></span>
+<span id="cb188-4"><a href="tips-tricks.html#cb188-4"></a>  <span class="kw">var</span> gif <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;loading&quot;</span>)<span class="op">;</span></span>
+<span id="cb188-5"><a href="tips-tricks.html#cb188-5"></a></span>
+<span id="cb188-6"><a href="tips-tricks.html#cb188-6"></a>  <span class="co">// make gif visible</span></span>
+<span id="cb188-7"><a href="tips-tricks.html#cb188-7"></a>  gif<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">visibility</span> <span class="op">=</span> <span class="st">&quot;visible&quot;</span><span class="op">;</span></span>
+<span id="cb188-8"><a href="tips-tricks.html#cb188-8"></a>})<span class="op">;</span></span>
+<span id="cb188-9"><a href="tips-tricks.html#cb188-9"></a></span>
+<span id="cb188-10"><a href="tips-tricks.html#cb188-10"></a>$(<span class="bu">document</span>)<span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;shiny:idle&#39;</span><span class="op">,</span> <span class="kw">function</span>(<span class="bu">event</span>) {</span>
+<span id="cb188-11"><a href="tips-tricks.html#cb188-11"></a>  <span class="kw">var</span> gif <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;loading&quot;</span>)<span class="op">;</span></span>
+<span id="cb188-12"><a href="tips-tricks.html#cb188-12"></a></span>
+<span id="cb188-13"><a href="tips-tricks.html#cb188-13"></a>  <span class="co">// hide gif</span></span>
+<span id="cb188-14"><a href="tips-tricks.html#cb188-14"></a>  gif<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">visibility</span> <span class="op">=</span> <span class="st">&quot;hidden&quot;</span><span class="op">;</span></span>
+<span id="cb188-15"><a href="tips-tricks.html#cb188-15"></a>})<span class="op">;</span></span></code></pre></div>
 <p>The application will then display the gif when the server is busy running computations.</p>
 <div class="figure">
 <img src="images/shiny-events.png" alt="" />
@@ -433,30 +433,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="table-buttons" class="section level2 unnumbered" number="">
 <h2>Table Buttons</h2>
 <p>For instance, using what was learned previously one can place buttons inside a shiny table and observe server-side which is clicked. Starting with a basic application that only includes a table to which we ultimately want to add a column containing a button on each row. Here we achieve this by having each button set a different value (e.g.: an id) to an input using <code>shiny.setInputValue</code> but one could very well create different input names for each button.</p>
-<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="tips-tricks.html#cb188-1"></a><span class="kw">library</span>(DT)</span>
-<span id="cb188-2"><a href="tips-tricks.html#cb188-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb188-3"><a href="tips-tricks.html#cb188-3"></a></span>
-<span id="cb188-4"><a href="tips-tricks.html#cb188-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb188-5"><a href="tips-tricks.html#cb188-5"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>)</span>
-<span id="cb188-6"><a href="tips-tricks.html#cb188-6"></a>)</span>
-<span id="cb188-7"><a href="tips-tricks.html#cb188-7"></a></span>
-<span id="cb188-8"><a href="tips-tricks.html#cb188-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
-<span id="cb188-9"><a href="tips-tricks.html#cb188-9"></a></span>
-<span id="cb188-10"><a href="tips-tricks.html#cb188-10"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
-<span id="cb188-11"><a href="tips-tricks.html#cb188-11"></a>    <span class="kw">datatable</span>(</span>
-<span id="cb188-12"><a href="tips-tricks.html#cb188-12"></a>      mtcars, </span>
-<span id="cb188-13"><a href="tips-tricks.html#cb188-13"></a>      <span class="dt">escape =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb188-14"><a href="tips-tricks.html#cb188-14"></a>      <span class="dt">selection =</span> <span class="st">&quot;none&quot;</span>, </span>
-<span id="cb188-15"><a href="tips-tricks.html#cb188-15"></a>      <span class="dt">rownames =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb188-16"><a href="tips-tricks.html#cb188-16"></a>      <span class="dt">style =</span> <span class="st">&quot;bootstrap&quot;</span></span>
-<span id="cb188-17"><a href="tips-tricks.html#cb188-17"></a>    )</span>
-<span id="cb188-18"><a href="tips-tricks.html#cb188-18"></a>  })</span>
-<span id="cb188-19"><a href="tips-tricks.html#cb188-19"></a></span>
-<span id="cb188-20"><a href="tips-tricks.html#cb188-20"></a>}</span>
-<span id="cb188-21"><a href="tips-tricks.html#cb188-21"></a></span>
-<span id="cb188-22"><a href="tips-tricks.html#cb188-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>Note that in the above we pass some parameters to <code>datatable</code> not all are necessary at the exception of <code>escape</code> which is set to <code>FALSE</code> as we will ultimately place HTML code the table which should appear rendered rather than show said code as a string.</p>
-<p>We start by creating the on-click functions as R character strings for each row of the <code>mtcars</code> dataset. This is the function that will be triggered when buttons are clicked. This should look familiar, we use <code>Shiny.setInputValue</code> to define an input named <code>click</code> which is set to a different value for every row of the table.</p>
 <div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb189-1"><a href="tips-tricks.html#cb189-1"></a><span class="kw">library</span>(DT)</span>
 <span id="cb189-2"><a href="tips-tricks.html#cb189-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb189-3"><a href="tips-tricks.html#cb189-3"></a></span>
@@ -467,20 +443,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb189-8"><a href="tips-tricks.html#cb189-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
 <span id="cb189-9"><a href="tips-tricks.html#cb189-9"></a></span>
 <span id="cb189-10"><a href="tips-tricks.html#cb189-10"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
-<span id="cb189-11"><a href="tips-tricks.html#cb189-11"></a>    onclick &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Shiny.setInputValue(&#39;click&#39;, &#39;&quot;</span>, <span class="kw">rownames</span>(mtcars), <span class="st">&quot;&#39;)&quot;</span>)</span>
-<span id="cb189-12"><a href="tips-tricks.html#cb189-12"></a>    <span class="kw">datatable</span>(</span>
-<span id="cb189-13"><a href="tips-tricks.html#cb189-13"></a>      mtcars, </span>
-<span id="cb189-14"><a href="tips-tricks.html#cb189-14"></a>      <span class="dt">escape =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb189-15"><a href="tips-tricks.html#cb189-15"></a>      <span class="dt">selection =</span> <span class="st">&quot;none&quot;</span>, </span>
-<span id="cb189-16"><a href="tips-tricks.html#cb189-16"></a>      <span class="dt">rownames =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb189-17"><a href="tips-tricks.html#cb189-17"></a>      <span class="dt">style =</span> <span class="st">&quot;bootstrap&quot;</span></span>
-<span id="cb189-18"><a href="tips-tricks.html#cb189-18"></a>    )</span>
-<span id="cb189-19"><a href="tips-tricks.html#cb189-19"></a>  })</span>
-<span id="cb189-20"><a href="tips-tricks.html#cb189-20"></a></span>
-<span id="cb189-21"><a href="tips-tricks.html#cb189-21"></a>}</span>
-<span id="cb189-22"><a href="tips-tricks.html#cb189-22"></a></span>
-<span id="cb189-23"><a href="tips-tricks.html#cb189-23"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>Next we create the buttons for each row and set the JavaScript functions previously created as the <code>onClick</code> attributes. The JavaScript code passed to the <code>onClick</code> attribute will be executed every time the button is clicked.</p>
+<span id="cb189-11"><a href="tips-tricks.html#cb189-11"></a>    <span class="kw">datatable</span>(</span>
+<span id="cb189-12"><a href="tips-tricks.html#cb189-12"></a>      mtcars, </span>
+<span id="cb189-13"><a href="tips-tricks.html#cb189-13"></a>      <span class="dt">escape =</span> <span class="ot">FALSE</span>, </span>
+<span id="cb189-14"><a href="tips-tricks.html#cb189-14"></a>      <span class="dt">selection =</span> <span class="st">&quot;none&quot;</span>, </span>
+<span id="cb189-15"><a href="tips-tricks.html#cb189-15"></a>      <span class="dt">rownames =</span> <span class="ot">FALSE</span>, </span>
+<span id="cb189-16"><a href="tips-tricks.html#cb189-16"></a>      <span class="dt">style =</span> <span class="st">&quot;bootstrap&quot;</span></span>
+<span id="cb189-17"><a href="tips-tricks.html#cb189-17"></a>    )</span>
+<span id="cb189-18"><a href="tips-tricks.html#cb189-18"></a>  })</span>
+<span id="cb189-19"><a href="tips-tricks.html#cb189-19"></a></span>
+<span id="cb189-20"><a href="tips-tricks.html#cb189-20"></a>}</span>
+<span id="cb189-21"><a href="tips-tricks.html#cb189-21"></a></span>
+<span id="cb189-22"><a href="tips-tricks.html#cb189-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>Note that in the above we pass some parameters to <code>datatable</code> not all are necessary at the exception of <code>escape</code> which is set to <code>FALSE</code> as we will ultimately place HTML code the table which should appear rendered rather than show said code as a string.</p>
+<p>We start by creating the on-click functions as R character strings for each row of the <code>mtcars</code> dataset. This is the function that will be triggered when buttons are clicked. This should look familiar, we use <code>Shiny.setInputValue</code> to define an input named <code>click</code> which is set to a different value for every row of the table.</p>
 <div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb190-1"><a href="tips-tricks.html#cb190-1"></a><span class="kw">library</span>(DT)</span>
 <span id="cb190-2"><a href="tips-tricks.html#cb190-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb190-3"><a href="tips-tricks.html#cb190-3"></a></span>
@@ -492,52 +468,76 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb190-9"><a href="tips-tricks.html#cb190-9"></a></span>
 <span id="cb190-10"><a href="tips-tricks.html#cb190-10"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
 <span id="cb190-11"><a href="tips-tricks.html#cb190-11"></a>    onclick &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Shiny.setInputValue(&#39;click&#39;, &#39;&quot;</span>, <span class="kw">rownames</span>(mtcars), <span class="st">&quot;&#39;)&quot;</span>)</span>
-<span id="cb190-12"><a href="tips-tricks.html#cb190-12"></a>    button &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;&lt;a class=&#39;btn btn-primary&#39; onClick=</span><span class="ch">\&quot;</span><span class="st">&quot;</span>, onclick, <span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">&gt;Click me&lt;/a&gt;&quot;</span>)</span>
-<span id="cb190-13"><a href="tips-tricks.html#cb190-13"></a>    mtcars<span class="op">$</span>button &lt;-<span class="st"> </span>button</span>
-<span id="cb190-14"><a href="tips-tricks.html#cb190-14"></a>    <span class="kw">datatable</span>(</span>
-<span id="cb190-15"><a href="tips-tricks.html#cb190-15"></a>      mtcars, </span>
-<span id="cb190-16"><a href="tips-tricks.html#cb190-16"></a>      <span class="dt">escape =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb190-17"><a href="tips-tricks.html#cb190-17"></a>      <span class="dt">selection =</span> <span class="st">&quot;none&quot;</span>, </span>
-<span id="cb190-18"><a href="tips-tricks.html#cb190-18"></a>      <span class="dt">rownames =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb190-19"><a href="tips-tricks.html#cb190-19"></a>      <span class="dt">style =</span> <span class="st">&quot;bootstrap&quot;</span></span>
-<span id="cb190-20"><a href="tips-tricks.html#cb190-20"></a>    )</span>
-<span id="cb190-21"><a href="tips-tricks.html#cb190-21"></a>  })</span>
+<span id="cb190-12"><a href="tips-tricks.html#cb190-12"></a>    <span class="kw">datatable</span>(</span>
+<span id="cb190-13"><a href="tips-tricks.html#cb190-13"></a>      mtcars, </span>
+<span id="cb190-14"><a href="tips-tricks.html#cb190-14"></a>      <span class="dt">escape =</span> <span class="ot">FALSE</span>, </span>
+<span id="cb190-15"><a href="tips-tricks.html#cb190-15"></a>      <span class="dt">selection =</span> <span class="st">&quot;none&quot;</span>, </span>
+<span id="cb190-16"><a href="tips-tricks.html#cb190-16"></a>      <span class="dt">rownames =</span> <span class="ot">FALSE</span>, </span>
+<span id="cb190-17"><a href="tips-tricks.html#cb190-17"></a>      <span class="dt">style =</span> <span class="st">&quot;bootstrap&quot;</span></span>
+<span id="cb190-18"><a href="tips-tricks.html#cb190-18"></a>    )</span>
+<span id="cb190-19"><a href="tips-tricks.html#cb190-19"></a>  })</span>
+<span id="cb190-20"><a href="tips-tricks.html#cb190-20"></a></span>
+<span id="cb190-21"><a href="tips-tricks.html#cb190-21"></a>}</span>
 <span id="cb190-22"><a href="tips-tricks.html#cb190-22"></a></span>
-<span id="cb190-23"><a href="tips-tricks.html#cb190-23"></a>}</span>
-<span id="cb190-24"><a href="tips-tricks.html#cb190-24"></a></span>
-<span id="cb190-25"><a href="tips-tricks.html#cb190-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>We can then observe the <code>click</code> input and, to demonstrate, render it’s value in the UI.</p>
+<span id="cb190-23"><a href="tips-tricks.html#cb190-23"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>Next we create the buttons for each row and set the JavaScript functions previously created as the <code>onClick</code> attributes. The JavaScript code passed to the <code>onClick</code> attribute will be executed every time the button is clicked.</p>
 <div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb191-1"><a href="tips-tricks.html#cb191-1"></a><span class="kw">library</span>(DT)</span>
 <span id="cb191-2"><a href="tips-tricks.html#cb191-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb191-3"><a href="tips-tricks.html#cb191-3"></a></span>
 <span id="cb191-4"><a href="tips-tricks.html#cb191-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb191-5"><a href="tips-tricks.html#cb191-5"></a>  <span class="kw">br</span>(),</span>
-<span id="cb191-6"><a href="tips-tricks.html#cb191-6"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>),</span>
-<span id="cb191-7"><a href="tips-tricks.html#cb191-7"></a>  <span class="kw">strong</span>(<span class="st">&quot;Clicked Model:&quot;</span>),</span>
-<span id="cb191-8"><a href="tips-tricks.html#cb191-8"></a>  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;model&quot;</span>)</span>
-<span id="cb191-9"><a href="tips-tricks.html#cb191-9"></a>)</span>
-<span id="cb191-10"><a href="tips-tricks.html#cb191-10"></a></span>
-<span id="cb191-11"><a href="tips-tricks.html#cb191-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
-<span id="cb191-12"><a href="tips-tricks.html#cb191-12"></a></span>
-<span id="cb191-13"><a href="tips-tricks.html#cb191-13"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
-<span id="cb191-14"><a href="tips-tricks.html#cb191-14"></a>    onclick &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Shiny.setInputValue(&#39;click&#39;, &#39;&quot;</span>, <span class="kw">rownames</span>(mtcars), <span class="st">&quot;&#39;)&quot;</span>)</span>
-<span id="cb191-15"><a href="tips-tricks.html#cb191-15"></a>    button &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;&lt;a class=&#39;btn btn-primary&#39; onClick=</span><span class="ch">\&quot;</span><span class="st">&quot;</span>, onclick, <span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">&gt;Click me&lt;/a&gt;&quot;</span>)</span>
-<span id="cb191-16"><a href="tips-tricks.html#cb191-16"></a>    mtcars<span class="op">$</span>button &lt;-<span class="st"> </span>button</span>
-<span id="cb191-17"><a href="tips-tricks.html#cb191-17"></a>    <span class="kw">datatable</span>(</span>
-<span id="cb191-18"><a href="tips-tricks.html#cb191-18"></a>      mtcars, </span>
-<span id="cb191-19"><a href="tips-tricks.html#cb191-19"></a>      <span class="dt">escape =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb191-20"><a href="tips-tricks.html#cb191-20"></a>      <span class="dt">selection =</span> <span class="st">&quot;none&quot;</span>, </span>
-<span id="cb191-21"><a href="tips-tricks.html#cb191-21"></a>      <span class="dt">rownames =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb191-22"><a href="tips-tricks.html#cb191-22"></a>      <span class="dt">style =</span> <span class="st">&quot;bootstrap&quot;</span></span>
-<span id="cb191-23"><a href="tips-tricks.html#cb191-23"></a>    )</span>
-<span id="cb191-24"><a href="tips-tricks.html#cb191-24"></a>  })</span>
-<span id="cb191-25"><a href="tips-tricks.html#cb191-25"></a></span>
-<span id="cb191-26"><a href="tips-tricks.html#cb191-26"></a>  output<span class="op">$</span>model &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
-<span id="cb191-27"><a href="tips-tricks.html#cb191-27"></a>    <span class="kw">print</span>(input<span class="op">$</span>click)</span>
-<span id="cb191-28"><a href="tips-tricks.html#cb191-28"></a>  })</span>
-<span id="cb191-29"><a href="tips-tricks.html#cb191-29"></a>}</span>
-<span id="cb191-30"><a href="tips-tricks.html#cb191-30"></a></span>
-<span id="cb191-31"><a href="tips-tricks.html#cb191-31"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<span id="cb191-5"><a href="tips-tricks.html#cb191-5"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>)</span>
+<span id="cb191-6"><a href="tips-tricks.html#cb191-6"></a>)</span>
+<span id="cb191-7"><a href="tips-tricks.html#cb191-7"></a></span>
+<span id="cb191-8"><a href="tips-tricks.html#cb191-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
+<span id="cb191-9"><a href="tips-tricks.html#cb191-9"></a></span>
+<span id="cb191-10"><a href="tips-tricks.html#cb191-10"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
+<span id="cb191-11"><a href="tips-tricks.html#cb191-11"></a>    onclick &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Shiny.setInputValue(&#39;click&#39;, &#39;&quot;</span>, <span class="kw">rownames</span>(mtcars), <span class="st">&quot;&#39;)&quot;</span>)</span>
+<span id="cb191-12"><a href="tips-tricks.html#cb191-12"></a>    button &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;&lt;a class=&#39;btn btn-primary&#39; onClick=</span><span class="ch">\&quot;</span><span class="st">&quot;</span>, onclick, <span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">&gt;Click me&lt;/a&gt;&quot;</span>)</span>
+<span id="cb191-13"><a href="tips-tricks.html#cb191-13"></a>    mtcars<span class="op">$</span>button &lt;-<span class="st"> </span>button</span>
+<span id="cb191-14"><a href="tips-tricks.html#cb191-14"></a>    <span class="kw">datatable</span>(</span>
+<span id="cb191-15"><a href="tips-tricks.html#cb191-15"></a>      mtcars, </span>
+<span id="cb191-16"><a href="tips-tricks.html#cb191-16"></a>      <span class="dt">escape =</span> <span class="ot">FALSE</span>, </span>
+<span id="cb191-17"><a href="tips-tricks.html#cb191-17"></a>      <span class="dt">selection =</span> <span class="st">&quot;none&quot;</span>, </span>
+<span id="cb191-18"><a href="tips-tricks.html#cb191-18"></a>      <span class="dt">rownames =</span> <span class="ot">FALSE</span>, </span>
+<span id="cb191-19"><a href="tips-tricks.html#cb191-19"></a>      <span class="dt">style =</span> <span class="st">&quot;bootstrap&quot;</span></span>
+<span id="cb191-20"><a href="tips-tricks.html#cb191-20"></a>    )</span>
+<span id="cb191-21"><a href="tips-tricks.html#cb191-21"></a>  })</span>
+<span id="cb191-22"><a href="tips-tricks.html#cb191-22"></a></span>
+<span id="cb191-23"><a href="tips-tricks.html#cb191-23"></a>}</span>
+<span id="cb191-24"><a href="tips-tricks.html#cb191-24"></a></span>
+<span id="cb191-25"><a href="tips-tricks.html#cb191-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>We can then observe the <code>click</code> input and, to demonstrate, render it’s value in the UI.</p>
+<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb192-1"><a href="tips-tricks.html#cb192-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb192-2"><a href="tips-tricks.html#cb192-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb192-3"><a href="tips-tricks.html#cb192-3"></a></span>
+<span id="cb192-4"><a href="tips-tricks.html#cb192-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb192-5"><a href="tips-tricks.html#cb192-5"></a>  <span class="kw">br</span>(),</span>
+<span id="cb192-6"><a href="tips-tricks.html#cb192-6"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>),</span>
+<span id="cb192-7"><a href="tips-tricks.html#cb192-7"></a>  <span class="kw">strong</span>(<span class="st">&quot;Clicked Model:&quot;</span>),</span>
+<span id="cb192-8"><a href="tips-tricks.html#cb192-8"></a>  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;model&quot;</span>)</span>
+<span id="cb192-9"><a href="tips-tricks.html#cb192-9"></a>)</span>
+<span id="cb192-10"><a href="tips-tricks.html#cb192-10"></a></span>
+<span id="cb192-11"><a href="tips-tricks.html#cb192-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
+<span id="cb192-12"><a href="tips-tricks.html#cb192-12"></a></span>
+<span id="cb192-13"><a href="tips-tricks.html#cb192-13"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
+<span id="cb192-14"><a href="tips-tricks.html#cb192-14"></a>    onclick &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Shiny.setInputValue(&#39;click&#39;, &#39;&quot;</span>, <span class="kw">rownames</span>(mtcars), <span class="st">&quot;&#39;)&quot;</span>)</span>
+<span id="cb192-15"><a href="tips-tricks.html#cb192-15"></a>    button &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;&lt;a class=&#39;btn btn-primary&#39; onClick=</span><span class="ch">\&quot;</span><span class="st">&quot;</span>, onclick, <span class="st">&quot;</span><span class="ch">\&quot;</span><span class="st">&gt;Click me&lt;/a&gt;&quot;</span>)</span>
+<span id="cb192-16"><a href="tips-tricks.html#cb192-16"></a>    mtcars<span class="op">$</span>button &lt;-<span class="st"> </span>button</span>
+<span id="cb192-17"><a href="tips-tricks.html#cb192-17"></a>    <span class="kw">datatable</span>(</span>
+<span id="cb192-18"><a href="tips-tricks.html#cb192-18"></a>      mtcars, </span>
+<span id="cb192-19"><a href="tips-tricks.html#cb192-19"></a>      <span class="dt">escape =</span> <span class="ot">FALSE</span>, </span>
+<span id="cb192-20"><a href="tips-tricks.html#cb192-20"></a>      <span class="dt">selection =</span> <span class="st">&quot;none&quot;</span>, </span>
+<span id="cb192-21"><a href="tips-tricks.html#cb192-21"></a>      <span class="dt">rownames =</span> <span class="ot">FALSE</span>, </span>
+<span id="cb192-22"><a href="tips-tricks.html#cb192-22"></a>      <span class="dt">style =</span> <span class="st">&quot;bootstrap&quot;</span></span>
+<span id="cb192-23"><a href="tips-tricks.html#cb192-23"></a>    )</span>
+<span id="cb192-24"><a href="tips-tricks.html#cb192-24"></a>  })</span>
+<span id="cb192-25"><a href="tips-tricks.html#cb192-25"></a></span>
+<span id="cb192-26"><a href="tips-tricks.html#cb192-26"></a>  output<span class="op">$</span>model &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb192-27"><a href="tips-tricks.html#cb192-27"></a>    <span class="kw">print</span>(input<span class="op">$</span>click)</span>
+<span id="cb192-28"><a href="tips-tricks.html#cb192-28"></a>  })</span>
+<span id="cb192-29"><a href="tips-tricks.html#cb192-29"></a>}</span>
+<span id="cb192-30"><a href="tips-tricks.html#cb192-30"></a></span>
+<span id="cb192-31"><a href="tips-tricks.html#cb192-31"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div class="figure">
 <img src="images/dt-button.png" alt="" />
 <p class="caption">DT with custom input</p>

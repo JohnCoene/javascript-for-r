@@ -225,7 +225,7 @@ The book is nonetheless not about learning JavaScript, even though it is aimed a
 \item
   The book opens with an introduction to better understand its premise. It starts with rationales for using JavaScript in conjunction with R which are supported with existing R packages that already make use of JavaScript and are available on CRAN. Then we briefly describe concepts essential to understand the rest of the book so the reader can follow along. Finally, the chapter closes by listing the various methods with which one might make JavaScript work with R.
 \item
-  Then we delve into using JavaScript for computations, namely via the V8 engine and node.js. After a short introduction, chapters will walk the reader through various examples: a fuzzy search, a time format converter, and a basic natural language tokenizer.
+  Then we delve into using JavaScript for computations, namely via the V8 engine and node.js. After a short introduction, chapters will walk the reader through various examples: a fuzzy search, a time format converter, and basic natural language operations.
 \item
   The third part of the book details how JavaScript can work with Shiny. Once the basics out of the way, we build utilities to display notifications. Then we create a functionality to notify the user when the shiny server is busy running computations. This part of the book ends with an example of custom shiny output for a library that applies filters to images.
 \item
@@ -698,8 +698,8 @@ Another difference is that variables must be declared with keywords such as \tex
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{x }\OperatorTok{=} \DecValTok{1}\OperatorTok{;} \CommentTok{// bad}
-\KeywordTok{var}\NormalTok{ x }\OperatorTok{=} \DecValTok{1}\OperatorTok{;} \CommentTok{// good}
+\NormalTok{x }\OperatorTok{=} \DecValTok{1}\OperatorTok{;} \CommentTok{// error}
+\KeywordTok{var}\NormalTok{ x }\OperatorTok{=} \DecValTok{1}\OperatorTok{;} \CommentTok{// works}
 \end{Highlighting}
 \end{Shaded}
 
@@ -707,8 +707,7 @@ One can declare a variable without assigning a value to it, to then do so later 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{// good}
-\KeywordTok{var}\NormalTok{ y}\OperatorTok{;} 
+\KeywordTok{var}\NormalTok{ y}\OperatorTok{;} \CommentTok{// declare }
 \NormalTok{y }\OperatorTok{=}\NormalTok{ [}\DecValTok{1}\OperatorTok{,}\DecValTok{2}\OperatorTok{,}\DecValTok{3}\NormalTok{]}\OperatorTok{;} \CommentTok{// define it as array}
 \NormalTok{y }\OperatorTok{=} \StringTok{\textquotesingle{}string\textquotesingle{}}\OperatorTok{;} \CommentTok{// change to character string}
 \end{Highlighting}
@@ -762,6 +761,31 @@ The JavaScript code below grabs the element where \texttt{id=\textquotesingle{}c
   \KeywordTok{\textless{}script\textgreater{}}
     \KeywordTok{var}\NormalTok{ cnt }\OperatorTok{=} \BuiltInTok{document}\OperatorTok{.}\FunctionTok{getElementById}\NormalTok{(}\StringTok{"content"}\NormalTok{)}\OperatorTok{;}
 \NormalTok{    cnt}\OperatorTok{.}\AttributeTok{innerText} \OperatorTok{=} \StringTok{"The text has changed"}\OperatorTok{;}
+  \KeywordTok{\textless{}/script\textgreater{}}
+\KeywordTok{\textless{}/html\textgreater{}}
+\end{Highlighting}
+\end{Shaded}
+
+One final thing to note for future reference, though not limited to the ids or classes most such selection of elements from the DOM are done with those where the pound sign refers to an element's id (\texttt{\#id}) and a dot refers to an element's class (\texttt{.class}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+ \ErrorTok{\textless{}}\NormalTok{!–– index.html ––\textgreater{}}
+\KeywordTok{\textless{}html\textgreater{}}
+  \KeywordTok{\textless{}head\textgreater{}}
+  \KeywordTok{\textless{}/head\textgreater{}}
+  \KeywordTok{\textless{}body\textgreater{}}
+    \KeywordTok{\textless{}p}\OtherTok{ id=}\StringTok{"content"}\OtherTok{ class=}\StringTok{"stuff"}\KeywordTok{\textgreater{}}\NormalTok{Trying JavaScript!}\KeywordTok{\textless{}/p\textgreater{}}
+  \KeywordTok{\textless{}/body\textgreater{}}
+  \KeywordTok{\textless{}script\textgreater{}}
+    \CommentTok{// select by id}
+    \KeywordTok{var}\NormalTok{ x }\OperatorTok{=} \BuiltInTok{document}\OperatorTok{.}\FunctionTok{getElementById}\NormalTok{(}\StringTok{"content"}\NormalTok{)}\OperatorTok{;}
+    \KeywordTok{var}\NormalTok{ y }\OperatorTok{=} \BuiltInTok{document}\OperatorTok{.}\FunctionTok{querySelector}\NormalTok{(}\StringTok{"\#content"}\NormalTok{)}\OperatorTok{;}
+
+    \BuiltInTok{console}\OperatorTok{.}\FunctionTok{log}\NormalTok{(x }\OperatorTok{==}\NormalTok{ y)}\OperatorTok{;} \CommentTok{// true}
+
+    \CommentTok{// select by class}
+    \KeywordTok{var}\NormalTok{ z }\OperatorTok{=} \BuiltInTok{document}\OperatorTok{.}\FunctionTok{querySelector}\NormalTok{(}\StringTok{".stuff"}\NormalTok{)}\OperatorTok{;}
   \KeywordTok{\textless{}/script\textgreater{}}
 \KeywordTok{\textless{}/html\textgreater{}}
 \end{Highlighting}
@@ -843,7 +867,7 @@ The Shiny framework allows creating applications accessible from web browsers wh
 \section*{Methods Amiss}\label{methods-amiss}}
 
 
-Note that there are also two other prominent ways one can use JavaScript with R that are not covered in this book. The reason they are not covered is that they require great knowledge of specific JavaScript libraries (React and d3.js). However, comes the end of the book, the reader should find the two methods below much more approachable.
+Note that there are also two other prominent ways one can use JavaScript with R that are not covered in this book. The main reason being that they require great knowledge of specific JavaScript libraries, d3.js and React, and while these are themselves advanced uses of JavaScript, their integration with R via the packages listed below is rather straightforward.
 
 \hypertarget{reactr}{%
 \subsection*{reactR}\label{reactr}}
@@ -1026,7 +1050,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Wed Jul 08 2020 12:23:50 GMT+0200 (Central European Summer Time)"
+## [1] "Wed Jul 08 2020 15:08:38 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1036,7 +1060,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Wed Jul 08 2020 12:23:50 GMT+0200 (Central European Summer Time)"
+## [1] "Wed Jul 08 2020 15:08:38 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -2871,7 +2895,7 @@ We can then observe the \texttt{click} input and, to demonstrate, render it's va
 \hypertarget{custom-outputs}{%
 \chapter{Custom Outputs}\label{custom-outputs}}
 
-In this chapter we create a custom shiny output, in practical terms, custom \texttt{render*} and \texttt{*Output} functions to use in Shiny. Note that this is destined for the curious who want to grasp some understanding of how these functions work under the hood as it is \textbf{often easier to create an htmlwidgets package}
+In this chapter we create a custom shiny output, in practical terms, custom \texttt{render*} and \texttt{*Output} functions to use in Shiny. Note that this is destined for the curious who want to grasp some understanding of how these functions work under the hood as it is \emph{often easier to create an htmlwidgets package.}
 We will demonstrate by creating a wrapper for \href{https://github.com/davidsonfellipe/lena.js}{lena.js}, a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs, there are much easier ways to apply such filters ina shiny application (e.g.: CSS).
 
 \hypertarget{inner-workings}{%
@@ -7126,7 +7150,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 16.38
+## [1] 42.55
 \end{verbatim}
 
 \begin{Shaded}
