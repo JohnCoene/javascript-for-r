@@ -120,6 +120,35 @@ Then again, there are many more options and methods that we do not implement her
 The way rsup is set up is interesting in that the loading bar is shown or hidden from the R server. One could set it up differently however. Perhaps, instead of having to trigger the loading bar from the server it could all be handled automatically: showing the bar when the server is computing or redrawing things and hiding it when the server becomes idle again. 
 
 ```r
+file.create("www/auto.js")
+```
+
+Below we declare the progress variable that will hold the Rsup-progress object. This is declared before it is created as this object needs to be accessible in various contexts.
+
+```js
+// auto.js
+var progress;
+```
+
+We can then observe for the `shiny:busy` and `shiny:idle` events to show and hide the progress bar automatically.
+
+```js
+// auto.js
+var progress;
+
+$(document).on('shiny:busy', function(event){
+  progress = new RsupProgress();
+  progress.start();
+});
+
+$(document).on('shiny:idle', function(event){
+  progress.end();
+});
+```
+
+With that done one can test that it works by placing `auto.js` in an application.
+
+```r
 library(shiny)
 
 shiny::addResourcePath("www", "www")
@@ -146,27 +175,3 @@ server <- function(input, output){
 
 shinyApp(ui, server)
 ```
-
-Below we declare the progress variable that will hold the Rsup-progress object. This is declared before it is created as this object needs to be accessible in various contexts.
-
-```js
-// auto.js
-var progress;
-```
-
-We can then observe for the `shiny:busy` and `shiny:idle` events to show and hide the progress bar automatically.
-
-```js
-// auto.js
-var progress;
-
-$(document).on('shiny:busy', function(event){
-  progress = new RsupProgress();
-  progress.start();
-});
-
-$(document).on('shiny:idle', function(event){
-  progress.end();
-});
-```
-
