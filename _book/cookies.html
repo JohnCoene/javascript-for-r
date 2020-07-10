@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>References | JavaScript for R</title>
+  <title>Chapter 19 Cookies | JavaScript for R</title>
   <meta name="description" content="Invite JavaScript into your Data Science workflow." />
   <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="References | JavaScript for R" />
+  <meta property="og:title" content="Chapter 19 Cookies | JavaScript for R" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="JohnCoene/javascript-for-r" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="References | JavaScript for R" />
+  <meta name="twitter:title" content="Chapter 19 Cookies | JavaScript for R" />
   
   <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="cookies.html"/>
-
+<link rel="prev" href="machine-learning.html"/>
+<link rel="next" href="references.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -352,91 +352,126 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="references" class="section level1 unnumbered" number="">
-<h1>References</h1>
+<div id="cookies" class="section level1" number="19">
+<h1><span class="header-section-number">Chapter 19</span> Cookies</h1>
+<p>In this example we scout yet another great example of how JavaScript can enhance shiny applications. We use an HTTP cookie, a small piece of data sent from a website and stored on the user’s web browser, to track users returning to a shiny application.</p>
+<p>The application will prompt the user to input their name, this will be stored in a cookie so that on their next visit they are welcomed to the app with a personalised message. Cookies are natively supported by web browsers and JavaScript, there is, however, a great library which eases greatly how those cookies are handled: <a href="https://github.com/js-cookie/js-cookie">js-cookie</a>.</p>
+<div id="discover-js-cookie" class="section level2 unnumbered" number="">
+<h2>Discover js-cookie</h2>
+<p>The library is at its core very straightforward, it exports a <code>Cookie</code> object from which one can access the <code>set</code>, <code>get</code>, and <code>remove</code> methods. There is also the possibility to pass additional options when defining the cookie, such as how long it is valid for, but we won’t explore these here.</p>
+<div class="sourceCode" id="cb408"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb408-1"><a href="cookies.html#cb408-1"></a><span class="co">// set a cookie</span></span>
+<span id="cb408-2"><a href="cookies.html#cb408-2"></a>Cookies<span class="op">.</span><span class="fu">set</span>(<span class="st">&#39;name&#39;</span><span class="op">,</span> <span class="st">&#39;value&#39;</span>)</span>
+<span id="cb408-3"><a href="cookies.html#cb408-3"></a></span>
+<span id="cb408-4"><a href="cookies.html#cb408-4"></a><span class="co">// get cookies</span></span>
+<span id="cb408-5"><a href="cookies.html#cb408-5"></a>Cookies<span class="op">.</span><span class="fu">get</span>()<span class="op">;</span></span>
+<span id="cb408-6"><a href="cookies.html#cb408-6"></a></span>
+<span id="cb408-7"><a href="cookies.html#cb408-7"></a><span class="co">// remove a cookie</span></span>
+<span id="cb408-8"><a href="cookies.html#cb408-8"></a>Cookies<span class="op">.</span><span class="fu">remove</span>(<span class="st">&#39;name&#39;</span>)<span class="op">;</span></span></code></pre></div>
+</div>
+<div id="setup-2" class="section level2 unnumbered" number="">
+<h2>Setup</h2>
+<p>Then again, it starts with the creation of a directory where we’ll place a JavaScript file containing the message handlers, we won’t download the dependency and use the CDN instead.</p>
+<div class="sourceCode" id="cb409"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb409-1"><a href="cookies.html#cb409-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
+<span id="cb409-2"><a href="cookies.html#cb409-2"></a><span class="kw">file.create</span>(<span class="st">&quot;www/script.js&quot;</span>)</span></code></pre></div>
+<p>We then lay down the skeleton of the application which features a text input to capture the name of the user, a button to save the cookie, another to remove it and finally a dynamic output that will display the personalised message.</p>
+<div class="sourceCode" id="cb410"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb410-1"><a href="cookies.html#cb410-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb410-2"><a href="cookies.html#cb410-2"></a></span>
+<span id="cb410-3"><a href="cookies.html#cb410-3"></a><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb410-4"><a href="cookies.html#cb410-4"></a></span>
+<span id="cb410-5"><a href="cookies.html#cb410-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb410-6"><a href="cookies.html#cb410-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb410-7"><a href="cookies.html#cb410-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb410-8"><a href="cookies.html#cb410-8"></a>      <span class="dt">src =</span> <span class="st">&quot;https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js&quot;</span></span>
+<span id="cb410-9"><a href="cookies.html#cb410-9"></a>    ),</span>
+<span id="cb410-10"><a href="cookies.html#cb410-10"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/script.js&quot;</span>)</span>
+<span id="cb410-11"><a href="cookies.html#cb410-11"></a>  ),</span>
+<span id="cb410-12"><a href="cookies.html#cb410-12"></a>  <span class="kw">textInput</span>(<span class="st">&quot;name_set&quot;</span>, <span class="st">&quot;What is your name?&quot;</span>),</span>
+<span id="cb410-13"><a href="cookies.html#cb410-13"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;save&quot;</span>, <span class="st">&quot;Save cookie&quot;</span>),</span>
+<span id="cb410-14"><a href="cookies.html#cb410-14"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;remove&quot;</span>, <span class="st">&quot;remove cookie&quot;</span>),</span>
+<span id="cb410-15"><a href="cookies.html#cb410-15"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;name_get&quot;</span>)</span>
+<span id="cb410-16"><a href="cookies.html#cb410-16"></a>)</span>
+<span id="cb410-17"><a href="cookies.html#cb410-17"></a></span>
+<span id="cb410-18"><a href="cookies.html#cb410-18"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb410-19"><a href="cookies.html#cb410-19"></a></span>
+<span id="cb410-20"><a href="cookies.html#cb410-20"></a>}</span>
+<span id="cb410-21"><a href="cookies.html#cb410-21"></a></span>
+<span id="cb410-22"><a href="cookies.html#cb410-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+</div>
+<div id="javascript-4" class="section level2 unnumbered" number="">
+<h2>JavaScript</h2>
+<p>First we define a JavaScript function that retrieves the cookies that it sets as <code>cookies</code> input. The reason we do so is simply because we will have to execute this in multiple places, this will become clearer in just a second.</p>
+<div class="sourceCode" id="cb411"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb411-1"><a href="cookies.html#cb411-1"></a><span class="co">// script.js</span></span>
+<span id="cb411-2"><a href="cookies.html#cb411-2"></a><span class="kw">function</span> <span class="fu">getCookies</span>(){</span>
+<span id="cb411-3"><a href="cookies.html#cb411-3"></a>  <span class="kw">var</span> res <span class="op">=</span> Cookies<span class="op">.</span><span class="fu">get</span>()<span class="op">;</span></span>
+<span id="cb411-4"><a href="cookies.html#cb411-4"></a>  Shiny<span class="op">.</span><span class="fu">setInputValue</span>(<span class="st">&#39;cookies&#39;</span><span class="op">,</span> res)<span class="op">;</span></span>
+<span id="cb411-5"><a href="cookies.html#cb411-5"></a>}</span></code></pre></div>
+<p>Then we define the message handlers, we define two distinct such handlers, one that sets the cookie and another that removes it. Note that both of then run the <code>getCookies</code> function defined previously. The reason this is done is that we need the input to be updated with the new values after it is set and after it is removed. Otherwise setting or removing the cookie will leave the actual input value untouched.</p>
+<div class="sourceCode" id="cb412"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb412-1"><a href="cookies.html#cb412-1"></a><span class="co">// script.js</span></span>
+<span id="cb412-2"><a href="cookies.html#cb412-2"></a>Shiny<span class="op">.</span><span class="fu">addCustomMessageHandler</span>(<span class="st">&#39;cookie-set&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg){</span>
+<span id="cb412-3"><a href="cookies.html#cb412-3"></a>  Cookies<span class="op">.</span><span class="fu">set</span>(msg<span class="op">.</span><span class="at">name</span><span class="op">,</span> msg<span class="op">.</span><span class="at">value</span>)<span class="op">;</span></span>
+<span id="cb412-4"><a href="cookies.html#cb412-4"></a>  getCookies()<span class="op">;</span></span>
+<span id="cb412-5"><a href="cookies.html#cb412-5"></a>})</span>
+<span id="cb412-6"><a href="cookies.html#cb412-6"></a></span>
+<span id="cb412-7"><a href="cookies.html#cb412-7"></a>Shiny<span class="op">.</span><span class="fu">addCustomMessageHandler</span>(<span class="st">&#39;cookie-remove&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg){</span>
+<span id="cb412-8"><a href="cookies.html#cb412-8"></a>  Cookies<span class="op">.</span><span class="fu">remove</span>(msg<span class="op">.</span><span class="at">name</span>)<span class="op">;</span></span>
+<span id="cb412-9"><a href="cookies.html#cb412-9"></a>  getCookies()<span class="op">;</span></span>
+<span id="cb412-10"><a href="cookies.html#cb412-10"></a>})</span></code></pre></div>
+<p>One more thing needs to be implemented JavaScript-side, the point of using the cookie is so that when users comes back to the shiny app, even days later, they do not need to re-enter their name. So when the app is launched the input value must be defined. There are probably a few ways to do so, below we set the input value when the shiny session connects which will occur when the app is fired up.</p>
+<div class="sourceCode" id="cb413"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb413-1"><a href="cookies.html#cb413-1"></a><span class="co">// script.js</span></span>
+<span id="cb413-2"><a href="cookies.html#cb413-2"></a>$(<span class="bu">document</span>)<span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;shiny:connected&#39;</span><span class="op">,</span> <span class="kw">function</span>(ev){</span>
+<span id="cb413-3"><a href="cookies.html#cb413-3"></a>  getCookies()<span class="op">;</span></span>
+<span id="cb413-4"><a href="cookies.html#cb413-4"></a>})</span></code></pre></div>
+</div>
+<div id="r-code-2" class="section level2 unnumbered" number="">
+<h2>R Code</h2>
+<p>Then it’s a matter a completing the shiny server which was left empty. We add an <code>observeEvent</code> on the save button where we check that a name has actually been typed in the text box before saving the cookie. There is another similar observer on the remove button. The <code>renderUI</code> expression checks that the cookie has been set and displays a message accordingly.</p>
+<div class="sourceCode" id="cb414"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb414-1"><a href="cookies.html#cb414-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb414-2"><a href="cookies.html#cb414-2"></a></span>
+<span id="cb414-3"><a href="cookies.html#cb414-3"></a><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb414-4"><a href="cookies.html#cb414-4"></a></span>
+<span id="cb414-5"><a href="cookies.html#cb414-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb414-6"><a href="cookies.html#cb414-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb414-7"><a href="cookies.html#cb414-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb414-8"><a href="cookies.html#cb414-8"></a>      <span class="dt">src =</span> <span class="st">&quot;https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js&quot;</span></span>
+<span id="cb414-9"><a href="cookies.html#cb414-9"></a>    ),</span>
+<span id="cb414-10"><a href="cookies.html#cb414-10"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/script.js&quot;</span>)</span>
+<span id="cb414-11"><a href="cookies.html#cb414-11"></a>  ),</span>
+<span id="cb414-12"><a href="cookies.html#cb414-12"></a>  <span class="kw">textInput</span>(<span class="st">&quot;name_set&quot;</span>, <span class="st">&quot;What is your name?&quot;</span>),</span>
+<span id="cb414-13"><a href="cookies.html#cb414-13"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;save&quot;</span>, <span class="st">&quot;Save cookie&quot;</span>),</span>
+<span id="cb414-14"><a href="cookies.html#cb414-14"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;remove&quot;</span>, <span class="st">&quot;remove cookie&quot;</span>),</span>
+<span id="cb414-15"><a href="cookies.html#cb414-15"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;name_get&quot;</span>)</span>
+<span id="cb414-16"><a href="cookies.html#cb414-16"></a>)</span>
+<span id="cb414-17"><a href="cookies.html#cb414-17"></a></span>
+<span id="cb414-18"><a href="cookies.html#cb414-18"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb414-19"><a href="cookies.html#cb414-19"></a></span>
+<span id="cb414-20"><a href="cookies.html#cb414-20"></a>  <span class="co"># save</span></span>
+<span id="cb414-21"><a href="cookies.html#cb414-21"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>save, {</span>
+<span id="cb414-22"><a href="cookies.html#cb414-22"></a>    <span class="cf">if</span>(input<span class="op">$</span>name_set <span class="op">!=</span><span class="st"> &quot;&quot;</span>)</span>
+<span id="cb414-23"><a href="cookies.html#cb414-23"></a>      session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;cookie-set&quot;</span>, <span class="kw">list</span>(<span class="dt">name =</span> <span class="st">&quot;name&quot;</span>, <span class="dt">value =</span> input<span class="op">$</span>name_set))</span>
+<span id="cb414-24"><a href="cookies.html#cb414-24"></a>  })</span>
+<span id="cb414-25"><a href="cookies.html#cb414-25"></a></span>
+<span id="cb414-26"><a href="cookies.html#cb414-26"></a>  <span class="co"># delete</span></span>
+<span id="cb414-27"><a href="cookies.html#cb414-27"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>remove, {</span>
+<span id="cb414-28"><a href="cookies.html#cb414-28"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;cookie-remove&quot;</span>, <span class="kw">list</span>(<span class="dt">name =</span> <span class="st">&quot;name&quot;</span>))</span>
+<span id="cb414-29"><a href="cookies.html#cb414-29"></a>  })</span>
+<span id="cb414-30"><a href="cookies.html#cb414-30"></a></span>
+<span id="cb414-31"><a href="cookies.html#cb414-31"></a>  <span class="co"># output if cookie is specified</span></span>
+<span id="cb414-32"><a href="cookies.html#cb414-32"></a>  output<span class="op">$</span>name_get &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
+<span id="cb414-33"><a href="cookies.html#cb414-33"></a>    <span class="cf">if</span>(<span class="op">!</span><span class="kw">is.null</span>(input<span class="op">$</span>cookies<span class="op">$</span>name))</span>
+<span id="cb414-34"><a href="cookies.html#cb414-34"></a>      <span class="kw">h3</span>(<span class="st">&quot;Hello,&quot;</span>, input<span class="op">$</span>cookies<span class="op">$</span>name)</span>
+<span id="cb414-35"><a href="cookies.html#cb414-35"></a>    <span class="cf">else</span></span>
+<span id="cb414-36"><a href="cookies.html#cb414-36"></a>      <span class="kw">h3</span>(<span class="st">&quot;Who are you?&quot;</span>)</span>
+<span id="cb414-37"><a href="cookies.html#cb414-37"></a>  })</span>
+<span id="cb414-38"><a href="cookies.html#cb414-38"></a></span>
+<span id="cb414-39"><a href="cookies.html#cb414-39"></a>}</span>
+<span id="cb414-40"><a href="cookies.html#cb414-40"></a></span>
+<span id="cb414-41"><a href="cookies.html#cb414-41"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="figure">
+<img src="images/shiny-cookies.png" alt="" />
+<p class="caption">Shiny cookies</p>
+</div>
+<p>Run the application and save your name. You can then refresh the application and the welcome message will display your name. You can even kill the server entirely and re-run the app, the welcome message will still display!</p>
 
-<div id="refs" class="references hanging-indent">
-<div>
-<p>Allaire, JJ, Yihui Xie, Jonathan McPherson, Javier Luraschi, Kevin Ushey, Aron Atkins, Hadley Wickham, Joe Cheng, Winston Chang, and Richard Iannone. 2020. <em>Rmarkdown: Dynamic Documents for R</em>. <a href="https://github.com/rstudio/rmarkdown">https://github.com/rstudio/rmarkdown</a>.</p>
-</div>
-<div>
-<p>Bache, Stefan Milton, and Hadley Wickham. 2014. <em>Magrittr: A Forward-Pipe Operator for R</em>. <a href="https://CRAN.R-project.org/package=magrittr">https://CRAN.R-project.org/package=magrittr</a>.</p>
-</div>
-<div>
-<p>Chamberlain, Scott, and Jeff Hollister. 2019. <em>Lawn: Client for ’Turfjs’ for ’Geospatial’ Analysis</em>. <a href="https://CRAN.R-project.org/package=lawn">https://CRAN.R-project.org/package=lawn</a>.</p>
-</div>
-<div>
-<p>Chang, Winston. 2019. <em>R6: Encapsulated Classes with Reference Semantics</em>. <a href="https://CRAN.R-project.org/package=R6">https://CRAN.R-project.org/package=R6</a>.</p>
-</div>
-<div>
-<p>Chang, Winston, Joe Cheng, JJ Allaire, Yihui Xie, and Jonathan McPherson. 2020. <em>Shiny: Web Application Framework for R</em>. <a href="https://CRAN.R-project.org/package=shiny">https://CRAN.R-project.org/package=shiny</a>.</p>
-</div>
-<div>
-<p>Cheng, Joe, Carson Sievert, Winston Chang, Yihui Xie, and Jeff Allen. 2020. <em>Htmltools: Tools for Html</em>. <a href="https://CRAN.R-project.org/package=htmltools">https://CRAN.R-project.org/package=htmltools</a>.</p>
-</div>
-<div>
-<p>Coene, John. 2020a. <em>Echarts4r: Create Interactive Graphs with ’Echarts Javascript’ Version 4</em>. <a href="http://echarts4r.john-coene.com/">http://echarts4r.john-coene.com/</a>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Waiter: Loading Screen for ’Shiny’</em>.</p>
-</div>
-<div>
-<p>Cooley, David. 2020. <em>Jsonify: Convert Between ’R’ Objects and Javascript Object Notation (Json)</em>. <a href="https://CRAN.R-project.org/package=jsonify">https://CRAN.R-project.org/package=jsonify</a>.</p>
-</div>
-<div>
-<p>Csárdi, Gábor. 2020. <em>Cli: Helpers for Developing Command Line Interfaces</em>. <a href="https://CRAN.R-project.org/package=cli">https://CRAN.R-project.org/package=cli</a>.</p>
-</div>
-<div>
-<p>Fay, Colin. 2020. <em>Bubble: Launch and Interact with a Nodejs Session</em>.</p>
-</div>
-<div>
-<p>Guyader, Vincent, Colin Fay, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://CRAN.R-project.org/package=golem">https://CRAN.R-project.org/package=golem</a>.</p>
-</div>
-<div>
-<p>Hester, Jim, Gábor Csárdi, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2020. <em>Remotes: R Package Installation from Remote Repositories, Including ’Github’</em>. <a href="https://CRAN.R-project.org/package=remotes">https://CRAN.R-project.org/package=remotes</a>.</p>
-</div>
-<div>
-<p>Inc, Facebook, Michel Weststrate, Kent Russell, and Alan Dipert. 2020. <em>ReactR: React Helpers</em>. <a href="https://CRAN.R-project.org/package=reactR">https://CRAN.R-project.org/package=reactR</a>.</p>
-</div>
-<div>
-<p>Kunst, Joshua. 2019. <em>Highcharter: A Wrapper for the ’Highcharts’ Library</em>. <a href="https://CRAN.R-project.org/package=highcharter">https://CRAN.R-project.org/package=highcharter</a>.</p>
-</div>
-<div>
-<p>Lin, Greg. 2020. <em>Reactable: Interactive Data Tables Based on ’React Table’</em>. <a href="https://CRAN.R-project.org/package=reactable">https://CRAN.R-project.org/package=reactable</a>.</p>
-</div>
-<div>
-<p>Luraschi, Javier, and JJ Allaire. 2018. <em>R2d3: Interface to ’D3’ Visualizations</em>. <a href="https://CRAN.R-project.org/package=r2d3">https://CRAN.R-project.org/package=r2d3</a>.</p>
-</div>
-<div>
-<p>Ooms, Jeroen. 2020. <em>Jsonlite: A Robust, High Performance Json Parser and Generator for R</em>. <a href="https://CRAN.R-project.org/package=jsonlite">https://CRAN.R-project.org/package=jsonlite</a>.</p>
-</div>
-<div>
-<p>Sievert, Carson, Chris Parmer, Toby Hocking, Scott Chamberlain, Karthik Ram, Marianne Corvellec, and Pedro Despouy. 2020. <em>Plotly: Create Interactive Web Graphics via ’Plotly.js’</em>. <a href="https://CRAN.R-project.org/package=plotly">https://CRAN.R-project.org/package=plotly</a>.</p>
-</div>
-<div>
-<p>Ushey, Kevin, JJ Allaire, and Yuan Tang. 2020. <em>Reticulate: Interface to ’Python’</em>. <a href="https://CRAN.R-project.org/package=reticulate">https://CRAN.R-project.org/package=reticulate</a>.</p>
-</div>
-<div>
-<p>Vaidyanathan, Ramnath, Yihui Xie, JJ Allaire, Joe Cheng, and Kenton Russell. 2019. <em>Htmlwidgets: HTML Widgets for R</em>. <a href="https://CRAN.R-project.org/package=htmlwidgets">https://CRAN.R-project.org/package=htmlwidgets</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley. 2020. <em>Testthat: Unit Testing for R</em>. <a href="https://CRAN.R-project.org/package=testthat">https://CRAN.R-project.org/package=testthat</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, and Jennifer Bryan. 2020. <em>Usethis: Automate Package and Project Setup</em>. <a href="https://CRAN.R-project.org/package=usethis">https://CRAN.R-project.org/package=usethis</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen, Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, and Dewey Dunnington. 2020. <em>Ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics</em>. <a href="https://CRAN.R-project.org/package=ggplot2">https://CRAN.R-project.org/package=ggplot2</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Peter Danenberg, Gábor Csárdi, and Manuel Eugster. 2020. <em>Roxygen2: In-Line Documentation for R</em>. <a href="https://CRAN.R-project.org/package=roxygen2">https://CRAN.R-project.org/package=roxygen2</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Jim Hester, and Winston Chang. 2020. <em>Devtools: Tools to Make Developing R Packages Easier</em>. <a href="https://CRAN.R-project.org/package=devtools">https://CRAN.R-project.org/package=devtools</a>.</p>
-</div>
-<div>
-<p>Xie, Yihui, Joe Cheng, and Xianying Tan. 2020. <em>DT: A Wrapper of the Javascript Library ’Datatables’</em>. <a href="https://CRAN.R-project.org/package=DT">https://CRAN.R-project.org/package=DT</a>.</p>
-</div>
 </div>
 </div>
             </section>
@@ -444,8 +479,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="cookies.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="machine-learning.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -476,7 +511,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/JohnCoene/javascript-for-r/edit/master/99-references.Rmd",
+"link": "https://github.com/JohnCoene/javascript-for-r/edit/master/35-examples-cookies.Rmd",
 "text": "Edit"
 },
 "history": {
