@@ -2,7 +2,7 @@
 
 While previous chapters on working with Shiny made use of external libraries and built packages that brought new functionalities previously not available in shiny, one does not have to go to this length to take advantage of the learnings contained in those pages. Moreover there are a few interesting things that have not yet been explored.
 
-## Events {-}
+## Shiny Events {-}
 
 There is a wee bit of documentation tucked away on the [shiny website](https://shiny.rstudio.com/articles/js-events.html) that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when shiny connects, when an element become visible, and more. To demonstrate how to use those events and how handy they can be we will create a notification which appears to indicate that the server is busy running computations. This could be as fancy as ever but for simplicity's sake we limit the demonstration to showing and hiding a gif.
 
@@ -232,3 +232,43 @@ shinyApp(ui, server)
 
 ![DT with custom input](images/dt-button.png)
 
+## jQuery {-}
+
+The shiny framework itself makes use and thus imports the [jQuery](https://jquery.com/) JavaScript library, a library that provides a convenient API to make a lot of things easier, including animations.
+
+As an example, we could use jQuery's `show`, `hide`, or `toggle` functions to show or hide an HTML element at the press of a button.
+
+```js
+// example of jQuery animation
+$('#id').toggle();
+```
+
+Because jQuery is already imported there is no need to do so, on the contrary, it might cause clashes. Below we create a shiny application containing a message handler to toggle (switch between show hide element depending on state), this is triggered by a button.
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  tags$head(
+    tags$script(
+      "Shiny.addCustomMessageHandler('jquery-toggle', function(id){
+        $('#' + id).toggle();
+      });"
+    )
+  ),
+  actionButton("toggle", "Toggle text"),
+  h1("This text is shown!", id = "text")
+)
+
+server <- function(input, output, session){
+
+  observeEvent(input$toggle, {
+    session$sendCustomMessage('jquery-toggle', msg = "text")
+  })
+
+}
+
+shinyApp(ui, server)
+```
+
+This is something where, again, R is leveraged in order to make it easier on the shiny developer but it must be said that it suffers from some inefficiency: the message travels from the browser (button click) to the R server where it is sent back to the browser and triggers `toggle`. It could indeed very well be rewritten in JavaScript entirely, this is however outside the scope of this book.

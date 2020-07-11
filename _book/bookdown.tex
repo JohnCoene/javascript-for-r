@@ -216,7 +216,7 @@ Throughout the book several shiny applications and R packages are put together a
 
 The R programming language has been propelled into web browsers with the introduction of packages such as \href{https://shiny.rstudio.com/}{shiny} \citep{R-shiny} and \href{https://rmarkdown.rstudio.com/}{rmarkdown} \citep{R-rmarkdown}. Yet most R developers are not familiar with one of web browsers' core technology: JavaScript. This books aims to remedy to that.
 
-The book is nonetheless not about learning JavaScript, even though it is aimed at R developers with no prior knowledge of the language. This statement might appear counter-intuitive at first but, we hope, the book gradually reveals just how little JavaScript is actually needed in order to observe immense benefits otherwise locked away from R developers.
+The book is nonetheless not about learning JavaScript, even though it is aimed at R developers with no prior knowledge of the language. This statement might appear counter-intuitive at first but, we hope, the book gradually reveals just how little JavaScript is actually needed in order to observe immense benefits otherwise locked away from R developers. This can be achieved by using Javascript only to do what R cannot, and rely R, a language familiar to us, to do the heavy lifting.
 
 Importantly, the focus of the book truly is the integration of JavaScript with R where both languages actively interact with one another, it is not merely about including JavaScript code that works alongside R.
 
@@ -1054,7 +1054,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Jul 11 2020 20:20:11 GMT+0200 (Central European Summer Time)"
+## [1] "Sat Jul 11 2020 21:15:15 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1064,7 +1064,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Jul 11 2020 20:20:11 GMT+0200 (Central European Summer Time)"
+## [1] "Sat Jul 11 2020 21:15:15 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -2636,8 +2636,8 @@ If one wants to create such packages or make extensive use of such integrations 
 
 While previous chapters on working with Shiny made use of external libraries and built packages that brought new functionalities previously not available in shiny, one does not have to go to this length to take advantage of the learnings contained in those pages. Moreover there are a few interesting things that have not yet been explored.
 
-\hypertarget{events}{%
-\section*{Events}\label{events}}
+\hypertarget{shiny-events}{%
+\section*{Shiny Events}\label{shiny-events}}
 
 
 There is a wee bit of documentation tucked away on the \href{https://shiny.rstudio.com/articles/js-events.html}{shiny website} that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when shiny connects, when an element become visible, and more. To demonstrate how to use those events and how handy they can be we will create a notification which appears to indicate that the server is busy running computations. This could be as fancy as ever but for simplicity's sake we limit the demonstration to showing and hiding a gif.
@@ -2895,6 +2895,53 @@ We can then observe the \texttt{click} input and, to demonstrate, render it's va
 \includegraphics{images/dt-button.png}
 \caption{DT with custom input}
 \end{figure}
+
+\hypertarget{jquery}{%
+\section*{jQuery}\label{jquery}}
+
+
+The shiny framework itself makes use and thus imports the \href{https://jquery.com/}{jQuery} JavaScript library, a library that provides a convenient API to make a lot of things easier, including animations.
+
+As an example, we could use jQuery's \texttt{show}, \texttt{hide}, or \texttt{toggle} functions to show or hide an HTML element at the press of a button.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// example of jQuery animation}
+\AttributeTok{$}\NormalTok{(}\StringTok{\textquotesingle{}\#id\textquotesingle{}}\NormalTok{).}\AttributeTok{toggle}\NormalTok{()}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+Because jQuery is already imported there is no need to do so, on the contrary, it might cause clashes. Below we create a shiny application containing a message handler to toggle (switch between show hide element depending on state), this is triggered by a button.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(shiny)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+\NormalTok{  tags}\OperatorTok{$}\KeywordTok{head}\NormalTok{(}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{script}\NormalTok{(}
+      \StringTok{"Shiny.addCustomMessageHandler(\textquotesingle{}jquery{-}toggle\textquotesingle{}, function(id)\{}
+\StringTok{        $(\textquotesingle{}\#\textquotesingle{} + id).toggle();}
+\StringTok{      \});"}
+\NormalTok{    )}
+\NormalTok{  ),}
+  \KeywordTok{actionButton}\NormalTok{(}\StringTok{"toggle"}\NormalTok{, }\StringTok{"Toggle text"}\NormalTok{),}
+  \KeywordTok{h1}\NormalTok{(}\StringTok{"This text is shown!"}\NormalTok{, }\DataTypeTok{id =} \StringTok{"text"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output, session)\{}
+
+  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{toggle, \{}
+\NormalTok{    session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\StringTok{\textquotesingle{}jquery{-}toggle\textquotesingle{}}\NormalTok{, }\DataTypeTok{msg =} \StringTok{"text"}\NormalTok{)}
+\NormalTok{  \})}
+
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+This is something where, again, R is leveraged in order to make it easier on the shiny developer but it must be said that it suffers from some inefficiency: the message travels from the browser (button click) to the R server where it is sent back to the browser and triggers \texttt{toggle}. It could indeed very well be rewritten in JavaScript entirely, this is however outside the scope of this book.
 
 \hypertarget{custom-outputs}{%
 \chapter{Custom Outputs}\label{custom-outputs}}
@@ -4047,12 +4094,6 @@ We shall leave it at that and move on to building another widget but completing 
 
 With a first widget built one can jump onto another one: \href{https://giojs.org/}{gio.js}, a library to draw arcs between countries on a 3 dimensional globe. This will include many more functionalities such packages can comprise.
 
-\begin{figure}
-\centering
-\includegraphics{images/gio-example.png}
-\caption{Example of Gio.js visualisation}
-\end{figure}
-
 Then again, the first order of business when looking to integrate a library is to look at the documentation to understand what should be reproduced in R.
 
 \begin{Shaded}
@@ -4082,6 +4123,12 @@ Then again, the first order of business when looking to integrate a library is t
 \KeywordTok{</html>}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/gio-example.png}
+\caption{Example of Gio.js visualisation}
+\end{figure}
 
 Gio.js has itself a dependency, \href{https://threejs.org/}{three.js}, which needs to be imported before gio.js, other than that not much differs from libraries previously explored in this chapter.
 
@@ -4155,16 +4202,37 @@ Let's copy the JavaScript code from the \href{https://giojs.org/index.html}{Get 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{...}
-\NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+\CommentTok{// gio.js}
+\VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{widget}\NormalTok{(}\OperatorTok{\{}
 
-  \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\StringTok{"globe"}\NormalTok{)}\OperatorTok{;}
-  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
-  \CommentTok{//controller.addData(data);}
-  \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
+  \DataTypeTok{name}\OperatorTok{:} \StringTok{\textquotesingle{}gio\textquotesingle{}}\OperatorTok{,}
 
-\OperatorTok{\}}
-\NormalTok{...}
+  \DataTypeTok{type}\OperatorTok{:} \StringTok{\textquotesingle{}output\textquotesingle{}}\OperatorTok{,}
+
+  \DataTypeTok{factory}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
+
+    \CommentTok{// }\AlertTok{TODO}\CommentTok{: define shared variables for this instance}
+
+    \ControlFlowTok{return} \OperatorTok{\{}
+
+      \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+
+        \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\StringTok{"globe"}\NormalTok{)}\OperatorTok{;}
+        \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+        \CommentTok{//controller.addData(data);}
+        \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
+
+      \OperatorTok{\},}
+
+      \DataTypeTok{resize}\OperatorTok{:} \KeywordTok{function}\NormalTok{(width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
+
+        \CommentTok{// }\AlertTok{TODO}\CommentTok{: code to re{-}render the widget with a new size}
+
+      \OperatorTok{\}}
+
+    \OperatorTok{\};}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4172,7 +4240,7 @@ One can document and load the package but it will not work as the code above att
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{...}
+\CommentTok{// gio.js}
 \NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
 
   \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
@@ -4181,7 +4249,6 @@ One can document and load the package but it will not work as the code above att
   \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
 
 \OperatorTok{\}}
-\NormalTok{...}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4201,7 +4268,20 @@ At this stage the widget should generate a visualisation.
 \caption{Output without data}
 \end{figure}
 
-Not too shabby given how little work was put into this!
+Not too shabby given how little work was put into this! Before we move on let us optimise something. In the JavaScript code we retrieve the \texttt{container} using \texttt{el.id} but this in effect is very inefficient: \texttt{el} is identical to \texttt{container}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// gio.js}
+\NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+
+  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(el)}\OperatorTok{;}
+  \CommentTok{//controller.addData(data);}
+  \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
+
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{working-with-data}{%
 \section*{Working with Data}\label{working-with-data}}
@@ -4284,16 +4364,14 @@ This must be reflected in the \texttt{play.js} file where we uncomment the line 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{...}
+\CommentTok{// gio.js}
 \NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
 
-  \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
-  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(el)}\OperatorTok{;}
   \VariableTok{controller}\NormalTok{.}\AttributeTok{addData}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;} \CommentTok{// uncomment \& use x.data}
   \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
 
 \OperatorTok{\}}
-\NormalTok{...}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4355,19 +4433,17 @@ JavaScript can be used to transform the data, leaving the serialiser as-is to re
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{...}
+\CommentTok{// gio.js}
 \NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
 
   \CommentTok{// long to wide}
   \VariableTok{x}\NormalTok{.}\AttributeTok{data} \OperatorTok{=} \VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{dataframeToD3}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;}
 
-  \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
-  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(el)}\OperatorTok{;}
   \VariableTok{controller}\NormalTok{.}\AttributeTok{addData}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;} 
   \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
 
 \OperatorTok{\}}
-\NormalTok{...}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4534,11 +4610,10 @@ The style is applied using the \texttt{setStyle} method on the controller before
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{...}
+\CommentTok{// gio.js}
 \NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
 
-  \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
-  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(el)}\OperatorTok{;}
   \VariableTok{controller}\NormalTok{.}\AttributeTok{addData}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;} 
 
   \VariableTok{controller}\NormalTok{.}\AttributeTok{setStyle}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{style}\NormalTok{)}\OperatorTok{;} \CommentTok{// set style}
@@ -4546,7 +4621,6 @@ The style is applied using the \texttt{setStyle} method on the controller before
   \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
 
 \OperatorTok{\}}
-\NormalTok{...}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4619,8 +4693,7 @@ The \texttt{controller} variable has to be declared outside of the \texttt{rende
 
       \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
 
-        \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
-\NormalTok{        controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;} \CommentTok{// declared outside}
+\NormalTok{        controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(el)}\OperatorTok{;} \CommentTok{// declared outside}
         
         \CommentTok{// add data}
         \VariableTok{controller}\NormalTok{.}\AttributeTok{addData}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;}
@@ -5254,8 +5327,7 @@ However, this will generate an issue experienced in a previous chapter; multiple
 \begin{Highlighting}[]
 \NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
 
-  \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
-  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+  \KeywordTok{var}\NormalTok{ controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(el)}\OperatorTok{;}
   \VariableTok{controller}\NormalTok{.}\AttributeTok{addData}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;}
   \VariableTok{controller}\NormalTok{.}\AttributeTok{setStyle}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{style}\NormalTok{)}\OperatorTok{;}
 
@@ -5494,9 +5566,8 @@ A solution to this is to ensure the container (\texttt{el}) is empty before gene
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{// gio.js}
-\KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
-\VariableTok{container}\NormalTok{.}\AttributeTok{innerHTML} \OperatorTok{=} \StringTok{\textquotesingle{}\textquotesingle{}}\OperatorTok{;} \CommentTok{// empty the container}
-\NormalTok{controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+\VariableTok{el}\NormalTok{.}\AttributeTok{innerHTML} \OperatorTok{=} \StringTok{\textquotesingle{}\textquotesingle{}}\OperatorTok{;} \CommentTok{// empty el}
+\NormalTok{controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(el)}\OperatorTok{;}
 \end{Highlighting}
 \end{Shaded}
 
@@ -5571,9 +5642,8 @@ We will need to be able to access the instance of the visualisation (\texttt{con
 
       \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
 
-        \KeywordTok{var}\NormalTok{ container }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
-        \VariableTok{container}\NormalTok{.}\AttributeTok{innerHTML} \OperatorTok{=} \StringTok{\textquotesingle{}\textquotesingle{}}\OperatorTok{;}
-\NormalTok{        controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(container)}\OperatorTok{;}
+        \VariableTok{el}\NormalTok{.}\AttributeTok{innerHTML} \OperatorTok{=} \StringTok{\textquotesingle{}\textquotesingle{}}\OperatorTok{;}
+\NormalTok{        controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(el)}\OperatorTok{;}
         
         \CommentTok{// add data}
         \VariableTok{controller}\NormalTok{.}\AttributeTok{addData}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;}
@@ -6802,8 +6872,8 @@ The message handlers themselves are rather bare since only the \texttt{setOption
 
 Then again, there are many more options and methods that we do not implement here but would make for a great exercise and even a great R package.
 
-\hypertarget{events-1}{%
-\section*{Events}\label{events-1}}
+\hypertarget{events}{%
+\section*{Events}\label{events}}
 
 
 The way rsup is set up is interesting in that the loading bar is shown or hidden from the R server. One could set it up differently however. Perhaps, instead of having to trigger the loading bar from the server it could all be handled automatically: showing the bar when the server is computing or redrawing things and hiding it when the server becomes idle again.
@@ -7073,7 +7143,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] -51.21
+## [1] -64.53
 \end{verbatim}
 
 \begin{Shaded}

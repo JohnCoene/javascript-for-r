@@ -2,8 +2,6 @@
 
 With a first widget built one can jump onto another one: [gio.js](https://giojs.org/), a library to draw arcs between countries on a 3 dimensional globe. This will include many more functionalities such packages can comprise.
 
-![Example of Gio.js visualisation](images/gio-example.png)
-
 Then again, the first order of business when looking to integrate a library is to look at the documentation to understand what should be reproduced in R.
 
 ```html
@@ -31,6 +29,8 @@ Then again, the first order of business when looking to integrate a library is t
 
 </html>
 ```
+
+![Example of Gio.js visualisation](images/gio-example.png)
 
 Gio.js has itself a dependency, [three.js](https://threejs.org/), which needs to be imported before gio.js, other than that not much differs from libraries previously explored in this chapter.
 
@@ -93,22 +93,43 @@ dependencies:
 Let's copy the JavaScript code from the [Get Started section of gio.js](https://giojs.org/index.html) in the `gio.js` file's `renderValue` function. At this point the data format is not known so we comment the line which adds data to the visualisation.
 
 ```js
-...
-renderValue: function(x) {
+// gio.js
+HTMLWidgets.widget({
 
-  var container = document.getElementById("globe");
-  var controller = new GIO.Controller(container);
-  //controller.addData(data);
-  controller.init();
+  name: 'gio',
 
-}
-...
+  type: 'output',
+
+  factory: function(el, width, height) {
+
+    // TODO: define shared variables for this instance
+
+    return {
+
+      renderValue: function(x) {
+
+        var container = document.getElementById("globe");
+        var controller = new GIO.Controller(container);
+        //controller.addData(data);
+        controller.init();
+
+      },
+
+      resize: function(width, height) {
+
+        // TODO: code to re-render the widget with a new size
+
+      }
+
+    };
+  }
+});
 ```
 
 One can document and load the package but it will not work as the code above attempts to place the visualisation in a `div` with `id = "globe"`. As for the previously written widget, this needs to be changed to `el.id`.
 
 ```js
-...
+// gio.js
 renderValue: function(x) {
 
   var container = document.getElementById(el.id);
@@ -117,7 +138,6 @@ renderValue: function(x) {
   controller.init();
 
 }
-...
 ```
 
 At this stage the widget should generate a visualisation.
@@ -130,7 +150,18 @@ gio(message = "This required but not used")
 
 ![Output without data](images/gio-init.png)
 
-Not too shabby given how little work was put into this!
+Not too shabby given how little work was put into this! Before we move on let us optimise something. In the JavaScript code we retrieve the `container` using `el.id` but this in effect is very inefficient: `el` is identical to `container`.
+
+```js
+// gio.js
+renderValue: function(x) {
+
+  var controller = new GIO.Controller(el);
+  //controller.addData(data);
+  controller.init();
+
+}
+```
 
 ## Working with Data {-}
 
@@ -198,16 +229,14 @@ gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
 This must be reflected in the `play.js` file where we uncomment the line previously commented and use `x.data` passed from R.
 
 ```js
-...
+// gio.js
 renderValue: function(x) {
 
-  var container = document.getElementById(el.id);
-  var controller = new GIO.Controller(container);
+  var controller = new GIO.Controller(el);
   controller.addData(x.data); // uncomment & use x.data
   controller.init();
 
 }
-...
 ```
 
 We can now use the function with the data to plot arcs!
@@ -244,19 +273,17 @@ There are multiple ways to transform the data and ensure the serialised JSON is 
 JavaScript can be used to transform the data, leaving the serialiser as-is to reshape the data in the client. The HTMLwidget JavaScript library (already imported by default) exports an object which provides a method, `dataframeToD3`, to transform the data from long to wide. 
 
 ```js
-...
+// gio.js
 renderValue: function(x) {
 
   // long to wide
   x.data = HTMLWidgets.dataframeToD3(x.data);
 
-  var container = document.getElementById(el.id);
-  var controller = new GIO.Controller(container);
+  var controller = new GIO.Controller(el);
   controller.addData(x.data); 
   controller.init();
 
 }
-...
 ```
 
 ### In R {-}
@@ -391,11 +418,10 @@ gio_style <- function(g, style = "magic"){
 The style is applied using the `setStyle` method on the controller before the visualisation is created, before the `init` method is called, using the style passed from R: `x.style`.
 
 ```js
-...
+// gio.js
 renderValue: function(x) {
 
-  var container = document.getElementById(el.id);
-  var controller = new GIO.Controller(container);
+  var controller = new GIO.Controller(el);
   controller.addData(x.data); 
 
   controller.setStyle(x.style); // set style
@@ -403,7 +429,6 @@ renderValue: function(x) {
   controller.init();
 
 }
-...
 ```
 
 We can now run `devtools::load_all` to export the newly written function and load the functions in the environment with `devtools::load_all`.
