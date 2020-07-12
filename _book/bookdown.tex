@@ -169,7 +169,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2020-07-11}
+\date{2020-07-12}
 
 \begin{document}
 \maketitle
@@ -216,7 +216,7 @@ Throughout the book several shiny applications and R packages are put together a
 
 The R programming language has been propelled into web browsers with the introduction of packages such as \href{https://shiny.rstudio.com/}{shiny} \citep{R-shiny} and \href{https://rmarkdown.rstudio.com/}{rmarkdown} \citep{R-rmarkdown}. Yet most R developers are not familiar with one of web browsers' core technology: JavaScript. This books aims to remedy to that.
 
-The book is nonetheless not about learning JavaScript, even though it is aimed at R developers with no prior knowledge of the language. This statement might appear counter-intuitive at first but, we hope, the book gradually reveals just how little JavaScript is actually needed in order to observe immense benefits otherwise locked away from R developers. This can be achieved by using Javascript only to do what R cannot, and rely R, a language familiar to us, to do the heavy lifting. This, it must be said, might, in a few places, lead to code that will appear inefficient to the trained JavaScript developer as instead of doing everything in JavaScript (say the browser) data might be passed from it to the server where R can be used. Rest assured that the impact this has on performances is largely unnoticeable.
+The book is nonetheless not about learning JavaScript, even though it is aimed at R developers with no prior knowledge of the language. This statement might appear counter-intuitive at first but, we hope, the book gradually reveals just how little JavaScript is actually needed in order to observe immense benefits otherwise locked away from R developers. This can be achieved by using Javascript only to do what R cannot, and rely on R, a language familiar to us, to do the heavy lifting. This, it must be said, might, in a few places, lead to code that will appear inefficient to the trained JavaScript developer as instead of doing everything in JavaScript (say the browser) data might be passed from it to the server where R can be used but rest assured that the impact this has on performances is largely unnoticeable.
 
 Importantly, the focus of the book truly is the integration of JavaScript with R where both languages actively interact with one another, it is not merely about including JavaScript code that works alongside R.
 
@@ -349,7 +349,7 @@ Start by installing those packages from CRAN.
 \end{Highlighting}
 \end{Shaded}
 
-We'll create an admittedly ridiculous package to explain how it works. Despite being useless, this package will introduce certain concepts of package development that are essential to understand for what is following. The package will be named ``test'' and will provide a single function that will print a JavaScript file stored inside our package. Useless but bear with it.
+We'll create an admittedly ridiculous package to explain how it works. Despite being useless, this package will introduce certain concepts of package development that are essential to understand for what is following. The package will be named ``test'' and will provide a single function that will print a JavaScript file stored inside the package. Useless but bear with it.
 
 Let's create the package, either do so using the RStudio IDE or with usethis. From the RStudio IDE go to \texttt{File\ \textgreater{}\ New\ Project\ \textgreater{}\ New\ Directory} then select ``R package'' and fill in the small form. But it could be argued that it's actually easier with usethis; type the code below in your R console to create a package named ``test'' in your current directory. If you run it from RStudio a new project window should open.
 
@@ -443,7 +443,7 @@ It does exactly what it printed in the console. The \texttt{DESCRIPTION} file in
 \end{Highlighting}
 \end{Shaded}
 
-We can add cli to our function, note that we use the namespace (or package name) followed by a double colon, as was printed by the \texttt{usethis::use\_package} function we ran earlier.
+We can add cli to the function, note that we use the namespace (or package name) followed by a double colon, as was printed by the \texttt{usethis::use\_package} function we ran earlier.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -557,7 +557,7 @@ Looking closely at the list and JSON output above one quickly sees the resemblan
 ## [1] TRUE
 \end{verbatim}
 
-JavaScript, on the other hand, does have scalar types, more often than not we will want to convert our vectors of length one to scalar types rather than arrays of length one. To do so we need use the \texttt{auto\_unbox} argument in \texttt{jsonlite::toJSON}, we'll do this most of the time we have to convert data to JSON.
+JavaScript, on the other hand, does have scalar types, more often than not we will want to convert the vectors of length one to scalar types rather than arrays of length one. To do so we need use the \texttt{auto\_unbox} argument in \texttt{jsonlite::toJSON}, we'll do this most of the time we have to convert data to JSON.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -575,7 +575,9 @@ JavaScript, on the other hand, does have scalar types, more often than not we wi
 ## }
 \end{verbatim}
 
-As demonstrated above the vector of length one was ``unboxed'' into an integer, with \texttt{auto\_unbox} set to \texttt{TRUE} jsonlite will properly convert such vectors into their appropriate type; integer, numeric, boolean, etc. If JSON is more or less the equivalent of lists in R one might wonder how jsonlite handles dataframes.
+As demonstrated above the vector of length one was ``unboxed'' into an integer, with \texttt{auto\_unbox} set to \texttt{TRUE} jsonlite will properly convert such vectors into their appropriate type; integer, numeric, boolean, etc. Note that this only applies to vectors, lists of length one will be serialised to arrays of length one even with \texttt{auto\_unbox} turned on: \texttt{list("hello")} will always be converted to \texttt{{[}"hello"{]}}.
+
+If JSON is more or less the equivalent of lists in R one might wonder how jsonlite handles dataframes since they do not exist in JavaScript.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -751,7 +753,7 @@ The above R code can be re-written in JavaScript. Note the slight variation in t
 
 One concept which does not exist in R is that of the ``DOM'' which stands for Document Object Model. When a web page is loaded, the browser creates a Document Object Model of the web page which can be accessed in JavaScript from the \texttt{document} object. This lets the developer programmatically manipulate the page itself so one can for instance, add an element (e.g.: a button), change the text of another, and plenty more.
 
-The JavaScript code below grabs the element where \texttt{id=\textquotesingle{}content\textquotesingle{}} from the \texttt{document} with \texttt{getElementById} and replaces the text (\texttt{innerText}). Even though our page only contains ``Trying JavaScript!'' when the page is opened (loaded) in the web browser JavaScript runs the code and changes it: this happens very fast so the original text cannot be seen.
+The JavaScript code below grabs the element where \texttt{id=\textquotesingle{}content\textquotesingle{}} from the \texttt{document} with \texttt{getElementById} and replaces the text (\texttt{innerText}). Even though the page only contains ``Trying JavaScript!'' when the page is opened (loaded) in the web browser JavaScript runs the code and changes it: this happens very fast so the original text cannot be seen.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -955,7 +957,7 @@ Then install the R package from CRAN.
 \section*{Basics}\label{basics-1}}
 
 
-V8 provides a reference class via \href{https://github.com/r-lib/R6}{R6} \citep{R-R6}, which pertains to object-oriented programming, hence it might look unconventional to many R users. It's nonetheless easy to grasp. If one wants to learn more about the R6's reference class system Hadley Wickham has a very good chapter on it in his \href{https://adv-r.hadley.nz/r6.html}{Advanced R} book.
+V8 provides a reference class provided via the \href{https://github.com/r-lib/R6}{R6} \citep{R-R6} package, this pertains to object-oriented programming, hence it might look unconventional to many R users. It's nonetheless easy to grasp. If one wants to learn more about the R6's reference class system Hadley Wickham has a very good chapter on it in his \href{https://adv-r.hadley.nz/r6.html}{Advanced R} book.
 
 Let's explore the basic functionalities of the package. First, load the library and use the function \texttt{v8} to instantiate a class, this effectively returns an execution environment, every such environment is independent of another.
 
@@ -967,11 +969,11 @@ Let's explore the basic functionalities of the package. First, load the library 
 \end{Highlighting}
 \end{Shaded}
 
-The \texttt{eval} method allows running JavaScript code from R \textasciitilde and retrieve the results.\textasciitilde{}
+The \texttt{eval} method allows running JavaScript code from R.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{engine}\OperatorTok{$}\KeywordTok{eval}\NormalTok{(}\StringTok{"var x = 3 + 4;"}\NormalTok{) }\CommentTok{\# this is evealuated in R}
+\NormalTok{engine}\OperatorTok{$}\KeywordTok{eval}\NormalTok{(}\StringTok{"var x = 3 + 4;"}\NormalTok{) }\CommentTok{\# this is evaluated in R}
 \NormalTok{engine}\OperatorTok{$}\KeywordTok{eval}\NormalTok{(}\StringTok{"x"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -980,11 +982,11 @@ The \texttt{eval} method allows running JavaScript code from R \textasciitilde a
 ## [1] "7"
 \end{verbatim}
 
-Two observations on the above snippet of code. First, the variable we got back in R is a character vector when it should have been either an integer or a numeric. This is because we used the \texttt{eval} method which merely prints the output, \texttt{get} is more appropriate; it converts it to an appropriate R equivalent.
+Two observations on the above snippet of code. First, the variable we got back in R is a character vector when it should have been either an integer or a numeric. This is because we used the \texttt{eval} method which returns what is printed in the v8 console, \texttt{get} is more appropriate; it converts the output to its appropriate R equivalent.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# retrieve our previously created variable}
+\CommentTok{\# retrieve the previously created variable}
 \NormalTok{(x <{-}}\StringTok{ }\NormalTok{engine}\OperatorTok{$}\KeywordTok{get}\NormalTok{(}\StringTok{"x"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
@@ -1045,7 +1047,7 @@ All of the conversion is handled by V8 internally with jsonlite as demonstrated 
 ## ]
 \end{verbatim}
 
-However the cyclical loop of 1) creating a variable in JavaScript to 2) run a function on the aforementioned object 3) get the results back in R, can be tedious. So V8 also allows calling JavaScript functions on R objects directly with the \texttt{call} method and obtain the results back in R.
+However this reveals a tedious cyclical loop: 1) creating an object in JavaScript to 2) run a function on the aforementioned object 3) get the results back in R, and repeat. So V8 also allows calling JavaScript functions on R objects directly with the \texttt{call} method and obtain the results back in R.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1054,7 +1056,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Jul 11 2020 21:26:48 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Jul 12 2020 11:03:25 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1064,7 +1066,7 @@ However the cyclical loop of 1) creating a variable in JavaScript to 2) run a fu
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Jul 11 2020 21:26:48 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Jul 12 2020 11:03:25 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -1096,7 +1098,7 @@ The very first step of integrating any external library is to look at the code, 
 \OperatorTok{\}}
 
 \CommentTok{// initialise}
-\KeywordTok{const}\NormalTok{ fuse }\OperatorTok{=} \KeywordTok{new} \AttributeTok{Fuse}\NormalTok{(list}\OperatorTok{,}\NormalTok{ options)}
+\KeywordTok{const}\NormalTok{ fuse }\OperatorTok{=} \KeywordTok{new} \AttributeTok{Fuse}\NormalTok{(books}\OperatorTok{,}\NormalTok{ options)}
 
 \CommentTok{// search \textquotesingle{}tion\textquotesingle{} in authors and titles}
 \KeywordTok{const}\NormalTok{ result }\OperatorTok{=} \VariableTok{fuse}\NormalTok{.}\AttributeTok{search}\NormalTok{(}\StringTok{\textquotesingle{}tion\textquotesingle{}}\NormalTok{)}
@@ -1124,29 +1126,12 @@ You can think of it as using the \texttt{script} tag in HTML to source (\texttt{
     \KeywordTok{<script}\OtherTok{ src=}\StringTok{\textquotesingle{}https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.4.6/fuse.min.js\textquotesingle{}}\KeywordTok{></script>}
   \KeywordTok{</head>}
   \KeywordTok{<body>}
-    \KeywordTok{<p>}\NormalTok{Content}\KeywordTok{</p>}
   \KeywordTok{</body>}
 \KeywordTok{</html>}
 \end{Highlighting}
 \end{Shaded}
 
-With the library imported its functions can accessed via V8. We'll replicate an example from fuse.js official website where it executes a search on an object that contains books and looks like JSON below.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{var}\NormalTok{ books }\OperatorTok{=}\NormalTok{ [}\OperatorTok{\{}
-  \StringTok{\textquotesingle{}ISBN\textquotesingle{}}\OperatorTok{:} \StringTok{\textquotesingle{}A\textquotesingle{}}\OperatorTok{,}
-  \StringTok{\textquotesingle{}title\textquotesingle{}}\OperatorTok{:} \StringTok{"Old Man\textquotesingle{}s War"}\OperatorTok{,}
-  \StringTok{\textquotesingle{}author\textquotesingle{}}\OperatorTok{:} \StringTok{\textquotesingle{}John Scalzi\textquotesingle{}}
-\OperatorTok{\},} \OperatorTok{\{}
-  \StringTok{\textquotesingle{}ISBN\textquotesingle{}}\OperatorTok{:} \StringTok{\textquotesingle{}B\textquotesingle{}}\OperatorTok{,}
-  \StringTok{\textquotesingle{}title\textquotesingle{}}\OperatorTok{:} \StringTok{\textquotesingle{}The Lock Artist\textquotesingle{}}\OperatorTok{,}
-  \StringTok{\textquotesingle{}author\textquotesingle{}}\OperatorTok{:} \StringTok{\textquotesingle{}Steve Hamilton\textquotesingle{}}
-\OperatorTok{\}}\NormalTok{]}
-\end{Highlighting}
-\end{Shaded}
-
-This can be easily created, as we've already seen this is just how V8 creates data frames. We define a data.frame of books that looks similar and load it into our engine.
+Now onto replicating the array (list) which we want to search through, the \texttt{books} object used in a previous example. As already observed this is in essence how V8 stores data frames in the environment. Below we define a data frame of books that looks similar and load it into the engine.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1164,7 +1149,7 @@ This can be easily created, as we've already seen this is just how V8 creates da
 \end{Highlighting}
 \end{Shaded}
 
-Then again we can make sure that the data.frame was turned into a rowwise JSON object.
+Then again we can make sure that the data frame was turned into a rowwise JSON object.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1193,7 +1178,7 @@ Then again we can make sure that the data.frame was turned into a rowwise JSON o
 ## ]
 \end{verbatim}
 
-Now we can define options for our search, we don't get into the details of fuse.js here as this is not the purpose of this book, you can read more about the options in the \href{https://fusejs.io/\#Examples}{examples section} of the site. We can mimic the format of the JSON options shown on the website with a simple list and assign that to our engine. If this confuses read the \href{intro.html\#json}{JSON section of the introduction}.
+Now we can define options for the search, we don't get into the details of fuse.js here as this is not the purpose of this book, you can read more about the options in the \href{https://fusejs.io/\#Examples}{examples section} of the site. We can mimic the format of the JSON options shown on the website with a simple list and assign that to a new variable in the engine. Note that we wrap the title in a \texttt{list} to ensure it is converted to an array of length 1: \texttt{list("title")} should be converted to a \texttt{{[}"title"{]}} array and not a \texttt{"title"} scalar.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1217,7 +1202,7 @@ Now we can define options for our search, we don't get into the details of fuse.
 \end{Highlighting}
 \end{Shaded}
 
-Then we can finish the second step of the online examples, instantiate a fuse.js object with our books and options objects then make a simple search, we assign the results of the search to an object which we then retrieve in R with \texttt{get}.
+Then we can finish the second step of the online examples, instantiate a fuse.js object with the books and options objects then make a search the result of which is assigned to an object which is retrieved in R with \texttt{get}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1247,11 +1232,11 @@ A search for ``sense'' returns a vector of ids where the term ``sense'' was foun
 \section*{With Npm}\label{with-npm}}
 
 
-We can also use \href{https://www.npmjs.com/}{npm} packages, though not all will work. Npm is Node's Package Manager, or in a sense Node's equivalent of CRAN.
+We can also use \href{https://www.npmjs.com/}{npm} packages, though not all will work. Npm is node's Package Manager, or in a sense Node's equivalent of CRAN.
 
-To use npm packages we need \href{http://browserify.org/}{browserify}, a node library to bundle all dependencies of an npm package into a single, file which we can subsequently source in V8. Browserify is itself an npm package and there requires node and npm installed.
+To use npm packages we need \href{http://browserify.org/}{browserify}, a node library to bundle all dependencies of an npm package into a single file which can subsequently be imported in V8. Browserify is itself an npm package and there requires node and npm installed.
 
-You can install browserify globally with the following command from the terminal.
+You can install browserify globally with the following the \texttt{g} flag. Install node.js and type the following the terminal.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1259,7 +1244,7 @@ You can install browserify globally with the following command from the terminal
 \end{Highlighting}
 \end{Shaded}
 
-We can now browserify an npm package. To demonstrate we will use \href{https://github.com/zeit/ms}{ms} which converts various time formats to milliseconds. First we install the npm package.
+We can now ``browserify'' an npm package. To demonstrate we will use \href{https://github.com/zeit/ms}{ms} which converts various time formats to milliseconds. First we install the npm package.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1267,7 +1252,7 @@ We can now browserify an npm package. To demonstrate we will use \href{https://g
 \end{Highlighting}
 \end{Shaded}
 
-Then we browserify it. From the terminal, the first line creates a file called \texttt{in.js} which contains \texttt{global.ms\ =\ require(\textquotesingle{}ms\textquotesingle{});} we then call browserify on that file specifying \texttt{ms.js} as output file.
+Then we browserify it. From the terminal, the first line creates a file called \texttt{in.js} which contains \texttt{global.ms\ =\ require(\textquotesingle{}ms\textquotesingle{});} we then call browserify on that file specifying \texttt{ms.js} as output file. The \texttt{require} function in JavaScript is used to import files, \texttt{require(\textquotesingle{}ms\textquotesingle{})} imports \texttt{ms.js}, it's to some extend like \texttt{source("ms.R")}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1301,21 +1286,19 @@ Then using the library simply consists of using \texttt{eval} or preferably \tex
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{ms}\OperatorTok{$}\KeywordTok{call}\NormalTok{(}\StringTok{"ms"}\NormalTok{, }\StringTok{"1y"}\NormalTok{)}
+\NormalTok{ms}\OperatorTok{$}\KeywordTok{call}\NormalTok{(}\StringTok{"ms"}\NormalTok{, }\StringTok{"2s"}\NormalTok{) }\CommentTok{\# 2 seconds}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 3.156e+10
+## [1] 2000
 \end{verbatim}
 
 \hypertarget{use-in-packages}{%
 \section*{Use in Packages}\label{use-in-packages}}
 
 
-In this section we detail how one should go about using V8 in an R package, if you are not familiar with package development you can skip ahead.
-
-Create a package however you usually do, using usethis, devtools or the RStudio IDE interface. Below we create a package called ``ms'' that will hold functionalities we explored in the previous section on npm packages.
+In this section we detail how one should go about using V8 in an R package, if you are not familiar with package development you can skip ahead. We start by creating a package called ``ms'' that will hold functionalities we explored in the previous section on npm packages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1340,11 +1323,11 @@ The package should also include the external library \texttt{ms.js} browserified
 \end{Highlighting}
 \end{Shaded}
 
-As explored, the core the V8 package is the execution environment(s) that are spawned using the \texttt{v8} function. One could perhaps provide a function that returns the class created by \texttt{v8} but it would not be convenient. This function would need to be called explicitly by the users of the package and the output of it would need to be passed to every subsequent functions. Thankfully there is a better way.
+As explored, the core of the V8 package is the execution environment(s) that are spawned using the \texttt{v8} function. One could perhaps provide a function that returns the object created by \texttt{v8} but it would not be convenient: this function would need to be called explicitly by the users of the package and the output of it would need to be passed to every subsequent functions. Thankfully there is a better way.
 
 Instead we can use the function \texttt{.onLoad}, to create the execution environment and import the dependency when the package is loaded by the user.
 
-You can read more about this function Hadley Wickham's \href{http://r-pkgs.had.co.nz/r.html}{Advanced R book}. The Python integration of R, \href{https://rstudio.github.io/reticulate}{reticulate} \citep{R-reticulate} also advises using \href{https://rstudio.github.io/reticulate/articles/package.html}{this method} to import modules too. We often see this function placed in a \texttt{zzz.R} file.
+You can read more about this function in Hadley Wickham's \href{http://r-pkgs.had.co.nz/r.html}{Advanced R book}. This is in effect very similar to how the Python integration of R, \href{https://rstudio.github.io/reticulate}{reticulate} \citep{R-reticulate} is \href{https://rstudio.github.io/reticulate/articles/package.html}{used in packages}. This function is often placed in a \texttt{zzz.R} file.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1357,7 +1340,7 @@ You can read more about this function Hadley Wickham's \href{http://r-pkgs.had.c
 \end{Highlighting}
 \end{Shaded}
 
-At this stage one should obtain a directory structure similar to the tree below.
+At this stage the package's directory structure should look similar to the tree below.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1403,12 +1386,12 @@ After running \texttt{devtools::document()} and \texttt{devtools::load\_all()} t
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{ms}\OperatorTok{::}\KeywordTok{to\_ms}\NormalTok{(}\StringTok{"2 days"}\NormalTok{)}
+\NormalTok{ms}\OperatorTok{::}\KeywordTok{to\_ms}\NormalTok{(}\StringTok{"10 hrs"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 172800000
+## [1] 36000000
 \end{verbatim}
 
 \hypertarget{node}{%
@@ -1659,7 +1642,7 @@ We can now use the \texttt{shiny::addResourcePath} to point to this directory. G
 \KeywordTok{addResourcePath}\NormalTok{(}
   \CommentTok{\# will be accessible at /files}
   \DataTypeTok{prefix =} \StringTok{"files"}\NormalTok{, }
-  \CommentTok{\# path to our assets directory}
+  \CommentTok{\# path to the assets directory}
   \DataTypeTok{directoryPath =} \StringTok{"assets"}
 \NormalTok{)}
 
@@ -1673,7 +1656,7 @@ We can now use the \texttt{shiny::addResourcePath} to point to this directory. G
 \end{Highlighting}
 \end{Shaded}
 
-If you then run the application and open it at the \texttt{/files/script.js} path (e.g.: \texttt{127.0.0.1:3000/files/script.js}) you should see the content of our JavaScript file (\texttt{console.log(\textquotesingle{}Hello\ JS!\textquotesingle{})}), commenting the \texttt{addResourcePath} line will have a ``Not Found'' error displayed on the page instead.
+If you then run the application and open it at the \texttt{/files/script.js} path (e.g.: \texttt{127.0.0.1:3000/files/script.js}) you should see the content of the JavaScript file (\texttt{console.log(\textquotesingle{}Hello\ JS!\textquotesingle{})}), commenting the \texttt{addResourcePath} line will have a ``Not Found'' error displayed on the page instead.
 
 All files in your asset directory will be served online and accessible to anyone: do not place sensitive files in it.
 
@@ -1689,7 +1672,7 @@ assets/
      └── pic.png
 \end{verbatim}
 
-At this stage we have made the JavaScript file we created accessible by the clients but we still have to source this file in our \texttt{ui} as currently this file is, though served, not used by our application. Were one creating a static HTML page one would use the \texttt{script} to \texttt{src} the file in the \texttt{head} of the page.
+At this stage we have made the JavaScript file we created accessible by the clients but we still have to source this file in the \texttt{ui} as currently this file is, though served, not used by the application. Were one creating a static HTML page one would use the \texttt{script} to \texttt{src} the file in the \texttt{head} of the page.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1743,7 +1726,7 @@ Note that we use the \texttt{tags} object which comes from the shiny package and
 \end{Highlighting}
 \end{Shaded}
 
-From the browser, inspecting page (right click \textgreater{} inspect \textgreater{} console tab) one should see ``Hello JS!'' in the console which means our application correctly ran the code in our JavaScript file.
+From the browser, inspecting page (right click \textgreater{} inspect \textgreater{} console tab) one should see ``Hello JS!'' in the console which means the application correctly ran the code in the JavaScript file.
 
 \hypertarget{example---alerts}{%
 \section*{Example - Alerts}\label{example---alerts}}
@@ -1789,7 +1772,7 @@ One thing important to note for later is that alerts will always block the execu
 \section*{From R to JavaScript}\label{from-r-to-javascript}}
 
 
-Now that we have a simple alert displayed in the application we can tie it with our R server; the alert should display a message sent by the R server, this would enable, for instance, displaying a message taken from a database or a user input. As might be expected there are two functions required to do so, an R function and its JavaScript complementary: one to send the data from the server and another to catch said data from the client and display the alert.
+Now that we have a simple alert displayed in the application we can tie it with the R server; the alert should display a message sent by the R server, this would enable, for instance, displaying a message taken from a database or a user input. As might be expected there are two functions required to do so, an R function and its JavaScript complementary: one to send the data from the server and another to catch said data from the client and display the alert.
 
 Let us start by writing the R code to send the data, thankfully very little is required of the developer. One can send data from the R server to the client from the \texttt{session} object using the \texttt{sendCustomMessage} method. The method takes two arguments, first an identifier (where to send the data to), second the actual data to send to JavaScript.
 
@@ -1802,7 +1785,7 @@ Let us start by writing the R code to send the data, thankfully very little is r
 \end{Highlighting}
 \end{Shaded}
 
-This effectively sends our message to the JavaScript client but we are yet to use that message JavaScript-side so the application still displays the same alert on load. We can add a ``handler'' for the identifier we defined (\texttt{send-alert}) which will so something with the message we sent from the server. This is done with the \texttt{addCustomMessageHandler} method from the \texttt{Shiny} object where the first argument is the identifier and the second is the function that handles the message, generally a function that takes a single argument: the data sent from the server.
+This effectively sends the message to the JavaScript client but we are yet to use that message JavaScript-side so the application still displays the same alert on load. We can add a ``handler'' for the identifier we defined (\texttt{send-alert}) which will so something with the message we sent from the server. This is done with the \texttt{addCustomMessageHandler} method from the \texttt{Shiny} object where the first argument is the identifier and the second is the function that handles the message, generally a function that takes a single argument: the data sent from the server.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1847,7 +1830,7 @@ This enables you to pass a message that is taken from a database for instance, o
 \end{Highlighting}
 \end{Shaded}
 
-In the application above, notice the path that our message follows: it goes from the client to the server which sends it back to the client. This might be considered suboptimal by some as it is not necessary to use the server as intermediary (in this example at least). Though there is some truth to this the above will work perfectly fine---and our aim here is to make JavaScript work with R---not alongside it.
+In the application above, notice the path that the message follows: it goes from the client to the server which sends it back to the client. This might be considered suboptimal by some as it is not necessary to use the server as intermediary (in this example at least). Though there is some truth to this the above will work perfectly fine---and the aim here is to make JavaScript work with R---not alongside it.
 
 \hypertarget{from-javascript-to-r}{%
 \section*{From JavaScript to R}\label{from-javascript-to-r}}
@@ -2026,7 +2009,7 @@ Thus far, this collection of chapters has covered both ways data travels between
 
 Let's exploit an external library to improve upon the work done so far: \href{https://github.com/StephanWagner/jBox}{jBox} allows displaying modals (pop-ups), very similar to the vanilla JavaScript alerts, but much better looking and with additional functionalities.
 
-The very first thing to do is to import jBox in our project, we could download the files and use them as described in the previous static files section but it comes with very convenient CDNs detailed in the \href{https://stephanwagner.me/jBox/get_started}{get-started page of the documentation}.
+The very first thing to do is to import jBox in the project, we could download the files and use them as described in the previous static files section but it comes with very convenient CDNs detailed in the \href{https://stephanwagner.me/jBox/get_started}{get-started page of the documentation}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2349,7 +2332,7 @@ Let's start by creating an R package, here we name it ``jbox,'' after the JavaSc
 
 \emph{If confused by any of the following please visit the \protect\hyperlink{static-files}{static files section} of this chapter.}
 
-The very first thing that is required are the dependencies without which nothing can work, let's create a directory of static assets, download and place the jBox CSS and JavaScript files within it. We create the directory ``inst'' as per the R package convention and within it create another to hold our assets.
+The very first thing that is required are the dependencies without which nothing can work, let's create a directory of static assets, download and place the jBox CSS and JavaScript files within it. We create the directory ``inst'' as per the R package convention and within it create another to hold the assets.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2402,7 +2385,7 @@ The difference between loading and attaching a package can be subtle, in this ca
 Loading will load code, data and any DLLs; register S3 and S4 methods; and run the .onLoad() function. After loading, the package is available in memory, but because it's not in the search path, you won't be able to access its components without using ::. Confusingly, :: will also load a package automatically if it isn't already loaded. It's rare to load a package explicitly, but you can do so with requireNamespace() or loadNamespace().
 \end{quote}
 
-The \texttt{addResourcePath} function should thus be placed within the \texttt{.onLoad} function, this way the files are served by shiny when the package is loaded. Note the few changes below, we refer to the path using \texttt{system.file} (detailed in the \protect\hyperlink{package-development}{Package Development section}) and change the the prefix to \texttt{jbox-assets} to avoid the url serving our static files to clash with others.
+The \texttt{addResourcePath} function should thus be placed within the \texttt{.onLoad} function, this way the files are served by shiny when the package is loaded. Note the few changes below, we refer to the path using \texttt{system.file} (detailed in the \protect\hyperlink{package-development}{Package Development section}) and change the the prefix to \texttt{jbox-assets} to avoid the url serving the static files to clash with others.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4666,7 +4649,7 @@ This closes this chapter but is not the last we see of gio.js, we shall use it a
 \hypertarget{advanced-topics}{%
 \chapter{Advanced Topics}\label{advanced-topics}}
 
-In the previous chapter we put together an interesting, fully functioning widget but it lacks polish and does not use all the features htmlwidgets provides, this chapter explores those. We look into handling the size of widgets to ensure they are responsive as well as discuss potential security concerns and how to address them. Finally we show how to pass JavaScript code from R to JavaScript and how to add HTML content before and after our widget.
+In the previous chapter we put together an interesting, fully functioning widget but it lacks polish and does not use all the features htmlwidgets provides, this chapter explores those. We look into handling the size of widgets to ensure they are responsive as well as discuss potential security concerns and how to address them. Finally we show how to pass JavaScript code from R to JavaScript and how to add HTML content before and after the widget.
 
 \hypertarget{shared-variables}{%
 \section*{Shared Variables}\label{shared-variables}}
@@ -5697,7 +5680,7 @@ Then, anywhere in the \texttt{gio.js} file, we create a function which uses \tex
 \subsection*{Handle Data}\label{handle-data}}
 
 
-We can now turn our attention to actually applying the data sent from the R server to the visualisation: the ``message handler.'' Registering the message handler is only relevant if shiny is running, therefore HTMLWidgets comes with a function to check whether that is the case which is useful to avoid needless errors. We can thus use it in an if statement in which all message handlers will be registered.
+We can now turn the attention to actually applying the data sent from the R server to the visualisation: the ``message handler.'' Registering the message handler is only relevant if shiny is running, therefore HTMLWidgets comes with a function to check whether that is the case which is useful to avoid needless errors. We can thus use it in an if statement in which all message handlers will be registered.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7143,7 +7126,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 88.11
+## [1] 13.34
 \end{verbatim}
 
 \begin{Shaded}

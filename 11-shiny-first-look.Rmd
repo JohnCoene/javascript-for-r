@@ -34,7 +34,7 @@ library(shiny)
 addResourcePath(
   # will be accessible at /files
   prefix = "files", 
-  # path to our assets directory
+  # path to the assets directory
   directoryPath = "assets"
 )
 
@@ -47,7 +47,7 @@ server <- function(input, output){}
 shinyApp(ui, server)
 ```
 
-If you then run the application and open it at the `/files/script.js` path (e.g.: `127.0.0.1:3000/files/script.js`) you should see the content of our JavaScript file (`console.log('Hello JS!')`), commenting the `addResourcePath` line will have a "Not Found" error displayed on the page instead.
+If you then run the application and open it at the `/files/script.js` path (e.g.: `127.0.0.1:3000/files/script.js`) you should see the content of the JavaScript file (`console.log('Hello JS!')`), commenting the `addResourcePath` line will have a "Not Found" error displayed on the page instead.
 
 ```{block, class='important'}
 All files in your asset directory will be served online and accessible to anyone: do not place sensitive files in it.
@@ -65,7 +65,7 @@ assets/
      └── pic.png
 ```
 
-At this stage we have made the JavaScript file we created accessible by the clients but we still have to source this file in our `ui` as currently this file is, though served, not used by our application. Were one creating a static HTML page one would use the `script` to `src` the file in the `head` of the page.
+At this stage we have made the JavaScript file we created accessible by the clients but we still have to source this file in the `ui` as currently this file is, though served, not used by the application. Were one creating a static HTML page one would use the `script` to `src` the file in the `head` of the page.
 
 ```html
 <html>
@@ -113,7 +113,7 @@ server <- function(input, output){}
 shinyApp(ui, server)
 ```
 
-From the browser, inspecting page (right click > inspect > console tab) one should see "Hello JS!" in the console which means our application correctly ran the code in our JavaScript file.
+From the browser, inspecting page (right click > inspect > console tab) one should see "Hello JS!" in the console which means the application correctly ran the code in the JavaScript file.
 
 ## Example - Alerts {-}
 
@@ -147,7 +147,7 @@ deleteEverythingOnlyIfUserOK();
 
 ## From R to JavaScript {-}
 
-Now that we have a simple alert displayed in the application we can tie it with our R server; the alert should display a message sent by the R server, this would enable, for instance, displaying a message taken from a database or a user input. As might be expected there are two functions required to do so, an R function and its JavaScript complementary: one to send the data from the server and another to catch said data from the client and display the alert. 
+Now that we have a simple alert displayed in the application we can tie it with the R server; the alert should display a message sent by the R server, this would enable, for instance, displaying a message taken from a database or a user input. As might be expected there are two functions required to do so, an R function and its JavaScript complementary: one to send the data from the server and another to catch said data from the client and display the alert. 
 
 Let us start by writing the R code to send the data, thankfully very little is required of the developer. One can send data from the R server to the client from the `session` object using the `sendCustomMessage` method. The method takes two arguments, first an identifier (where to send the data to), second the actual data to send to JavaScript.  
 
@@ -158,7 +158,7 @@ server <- function(input, output, session){
 }
 ```
 
-This effectively sends our message to the JavaScript client but we are yet to use that message JavaScript-side so the application still displays the same alert on load. We can add a "handler" for the identifier we defined (`send-alert`) which will so something with the message we sent from the server. This is done with the `addCustomMessageHandler` method from the `Shiny` object where the first argument is the identifier and the second is the function that handles the message, generally a function that takes a single argument: the data sent from the server. 
+This effectively sends the message to the JavaScript client but we are yet to use that message JavaScript-side so the application still displays the same alert on load. We can add a "handler" for the identifier we defined (`send-alert`) which will so something with the message we sent from the server. This is done with the `addCustomMessageHandler` method from the `Shiny` object where the first argument is the identifier and the second is the function that handles the message, generally a function that takes a single argument: the data sent from the server. 
 
 ```r
 tags$script(
@@ -195,7 +195,7 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-In the application above, notice the path that our message follows: it goes from the client to the server which sends it back to the client. This might be considered suboptimal by some as it is not necessary to use the server as intermediary (in this example at least). Though there is some truth to this the above will work perfectly fine---and our aim here is to make JavaScript work with R---not alongside it.
+In the application above, notice the path that the message follows: it goes from the client to the server which sends it back to the client. This might be considered suboptimal by some as it is not necessary to use the server as intermediary (in this example at least). Though there is some truth to this the above will work perfectly fine---and the aim here is to make JavaScript work with R---not alongside it.
 
 ## From JavaScript to R {-}
 

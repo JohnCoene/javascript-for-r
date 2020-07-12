@@ -76,7 +76,7 @@ Start by installing those packages from CRAN.
 install.packages(c("devtools", "usethis"))
 ```
 
-We'll create an admittedly ridiculous package to explain how it works. Despite being useless, this package will introduce certain concepts of package development that are essential to understand for what is following. The package will be named "test" and will provide a single function that will print a JavaScript file stored inside our package. Useless but bear with it.
+We'll create an admittedly ridiculous package to explain how it works. Despite being useless, this package will introduce certain concepts of package development that are essential to understand for what is following. The package will be named "test" and will provide a single function that will print a JavaScript file stored inside the package. Useless but bear with it.
 
 Let's create the package, either do so using the RStudio IDE or with usethis. From the RStudio IDE go to `File > New Project > New Directory` then select "R package" and fill in the small form. But it could be argued that it's actually easier with usethis; type the code below in your R console to create a package named "test" in your current directory. If you run it from RStudio a new project window should open.
 
@@ -154,7 +154,7 @@ Imports:
     cli
 ```
 
-We can add cli to our function, note that we use the namespace (or package name) followed by a double colon, as was printed by the `usethis::use_package` function we ran earlier.
+We can add cli to the function, note that we use the namespace (or package name) followed by a double colon, as was printed by the `usethis::use_package` function we ran earlier.
 
 ```r
 print_file <- function(){
@@ -225,13 +225,15 @@ length(x)
 is.vector(x)
 ```
 
-JavaScript, on the other hand, does have scalar types, more often than not we will want to convert our vectors of length one to scalar types rather than arrays of length one. To do so we need use the `auto_unbox` argument in `jsonlite::toJSON`, we'll do this most of the time we have to convert data to JSON.
+JavaScript, on the other hand, does have scalar types, more often than not we will want to convert the vectors of length one to scalar types rather than arrays of length one. To do so we need use the `auto_unbox` argument in `jsonlite::toJSON`, we'll do this most of the time we have to convert data to JSON.
 
 ```{r}
 toJSON(lst, pretty = TRUE, auto_unbox = TRUE)
 ```
 
-As demonstrated above the vector of length one was "unboxed" into an integer, with `auto_unbox` set to `TRUE` jsonlite will properly convert such vectors into their appropriate type; integer, numeric, boolean, etc. If JSON is more or less the equivalent of lists in R one might wonder how jsonlite handles dataframes.
+As demonstrated above the vector of length one was "unboxed" into an integer, with `auto_unbox` set to `TRUE` jsonlite will properly convert such vectors into their appropriate type; integer, numeric, boolean, etc. Note that this only applies to vectors, lists of length one will be serialised to arrays of length one even with `auto_unbox` turned on: `list("hello")` will always be converted to `["hello"]`.
+
+If JSON is more or less the equivalent of lists in R one might wonder how jsonlite handles dataframes since they do not exist in JavaScript.
 
 ```{r}
 # subset of built-in dataset
@@ -334,7 +336,7 @@ foo();
 
 One concept which does not exist in R is that of the "DOM" which stands for Document Object Model. When a web page is loaded, the browser creates a Document Object Model of the web page which can be accessed in JavaScript from the `document` object. This lets the developer programmatically manipulate the page itself so one can for instance, add an element (e.g.: a button), change the text of another, and plenty more.
 
-The JavaScript code below grabs the element where `id='content'` from the `document` with `getElementById` and replaces the text (`innerText`). Even though our page only contains "Trying JavaScript!" when the page is opened (loaded) in the web browser JavaScript runs the code and changes it: this happens very fast so the original text cannot be seen.
+The JavaScript code below grabs the element where `id='content'` from the `document` with `getElementById` and replaces the text (`innerText`). Even though the page only contains "Trying JavaScript!" when the page is opened (loaded) in the web browser JavaScript runs the code and changes it: this happens very fast so the original text cannot be seen.
 
 ```html
  <!–– index.html ––>
