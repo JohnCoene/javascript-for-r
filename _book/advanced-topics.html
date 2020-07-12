@@ -284,6 +284,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="advanced-topics.html"><a href="advanced-topics.html#dependencies-2"><i class="fa fa-check"></i>Dependencies</a></li>
 <li class="chapter" data-level="" data-path="advanced-topics.html"><a href="advanced-topics.html#compatibility"><i class="fa fa-check"></i>Compatibility</a></li>
 <li class="chapter" data-level="" data-path="advanced-topics.html"><a href="advanced-topics.html#unit-tests"><i class="fa fa-check"></i>Unit Tests</a></li>
+<li class="chapter" data-level="" data-path="advanced-topics.html"><a href="advanced-topics.html#performances"><i class="fa fa-check"></i>Performances</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="working-with-shiny.html"><a href="working-with-shiny.html"><i class="fa fa-check"></i><b>13</b> Working with Shiny</a>
 <ul>
@@ -337,7 +338,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="part"><span><b>VI Closing Remarks</b></span></li>
 <li class="chapter" data-level="19" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>19</b> Conclusion</a>
 <ul>
-<li class="chapter" data-level="" data-path="conclusion.html"><a href="conclusion.html#performances"><i class="fa fa-check"></i>Performances</a></li>
+<li class="chapter" data-level="" data-path="conclusion.html"><a href="conclusion.html#performances-1"><i class="fa fa-check"></i>Performances</a></li>
 <li class="chapter" data-level="" data-path="conclusion.html"><a href="conclusion.html#road-ahead"><i class="fa fa-check"></i>Road ahead</a>
 <ul>
 <li class="chapter" data-level="" data-path="conclusion.html"><a href="conclusion.html#computation"><i class="fa fa-check"></i>Computation</a></li>
@@ -559,6 +560,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="dependencies-2" class="section level2 unnumbered" number="">
 <h2>Dependencies</h2>
 <p>Thus far, this book has only covered one of two ways dependencies can be included in htmlwidgets. Though the one covered, using the <code>.yml</code> file, will likely be necessary for every widget it has one drawback: all dependencies listed in the file are always included with the output. Dependencies can greatly affect the load time of the output (be it a standalone visualisation, an R markdown document, or a shiny application) as these files may be large. Most large visualisation libraries will therefore allow to bundle those dependencies in separate files. For instance, ECharts.js provides a way to customise the bundle to only include dependencies for charts that one wants to draw (e.g.: bar chart, or boxplot), Highcharts also allows splitting dependencies so one can load those needed for maps, stock charts, and more, separately. It is thus good practice to do the same in widgets so only the required dependencies are loaded, e.g.: when the user produces a bar chart, only that dependency is loaded. It used in the leaflet package to load map tiles for instance.</p>
+<p>The Google Chrome network tab shows information on resources downloaded by the browser (including dependencies) including how long it takes. It is advisable to take a look at it to ensure no dependency drags load time.</p>
+<div class="figure">
+<img src="images/htmlwidgets-performances.png" alt="" />
+<p class="caption">Google Chrome network tab</p>
+</div>
 <p>To demonstrate, we will add a function in gio to optionally include <a href="https://github.com/mrdoob/stats.js/">stats.js</a>, a JavaScript performance monitor which displays information such as the number of frames per second (FPS) rendered, or the number of milliseconds needed to render the visualisation. Gio.js natively supports stats.js but the dependency needs to be imported and that option needs to be enabled on the <code>controller</code> as shown in the <a href="https://giojs.org/html/docs/interfaceStats.html">documentation</a>.</p>
 <div class="sourceCode" id="cb310"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb310-1"><a href="advanced-topics.html#cb310-1"></a><span class="co">// enable stats</span></span>
 <span id="cb310-2"><a href="advanced-topics.html#cb310-2"></a><span class="va">controller</span>.<span class="at">enableStats</span>()<span class="op">;</span></span></code></pre></div>
@@ -776,6 +782,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb322-10"><a href="advanced-topics.html#cb322-10"></a>  <span class="co"># gio does not work without data</span></span>
 <span id="cb322-11"><a href="advanced-topics.html#cb322-11"></a>  <span class="kw">expect_error</span>(<span class="kw">gio</span>())</span>
 <span id="cb322-12"><a href="advanced-topics.html#cb322-12"></a>})</span></code></pre></div>
+</div>
+<div id="performances" class="section level2 unnumbered" number="">
+<h2>Performances</h2>
+<p>A few hints have already been given to ensure one does not drain the browser, consider assessing the performances of the widget as it is being built. Always try and imagine what happens under the hood of the htmlwidget as you build it, it often reveals potential bottlenecks and solutions.</p>
+<p>Remember that data passed to <code>htmlwidgets::createWidget</code> is 1) loaded into R, 2) serialised to JSON, 3) embedded into the HTML output, 4) read back in with JavaScript, which adds some overhead considering it might be read into JavaScript directly. This will not be a problem for most visualisations but might become one when the data is large.</p>
+<p>Consider for instance GeoJSON encoded geographic features, these might not require being loaded into R (converted from JSON to an R data structure), to be re-serialised to JSON, only to be read in JavaScript.</p>
+<p>Also keep the previous remark in mind when repeatedly serialising data objects, again, GeoJSON can suffer from that. For instance, some GeoJSON encoded features used in multiple places in an application not only should not be loaded and serialised but doing so multiple times would be very inefficient. You might consider providing other ways to load such data.</p>
+<p>Below is a mock up function that could be used within the R markdown or shiny UI to load data bypassing any kind of serialisation. Note that in addition the function makes use of AJAX (Asynchronous JavaScript And XML) to asynchronously load the data, thereby further reducing load time.</p>
+<div class="sourceCode" id="cb323"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb323-1"><a href="advanced-topics.html#cb323-1"></a><span class="co"># this would placed in the shiny UI</span></span>
+<span id="cb323-2"><a href="advanced-topics.html#cb323-2"></a>load_json_from_ui &lt;-<span class="st"> </span><span class="cf">function</span>(json){</span>
+<span id="cb323-3"><a href="advanced-topics.html#cb323-3"></a>  script &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;</span></span>
+<span id="cb323-4"><a href="advanced-topics.html#cb323-4"></a><span class="st">    $.ajax({ </span></span>
+<span id="cb323-5"><a href="advanced-topics.html#cb323-5"></a><span class="st">        url: &#39;&quot;</span>, json, <span class="st">&quot;&#39;, </span></span>
+<span id="cb323-6"><a href="advanced-topics.html#cb323-6"></a><span class="st">        dataType: &#39;json&#39;, </span></span>
+<span id="cb323-7"><a href="advanced-topics.html#cb323-7"></a><span class="st">        async: true,</span></span>
+<span id="cb323-8"><a href="advanced-topics.html#cb323-8"></a><span class="st">        success: function(data){ </span></span>
+<span id="cb323-9"><a href="advanced-topics.html#cb323-9"></a><span class="st">          console.log(data);</span></span>
+<span id="cb323-10"><a href="advanced-topics.html#cb323-10"></a><span class="st">          window.globalData = data;</span></span>
+<span id="cb323-11"><a href="advanced-topics.html#cb323-11"></a><span class="st">        } </span></span>
+<span id="cb323-12"><a href="advanced-topics.html#cb323-12"></a><span class="st">      });&quot;</span></span>
+<span id="cb323-13"><a href="advanced-topics.html#cb323-13"></a>    )</span>
+<span id="cb323-14"><a href="advanced-topics.html#cb323-14"></a>  shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb323-15"><a href="advanced-topics.html#cb323-15"></a>    script</span>
+<span id="cb323-16"><a href="advanced-topics.html#cb323-16"></a>  )</span>
+<span id="cb323-17"><a href="advanced-topics.html#cb323-17"></a>}</span></code></pre></div>
+<p>Using the above the data loaded would be accessible from the htmlwidgets JavaScript (e.g.: <code>gio.js</code>) with <code>window.globalData</code>. The <code>window</code> object is akin to the <code>document</code> object, while the latter pertains to the Document Object Model (DOM) and represents the page, the former pertains to the Browser Object Model (BOM) and represents the browser window. So while <code>var x;</code> will only be accessible within that script as it’s placed in the document (DOM), <code>window.x</code> will accessible anywhere in that window (BOW) and thus anywhere in the document it contains.</p>
 
 </div>
 </div>
