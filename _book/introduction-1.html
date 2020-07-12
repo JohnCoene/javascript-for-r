@@ -366,13 +366,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="introduction-1" class="section level1" number="4">
 <h1><span class="header-section-number">Chapter 4</span> Introduction</h1>
-<p>Shiny is the web framework of choice for the R programming language. Since JavaScript and Shiny both run in web browsers it follows that they can run alongside one another as one can include JavaScript in such applications. Yet, often disregarded is the ability for Shiny’s R server to communicate to the front-end and vice versa. This collection of chapters aims to remedy to this. In this first part, we brush up on the essentials so we understand how to include JavaScript in shiny applications.</p>
+<p>Shiny is the web framework of choice for the R programming language. Since JavaScript and Shiny both run in web browsers it follows that they can run alongside one another as one can include JavaScript in such applications. Yet, often disregarded is the ability for Shiny’s R server to communicate to the front-end and vice versa. This collection of chapters aims to show precisely how this works. In this first part, we brush up on the essentials so we understand how to include JavaScript in shiny applications.</p>
 <p>Then again, the goal is not to write a lot of convoluted JavaScript, on the contrary, with little knowledge of the language the aim is to write as little as possible but demonstrate to the reader that it is often enough to greatly improve the user experience of shiny applications.</p>
 <div id="static-files" class="section level2 unnumbered" number="">
 <h2>Static Files</h2>
 <p>In order to introduce JavaScript to shiny applications one must understand static files and how they work with the framework. Static files are files that are downloaded by the clients, in this case web browsers accessing shiny applications, as-is, these generally include images, CSS (<code>.css</code>), and JavaScript (<code>.js</code>).</p>
-<p>If you are familiar with R package development, static files are to shiny applications what the “inst” directory is to an R package, those files are installed as-is and do not require further processing as opposed to the “src” folder which contains files that need compiling for instance.</p>
-<p>There are numerous ways to run a shiny application locally; the two most used probably are <code>shinyApp</code> and <code>runApp</code>. The RStudio IDE comes with a convenient “Run” button when writing a shiny application, which when clicked actually uses the function <code>shiny::runApp</code> in the background, this function looks for said static files in the <code>www</code> directory and makes them available at the same path (<code>/www</code>). If you are building your applications outside of RStudio, you should either also use <code>shiny::runApp</code> or specify the directory which then allows using <code>shiny::shinyApp</code>. Note that this only applies locally, shiny server (community and pro) as well as <a href="https://www.shinyapps.io/">shinyapps.io</a> use the same defaults as the RStudio IDE and <code>shiny::runApp</code>.</p>
+<p>If you are familiar with R packags it enablesge development, static files are to shiny applications what the “inst” directory is to an R package, those files are installed as-is and do not require further processing as opposed to the “src” folder which contains files that need compiling for instance.</p>
+<p>There are numerous functions to launch a shiny application locally; the two most used probably are <code>shinyApp</code> and <code>runApp</code>. The RStudio IDE comes with a convenient “Run” button when writing a shiny application, which when clicked actually uses the function <code>shiny::runApp</code> in the background, this function looks for said static files in the <code>www</code> directory and makes them available at the same path (<code>/www</code>). If you are building your applications outside of RStudio, you should either also use <code>shiny::runApp</code> or specify the directory which then allows using <code>shiny::shinyApp</code>. Note that this only applies locally, shiny server (community and pro) as well as <a href="https://www.shinyapps.io/">shinyapps.io</a> use the same defaults as the RStudio IDE and <code>shiny::runApp</code>.</p>
 <p>In order to ensure the code in this book can run regardless of the reader’s machine or editor, the asset directory is always specified explicitly. This is probably advised to steer clear of the potential headaches as, unlike the default, it’ll work regardless of the environment. If you are using <a href="https://thinkr-open.github.io/golem/">golem</a> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> to develop your application then you should not worry about this as it specifies the directory internally.</p>
 <p>Below we build a basic shiny application, however, before we define the ui and server we use the <code>shiny::addResourcePath</code> function to specify the location of the directory of static files that will be served by the server and thus accessible by the client. This function takes two arguments, first the <code>prefix</code>, which is the path (URL) at which the assets will be available, second the path to the directory of static assets.</p>
 <p>We thus create the “assets” directory and a JavaScript file called <code>script.js</code> within it.</p>
@@ -478,7 +478,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb140-2"><a href="introduction-1.html#cb140-2"></a>  <span class="co"># set the identifier to send-alert</span></span>
 <span id="cb140-3"><a href="introduction-1.html#cb140-3"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Hi there!&quot;</span>)</span>
 <span id="cb140-4"><a href="introduction-1.html#cb140-4"></a>}</span></code></pre></div>
-<p>This effectively sends the message to the JavaScript client but we are yet to use that message JavaScript-side so the application still displays the same alert on load. We can add a “handler” for the identifier we defined (<code>send-alert</code>) which will so something with the message we sent from the server. This is done with the <code>addCustomMessageHandler</code> method from the <code>Shiny</code> object where the first argument is the identifier and the second is the function that handles the message, generally a function that takes a single argument: the data sent from the server.</p>
+<p>This effectively sends the message to the JavaScript client but we are yet to use that message JavaScript-side so the application still displays the same alert on load. We can add a “handler” for the identifier we defined (<code>send-alert</code>) which will so something with the message we sent from the server. This is done with the <code>addCustomMessageHandler</code> method from the <code>Shiny</code> object where the first argument is the identifier and the second is the function that handles the message, a function that takes a single argument: the data sent from the server.</p>
 <div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="introduction-1.html#cb141-1"></a>tags<span class="op">$</span><span class="kw">script</span>(</span>
 <span id="cb141-2"><a href="introduction-1.html#cb141-2"></a>  <span class="st">&quot;Shiny.addCustomMessageHandler(type = &#39;send-alert&#39;, function(message) {</span></span>
 <span id="cb141-3"><a href="introduction-1.html#cb141-3"></a><span class="st">    alert(message);</span></span>
@@ -514,7 +514,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="from-javascript-to-r" class="section level2 unnumbered" number="">
 <h2>From JavaScript to R</h2>
 <p>Imagine if you will that instead of displaying a somewhat anodyne alert it was one that actually mattered where the user is warned that clicking “OK” will execute an irreversible action like the deletion of a record. In order to implement this the server would need to “know” whether the user has clicked said “OK” button. To do so one needs to pass data from the client to the server.</p>
-<p>This can be done by defining a new <em>simplified</em> shiny input. While one can define a fully-fledged shiny input that can be registered, updated, etc. there is also a simplified version of the latter which allows sending reactive input value to the server where it can be used just like any other inputs (<code>input$id</code>). The value of the input can be defined using the <code>setInputValue</code> method which takes the id of the input and the value to give it.</p>
+<p>This can be done by defining a <em>simplified</em> shiny input. While one can define a fully-fledged shiny inputs that can be registered, updated, etc. there is also a simplified version of the latter which allows sending reactive input values to the server where it can be used just like any other inputs (<code>input$id</code>). The value of the input can be defined using the <code>setInputValue</code> method which takes the id of the input and the value to give it.</p>
 <div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="introduction-1.html#cb143-1"></a>tags<span class="op">$</span><span class="kw">script</span>(</span>
 <span id="cb143-2"><a href="introduction-1.html#cb143-2"></a>  <span class="st">&quot;Shiny.addCustomMessageHandler(type = &#39;send-alert&#39;, function(message) {</span></span>
 <span id="cb143-3"><a href="introduction-1.html#cb143-3"></a><span class="st">    </span></span>
@@ -571,61 +571,67 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb145-20"><a href="introduction-1.html#cb145-20"></a>}</span>
 <span id="cb145-21"><a href="introduction-1.html#cb145-21"></a></span>
 <span id="cb145-22"><a href="introduction-1.html#cb145-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="deserialise" class="section level2 unnumbered" number="">
 <h2>Deserialise</h2>
 <p>In the section on sending data from R to JavaScript we used a “message handler” in JavaScript to handle the data coming from the server. There is also the corollary, an “input handler” to preprocess the data coming from JavaScript before it is made accessible by the input. In R, this is a function that must accept three arguments, the data coming JavaScript, a shiny session, and the name of the input. Note that all of these arguments are mandatory even if they are used in the function.</p>
-<p>Input handlers are most often used to reshape or change the type of the data coming in. To demonstrate how use them, we create a handler for the <code>delete_alert</code> which adds some admittedly useless meta information to the data.</p>
-<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="introduction-1.html#cb146-1"></a><span class="co"># create handler</span></span>
-<span id="cb146-2"><a href="introduction-1.html#cb146-2"></a>process_input &lt;-<span class="st"> </span><span class="cf">function</span>(x, session, inputname){</span>
-<span id="cb146-3"><a href="introduction-1.html#cb146-3"></a>  data &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb146-4"><a href="introduction-1.html#cb146-4"></a>    <span class="dt">data =</span> x,</span>
-<span id="cb146-5"><a href="introduction-1.html#cb146-5"></a>    <span class="dt">meta =</span> <span class="st">&quot;This is some meta-data&quot;</span></span>
-<span id="cb146-6"><a href="introduction-1.html#cb146-6"></a>  )</span>
-<span id="cb146-7"><a href="introduction-1.html#cb146-7"></a>  <span class="kw">return</span>(data)</span>
-<span id="cb146-8"><a href="introduction-1.html#cb146-8"></a>}</span></code></pre></div>
+<p>Input handlers are most often used to reshape or change the type of the data coming in. To demonstrate how use them, we create a handler for the <code>delete_alert</code> which adds somewhat useless meta information to the data.</p>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="introduction-1.html#cb147-1"></a><span class="co"># create handler</span></span>
+<span id="cb147-2"><a href="introduction-1.html#cb147-2"></a>process_input &lt;-<span class="st"> </span><span class="cf">function</span>(x, session, inputname){</span>
+<span id="cb147-3"><a href="introduction-1.html#cb147-3"></a>  data &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb147-4"><a href="introduction-1.html#cb147-4"></a>    <span class="dt">data =</span> x,</span>
+<span id="cb147-5"><a href="introduction-1.html#cb147-5"></a>    <span class="dt">meta =</span> <span class="st">&quot;This is some meta-data&quot;</span></span>
+<span id="cb147-6"><a href="introduction-1.html#cb147-6"></a>  )</span>
+<span id="cb147-7"><a href="introduction-1.html#cb147-7"></a>  <span class="kw">return</span>(data)</span>
+<span id="cb147-8"><a href="introduction-1.html#cb147-8"></a>}</span></code></pre></div>
 <p>Once this function created it needs to be registered with shiny using the <code>registerInputHandler</code> function which takes two arguments. First, a unique identifier for the handler, second, the handler function. Attempt to give the handler a unique yet simple name (alphanumeric characters, underscores, and periods) to avoid clashes with other handlers.</p>
-<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="introduction-1.html#cb147-1"></a><span class="co"># register with shiny</span></span>
-<span id="cb147-2"><a href="introduction-1.html#cb147-2"></a><span class="kw">registerInputHandler</span>(<span class="st">&quot;alert.processor&quot;</span>, process_input)</span></code></pre></div>
-<p>Note that handlers can only be registered once, running the above twice will fail the second time, even if the handler function has changed. Thus, the handler can be overwritten by setting <code>force</code> to <code>TRUE</code>.</p>
 <div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="introduction-1.html#cb148-1"></a><span class="co"># register with shiny</span></span>
-<span id="cb148-2"><a href="introduction-1.html#cb148-2"></a><span class="kw">registerInputHandler</span>(<span class="st">&quot;alert.processor&quot;</span>, process_input, <span class="dt">force =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<span id="cb148-2"><a href="introduction-1.html#cb148-2"></a><span class="kw">registerInputHandler</span>(<span class="st">&quot;alert.processor&quot;</span>, process_input)</span></code></pre></div>
+<p>Note that handlers can only be registered once, running the above twice will fail the second time, even if the handler function has changed. Thus, the handler can be overwritten by setting <code>force</code> to <code>TRUE</code>.</p>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="introduction-1.html#cb149-1"></a><span class="co"># register with shiny</span></span>
+<span id="cb149-2"><a href="introduction-1.html#cb149-2"></a><span class="kw">registerInputHandler</span>(<span class="st">&quot;alert.processor&quot;</span>, process_input, <span class="dt">force =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <p>Once the handler function created and registered with shiny what is left to do is tell shiny which input should use that handler. This is done by adding the name of the handler, <code>alert.processor</code>, preceded by a colon (<code>:alert.processor</code>) as a suffix to the input name.</p>
-<div class="sourceCode" id="cb149"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb149-1"><a href="introduction-1.html#cb149-1"></a><span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&#39;delete_alert:alert.processor&#39;</span><span class="op">,</span> <span class="kw">true</span><span class="op">,</span> <span class="op">{</span><span class="dt">priority</span><span class="op">:</span> <span class="st">&#39;event&#39;</span><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb150"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb150-1"><a href="introduction-1.html#cb150-1"></a><span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&#39;delete_alert:alert.processor&#39;</span><span class="op">,</span> <span class="kw">true</span><span class="op">,</span> <span class="op">{</span><span class="dt">priority</span><span class="op">:</span> <span class="st">&#39;event&#39;</span><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 <p>We can then recap to see what the application would look like now.</p>
-<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="introduction-1.html#cb150-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb150-2"><a href="introduction-1.html#cb150-2"></a></span>
-<span id="cb150-3"><a href="introduction-1.html#cb150-3"></a><span class="co"># create handler</span></span>
-<span id="cb150-4"><a href="introduction-1.html#cb150-4"></a>process_input &lt;-<span class="st"> </span><span class="cf">function</span>(x, session, inputname){</span>
-<span id="cb150-5"><a href="introduction-1.html#cb150-5"></a>  data &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb150-6"><a href="introduction-1.html#cb150-6"></a>    <span class="dt">data =</span> x,</span>
-<span id="cb150-7"><a href="introduction-1.html#cb150-7"></a>    <span class="dt">meta =</span> <span class="st">&quot;This is some meta-data&quot;</span></span>
-<span id="cb150-8"><a href="introduction-1.html#cb150-8"></a>  )</span>
-<span id="cb150-9"><a href="introduction-1.html#cb150-9"></a>  <span class="kw">return</span>(data)</span>
-<span id="cb150-10"><a href="introduction-1.html#cb150-10"></a>}</span>
-<span id="cb150-11"><a href="introduction-1.html#cb150-11"></a></span>
-<span id="cb150-12"><a href="introduction-1.html#cb150-12"></a><span class="co"># register with shiny</span></span>
-<span id="cb150-13"><a href="introduction-1.html#cb150-13"></a><span class="kw">registerInputHandler</span>(<span class="st">&quot;alert.processor&quot;</span>, process_input)</span>
-<span id="cb150-14"><a href="introduction-1.html#cb150-14"></a></span>
-<span id="cb150-15"><a href="introduction-1.html#cb150-15"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb150-16"><a href="introduction-1.html#cb150-16"></a>  tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb150-17"><a href="introduction-1.html#cb150-17"></a>    <span class="st">&quot;Shiny.addCustomMessageHandler(type = &#39;send-alert&#39;, function(message) {</span></span>
-<span id="cb150-18"><a href="introduction-1.html#cb150-18"></a><span class="st">      alert(message);</span></span>
-<span id="cb150-19"><a href="introduction-1.html#cb150-19"></a><span class="st">      Shiny.setInputValue(&#39;delete_alert:alert.processor&#39;, true, {priority: &#39;event&#39;});</span></span>
-<span id="cb150-20"><a href="introduction-1.html#cb150-20"></a><span class="st">    });&quot;</span></span>
-<span id="cb150-21"><a href="introduction-1.html#cb150-21"></a>  ),</span>
-<span id="cb150-22"><a href="introduction-1.html#cb150-22"></a>  <span class="kw">h1</span>(<span class="st">&quot;Hello&quot;</span>)</span>
-<span id="cb150-23"><a href="introduction-1.html#cb150-23"></a>)</span>
-<span id="cb150-24"><a href="introduction-1.html#cb150-24"></a></span>
-<span id="cb150-25"><a href="introduction-1.html#cb150-25"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb150-26"><a href="introduction-1.html#cb150-26"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Deleting a record!&quot;</span>)</span>
-<span id="cb150-27"><a href="introduction-1.html#cb150-27"></a></span>
-<span id="cb150-28"><a href="introduction-1.html#cb150-28"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>delete_alert, {</span>
-<span id="cb150-29"><a href="introduction-1.html#cb150-29"></a>    <span class="kw">print</span>(input<span class="op">$</span>delete_alert) </span>
-<span id="cb150-30"><a href="introduction-1.html#cb150-30"></a>  })</span>
-<span id="cb150-31"><a href="introduction-1.html#cb150-31"></a>}</span>
-<span id="cb150-32"><a href="introduction-1.html#cb150-32"></a></span>
-<span id="cb150-33"><a href="introduction-1.html#cb150-33"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="introduction-1.html#cb151-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb151-2"><a href="introduction-1.html#cb151-2"></a></span>
+<span id="cb151-3"><a href="introduction-1.html#cb151-3"></a><span class="co"># create handler</span></span>
+<span id="cb151-4"><a href="introduction-1.html#cb151-4"></a>process_input &lt;-<span class="st"> </span><span class="cf">function</span>(x, session, inputname){</span>
+<span id="cb151-5"><a href="introduction-1.html#cb151-5"></a>  data &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb151-6"><a href="introduction-1.html#cb151-6"></a>    <span class="dt">data =</span> x,</span>
+<span id="cb151-7"><a href="introduction-1.html#cb151-7"></a>    <span class="dt">meta =</span> <span class="st">&quot;This is some meta-data&quot;</span></span>
+<span id="cb151-8"><a href="introduction-1.html#cb151-8"></a>  )</span>
+<span id="cb151-9"><a href="introduction-1.html#cb151-9"></a>  <span class="kw">return</span>(data)</span>
+<span id="cb151-10"><a href="introduction-1.html#cb151-10"></a>}</span>
+<span id="cb151-11"><a href="introduction-1.html#cb151-11"></a></span>
+<span id="cb151-12"><a href="introduction-1.html#cb151-12"></a><span class="co"># register with shiny</span></span>
+<span id="cb151-13"><a href="introduction-1.html#cb151-13"></a><span class="kw">registerInputHandler</span>(<span class="st">&quot;alert.processor&quot;</span>, process_input)</span>
+<span id="cb151-14"><a href="introduction-1.html#cb151-14"></a></span>
+<span id="cb151-15"><a href="introduction-1.html#cb151-15"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb151-16"><a href="introduction-1.html#cb151-16"></a>  tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb151-17"><a href="introduction-1.html#cb151-17"></a>    <span class="st">&quot;Shiny.addCustomMessageHandler(type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb151-18"><a href="introduction-1.html#cb151-18"></a><span class="st">      alert(message);</span></span>
+<span id="cb151-19"><a href="introduction-1.html#cb151-19"></a><span class="st">      Shiny.setInputValue(&#39;delete_alert:alert.processor&#39;, true, {priority: &#39;event&#39;});</span></span>
+<span id="cb151-20"><a href="introduction-1.html#cb151-20"></a><span class="st">    });&quot;</span></span>
+<span id="cb151-21"><a href="introduction-1.html#cb151-21"></a>  ),</span>
+<span id="cb151-22"><a href="introduction-1.html#cb151-22"></a>  <span class="kw">h1</span>(<span class="st">&quot;Hello&quot;</span>)</span>
+<span id="cb151-23"><a href="introduction-1.html#cb151-23"></a>)</span>
+<span id="cb151-24"><a href="introduction-1.html#cb151-24"></a></span>
+<span id="cb151-25"><a href="introduction-1.html#cb151-25"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb151-26"><a href="introduction-1.html#cb151-26"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Deleting a record!&quot;</span>)</span>
+<span id="cb151-27"><a href="introduction-1.html#cb151-27"></a></span>
+<span id="cb151-28"><a href="introduction-1.html#cb151-28"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>delete_alert, {</span>
+<span id="cb151-29"><a href="introduction-1.html#cb151-29"></a>    <span class="kw">print</span>(input<span class="op">$</span>delete_alert) </span>
+<span id="cb151-30"><a href="introduction-1.html#cb151-30"></a>  })</span>
+<span id="cb151-31"><a href="introduction-1.html#cb151-31"></a>}</span>
+<span id="cb151-32"><a href="introduction-1.html#cb151-32"></a></span>
+<span id="cb151-33"><a href="introduction-1.html#cb151-33"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<pre><code>## $data
+## [1] TRUE
+## 
+## $meta
+## [1] &quot;This is some meta-data&quot;</code></pre>
 <p>The previous section on the input handler is entirely optional but as we will see in later parts of the book it can be nice touch in some cases.</p>
 
 </div>

@@ -1,6 +1,6 @@
 # Introduction
 
-Shiny is the web framework of choice for the R programming language. Since JavaScript and Shiny both run in web browsers it follows that they can run alongside one another as one can include JavaScript in such applications. Yet, often disregarded is the ability for Shiny's R server to communicate to the front-end and vice versa. This collection of chapters aims to remedy to this. In this first part, we brush up on the essentials so we understand how to include JavaScript in shiny applications.
+Shiny is the web framework of choice for the R programming language. Since JavaScript and Shiny both run in web browsers it follows that they can run alongside one another as one can include JavaScript in such applications. Yet, often disregarded is the ability for Shiny's R server to communicate to the front-end and vice versa. This collection of chapters aims to show precisely how this works. In this first part, we brush up on the essentials so we understand how to include JavaScript in shiny applications.
 
 Then again, the goal is not to write a lot of convoluted JavaScript, on the contrary, with little knowledge of the language the aim is to write as little as possible but demonstrate to the reader that it is often enough to greatly improve the user experience of shiny applications.
 
@@ -8,9 +8,9 @@ Then again, the goal is not to write a lot of convoluted JavaScript, on the cont
 
 In order to introduce JavaScript to shiny applications one must understand static files and how they work with the framework. Static files are files that are downloaded by the clients, in this case web browsers accessing shiny applications, as-is, these generally include images, CSS (`.css`), and JavaScript (`.js`).
 
-If you are familiar with R package development, static files are to shiny applications what the "inst" directory is to an R package, those files are installed as-is and do not require further processing as opposed to the "src" folder which contains files that need compiling for instance.
+If you are familiar with R packags it enablesge development, static files are to shiny applications what the "inst" directory is to an R package, those files are installed as-is and do not require further processing as opposed to the "src" folder which contains files that need compiling for instance.
 
-There are numerous ways to run a shiny application locally; the two most used probably are `shinyApp` and `runApp`. The RStudio IDE comes with a convenient "Run" button when writing a shiny application, which when clicked actually uses the function `shiny::runApp` in the background, this function looks for said static files in the `www` directory and makes them available at the same path (`/www`). If you are building your applications outside of RStudio, you should either also use `shiny::runApp` or specify the directory which then allows using `shiny::shinyApp`. Note that this only applies locally, shiny server (community and pro) as well as [shinyapps.io](https://www.shinyapps.io/) use the same defaults as the RStudio IDE and `shiny::runApp`.
+There are numerous functions to launch a shiny application locally; the two most used probably are `shinyApp` and `runApp`. The RStudio IDE comes with a convenient "Run" button when writing a shiny application, which when clicked actually uses the function `shiny::runApp` in the background, this function looks for said static files in the `www` directory and makes them available at the same path (`/www`). If you are building your applications outside of RStudio, you should either also use `shiny::runApp` or specify the directory which then allows using `shiny::shinyApp`. Note that this only applies locally, shiny server (community and pro) as well as [shinyapps.io](https://www.shinyapps.io/) use the same defaults as the RStudio IDE and `shiny::runApp`.
 
 In order to ensure the code in this book can run regardless of the reader's machine or editor, the asset directory is always specified explicitly. This is probably advised to steer clear of the potential headaches as, unlike the default, it'll work regardless of the environment. If you are using [golem](https://thinkr-open.github.io/golem/) [@R-golem] to develop your application then you should not worry about this as it specifies the directory internally.
 
@@ -158,7 +158,7 @@ server <- function(input, output, session){
 }
 ```
 
-This effectively sends the message to the JavaScript client but we are yet to use that message JavaScript-side so the application still displays the same alert on load. We can add a "handler" for the identifier we defined (`send-alert`) which will so something with the message we sent from the server. This is done with the `addCustomMessageHandler` method from the `Shiny` object where the first argument is the identifier and the second is the function that handles the message, generally a function that takes a single argument: the data sent from the server. 
+This effectively sends the message to the JavaScript client but we are yet to use that message JavaScript-side so the application still displays the same alert on load. We can add a "handler" for the identifier we defined (`send-alert`) which will so something with the message we sent from the server. This is done with the `addCustomMessageHandler` method from the `Shiny` object where the first argument is the identifier and the second is the function that handles the message, a function that takes a single argument: the data sent from the server. 
 
 ```r
 tags$script(
@@ -201,7 +201,7 @@ In the application above, notice the path that the message follows: it goes from
 
 Imagine if you will that instead of displaying a somewhat anodyne alert it was one that actually mattered where the user is warned that clicking "OK" will execute an irreversible action like the deletion of a record. In order to implement this the server would need to "know" whether the user has clicked said "OK" button. To do so one needs to pass data from the client to the server.
 
-This can be done by defining a new _simplified_ shiny input. While one can define a fully-fledged shiny input that can be registered, updated, etc. there is also a simplified version of the latter which allows sending reactive input value to the server where it can be used just like any other inputs (`input$id`). The value of the input can be defined using the `setInputValue` method which takes the id of the input and the value to give it.
+This can be done by defining a _simplified_ shiny input. While one can define a fully-fledged shiny inputs that can be registered, updated, etc. there is also a simplified version of the latter which allows sending reactive input values to the server where it can be used just like any other inputs (`input$id`). The value of the input can be defined using the `setInputValue` method which takes the id of the input and the value to give it.
 
 ```r
 tags$script(
@@ -270,11 +270,15 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
+```
+## [1] TRUE
+```
+
 ## Deserialise {-}
 
 In the section on sending data from R to JavaScript we used a "message handler" in JavaScript to handle the data coming from the server. There is also the corollary, an "input handler" to preprocess the data coming from JavaScript before it is made accessible by the input. In R, this is a function that must accept three arguments, the data coming JavaScript, a shiny session, and the name of the input. Note that all of these arguments are mandatory even if they are used in the function.
 
-Input handlers are most often used to reshape or change the type of the data coming in. To demonstrate how use them, we create a handler for the `delete_alert` which adds some admittedly useless meta information to the data.
+Input handlers are most often used to reshape or change the type of the data coming in. To demonstrate how use them, we create a handler for the `delete_alert` which adds somewhat useless meta information to the data.
 
 ```r
 # create handler
@@ -343,6 +347,14 @@ server <- function(input, output, session){
 }
 
 shinyApp(ui, server)
+```
+
+```
+## $data
+## [1] TRUE
+## 
+## $meta
+## [1] "This is some meta-data"
 ```
 
 The previous section on the input handler is entirely optional but as we will see in later parts of the book it can be nice touch in some cases.
