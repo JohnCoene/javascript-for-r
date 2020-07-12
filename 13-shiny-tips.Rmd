@@ -243,7 +243,7 @@ As an example, we could use jQuery's `show`, `hide`, or `toggle` functions to sh
 $('#id').toggle();
 ```
 
-Because jQuery is already imported there is no need to do so, on the contrary, it might cause clashes. Below we create a shiny application containing a message handler to toggle (switch between show hide element depending on state), this is triggered by a button.
+Because jQuery is already imported there is no need to do so, on the contrary, importing it again will impact load time and might clash with the pre-existing version. Below we create a shiny application containing a message handler to toggle (show or hide element depending on its state) at the click of a button.
 
 ```r
 library(shiny)
@@ -252,7 +252,7 @@ ui <- fluidPage(
   tags$head(
     tags$script(
       "Shiny.addCustomMessageHandler('jquery-toggle', function(id){
-        $('#' + id).toggle();
+        $('#' + id).toggle(); // id
       });"
     )
   ),
@@ -263,7 +263,36 @@ ui <- fluidPage(
 server <- function(input, output, session){
 
   observeEvent(input$toggle, {
-    session$sendCustomMessage('jquery-toggle', msg = "text")
+    session$sendCustomMessage('jquery-toggle', "text")
+  })
+
+}
+
+shinyApp(ui, server)
+```
+
+Note that jQuery takes a selector so one could very well use a class to hide and show multiple elements (with said class) at once.
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  tags$head(
+    tags$script(
+      "Shiny.addCustomMessageHandler('jquery-toggle', function(selector){
+        $(selector).toggle();
+      });"
+    )
+  ),
+  actionButton("toggle", "Toggle text"),
+  h1("This text is shown!", class = "to-toggle"),
+  actionButton("btn", "Another visible button", class = "to-toggle")
+)
+
+server <- function(input, output, session){
+
+  observeEvent(input$toggle, {
+    session$sendCustomMessage('jquery-toggle', ".to-toggle")
   })
 
 }

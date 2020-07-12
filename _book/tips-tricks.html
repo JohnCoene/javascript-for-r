@@ -334,6 +334,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="cookies.html"><a href="cookies.html#javascript-4"><i class="fa fa-check"></i>JavaScript</a></li>
 <li class="chapter" data-level="" data-path="cookies.html"><a href="cookies.html#r-code-2"><i class="fa fa-check"></i>R Code</a></li>
 </ul></li>
+<li class="part"><span><b>VI Closing Remarks</b></span></li>
+<li class="chapter" data-level="19" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>19</b> Conclusion</a>
+<ul>
+<li class="chapter" data-level="" data-path="conclusion.html"><a href="conclusion.html#performances"><i class="fa fa-check"></i>Performances</a></li>
+<li class="chapter" data-level="" data-path="conclusion.html"><a href="conclusion.html#road-ahead"><i class="fa fa-check"></i>Road ahead</a>
+<ul>
+<li class="chapter" data-level="" data-path="conclusion.html"><a href="conclusion.html#computation"><i class="fa fa-check"></i>Computation</a></li>
+<li class="chapter" data-level="" data-path="conclusion.html"><a href="conclusion.html#shiny-1"><i class="fa fa-check"></i>Shiny</a></li>
+<li class="chapter" data-level="" data-path="conclusion.html"><a href="conclusion.html#htmlwidgets-1"><i class="fa fa-check"></i>htmlwidgets</a></li>
+</ul></li>
+</ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 </ul>
 
@@ -558,14 +569,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>As an example, we could use jQuery’s <code>show</code>, <code>hide</code>, or <code>toggle</code> functions to show or hide an HTML element at the press of a button.</p>
 <div class="sourceCode" id="cb192"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb192-1"><a href="tips-tricks.html#cb192-1"></a><span class="co">// example of jQuery animation</span></span>
 <span id="cb192-2"><a href="tips-tricks.html#cb192-2"></a><span class="at">$</span>(<span class="st">&#39;#id&#39;</span>).<span class="at">toggle</span>()<span class="op">;</span></span></code></pre></div>
-<p>Because jQuery is already imported there is no need to do so, on the contrary, it might cause clashes. Below we create a shiny application containing a message handler to toggle (switch between show hide element depending on state), this is triggered by a button.</p>
+<p>Because jQuery is already imported there is no need to do so, on the contrary, importing it again will impact load time and might clash with the pre-existing version. Below we create a shiny application containing a message handler to toggle (show or hide element depending on its state) at the click of a button.</p>
 <div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="tips-tricks.html#cb193-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb193-2"><a href="tips-tricks.html#cb193-2"></a></span>
 <span id="cb193-3"><a href="tips-tricks.html#cb193-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
 <span id="cb193-4"><a href="tips-tricks.html#cb193-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
 <span id="cb193-5"><a href="tips-tricks.html#cb193-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
 <span id="cb193-6"><a href="tips-tricks.html#cb193-6"></a>      <span class="st">&quot;Shiny.addCustomMessageHandler(&#39;jquery-toggle&#39;, function(id){</span></span>
-<span id="cb193-7"><a href="tips-tricks.html#cb193-7"></a><span class="st">        $(&#39;#&#39; + id).toggle();</span></span>
+<span id="cb193-7"><a href="tips-tricks.html#cb193-7"></a><span class="st">        $(&#39;#&#39; + id).toggle(); // id</span></span>
 <span id="cb193-8"><a href="tips-tricks.html#cb193-8"></a><span class="st">      });&quot;</span></span>
 <span id="cb193-9"><a href="tips-tricks.html#cb193-9"></a>    )</span>
 <span id="cb193-10"><a href="tips-tricks.html#cb193-10"></a>  ),</span>
@@ -576,12 +587,37 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb193-15"><a href="tips-tricks.html#cb193-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
 <span id="cb193-16"><a href="tips-tricks.html#cb193-16"></a></span>
 <span id="cb193-17"><a href="tips-tricks.html#cb193-17"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>toggle, {</span>
-<span id="cb193-18"><a href="tips-tricks.html#cb193-18"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;jquery-toggle&#39;</span>, <span class="dt">msg =</span> <span class="st">&quot;text&quot;</span>)</span>
+<span id="cb193-18"><a href="tips-tricks.html#cb193-18"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;jquery-toggle&#39;</span>, <span class="st">&quot;text&quot;</span>)</span>
 <span id="cb193-19"><a href="tips-tricks.html#cb193-19"></a>  })</span>
 <span id="cb193-20"><a href="tips-tricks.html#cb193-20"></a></span>
 <span id="cb193-21"><a href="tips-tricks.html#cb193-21"></a>}</span>
 <span id="cb193-22"><a href="tips-tricks.html#cb193-22"></a></span>
 <span id="cb193-23"><a href="tips-tricks.html#cb193-23"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>Note that jQuery takes a selector so one could very well use a class to hide and show multiple elements (with said class) at once.</p>
+<div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb194-1"><a href="tips-tricks.html#cb194-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb194-2"><a href="tips-tricks.html#cb194-2"></a></span>
+<span id="cb194-3"><a href="tips-tricks.html#cb194-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb194-4"><a href="tips-tricks.html#cb194-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb194-5"><a href="tips-tricks.html#cb194-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb194-6"><a href="tips-tricks.html#cb194-6"></a>      <span class="st">&quot;Shiny.addCustomMessageHandler(&#39;jquery-toggle&#39;, function(selector){</span></span>
+<span id="cb194-7"><a href="tips-tricks.html#cb194-7"></a><span class="st">        $(selector).toggle();</span></span>
+<span id="cb194-8"><a href="tips-tricks.html#cb194-8"></a><span class="st">      });&quot;</span></span>
+<span id="cb194-9"><a href="tips-tricks.html#cb194-9"></a>    )</span>
+<span id="cb194-10"><a href="tips-tricks.html#cb194-10"></a>  ),</span>
+<span id="cb194-11"><a href="tips-tricks.html#cb194-11"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;toggle&quot;</span>, <span class="st">&quot;Toggle text&quot;</span>),</span>
+<span id="cb194-12"><a href="tips-tricks.html#cb194-12"></a>  <span class="kw">h1</span>(<span class="st">&quot;This text is shown!&quot;</span>, <span class="dt">class =</span> <span class="st">&quot;to-toggle&quot;</span>),</span>
+<span id="cb194-13"><a href="tips-tricks.html#cb194-13"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;btn&quot;</span>, <span class="st">&quot;Another visible button&quot;</span>, <span class="dt">class =</span> <span class="st">&quot;to-toggle&quot;</span>)</span>
+<span id="cb194-14"><a href="tips-tricks.html#cb194-14"></a>)</span>
+<span id="cb194-15"><a href="tips-tricks.html#cb194-15"></a></span>
+<span id="cb194-16"><a href="tips-tricks.html#cb194-16"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb194-17"><a href="tips-tricks.html#cb194-17"></a></span>
+<span id="cb194-18"><a href="tips-tricks.html#cb194-18"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>toggle, {</span>
+<span id="cb194-19"><a href="tips-tricks.html#cb194-19"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;jquery-toggle&#39;</span>, <span class="st">&quot;.to-toggle&quot;</span>)</span>
+<span id="cb194-20"><a href="tips-tricks.html#cb194-20"></a>  })</span>
+<span id="cb194-21"><a href="tips-tricks.html#cb194-21"></a></span>
+<span id="cb194-22"><a href="tips-tricks.html#cb194-22"></a>}</span>
+<span id="cb194-23"><a href="tips-tricks.html#cb194-23"></a></span>
+<span id="cb194-24"><a href="tips-tricks.html#cb194-24"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>This is something where, again, R is leveraged in order to make it easier on the shiny developer but it must be said that it suffers from some inefficiency: the message travels from the browser (button click) to the R server where it is sent back to the browser and triggers <code>toggle</code>. It could indeed very well be rewritten in JavaScript entirely, this is however outside the scope of this book.</p>
 
 </div>
