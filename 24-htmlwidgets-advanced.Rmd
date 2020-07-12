@@ -412,20 +412,20 @@ test_that("gio has correct data", {
 
 A few hints have already been given to ensure one does not drain the browser, consider assessing the performances of the widget as it is being built. Always try and imagine what happens under the hood of the htmlwidget as you build it, it often reveals potential bottlenecks and solutions.
 
-Remember that data passed to `htmlwidgets::createWidget` is 1) loaded into R, 2) serialised to JSON, 3) embedded into the HTML output, 4) read back in with JavaScript, which adds some overhead considering it might be read into JavaScript directly. This will not be a problem for most visualisations but might become one when that data is large. Indeed, there are sometimes shorter, more efficient, ways to load data into browser where it is needed for the visualisation.
+Remember that data passed to `htmlwidgets::createWidget` is 1) loaded into R, 2) serialised to JSON, 3) embedded into the HTML output, 4) read back in with JavaScript, which adds some overhead considering it might be read into JavaScript directly. This will not be a problem for most visualisations but might become one when that data is large. Indeed, there are sometimes shorter, more efficient ways to load data into browser where it is needed for the visualisation.
 
-Consider for instance GeoJSON encoded geographic features, these might not require being loaded into R (converted from JSON to an R data structure), only to be re-serialised to JSON before being read in JavaScript.
+Consider for instance geographic features (topoJSON and GeoJSON), why load them into R if it is to then re-serialise it to JSON?
 
-Also keep the previous remark in mind when repeatedly serialising data objects, GeoJSON is again a good example. Often, geographic features are not used once but multiple times within a web page (multiple maps); not only should that data not be loaded and serialised but doing so multiple times would be very inefficient given these geographic features do not change: consider providing other ways to for the developer to make that data accessible to the browser.
+Also keep the previous remark in mind when repeatedly serialising data objects, GeoJSON is again a good example. Often, geographic features are not used once but multiple times within a web page (multiple maps); this data should not be processed multiple multiple times: it would be inefficient given these geographic features do not change. Consider providing other ways to for the developer to make potentially large data files accessible to the browser.
 
-Below is an example of function that could be used within R markdown or shiny UI to load data in the front-end and bypass serialisation. Note that in addition the function makes use of AJAX (Asynchronous JavaScript And XML) to asynchronously load the data, thereby further reducing load time.
+Below is an example of function that could be used within R markdown or shiny UI to load data in the front-end and bypass serialisation. Additionally the function makes use of AJAX (Asynchronous JavaScript And XML) to asynchronously load the data, thereby further reducing load time.
 
 ```r
 # this would placed in the shiny UI
-load_json_from_ui <- function(json){
+load_json_from_ui <- function(path_to_json){
   script <- paste0("
     $.ajax({ 
-        url: '", json, "', 
+        url: '", path_to_json, "', 
         dataType: 'json', 
         async: true,
         success: function(data){ 
@@ -440,4 +440,4 @@ load_json_from_ui <- function(json){
 }
 ```
 
-Using the above the data loaded would be accessible from the htmlwidgets JavaScript (e.g.: `gio.js`) with `window.globalData`. The `window` object is akin to the `document` object, while the latter pertains to the Document Object Model (DOM) and represents the page, the former pertains to the Browser Object Model (BOM) and represents the browser window. So while `var x;` will only be accessible within that script as it's placed in the document (DOM), `window.x` will accessible anywhere in that window (BOW) and thus anywhere in the document it contains.
+Using the above the data loaded would be accessible from the htmlwidgets JavaScript (e.g.: `gio.js`) with `window.globalData`. The `window` object is akin to the `document` object, while the latter pertains to the Document Object Model (DOM) and represents the page, the former pertains to the Browser Object Model (BOM) and represents the browser window. While `var x;` will only be accessible within the script where it is declared, `window.x` will be accessible anywhere.

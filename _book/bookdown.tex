@@ -235,7 +235,9 @@ Importantly, the focus of the book truly is the integration of JavaScript with R
 \item
   A sizeable part of the book concerns data visualisation, it plunges into creating interactive outputs with the htmlwidgets and shiny packages. This opens with a brief overview of how it works and libraries that make great candidates to integrate with the htmlwidgets package. Then a first, admittedly unimpressive, widget is built to look under the hood and observe the inner-workings of such outputs in order to grasp a better understanding of how htmlwidgets work. Then a second package is built, one that allows to mimic text being typed. Next, we tackle a more substantial library that allows drawing arcs between countries on a 3D globe. The last two chapters go into more advanced topics such as security and resizing as well as how such interactive visualisations can work hand in hand with the shiny framework.
 \item
-  Finally the book closes with examples of all the integrations explored previously. This involves recreating (a part of) the plotly package, building an image classifier, adding progress bars to a shiny application, building an app with HTTP cookies and running basic machine learning operations in JavaScript.
+  Next the book closes with examples of all the integrations explored previously. This involves recreating (a part of) the plotly package, building an image classifier, adding progress bars to a shiny application, building an app with HTTP cookies and running basic machine learning operations in JavaScript.
+\item
+  Finally, the book concludes with some noteworthy remarks on where to go next.
 \end{enumerate}
 
 \hypertarget{disclaimer}{%
@@ -1056,7 +1058,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jul 12 2020 18:14:03 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Jul 12 2020 20:16:51 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -1066,7 +1068,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Jul 12 2020 18:14:03 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Jul 12 2020 20:16:51 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -5308,21 +5310,21 @@ The best way to write unit tests for htmlwidgets is to test the object created b
 
 A few hints have already been given to ensure one does not drain the browser, consider assessing the performances of the widget as it is being built. Always try and imagine what happens under the hood of the htmlwidget as you build it, it often reveals potential bottlenecks and solutions.
 
-Remember that data passed to \texttt{htmlwidgets::createWidget} is 1) loaded into R, 2) serialised to JSON, 3) embedded into the HTML output, 4) read back in with JavaScript, which adds some overhead considering it might be read into JavaScript directly. This will not be a problem for most visualisations but might become one when that data is large. Indeed, there are sometimes shorter, more efficient, ways to load data into browser where it is needed for the visualisation.
+Remember that data passed to \texttt{htmlwidgets::createWidget} is 1) loaded into R, 2) serialised to JSON, 3) embedded into the HTML output, 4) read back in with JavaScript, which adds some overhead considering it might be read into JavaScript directly. This will not be a problem for most visualisations but might become one when that data is large. Indeed, there are sometimes shorter, more efficient ways to load data into browser where it is needed for the visualisation.
 
-Consider for instance GeoJSON encoded geographic features, these might not require being loaded into R (converted from JSON to an R data structure), only to be re-serialised to JSON before being read in JavaScript.
+Consider for instance geographic features (topoJSON and GeoJSON), why load them into R if it is to then re-serialise it to JSON?
 
-Also keep the previous remark in mind when repeatedly serialising data objects, GeoJSON is again a good example. Often, geographic features are not used once but multiple times within a web page (multiple maps); not only should that data not be loaded and serialised but doing so multiple times would be very inefficient given these geographic features do not change: consider providing other ways to for the developer to make that data accessible to the browser.
+Also keep the previous remark in mind when repeatedly serialising data objects, GeoJSON is again a good example. Often, geographic features are not used once but multiple times within a web page (multiple maps); this data should not be processed multiple multiple times: it would be inefficient given these geographic features do not change. Consider providing other ways to for the developer to make potentially large data files accessible to the browser.
 
-Below is an example of function that could be used within R markdown or shiny UI to load data in the front-end and bypass serialisation. Note that in addition the function makes use of AJAX (Asynchronous JavaScript And XML) to asynchronously load the data, thereby further reducing load time.
+Below is an example of function that could be used within R markdown or shiny UI to load data in the front-end and bypass serialisation. Additionally the function makes use of AJAX (Asynchronous JavaScript And XML) to asynchronously load the data, thereby further reducing load time.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# this would placed in the shiny UI}
-\NormalTok{load\_json\_from\_ui <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(json)\{}
+\NormalTok{load\_json\_from\_ui <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(path\_to\_json)\{}
 \NormalTok{  script <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(}\StringTok{"}
 \StringTok{    $.ajax(\{ }
-\StringTok{        url: \textquotesingle{}"}\NormalTok{, json, }\StringTok{"\textquotesingle{}, }
+\StringTok{        url: \textquotesingle{}"}\NormalTok{, path\_to\_json, }\StringTok{"\textquotesingle{}, }
 \StringTok{        dataType: \textquotesingle{}json\textquotesingle{}, }
 \StringTok{        async: true,}
 \StringTok{        success: function(data)\{ }
@@ -5338,7 +5340,7 @@ Below is an example of function that could be used within R markdown or shiny UI
 \end{Highlighting}
 \end{Shaded}
 
-Using the above the data loaded would be accessible from the htmlwidgets JavaScript (e.g.: \texttt{gio.js}) with \texttt{window.globalData}. The \texttt{window} object is akin to the \texttt{document} object, while the latter pertains to the Document Object Model (DOM) and represents the page, the former pertains to the Browser Object Model (BOM) and represents the browser window. So while \texttt{var\ x;} will only be accessible within that script as it's placed in the document (DOM), \texttt{window.x} will accessible anywhere in that window (BOW) and thus anywhere in the document it contains.
+Using the above the data loaded would be accessible from the htmlwidgets JavaScript (e.g.: \texttt{gio.js}) with \texttt{window.globalData}. The \texttt{window} object is akin to the \texttt{document} object, while the latter pertains to the Document Object Model (DOM) and represents the page, the former pertains to the Browser Object Model (BOM) and represents the browser window. While \texttt{var\ x;} will only be accessible within the script where it is declared, \texttt{window.x} will be accessible anywhere.
 
 \hypertarget{working-with-shiny}{%
 \chapter{Working with Shiny}\label{working-with-shiny}}
@@ -7203,7 +7205,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] -46.06
+## [1] 44.18
 \end{verbatim}
 
 \begin{Shaded}
