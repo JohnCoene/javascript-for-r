@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-07-12" />
+<meta name="date" content="2020-07-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -216,7 +216,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="a-complete-integration.html"><a href="a-complete-integration.html#input-handler"><i class="fa fa-check"></i>Input Handler</a></li>
 <li class="chapter" data-level="" data-path="a-complete-integration.html"><a href="a-complete-integration.html#wrapping-up"><i class="fa fa-check"></i>Wrapping up</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="a-complete-integration.html"><a href="a-complete-integration.html#exercises"><i class="fa fa-check"></i>Exercises</a></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="tips-tricks.html"><a href="tips-tricks.html"><i class="fa fa-check"></i><b>6</b> Tips &amp; Tricks</a>
 <ul>
@@ -423,9 +422,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## ]</code></pre>
 <p>However this reveals a tedious cyclical loop: 1) creating an object in JavaScript to 2) run a function on the aforementioned object 3) get the results back in R, and repeat. So V8 also allows calling JavaScript functions on R objects directly with the <code>call</code> method and obtain the results back in R.</p>
 <div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="the-v8-engine.html#cb68-1"></a>engine<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;new Date();&quot;</span>) <span class="co"># using eval</span></span></code></pre></div>
-<pre><code>## [1] &quot;Sun Jul 12 2020 21:18:39 GMT+0200 (Central European Summer Time)&quot;</code></pre>
+<pre><code>## [1] &quot;Mon Jul 13 2020 12:16:47 GMT+0200 (Central European Summer Time)&quot;</code></pre>
 <div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="the-v8-engine.html#cb70-1"></a>engine<span class="op">$</span><span class="kw">call</span>(<span class="st">&quot;Date&quot;</span>, <span class="kw">Sys.Date</span>()) <span class="co"># using call</span></span></code></pre></div>
-<pre><code>## [1] &quot;Sun Jul 12 2020 21:18:39 GMT+0200 (Central European Summer Time)&quot;</code></pre>
+<pre><code>## [1] &quot;Mon Jul 13 2020 12:16:47 GMT+0200 (Central European Summer Time)&quot;</code></pre>
 <p>Finally, one can run code interactively rather than as strings by calling the console from the engine with <code>engine$console()</code> you can then exit the console by typing <code>exit</code> or hitting the <kbd>ESC</kbd> key.</p>
 </div>
 <div id="external-libraries" class="section level2 unnumbered" number="">
@@ -433,26 +432,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>V8 is actually quite bare in and of itself, there is for instance no functionalities built-in to read or write files from disk, it thus becomes truly interesting when you can use it JavaScript libraries. We’ll demonstrate this using <a href="https://fusejs.io/">fuse.js</a> a fuzzy-search library.</p>
 <p>The very first step of integrating any external library is to look at the code, often examples, to grasp an idea of what is to be achieved from R. Below is an example from the official documentation. First, an array of two <code>books</code> is defined, this is later used to test the search. Then another array of options is defined, this should at the very least include the key(s) that should be searched, here it is set to search through the title and authors. Then, the fuse object is initialised based on the array of books and the options. Finally, the <code>search</code> method is used to retrieve all books, the title or author of which, partially match the term <code>tion</code>.</p>
 <div class="sourceCode" id="cb72"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb72-1"><a href="the-v8-engine.html#cb72-1"></a><span class="co">// books to search through</span></span>
-<span id="cb72-2"><a href="the-v8-engine.html#cb72-2"></a><span class="kw">var</span> books <span class="op">=</span> [<span class="op">{</span></span>
+<span id="cb72-2"><a href="the-v8-engine.html#cb72-2"></a><span class="kw">var</span> books <span class="op">=</span> [{</span>
 <span id="cb72-3"><a href="the-v8-engine.html#cb72-3"></a>  <span class="st">&#39;ISBN&#39;</span><span class="op">:</span> <span class="st">&#39;A&#39;</span><span class="op">,</span></span>
 <span id="cb72-4"><a href="the-v8-engine.html#cb72-4"></a>  <span class="st">&#39;title&#39;</span><span class="op">:</span> <span class="st">&quot;Old Man&#39;s War&quot;</span><span class="op">,</span></span>
 <span id="cb72-5"><a href="the-v8-engine.html#cb72-5"></a>  <span class="st">&#39;author&#39;</span><span class="op">:</span> <span class="st">&#39;John Scalzi&#39;</span></span>
-<span id="cb72-6"><a href="the-v8-engine.html#cb72-6"></a><span class="op">},</span> <span class="op">{</span></span>
+<span id="cb72-6"><a href="the-v8-engine.html#cb72-6"></a>}<span class="op">,</span> {</span>
 <span id="cb72-7"><a href="the-v8-engine.html#cb72-7"></a>  <span class="st">&#39;ISBN&#39;</span><span class="op">:</span> <span class="st">&#39;B&#39;</span><span class="op">,</span></span>
 <span id="cb72-8"><a href="the-v8-engine.html#cb72-8"></a>  <span class="st">&#39;title&#39;</span><span class="op">:</span> <span class="st">&#39;The Lock Artist&#39;</span><span class="op">,</span></span>
 <span id="cb72-9"><a href="the-v8-engine.html#cb72-9"></a>  <span class="st">&#39;author&#39;</span><span class="op">:</span> <span class="st">&#39;Steve Hamilton&#39;</span></span>
-<span id="cb72-10"><a href="the-v8-engine.html#cb72-10"></a><span class="op">}</span>]</span>
+<span id="cb72-10"><a href="the-v8-engine.html#cb72-10"></a>}]</span>
 <span id="cb72-11"><a href="the-v8-engine.html#cb72-11"></a></span>
-<span id="cb72-12"><a href="the-v8-engine.html#cb72-12"></a><span class="kw">const</span> options <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb72-12"><a href="the-v8-engine.html#cb72-12"></a><span class="kw">const</span> options <span class="op">=</span> {</span>
 <span id="cb72-13"><a href="the-v8-engine.html#cb72-13"></a>  <span class="co">// Search in `author` and in `title` array</span></span>
 <span id="cb72-14"><a href="the-v8-engine.html#cb72-14"></a>  <span class="dt">keys</span><span class="op">:</span> [<span class="st">&#39;author&#39;</span><span class="op">,</span> <span class="st">&#39;title&#39;</span>]</span>
-<span id="cb72-15"><a href="the-v8-engine.html#cb72-15"></a><span class="op">}</span></span>
+<span id="cb72-15"><a href="the-v8-engine.html#cb72-15"></a>}</span>
 <span id="cb72-16"><a href="the-v8-engine.html#cb72-16"></a></span>
 <span id="cb72-17"><a href="the-v8-engine.html#cb72-17"></a><span class="co">// initialise</span></span>
-<span id="cb72-18"><a href="the-v8-engine.html#cb72-18"></a><span class="kw">const</span> fuse <span class="op">=</span> <span class="kw">new</span> <span class="at">Fuse</span>(books<span class="op">,</span> options)</span>
+<span id="cb72-18"><a href="the-v8-engine.html#cb72-18"></a><span class="kw">const</span> fuse <span class="op">=</span> <span class="kw">new</span> Fuse(books<span class="op">,</span> options)</span>
 <span id="cb72-19"><a href="the-v8-engine.html#cb72-19"></a></span>
 <span id="cb72-20"><a href="the-v8-engine.html#cb72-20"></a><span class="co">// search &#39;tion&#39; in authors and titles</span></span>
-<span id="cb72-21"><a href="the-v8-engine.html#cb72-21"></a><span class="kw">const</span> result <span class="op">=</span> <span class="va">fuse</span>.<span class="at">search</span>(<span class="st">&#39;tion&#39;</span>)</span></code></pre></div>
+<span id="cb72-21"><a href="the-v8-engine.html#cb72-21"></a><span class="kw">const</span> result <span class="op">=</span> fuse<span class="op">.</span><span class="fu">search</span>(<span class="st">&#39;tion&#39;</span>)</span></code></pre></div>
 <p>With some understanding of what is to be reproduced in R we can import the library with the <code>source</code> method which takes a <code>file</code> argument that will accept a path or URL to a JavaScript file to source, below we use the handy CDN (Content Delivery Network) so as to avoid downloading a file.</p>
 <div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="the-v8-engine.html#cb73-1"></a>engine<span class="op">$</span><span class="kw">source</span>(<span class="st">&quot;https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.4.6/fuse.min.js&quot;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;true&quot;</code></pre>
@@ -498,10 +497,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## ]</code></pre>
 <p>Now we can define options for the search, we don’t get into the details of fuse.js here as this is not the purpose of this book, you can read more about the options in the <a href="https://fusejs.io/#Examples">examples section</a> of the site. We can mimic the format of the JSON options shown on the website with a simple list and assign that to a new variable in the engine. Note that we wrap the title in a <code>list</code> to ensure it is converted to an array of length 1: <code>list("title")</code> should be converted to a <code>["title"]</code> array and not a <code>"title"</code> scalar.</p>
 <div class="sourceCode" id="cb79"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb79-1"><a href="the-v8-engine.html#cb79-1"></a><span class="co">// JavaScript</span></span>
-<span id="cb79-2"><a href="the-v8-engine.html#cb79-2"></a><span class="kw">var</span> options <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb79-2"><a href="the-v8-engine.html#cb79-2"></a><span class="kw">var</span> options <span class="op">=</span> {</span>
 <span id="cb79-3"><a href="the-v8-engine.html#cb79-3"></a>  <span class="dt">keys</span><span class="op">:</span> [<span class="st">&#39;title&#39;</span>]<span class="op">,</span></span>
 <span id="cb79-4"><a href="the-v8-engine.html#cb79-4"></a>  <span class="dt">id</span><span class="op">:</span> <span class="st">&#39;id&#39;</span></span>
-<span id="cb79-5"><a href="the-v8-engine.html#cb79-5"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb79-5"><a href="the-v8-engine.html#cb79-5"></a>}</span></code></pre></div>
 <div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="the-v8-engine.html#cb80-1"></a><span class="co"># R</span></span>
 <span id="cb80-2"><a href="the-v8-engine.html#cb80-2"></a>options &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
 <span id="cb80-3"><a href="the-v8-engine.html#cb80-3"></a>  <span class="dt">keys =</span> <span class="kw">list</span>(<span class="st">&quot;title&quot;</span>),</span>
