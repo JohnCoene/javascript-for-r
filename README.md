@@ -1,6 +1,8 @@
 # R and JavaScript
 
-To build the book.
+Code for the [JavaScript for R](https://javascript-for-r.com/) book.
+
+# Rebuild
 
 ```bash
 # install packages
