@@ -301,38 +301,3 @@ shinyApp(ui, server)
 ```
 
 This is something where, again, R is leveraged in order to make it easier on the shiny developer but it must be said that it suffers from some inefficiency: the message travels from the browser (button click) to the R server where it is sent back to the browser and triggers `toggle`. It could indeed very well be rewritten in JavaScript entirely, this is however outside the scope of this book.
-
-## JQuery - Events {-}
-
-The Document Object Model comes with events out of the box, though here we use the [convenient API](https://api.jquery.com/category/events/) provided by jQuery. 
-
-```r
-library(shiny)
-
-script <- "$('#hoverMe').hover(function(){
-  console.log(true);
-  Shiny.setInputValue('hovered', true);
-})"
-
-ui <- fluidPage(
-  h3("Hover the icon below for info."),
-  span(
-    id = "hoverMe",
-    icon("info")
-  ),
-  uiOutput("info"),
-  tags$script(script)
-)
-
-server <- function(input, output) {
-
-  output$info <- renderUI({
-    if(is.null(input$hovered)) 
-      return()
-    p("This is some information")
-  })
-
-}
-
-shinyApp(ui, server)
-```
