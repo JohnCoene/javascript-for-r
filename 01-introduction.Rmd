@@ -167,7 +167,7 @@ print_file <- function(){
 
 It's not done just yet. Let's demonstrate why: it allows introducing devtools. We can install the "test" package we created with `devtools::install()`, afterwards we would expect to be able to run the `print_file` function from the package test but doing so returns the following error: `could not find function "print_file"`. This is because we have not explicitly "exported" the function, by default functions and objects declared in `.R` files (in packages) can only be used internally (within the package itself). In order to export it we need another package called roxygen2, it allows writing the documentation in the `.R` file rather than have to create a separate `.Rd` file, a lifesaver. Note that roxygen2 should already be installed as it is a dependency of devtools. Using said documentation we can specify which function should be exported with a "tag".
 
-Tags are preceded by `#' @`, there are plenty of them, we don't explore any other here.
+Tags are preceded by a special comment `#'` and the tags themselves are defined with `@`, there are plenty of them, we don't explore any other in this book.
 
 ```r
 #' @export
@@ -179,12 +179,10 @@ print_file <- function(){
 }
 ```
 
-Now one can run `devtools::document()` to generate the documentation of the package (the `.Rd` files) using the export tag we added: this exports the function. Then we can run `devtools::install()` to build and install the package.
+Now one can run `devtools::document()` to generate the documentation of the package (the `.Rd` files) using the export tag we added: this exports the function by adding `export(print_file)` to the `NAMESPACE` file, which you should not edit yourself. Then we can run `devtools::install()` to build and install the package.
 
-```r
+```{r}
 test::print_file()
-## ℹ JavaScript code below.
-## [1] "var x = 3;"
 ```
 
 Finally, the cyclical nature of building packages substitute `devtools::install()` with `devtools::load_all()`, the latter does not install the package and simply loads all the functions and objects of the package in the environment, this is much faster than installing it.
@@ -198,7 +196,7 @@ Note the package we built is good enough for your own machine but won't pass CRA
 
 ### JSON {-}
 
-JSON (JavaScript Object Notation) is a very popular data _interchange_ format with which we will work extensively throughout this book, it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together it is essential that we have a data format that can be understood by both---JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the [jsonlite package](https://CRAN.R-project.org/package=jsonlite) [@R-jsonlite], in fact it is the serialiser used internally by all of the methods detailed in the previous section.
+JSON (JavaScript Object Notation) is a very popular data _interchange_ format with which we will work extensively throughout this book, it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together it is essential that we have a data format that can be understood by both---JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the [jsonlite package](https://CRAN.R-project.org/package=jsonlite) [@R-jsonlite], in fact it is the serialiser used internally by all the packages we shall explore in this book.
 
 JSON is to all intents and purposes the equivalent of lists in R; a flexible data format that can store pretty much anything. Below we create a nested list and convert it to JSON with the help of jsonlite, we set `pretty` to `TRUE` to add indentation for clearer printing but this is an argument you should omit when writing production code, it will reduce the file size (fewer spaces = smaller file size). 
 
@@ -295,6 +293,8 @@ console.log("hello JavaScript") // bad
 console.log("hello JavaScript"); // good
 ```
 
+![Printing to the console](images/javascript-intro.png)
+
 Another difference is that variables must be declared with keywords such as `var` or `const` to declare a constant.
 
 ```js
@@ -328,7 +328,7 @@ The above R code can be re-written in JavaScript. Note the slight variation in t
 var x = 1;
 
 function foo(){
-  console.log(x); 
+  console.log(x); // print to console
 }
 
 foo();
@@ -353,7 +353,7 @@ The JavaScript code below grabs the element where `id='content'` from the `docum
 </html>
 ```
 
-One final thing to note for future reference, though not limited to the ids or classes most such selection of elements from the DOM are done with those where the pound sign refers to an element's id (`#id`) and a dot refers to an element's class (`.class`).
+One final thing to note for future reference, though not limited to the ids or classes most such selection of elements from the DOM are done with those where the pound sign refers to an element's id (`#id`) and a dot refers to an element's class (`.class`), just like in CSS.
 
 ```html
  <!–– index.html ––>
@@ -376,6 +376,14 @@ One final thing to note for future reference, though not limited to the ids or c
 </html>
 ```
 
+Getting elements from the DOM is a very common operation in JavaScript. While a class can be applied to multiple elements which is useful to get and apply actions to multiple elements, the id attribute must be unique (no two elements can bear the same id in the HTML document) is useful to retrieve a specific element. 
+
+Interestingly some of that mechanism is used by shiny to retrieve and manipulate inputs, the argument `inputId` of shiny inputs effectively define the HTML `id` attribute of said input. Shiny can then internally make use of functions the likes of `getElementById` in order to get those inputs, set or update their values, etc.
+
+```{r}
+shiny::actionButton(inputId = "theId", label = "the label") 
+```
+
 This of course only scratches the surface of JavaScript thus this provides ample understanding of the language to keep up with the next chapters. Also, a somewhat interesting fact that will prove useful later in the book: the RStudio IDE is actually a browser, therefore, in the IDE, one can right-click and "inspect element" to view the rendered source code.
 
 ## Methods {-}
@@ -386,7 +394,7 @@ Let's list the methods available to us to blend JavaScript with R before coverin
 
 ### V8 {-}
 
-[V8](https://github.com/jeroen/v8) by Jeroen Ooms is an R interface to Google's JavaScript engine. It will let you run JavaScript code directly from R and get the result back, it even comes with an interactive console. This is the way the lawn package used in a previous example internally calls turf.js.
+[V8](https://github.com/jeroen/v8) by Jeroen Ooms is an R interface to Google's JavaScript engine. It will let you run JavaScript code directly from R and get the result back, it even comes with an interactive console. This is the way the lawn package used in a previous example internally interfaces with the turf.js library.
 
 ```{r}
 library(V8)
@@ -404,7 +412,7 @@ It is by far the most popular integration out there, at the time of writing this
 
 ### Shiny {-}
 
-The Shiny framework allows creating applications accessible from web browsers where JavaScript natively runs, it follows that JavaScript can run _alongside_ such applications. Often overlooked though, the two can also work _hand-in-hand_ as one can pass data from the R server to the JavaScript front-end and vice versa. Some form of that tends to be included in htmlwidgets so one can pick up server-side which point on a scatter plot was clicked for instance.
+The Shiny framework allows creating applications accessible from web browsers where JavaScript natively runs, it follows that JavaScript can run _alongside_ such applications. Often overlooked though, the two can also work _hand-in-hand_ as one can pass data from the R server to the JavaScript front-end and vice versa. This is how the package waiter mentioned previously internally works with R.
 
 ### bubble {-}
 
