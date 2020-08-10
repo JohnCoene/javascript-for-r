@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-08-08" />
+<meta name="date" content="2020-08-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -184,9 +184,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#r-code"><i class="fa fa-check"></i>R code</a></li>
 <li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#documentation"><i class="fa fa-check"></i>Documentation</a></li>
 <li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#installed-files"><i class="fa fa-check"></i>Installed files</a></li>
-<li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#build-load-and-install"><i class="fa fa-check"></i>Build, Load, and Install</a></li>
+<li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#build-load-and-install"><i class="fa fa-check"></i>Build, load, and install</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#json"><i class="fa fa-check"></i>JSON</a></li>
+<li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#json"><i class="fa fa-check"></i>JSON</a>
+<ul>
+<li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#serialising"><i class="fa fa-check"></i>Serialising</a></li>
+<li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#tabular-data"><i class="fa fa-check"></i>Tabular data</a></li>
+</ul></li>
 <li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#javascript"><i class="fa fa-check"></i>JavaScript</a>
 <ul>
 <li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#developer-tools"><i class="fa fa-check"></i>Developer tools</a></li>
@@ -443,7 +447,7 @@ RoxygenNote: 7.1.1.9000</code></pre>
 <span id="cb15-4"><a href="prerequisites.html#cb15-4"></a>}</span></code></pre></div>
 <div class="note">
 <p>
-Note that the function is preceded by its namespace with <code>::</code>, more on this later.
+Note that the function is preceded by its namespace with <code>::</code> (more on this later).
 </p>
 </div>
 <p>The <code>DESCRIPTION</code> file does this, it will make sure that the dependencies of the package are met by users who install it. We can specify such dependencies under <code>Imports</code> where we can list packages required separated by a comma.</p>
@@ -528,7 +532,7 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 <span id="cb23-2"><a href="prerequisites.html#cb23-2"></a>path &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;dependency.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;myPackage&quot;</span>)</span></code></pre></div>
 </div>
 <div id="build-load-and-install" class="section level3 unnumbered" number="">
-<h3>Build, Load, and Install</h3>
+<h3>Build, load, and install</h3>
 <p>Finally, after generating the documentation of the package with <code>devtools::document()</code> one can install it locally with <code>devtools::install()</code>. This however can take a few seconds too many whilst developing a package as one iterates and regularly tries things; <code>devtools::load_all()</code> will not install the package but load all the functions and object in the global environment to let you run them.</p>
 <p>There is some cyclical nature to developing packages:</p>
 <ol style="list-style-type: decimal">
@@ -543,6 +547,13 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 <div id="json" class="section level2 unnumbered" number="">
 <h2>JSON</h2>
 <p>JSON (JavaScript Object Notation) is a very popular data <em>interchange</em> format with which we will work extensively throughout this book, it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together it is essential that we have a data format that can be understood by both—JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the <a href="https://CRAN.R-project.org/package=jsonlite">jsonlite package</a> <span class="citation">(Ooms <a href="#ref-R-jsonlite" role="doc-biblioref">2020</a>)</span>, in fact it is the serialiser used internally by all the packages we shall explore in this book.</p>
+<div class="note">
+<p>
+“To serialise” is just jargon for converting data to JSON.
+</p>
+</div>
+<div id="serialising" class="section level3 unnumbered" number="">
+<h3>Serialising</h3>
 <p>JSON is to all intents and purposes the equivalent of lists in R; a flexible data format that can store pretty much anything–expect data.frames a structure that does not exist in JavaScript. Below we create a nested list and convert it to JSON with the help of jsonlite, we set <code>pretty</code> to <code>TRUE</code> to add indentation for clearer printing but this is an argument you should omit when writing production code, it will reduce the file size (fewer spaces = smaller file size).</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="prerequisites.html#cb24-1"></a><span class="co"># install.packages(&quot;jsonlite&quot;)</span></span>
 <span id="cb24-2"><a href="prerequisites.html#cb24-2"></a><span class="kw">library</span>(jsonlite)</span>
@@ -579,6 +590,9 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 ##   &quot;d&quot;: [1, 2, 3, 4, 5]
 ## }</code></pre>
 <p>As demonstrated above the vector of length one was “unboxed” into an integer, with <code>auto_unbox</code> set to <code>TRUE</code> jsonlite will properly convert such vectors into their appropriate type; integer, numeric, boolean, etc. Note that this only applies to vectors, lists of length one will be serialised to arrays of length one even with <code>auto_unbox</code> turned on: <code>list("hello")</code> will always be converted to <code>["hello"]</code>.</p>
+</div>
+<div id="tabular-data" class="section level3 unnumbered" number="">
+<h3>Tabular data</h3>
 <p>If JSON is more or less the equivalent of lists in R one might wonder how jsonlite handles dataframes since they do not exist in JavaScript.</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="prerequisites.html#cb32-1"></a><span class="co"># subset of built-in dataset</span></span>
 <span id="cb32-2"><a href="prerequisites.html#cb32-2"></a>df &lt;-<span class="st"> </span>cars[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</span>
@@ -594,7 +608,12 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 ##     &quot;dist&quot;: 10
 ##   }
 ## ]</code></pre>
-<p>What jsonlite does internally is essentially turn the data.frame into a list <em>rowwise</em> to produce a sub-list for every row then it serialises to JSON. This is generally how rectangular data is represented in lists, for instance, <code>purrr::transpose</code> does the same. We can reproduce this with the snippet below, we remove row names and use apply to turn every row into a list.</p>
+<p>What jsonlite does internally is essentially turn the data.frame into a list <em>rowwise</em> to produce a sub-list for every row then it serialises to JSON. This is generally how rectangular data is represented in lists, for instance, <code>purrr::transpose</code> does the same. Another great example is to use <code>console.table</code> in the JavaScript console (more on that later) to display the table JSON as a table.</p>
+<div class="figure">
+<img src="images/console-table.png" alt="" />
+<p class="caption">console.table output</p>
+</div>
+<p>We can reproduce this with the snippet below, we remove row names and use apply to turn every row into a list.</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="prerequisites.html#cb34-1"></a><span class="kw">row.names</span>(df) &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
 <span id="cb34-2"><a href="prerequisites.html#cb34-2"></a>df_list &lt;-<span class="st"> </span><span class="kw">apply</span>(df, <span class="dv">1</span>, as.list)</span>
 <span id="cb34-3"><a href="prerequisites.html#cb34-3"></a></span>
@@ -625,6 +644,7 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 ## 2     4   10</code></pre>
 <p>Jsonlite provides many more options and functions that will let you tune how JSON data is read and written. Also, the jsonlite package does far more than what we detailed in this section but at this juncture this is an adequate understanding of things.</p>
 </div>
+</div>
 <div id="javascript" class="section level2 unnumbered" number="">
 <h2>JavaScript</h2>
 <p>The book is not meant to teach one JavaScript, only to show how graciously it can work with R. Let us thus go through the very basics to ensure we know enough to get started with the coming chapters.</p>
@@ -641,6 +661,7 @@ The RStudio IDE is built on Chromium, some of these tools will therefore also wo
 <img src="images/devtools.png" alt="" />
 <p class="caption">Google Chrome Devtools</p>
 </div>
+<p>The developer tools pane consists of several tabs.</p>
 </div>
 <div id="variable-declaration" class="section level3 unnumbered" number="">
 <h3>Variable declaration</h3>

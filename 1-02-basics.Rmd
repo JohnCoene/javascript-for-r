@@ -84,7 +84,7 @@ string_length <- function(string) {
 ```
 
 ```{block, type='note'}
-Note that the function is preceded by its namespace with `::`, more on this later.
+Note that the function is preceded by its namespace with `::` (more on this later).
 ```
 
 The `DESCRIPTION` file does this, it will make sure that the dependencies of the package are met by users who install it. We can specify such dependencies under `Imports` where we can list packages required separated by a comma.
@@ -200,7 +200,7 @@ Here we tackle the topic of installed files as it will be relevant to much of wh
 path <- system.file("dependency.js", package = "myPackage")
 ```
 
-### Build, Load, and Install {-}
+### Build, load, and install {-}
 
 Finally, after generating the documentation of the package with `devtools::document()` one can install it locally with `devtools::install()`. This however can take a few seconds too many whilst developing a package as one iterates and regularly tries things; `devtools::load_all()` will not install the package but load all the functions and object in the global environment to let you run them.
 
@@ -216,6 +216,12 @@ Note whilst this short guide will help you develop packages good enough for your
 ## JSON {-}
 
 JSON (JavaScript Object Notation) is a very popular data _interchange_ format with which we will work extensively throughout this book, it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together it is essential that we have a data format that can be understood by both---JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the [jsonlite package](https://CRAN.R-project.org/package=jsonlite) [@R-jsonlite], in fact it is the serialiser used internally by all the packages we shall explore in this book.
+
+```{block, type='note'}
+"To serialise" is just jargon for converting data to JSON.
+```
+
+### Serialising {-}
 
 JSON is to all intents and purposes the equivalent of lists in R; a flexible data format that can store pretty much anything--expect data.frames a structure that does not exist in JavaScript. Below we create a nested list and convert it to JSON with the help of jsonlite, we set `pretty` to `TRUE` to add indentation for clearer printing but this is an argument you should omit when writing production code, it will reduce the file size (fewer spaces = smaller file size). 
 
@@ -250,6 +256,8 @@ toJSON(lst, pretty = TRUE, auto_unbox = TRUE)
 
 As demonstrated above the vector of length one was "unboxed" into an integer, with `auto_unbox` set to `TRUE` jsonlite will properly convert such vectors into their appropriate type; integer, numeric, boolean, etc. Note that this only applies to vectors, lists of length one will be serialised to arrays of length one even with `auto_unbox` turned on: `list("hello")` will always be converted to `["hello"]`.
 
+### Tabular data {-}
+
 If JSON is more or less the equivalent of lists in R one might wonder how jsonlite handles dataframes since they do not exist in JavaScript.
 
 ```{r}
@@ -259,7 +267,11 @@ df <- cars[1:2, ]
 toJSON(df, pretty = TRUE)
 ```
 
-What jsonlite does internally is essentially turn the data.frame into a list _rowwise_ to produce a sub-list for every row then it serialises to JSON. This is generally how rectangular data is represented in lists, for instance, `purrr::transpose` does the same. We can reproduce this with the snippet below, we remove row names and use apply to turn every row into a list.
+What jsonlite does internally is essentially turn the data.frame into a list _rowwise_ to produce a sub-list for every row then it serialises to JSON. This is generally how rectangular data is represented in lists, for instance, `purrr::transpose` does the same. Another great example is to use `console.table` in the JavaScript console (more on that later) to display the table JSON as a table.
+
+![console.table output](images/console-table.png)
+
+We can reproduce this with the snippet below, we remove row names and use apply to turn every row into a list.
 
 ```{r}
 row.names(df) <- NULL
@@ -301,7 +313,46 @@ The easiest way to access the developer the developer tools from the browser is 
 
 ![Google Chrome Devtools](images/devtools.png)
 
-### Variable declaration {-}
+The developer tools pane consists of several tabs but we will mainly use:
+
+1. Elements: Presents the DOM Tree, the HTML document structure, great for inspecting the structure of the outputs generated from R.
+2. Console: The JavaScript console where messages, errors, and other such things are logged. Essential for debugging.
+
+### Variable declaration and scope {-}
+
+One major way JavaScript differs from R is that variables must be declared with keywords one of three keywords, `var`, `let`, or `const` which mainly affect the scope where the declared variable will be accessible from.
+
+```js
+x = 1; // error
+var x = 1; // works
+```
+
+One can declare a variable without assigning a value to it, to then do so later on. 
+
+```js
+var y; // declare 
+y = [1,2,3]; // define it as array
+y = 'string'; // change to character string
+```
+
+The `let` and `const` keywords were added in 2015, the `const` is used to defined a constant: a variable that once declared cannot be changed.
+
+```js
+const x = 1; // declare constant
+x = 2; // error
+```
+
+Though this is probably only rarely done in R, one can produce something similar by locking the binding for a variable in its environment.
+
+```r
+x <- 1 # declare x
+lockBinding("x", env = .GlobalEnv) # make constant
+x <- 2 # error
+unlockBinding("x", env = .GlobalEnv) # unlock binding
+x <- 2 # works
+```
+
+The `let` keyword is akin to declaring a variable with the `var` keyword, however `let` (and `const`) will declare the variable in the "block scope."
 
 ### Document object model {-}
 
@@ -330,20 +381,7 @@ console.log("hello JavaScript"); // good
 
 ![Printing to the console](images/javascript-intro.png)
 
-Another difference is that variables must be declared with keywords such as `var` or `const` to declare a constant.
 
-```js
-x = 1; // error
-var x = 1; // works
-```
-
-One can declare a variable without assigning a value to it, to then do so later on. 
-
-```js
-var y; // declare 
-y = [1,2,3]; // define it as array
-y = 'string'; // change to character string
-```
 
 In R like in JavaScript, variables can be accessed from the parent environment (often referred to as "context" in the latter). One immense difference though is that while it is seen as bad practice in R it is not in JavaScript where it is extremely useful.
 
