@@ -3,7 +3,7 @@
 In this chapter we create a custom shiny output, in practical terms, custom `render*` and `*Output` functions to use in Shiny. Note that this is destined for the curious who want to grasp some understanding of how these functions work under the hood as it is _often easier to create an htmlwidgets package._
 We will demonstrate by creating a wrapper for [lena.js](https://github.com/davidsonfellipe/lena.js), a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs, there are much easier ways to apply such filters ina shiny application (e.g.: CSS). 
 
-## Inner-workings {-}
+## Inner-workings 
 
 At the core, this consists in creating a `lena`, `renderLena` and `lenaOutput` functions (analogous to `plot`, `renderPlot`, `plotOutput`) which are linked by an "output binding" in JavaScript. The latter function essentially creates an HTML element (e.g.: `<div>`) with its dependencies attached, the former `render*` rather straightforward, unlike previous examples, the data does not need to be explicitly sent to the front-end using `session$sendCustomMessage` as this is handled by shiny itself under the hood.
 
@@ -11,7 +11,7 @@ Previous work with shiny and JavaScript covered in this book had no dedicated "o
 
 Finally, the two R functions are "bound" JavaScript-side with an "output binding" that renders the data from the `render*` function with its `*output`.
 
-## Discover Lena.js {-}
+## Discover Lena.js 
 
 Let us take a look at an example of lena.js. The library reads the original image and outputs the filtered image in a `<canvas>`. There are many filters to chose from.
 
@@ -54,7 +54,7 @@ Let us take a look at an example of lena.js. The library reads the original imag
 
 Therefore, there should be a `lenaOutput` function that creates the `<canvas>`, a `renderLena` function that sends the output of `lena` which itself accepts the id of the image to filter as well as the filter to apply. Finally, there will be a "output binding" which will include the JavaScript code included in the `<script>` tags above.
 
-## Setup {-}
+## Setup 
 
 Start by creating a package called "lena."
 
@@ -94,7 +94,7 @@ At this point one should have a package directory looking like the tree below.
 └── man
 ```
 
-## Output {-}
+## Output 
 
 We can then create the `lenaOutput` function. This function should return an HTML tag which bears an `id`, or a `data-input-id` attribute (more on that later) and a `class`. This is to be used by the user of the function in Shiny just like any other such outputs. For instance, `plotOutput` creates a `<div>` the `id` of which is actually the `id` used in the `plotOutput` function.
 
@@ -139,7 +139,7 @@ lenaOutput <- function(id){
 }
 ```
 
-## Render {-}
+## Render 
 
 Onto coding the server-side functions, we first define a function called "lena" which takes two arguments and return them as a list (which will eventually be used in JavaScript). First, the id of the image to apply the filter to and second the name of the filter to apply. Again, were we not creating a custom output we could use `session$sendCustomMessage` to send that list of options JavaScript directly. Here we do not as it will be indirectly handled by the `render` function we are creating next. 
 
@@ -177,7 +177,7 @@ renderLena <- function(expr, env = parent.frame(), quoted = FALSE) {
 
 This covers all R-related code, what's yet missing is the JavaScript binding.
 
-## JavaScript Binding {-}
+## JavaScript Binding 
 
 Here we create an "output binding," it tells Shiny how to find the component and how to interact with it. An output binding is initialised from `Shiny.OutputBinding`. Below we initialise a new binding.
 
@@ -268,7 +268,7 @@ Shiny.outputBindings.register(lenaBinding, "lenaPackage.lenaBinding");
 
 Ensure that string uniquely identifies the binding to avoid future clash with other such bindings.
 
-## Test {-}
+## Test 
 
 In order to test the package, an image needs to be downloaded in order to test it otherwise a Cross-Origin Resource Sharing (CORS) error will occur. Below we create a directory for the static files and download the R logo to test lena.
 

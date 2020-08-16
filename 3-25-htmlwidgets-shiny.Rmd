@@ -4,7 +4,7 @@ A previous set of chapters explored how to make JavaScript and R communicate in 
 
 To demonstrate how to integrate these functionalities in widgets we shall implement them in the previously built gio package.
 
-## JavaScript to R {-}
+## JavaScript to R 
 
 JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. Gio.js provides a callback that is fired when a country is selected on the globe, this callback function accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). These could send back to the R server where they could be used for many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
 
@@ -124,7 +124,7 @@ function callback (selectedCountry, relatedCountries) {
 }
 ```
 
-## Input Handler {-}
+## Input Handler 
 
 While input handlers were explored previously we found limited use for them as these were set to simple boolean values for which a preprocessor made little sense. It can be useful in this case as the inputs return more substantial data. Namely the input returning data on the related countries, it is converted from JSON to a list but could be reshaped to a data frame of arcs (looking like `gio`'s input data).
 
@@ -186,7 +186,7 @@ shinyApp(ui, server)
 
 ![Gio input data transformed to a data frame](images/gio-input-handler.png)
 
-## R to JavaScript {-}
+## R to JavaScript 
 
 This book previously explored how to send data from the shiny server to the front-end, this section applies this to htmlwidgets. Currently, using gio in shiny consists of generating the globe with the `renderGio` and complimentary `gioOutput` functions. This generates the entire visualisation, it creates the HTML element where it places the globe, draws the arcs based on the data, sets the style, etc.
 
@@ -252,7 +252,7 @@ We got sidetracked but this had to be fixed. Ideally, when the user selects a da
 
 This involves a few moving parts, thankfully some of them were already explored, just not in the context of htmlwidgets. The scheme is to send data from R to JavaScript using the formerly exploited `session$sendCustomMessage`, then in JavaScript fetch the instance of the visualisation (`controller` in the case of gio) to interact with it (`e.g.: controller.addData(data);`).
 
-### Send Data {-}
+### Send Data 
 
 Let's start by creating the R function used to send data to JavaScript. This is hopefully reminiscent of a previous chapter, this function sends a message to JavaScript where it is paired with "message handler" that does something with said message.
 
@@ -283,7 +283,7 @@ gio_send_data <- function(id, data, session = shiny::getDefaultReactiveDomain())
 }
 ```
 
-### Retrieve Widget Instance {-}
+### Retrieve Widget Instance 
 
 We will need to be able to access the instance of the visualisation (`controller`) outside of the function `factory`. This can be made accessible by adding a function (technically a method) that returns the `controller`. Below we create a function called `getGlobe` which returns the `controller`.
 
@@ -350,7 +350,7 @@ function get_gio(id){
 }
 ```
 
-### Handle Data {-}
+### Handle Data 
 
 We can now turn the attention to actually applying the data sent from the R server to the visualisation: the "message handler." Registering the message handler is only relevant if shiny is running, therefore HTMLWidgets comes with a function to check whether that is the case which is useful to avoid needless errors. We can thus use it in an if statement in which all message handlers will be registered.
 
@@ -446,7 +446,7 @@ shinyApp(ui, server)
 
 Switching dataset with the dropdown only changes the data, it makes for a much smoother animation, even the difference in the speed at which the effect is visible on the visualisation is perceivable.
 
-## Proxy Function {-}
+## Proxy Function 
 
 Before we add other similar functions we ought to pause and consider the API this provides the user. There are two points, every function such as `gio_send_data`, will need to accept the `id` and `session` arguments. It will be tedious to so every time, following the old "don't repeat yourself" adage we ought to abstract this further. 
 
@@ -470,7 +470,7 @@ gio_send_data <- function(proxy, data){
 }
 ```
 
-## Clear Data {-}
+## Clear Data 
 
 In order to actively demonstrate the advantage of the "proxy" function as well as to hammer home how such functions work, we shall build another which removes all data from the globe. In JavaScript it's as simple as `controller.clearData();`.
 
@@ -537,7 +537,7 @@ shinyApp(ui, server)
 
 ![Gio with clear data proxy](images/gio-shiny-clear.png)
 
-## Update {-}
+## Update 
 
 The previous proxies defined worked for reasons unbeknownst to the author of this book. It will not work with all methods. The reason it will not work is one that is likely to occur with many other visualisation libraries. For instance, one can attempt to develop a function to dynamically change the style without having to redraw the entire globe, starting again with the R function.
 
