@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-08-10" />
+<meta name="date" content="2020-08-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -194,7 +194,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#javascript"><i class="fa fa-check"></i>JavaScript</a>
 <ul>
 <li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#developer-tools"><i class="fa fa-check"></i>Developer tools</a></li>
-<li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#variable-declaration"><i class="fa fa-check"></i>Variable declaration</a></li>
+<li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#variable-declaration-and-scope"><i class="fa fa-check"></i>Variable declaration and scope</a></li>
 <li class="chapter" data-level="" data-path="prerequisites.html"><a href="prerequisites.html#document-object-model"><i class="fa fa-check"></i>Document object model</a></li>
 </ul></li>
 </ul></li>
@@ -389,7 +389,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2>R Package Development</h2>
 <p>Developing packages used to be notoriously difficult but things have greatly changed in recent years, namely thanks to the devtools <span class="citation">(Wickham, Hester, and Chang <a href="#ref-R-devtools" role="doc-biblioref">2020</a>)</span>, roxygen2 <span class="citation">(Wickham, Danenberg, et al. <a href="#ref-R-roxygen2" role="doc-biblioref">2020</a>)</span> and more recent <a href="https://usethis.r-lib.org/">usethis</a> <span class="citation">(Wickham and Bryan <a href="#ref-R-usethis" role="doc-biblioref">2020</a>)</span> packages. Devtools is short for “developer tools,” it is specifically designed to help creating packages; setting up tests, running checks, building and installing packages, etc. The second provides an all too convenient way to generate the documentation of packages, and usethis, more broadly helps setting up projects, and automating repetitive tasks. Here, we only skim over the fundamentals, there is an entire book by Hadley Wickham called <a href="http://r-pkgs.had.co.nz/">R Packages</a> solely dedicated to the topic.</p>
 <p>Start by installing those packages from CRAN, the roxygen2 package does not need to be explicitly installed as it is a dependency of devtools.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="prerequisites.html#cb11-1"></a><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;devtools&quot;</span>, <span class="st">&quot;usethis&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="prerequisites.html#cb13-1"></a><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;devtools&quot;</span>, <span class="st">&quot;usethis&quot;</span>))</span></code></pre></div>
 <div id="creating-a-package" class="section level3 unnumbered" number="">
 <h3>Creating a Package</h3>
 <p>There are multiple ways to create a package. One could manually create every file, use the RStudio IDE, or create it from the R console with the usethis <span class="citation">(Wickham and Bryan <a href="#ref-R-usethis" role="doc-biblioref">2020</a>)</span> package.</p>
@@ -399,8 +399,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p class="caption">Package creation wizard</p>
 </div>
 <p>But it could be argued that it’s actually easier from the R console with the usethis package. The <code>create_package</code> function takes as first argument the path to create the package. If you run it from RStudio a new project window should open.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="prerequisites.html#cb12-1"></a><span class="co"># creates a package named &quot;test&quot; in root of directory.</span></span>
-<span id="cb12-2"><a href="prerequisites.html#cb12-2"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;test&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="prerequisites.html#cb14-1"></a><span class="co"># creates a package named &quot;test&quot; in root of directory.</span></span>
+<span id="cb14-2"><a href="prerequisites.html#cb14-2"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;test&quot;</span>)</span></code></pre></div>
 <pre><code>✔ Creating &#39;test/&#39;
 ✔ Setting active project to &#39;/Packages/test&#39;
 ✔ Creating &#39;R/&#39;
@@ -441,11 +441,11 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1.9000</code></pre>
 <p>Much of this is outside the scope of the book. However, it is good to grasp how dependencies are specified. As packages are generally intended for sharing with others it is important to ensure users of the package meet the dependencies otherwise the package may not work in places. For instance, were we to create a package that relies on one or more functions from the stringr <span class="citation">(Wickham <a href="#ref-R-stringr" role="doc-biblioref">2019</a>)</span> package we would need to ensure people who install the package actually have it installed on their machine or those functions will not work.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="prerequisites.html#cb15-1"></a><span class="co"># R/string.R</span></span>
-<span id="cb15-2"><a href="prerequisites.html#cb15-2"></a>string_length &lt;-<span class="st"> </span><span class="cf">function</span>(string) {</span>
-<span id="cb15-3"><a href="prerequisites.html#cb15-3"></a>  stringr<span class="op">::</span><span class="kw">str_length</span>(string)</span>
-<span id="cb15-4"><a href="prerequisites.html#cb15-4"></a>}</span></code></pre></div>
-<div class="note">
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="prerequisites.html#cb17-1"></a><span class="co"># R/string.R</span></span>
+<span id="cb17-2"><a href="prerequisites.html#cb17-2"></a>string_length &lt;-<span class="st"> </span><span class="cf">function</span>(string) {</span>
+<span id="cb17-3"><a href="prerequisites.html#cb17-3"></a>  stringr<span class="op">::</span><span class="kw">str_length</span>(string)</span>
+<span id="cb17-4"><a href="prerequisites.html#cb17-4"></a>}</span></code></pre></div>
+<div class="rmdnote">
 <p>
 Note that the function is preceded by its namespace with <code>::</code> (more on this later).
 </p>
@@ -455,54 +455,29 @@ Note that the function is preceded by its namespace with <code>::</code> (more o
   stringr,
   dplyr</code></pre>
 <p>Then again, the usethis package also allows doing so consistently from the R console, which is great to avoid mishandling the <code>DESCRIPTION</code> file.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="prerequisites.html#cb17-1"></a><span class="co"># add stringr under Imports</span></span>
-<span id="cb17-2"><a href="prerequisites.html#cb17-2"></a>usethis<span class="op">::</span><span class="kw">use_package</span>(<span class="st">&#39;stringr&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="prerequisites.html#cb19-1"></a><span class="co"># add stringr under Imports</span></span>
+<span id="cb19-2"><a href="prerequisites.html#cb19-2"></a>usethis<span class="op">::</span><span class="kw">use_package</span>(<span class="st">&#39;stringr&#39;</span>)</span></code></pre></div>
 <p>One can also specify another type of dependencies under <code>Suggests</code>, other packages that enhance that enhance the package but are not required to run it. These, unlike package under ‘Imports’ are not automatically installed if missing which can greatly reduce overhead.</p>
 </div>
 <div id="r-code" class="section level3 unnumbered" number="">
 <h3>R code</h3>
 <p>An R package must follow a strict structure. R code must be placed in an <code>R/</code> directory so one should only find <code>.R</code> files in that directory. These files generally contain functions, methods, and R objects.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="prerequisites.html#cb18-1"></a><span class="co"># R/add.R</span></span>
-<span id="cb18-2"><a href="prerequisites.html#cb18-2"></a>string_length &lt;-<span class="st"> </span><span class="cf">function</span>(strings) {</span>
-<span id="cb18-3"><a href="prerequisites.html#cb18-3"></a>  stringr<span class="op">::</span><span class="kw">str_length</span>(strings)</span>
-<span id="cb18-4"><a href="prerequisites.html#cb18-4"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="prerequisites.html#cb20-1"></a><span class="co"># R/add.R</span></span>
+<span id="cb20-2"><a href="prerequisites.html#cb20-2"></a>string_length &lt;-<span class="st"> </span><span class="cf">function</span>(strings) {</span>
+<span id="cb20-3"><a href="prerequisites.html#cb20-3"></a>  stringr<span class="op">::</span><span class="kw">str_length</span>(strings)</span>
+<span id="cb20-4"><a href="prerequisites.html#cb20-4"></a>}</span></code></pre></div>
 </div>
 <div id="documentation" class="section level3 unnumbered" number="">
 <h3>Documentation</h3>
 <p>Documenting packages used to be notoriously complicated but thanks to the package roxygen2 it no longer is the case. The documentation of functions of the package (accessible with <code>?</code>) and datasets that comprise the package reside in separate files in the <code>man/</code> directory. These are <code>.Rd</code> files that use a custom syntax resembling LaTex. The roxygen package eases the creation of these files by turning special comments and tags in <code>.R</code> files into said <code>.Rd</code> files.</p>
 <p>Special comments are a standard R comment <code>#</code> followed by an apostrophe <code>'</code>. The first sentence of the documentation is the title of the documentation file while the second is the description.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="prerequisites.html#cb19-1"></a><span class="co">#&#39; Strings Length</span></span>
-<span id="cb19-2"><a href="prerequisites.html#cb19-2"></a><span class="co">#&#39; </span></span>
-<span id="cb19-3"><a href="prerequisites.html#cb19-3"></a><span class="co">#&#39; Returns the number of characters in strings. </span></span>
-<span id="cb19-4"><a href="prerequisites.html#cb19-4"></a>string_length &lt;-<span class="st"> </span><span class="cf">function</span>(strings) {</span>
-<span id="cb19-5"><a href="prerequisites.html#cb19-5"></a>  stringr<span class="op">::</span><span class="kw">str_length</span>(strings)</span>
-<span id="cb19-6"><a href="prerequisites.html#cb19-6"></a>}</span></code></pre></div>
-<p>There are a plethora of roxygen2 tags to further document different sections, below we use two different tags to document the parameters and give an example.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="prerequisites.html#cb20-1"></a><span class="co">#&#39; Strings Length</span></span>
-<span id="cb20-2"><a href="prerequisites.html#cb20-2"></a><span class="co">#&#39; </span></span>
-<span id="cb20-3"><a href="prerequisites.html#cb20-3"></a><span class="co">#&#39; Returns the number of characters in strings. </span></span>
-<span id="cb20-4"><a href="prerequisites.html#cb20-4"></a><span class="co">#&#39; </span></span>
-<span id="cb20-5"><a href="prerequisites.html#cb20-5"></a><span class="co">#&#39; @param strings A vector of character strings.</span></span>
-<span id="cb20-6"><a href="prerequisites.html#cb20-6"></a><span class="co">#&#39; </span></span>
-<span id="cb20-7"><a href="prerequisites.html#cb20-7"></a><span class="co">#&#39; @example string_length(c(&quot;hello&quot;, &quot;world&quot;))</span></span>
-<span id="cb20-8"><a href="prerequisites.html#cb20-8"></a>string_length &lt;-<span class="st"> </span><span class="cf">function</span>(strings) {</span>
-<span id="cb20-9"><a href="prerequisites.html#cb20-9"></a>  stringr<span class="op">::</span><span class="kw">str_length</span>(strings)</span>
-<span id="cb20-10"><a href="prerequisites.html#cb20-10"></a>}</span></code></pre></div>
-<p>As well as generating documentation the roxygen2 package also allows populating the <code>NAMESPACE</code> file. This is an extensive and often confusing topic but for the purpose of this book we’ll content with the following: the <code>NAMESPACE</code> includes functions that are <em>imported</em> and <em>exported</em> by the package.</p>
-<p>By default functions that are present in the R files in the <code>R/</code> directory are not exported: they are not accessible outside the package. Therefore the <code>string_length</code> function defined previously will not be made available to users of the package, only other function within the package will be able to call it. In order to export it we can use the <code>@export</code> tag. This will place the function as exported in the <code>NAMESPACE</code> file.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="prerequisites.html#cb21-1"></a><span class="co">#&#39; Strings Length</span></span>
 <span id="cb21-2"><a href="prerequisites.html#cb21-2"></a><span class="co">#&#39; </span></span>
 <span id="cb21-3"><a href="prerequisites.html#cb21-3"></a><span class="co">#&#39; Returns the number of characters in strings. </span></span>
-<span id="cb21-4"><a href="prerequisites.html#cb21-4"></a><span class="co">#&#39; </span></span>
-<span id="cb21-5"><a href="prerequisites.html#cb21-5"></a><span class="co">#&#39; @param strings A vector of character strings.</span></span>
-<span id="cb21-6"><a href="prerequisites.html#cb21-6"></a><span class="co">#&#39; </span></span>
-<span id="cb21-7"><a href="prerequisites.html#cb21-7"></a><span class="co">#&#39; @example string_length(c(&quot;hello&quot;, &quot;world&quot;))</span></span>
-<span id="cb21-8"><a href="prerequisites.html#cb21-8"></a><span class="co">#&#39; </span></span>
-<span id="cb21-9"><a href="prerequisites.html#cb21-9"></a><span class="co">#&#39; @export</span></span>
-<span id="cb21-10"><a href="prerequisites.html#cb21-10"></a>string_length &lt;-<span class="st"> </span><span class="cf">function</span>(strings) {</span>
-<span id="cb21-11"><a href="prerequisites.html#cb21-11"></a>  stringr<span class="op">::</span><span class="kw">str_length</span>(strings)</span>
-<span id="cb21-12"><a href="prerequisites.html#cb21-12"></a>}</span></code></pre></div>
-<p>There are two ways to use external functions (functions from other R packages), as done thus far in the <code>string_length</code> function by using the namespace (package name) to call the function: <code>stringr::str_length</code>. Or by importing the function needed using a roxygen2 tag thereby removing the need for using the namespace.</p>
+<span id="cb21-4"><a href="prerequisites.html#cb21-4"></a>string_length &lt;-<span class="st"> </span><span class="cf">function</span>(strings) {</span>
+<span id="cb21-5"><a href="prerequisites.html#cb21-5"></a>  stringr<span class="op">::</span><span class="kw">str_length</span>(strings)</span>
+<span id="cb21-6"><a href="prerequisites.html#cb21-6"></a>}</span></code></pre></div>
+<p>There are a plethora of roxygen2 tags to further document different sections, below we use two different tags to document the parameters and give an example.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="prerequisites.html#cb22-1"></a><span class="co">#&#39; Strings Length</span></span>
 <span id="cb22-2"><a href="prerequisites.html#cb22-2"></a><span class="co">#&#39; </span></span>
 <span id="cb22-3"><a href="prerequisites.html#cb22-3"></a><span class="co">#&#39; Returns the number of characters in strings. </span></span>
@@ -510,16 +485,41 @@ Note that the function is preceded by its namespace with <code>::</code> (more o
 <span id="cb22-5"><a href="prerequisites.html#cb22-5"></a><span class="co">#&#39; @param strings A vector of character strings.</span></span>
 <span id="cb22-6"><a href="prerequisites.html#cb22-6"></a><span class="co">#&#39; </span></span>
 <span id="cb22-7"><a href="prerequisites.html#cb22-7"></a><span class="co">#&#39; @example string_length(c(&quot;hello&quot;, &quot;world&quot;))</span></span>
-<span id="cb22-8"><a href="prerequisites.html#cb22-8"></a><span class="co">#&#39; </span></span>
-<span id="cb22-9"><a href="prerequisites.html#cb22-9"></a><span class="co">#&#39; @importFrom stringr str_length</span></span>
-<span id="cb22-10"><a href="prerequisites.html#cb22-10"></a><span class="co">#&#39; </span></span>
-<span id="cb22-11"><a href="prerequisites.html#cb22-11"></a><span class="co">#&#39; @export</span></span>
-<span id="cb22-12"><a href="prerequisites.html#cb22-12"></a>string_length &lt;-<span class="st"> </span><span class="cf">function</span>(strings) {</span>
-<span id="cb22-13"><a href="prerequisites.html#cb22-13"></a>  <span class="kw">str_length</span>(strings) <span class="co"># namespace removed</span></span>
-<span id="cb22-14"><a href="prerequisites.html#cb22-14"></a>}</span></code></pre></div>
+<span id="cb22-8"><a href="prerequisites.html#cb22-8"></a>string_length &lt;-<span class="st"> </span><span class="cf">function</span>(strings) {</span>
+<span id="cb22-9"><a href="prerequisites.html#cb22-9"></a>  stringr<span class="op">::</span><span class="kw">str_length</span>(strings)</span>
+<span id="cb22-10"><a href="prerequisites.html#cb22-10"></a>}</span></code></pre></div>
+<p>As well as generating documentation the roxygen2 package also allows populating the <code>NAMESPACE</code> file. This is an extensive and often confusing topic but for the purpose of this book we’ll content with the following: the <code>NAMESPACE</code> includes functions that are <em>imported</em> and <em>exported</em> by the package.</p>
+<p>By default functions that are present in the R files in the <code>R/</code> directory are not exported: they are not accessible outside the package. Therefore the <code>string_length</code> function defined previously will not be made available to users of the package, only other function within the package will be able to call it. In order to export it we can use the <code>@export</code> tag. This will place the function as exported in the <code>NAMESPACE</code> file.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="prerequisites.html#cb23-1"></a><span class="co">#&#39; Strings Length</span></span>
+<span id="cb23-2"><a href="prerequisites.html#cb23-2"></a><span class="co">#&#39; </span></span>
+<span id="cb23-3"><a href="prerequisites.html#cb23-3"></a><span class="co">#&#39; Returns the number of characters in strings. </span></span>
+<span id="cb23-4"><a href="prerequisites.html#cb23-4"></a><span class="co">#&#39; </span></span>
+<span id="cb23-5"><a href="prerequisites.html#cb23-5"></a><span class="co">#&#39; @param strings A vector of character strings.</span></span>
+<span id="cb23-6"><a href="prerequisites.html#cb23-6"></a><span class="co">#&#39; </span></span>
+<span id="cb23-7"><a href="prerequisites.html#cb23-7"></a><span class="co">#&#39; @example string_length(c(&quot;hello&quot;, &quot;world&quot;))</span></span>
+<span id="cb23-8"><a href="prerequisites.html#cb23-8"></a><span class="co">#&#39; </span></span>
+<span id="cb23-9"><a href="prerequisites.html#cb23-9"></a><span class="co">#&#39; @export</span></span>
+<span id="cb23-10"><a href="prerequisites.html#cb23-10"></a>string_length &lt;-<span class="st"> </span><span class="cf">function</span>(strings) {</span>
+<span id="cb23-11"><a href="prerequisites.html#cb23-11"></a>  stringr<span class="op">::</span><span class="kw">str_length</span>(strings)</span>
+<span id="cb23-12"><a href="prerequisites.html#cb23-12"></a>}</span></code></pre></div>
+<p>There are two ways to use external functions (functions from other R packages), as done thus far in the <code>string_length</code> function by using the namespace (package name) to call the function: <code>stringr::str_length</code>. Or by importing the function needed using a roxygen2 tag thereby removing the need for using the namespace.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="prerequisites.html#cb24-1"></a><span class="co">#&#39; Strings Length</span></span>
+<span id="cb24-2"><a href="prerequisites.html#cb24-2"></a><span class="co">#&#39; </span></span>
+<span id="cb24-3"><a href="prerequisites.html#cb24-3"></a><span class="co">#&#39; Returns the number of characters in strings. </span></span>
+<span id="cb24-4"><a href="prerequisites.html#cb24-4"></a><span class="co">#&#39; </span></span>
+<span id="cb24-5"><a href="prerequisites.html#cb24-5"></a><span class="co">#&#39; @param strings A vector of character strings.</span></span>
+<span id="cb24-6"><a href="prerequisites.html#cb24-6"></a><span class="co">#&#39; </span></span>
+<span id="cb24-7"><a href="prerequisites.html#cb24-7"></a><span class="co">#&#39; @example string_length(c(&quot;hello&quot;, &quot;world&quot;))</span></span>
+<span id="cb24-8"><a href="prerequisites.html#cb24-8"></a><span class="co">#&#39; </span></span>
+<span id="cb24-9"><a href="prerequisites.html#cb24-9"></a><span class="co">#&#39; @importFrom stringr str_length</span></span>
+<span id="cb24-10"><a href="prerequisites.html#cb24-10"></a><span class="co">#&#39; </span></span>
+<span id="cb24-11"><a href="prerequisites.html#cb24-11"></a><span class="co">#&#39; @export</span></span>
+<span id="cb24-12"><a href="prerequisites.html#cb24-12"></a>string_length &lt;-<span class="st"> </span><span class="cf">function</span>(strings) {</span>
+<span id="cb24-13"><a href="prerequisites.html#cb24-13"></a>  <span class="kw">str_length</span>(strings) <span class="co"># namespace removed</span></span>
+<span id="cb24-14"><a href="prerequisites.html#cb24-14"></a>}</span></code></pre></div>
 <p>Above we import the function <code>str_length</code> from the <code>stringr</code> package using the <code>importFrom</code> roxygen2 tag. The first term following the tag is the name of the package wherefrom to import the functions and the following terms are the name of the functions separated by spaces so one can import multiple functions from the same package with, e.g.: <code>@importFrom stringr str_length str_to_upper</code>. If the package uses very many functions from a single package one might also consider importing said package in its entirety with e.g.: <code>@import stringr</code>.</p>
 <p>Finally, one can actually generate the <code>.Rd</code> documentation files and populate the <code>NAMESPACE</code> with either the <code>devtools::document()</code> function or <code>roxygen2::roxygenise()</code>.</p>
-<div class="note">
+<div class="rmdnote">
 <p>
 Remember to run <code>devtools::document()</code> after changing roxygen2 tags otherwise changes are not actually reflected in the <code>NAMESPACE</code> and documentation.
 </p>
@@ -528,8 +528,8 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 <div id="installed-files" class="section level3 unnumbered" number="">
 <h3>Installed files</h3>
 <p>Here we tackle the topic of installed files as it will be relevant to much of what the book covers. Installed files are files that are downloaded and copied as-is when users install the package. This directory will therefore come in very handy to store JavaScript files that package will require. These files can be accessed with the <code>system.file</code> function which will look for a file from the root of the <code>inst/</code> directory.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="prerequisites.html#cb23-1"></a><span class="co"># return path to `inst/dependency.js` in `myPackage`</span></span>
-<span id="cb23-2"><a href="prerequisites.html#cb23-2"></a>path &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;dependency.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;myPackage&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="prerequisites.html#cb25-1"></a><span class="co"># return path to `inst/dependency.js` in `myPackage`</span></span>
+<span id="cb25-2"><a href="prerequisites.html#cb25-2"></a>path &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;dependency.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;myPackage&quot;</span>)</span></code></pre></div>
 </div>
 <div id="build-load-and-install" class="section level3 unnumbered" number="">
 <h3>Build, load, and install</h3>
@@ -547,7 +547,7 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 <div id="json" class="section level2 unnumbered" number="">
 <h2>JSON</h2>
 <p>JSON (JavaScript Object Notation) is a very popular data <em>interchange</em> format with which we will work extensively throughout this book, it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together it is essential that we have a data format that can be understood by both—JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the <a href="https://CRAN.R-project.org/package=jsonlite">jsonlite package</a> <span class="citation">(Ooms <a href="#ref-R-jsonlite" role="doc-biblioref">2020</a>)</span>, in fact it is the serialiser used internally by all the packages we shall explore in this book.</p>
-<div class="note">
+<div class="rmdnote">
 <p>
 “To serialise” is just jargon for converting data to JSON.
 </p>
@@ -555,18 +555,18 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 <div id="serialising" class="section level3 unnumbered" number="">
 <h3>Serialising</h3>
 <p>JSON is to all intents and purposes the equivalent of lists in R; a flexible data format that can store pretty much anything–expect data.frames a structure that does not exist in JavaScript. Below we create a nested list and convert it to JSON with the help of jsonlite, we set <code>pretty</code> to <code>TRUE</code> to add indentation for clearer printing but this is an argument you should omit when writing production code, it will reduce the file size (fewer spaces = smaller file size).</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="prerequisites.html#cb24-1"></a><span class="co"># install.packages(&quot;jsonlite&quot;)</span></span>
-<span id="cb24-2"><a href="prerequisites.html#cb24-2"></a><span class="kw">library</span>(jsonlite)</span>
-<span id="cb24-3"><a href="prerequisites.html#cb24-3"></a></span>
-<span id="cb24-4"><a href="prerequisites.html#cb24-4"></a>lst &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb24-5"><a href="prerequisites.html#cb24-5"></a>  <span class="dt">a =</span> <span class="dv">1</span>,</span>
-<span id="cb24-6"><a href="prerequisites.html#cb24-6"></a>  <span class="dt">b =</span> <span class="kw">list</span>(</span>
-<span id="cb24-7"><a href="prerequisites.html#cb24-7"></a>    <span class="dt">c =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>)</span>
-<span id="cb24-8"><a href="prerequisites.html#cb24-8"></a>  ),</span>
-<span id="cb24-9"><a href="prerequisites.html#cb24-9"></a>  <span class="dt">d =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span></span>
-<span id="cb24-10"><a href="prerequisites.html#cb24-10"></a>)</span>
-<span id="cb24-11"><a href="prerequisites.html#cb24-11"></a></span>
-<span id="cb24-12"><a href="prerequisites.html#cb24-12"></a><span class="kw">toJSON</span>(lst, <span class="dt">pretty =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="prerequisites.html#cb26-1"></a><span class="co"># install.packages(&quot;jsonlite&quot;)</span></span>
+<span id="cb26-2"><a href="prerequisites.html#cb26-2"></a><span class="kw">library</span>(jsonlite)</span>
+<span id="cb26-3"><a href="prerequisites.html#cb26-3"></a></span>
+<span id="cb26-4"><a href="prerequisites.html#cb26-4"></a>lst &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb26-5"><a href="prerequisites.html#cb26-5"></a>  <span class="dt">a =</span> <span class="dv">1</span>,</span>
+<span id="cb26-6"><a href="prerequisites.html#cb26-6"></a>  <span class="dt">b =</span> <span class="kw">list</span>(</span>
+<span id="cb26-7"><a href="prerequisites.html#cb26-7"></a>    <span class="dt">c =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>)</span>
+<span id="cb26-8"><a href="prerequisites.html#cb26-8"></a>  ),</span>
+<span id="cb26-9"><a href="prerequisites.html#cb26-9"></a>  <span class="dt">d =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span></span>
+<span id="cb26-10"><a href="prerequisites.html#cb26-10"></a>)</span>
+<span id="cb26-11"><a href="prerequisites.html#cb26-11"></a></span>
+<span id="cb26-12"><a href="prerequisites.html#cb26-12"></a><span class="kw">toJSON</span>(lst, <span class="dt">pretty =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>## {
 ##   &quot;a&quot;: [1],
 ##   &quot;b&quot;: {
@@ -575,13 +575,13 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 ##   &quot;d&quot;: [1, 2, 3, 4, 5]
 ## }</code></pre>
 <p>Looking closely at the list and JSON output above one quickly sees the resemblance. Something seems odd though, the first value in the list (<code>a = 1</code>) was serialised to an array (vector) of length one (<code>"a": [1]</code>) where one would probably expect an integer instead, <code>1</code> not <code>[1]</code>. This is not a mistake, we often forget that there are no scalar types in R and that <code>a</code> is in fact a vector as we can observe below.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="prerequisites.html#cb26-1"></a>x &lt;-<span class="st"> </span><span class="dv">1</span></span>
-<span id="cb26-2"><a href="prerequisites.html#cb26-2"></a><span class="kw">length</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="prerequisites.html#cb28-1"></a>x &lt;-<span class="st"> </span><span class="dv">1</span></span>
+<span id="cb28-2"><a href="prerequisites.html#cb28-2"></a><span class="kw">length</span>(x)</span></code></pre></div>
 <pre><code>## [1] 1</code></pre>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="prerequisites.html#cb28-1"></a><span class="kw">is.vector</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="prerequisites.html#cb30-1"></a><span class="kw">is.vector</span>(x)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 <p>JavaScript, on the other hand, does have scalar types, more often than not we will want to convert the vectors of length one to scalar types rather than arrays of length one. To do so we need use the <code>auto_unbox</code> argument in <code>jsonlite::toJSON</code>, we’ll do this most of the time we have to convert data to JSON.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="prerequisites.html#cb30-1"></a><span class="kw">toJSON</span>(lst, <span class="dt">pretty =</span> <span class="ot">TRUE</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="prerequisites.html#cb32-1"></a><span class="kw">toJSON</span>(lst, <span class="dt">pretty =</span> <span class="ot">TRUE</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>## {
 ##   &quot;a&quot;: 1,
 ##   &quot;b&quot;: {
@@ -594,10 +594,10 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 <div id="tabular-data" class="section level3 unnumbered" number="">
 <h3>Tabular data</h3>
 <p>If JSON is more or less the equivalent of lists in R one might wonder how jsonlite handles dataframes since they do not exist in JavaScript.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="prerequisites.html#cb32-1"></a><span class="co"># subset of built-in dataset</span></span>
-<span id="cb32-2"><a href="prerequisites.html#cb32-2"></a>df &lt;-<span class="st"> </span>cars[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</span>
-<span id="cb32-3"><a href="prerequisites.html#cb32-3"></a></span>
-<span id="cb32-4"><a href="prerequisites.html#cb32-4"></a><span class="kw">toJSON</span>(df, <span class="dt">pretty =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="prerequisites.html#cb34-1"></a><span class="co"># subset of built-in dataset</span></span>
+<span id="cb34-2"><a href="prerequisites.html#cb34-2"></a>df &lt;-<span class="st"> </span>cars[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</span>
+<span id="cb34-3"><a href="prerequisites.html#cb34-3"></a></span>
+<span id="cb34-4"><a href="prerequisites.html#cb34-4"></a><span class="kw">toJSON</span>(df, <span class="dt">pretty =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>## [
 ##   {
 ##     &quot;speed&quot;: 4,
@@ -614,10 +614,10 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 <p class="caption">console.table output</p>
 </div>
 <p>We can reproduce this with the snippet below, we remove row names and use apply to turn every row into a list.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="prerequisites.html#cb34-1"></a><span class="kw">row.names</span>(df) &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb34-2"><a href="prerequisites.html#cb34-2"></a>df_list &lt;-<span class="st"> </span><span class="kw">apply</span>(df, <span class="dv">1</span>, as.list)</span>
-<span id="cb34-3"><a href="prerequisites.html#cb34-3"></a></span>
-<span id="cb34-4"><a href="prerequisites.html#cb34-4"></a><span class="kw">toJSON</span>(df_list, <span class="dt">pretty =</span> <span class="ot">TRUE</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="prerequisites.html#cb36-1"></a><span class="kw">row.names</span>(df) &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb36-2"><a href="prerequisites.html#cb36-2"></a>df_list &lt;-<span class="st"> </span><span class="kw">apply</span>(df, <span class="dv">1</span>, as.list)</span>
+<span id="cb36-3"><a href="prerequisites.html#cb36-3"></a></span>
+<span id="cb36-4"><a href="prerequisites.html#cb36-4"></a><span class="kw">toJSON</span>(df_list, <span class="dt">pretty =</span> <span class="ot">TRUE</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>## [
 ##   {
 ##     &quot;speed&quot;: 4,
@@ -629,16 +629,16 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 ##   }
 ## ]</code></pre>
 <p>Jsonlite of course also enables reading data from JSON into R with the function <code>fromJSON</code>.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="prerequisites.html#cb36-1"></a>json &lt;-<span class="st"> </span><span class="kw">toJSON</span>(df) <span class="co"># convert to JSON</span></span>
-<span id="cb36-2"><a href="prerequisites.html#cb36-2"></a><span class="kw">fromJSON</span>(json) <span class="co"># read from JSON</span></span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="prerequisites.html#cb38-1"></a>json &lt;-<span class="st"> </span><span class="kw">toJSON</span>(df) <span class="co"># convert to JSON</span></span>
+<span id="cb38-2"><a href="prerequisites.html#cb38-2"></a><span class="kw">fromJSON</span>(json) <span class="co"># read from JSON</span></span></code></pre></div>
 <pre><code>##   speed dist
 ## 1     4    2
 ## 2     4   10</code></pre>
 <p>It’s important to note that jsonlite did the conversion back to a data frame. Therefore the code below also returns a data frame even though the object we initially converted to JSON is a list.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="prerequisites.html#cb38-1"></a><span class="kw">class</span>(df_list)</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="prerequisites.html#cb40-1"></a><span class="kw">class</span>(df_list)</span></code></pre></div>
 <pre><code>## [1] &quot;list&quot;</code></pre>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="prerequisites.html#cb40-1"></a>json &lt;-<span class="st"> </span><span class="kw">toJSON</span>(df_list)</span>
-<span id="cb40-2"><a href="prerequisites.html#cb40-2"></a><span class="kw">fromJSON</span>(json)</span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="prerequisites.html#cb42-1"></a>json &lt;-<span class="st"> </span><span class="kw">toJSON</span>(df_list)</span>
+<span id="cb42-2"><a href="prerequisites.html#cb42-2"></a><span class="kw">fromJSON</span>(json)</span></code></pre></div>
 <pre><code>##   speed dist
 ## 1     4    2
 ## 2     4   10</code></pre>
@@ -648,10 +648,24 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 <div id="javascript" class="section level2 unnumbered" number="">
 <h2>JavaScript</h2>
 <p>The book is not meant to teach one JavaScript, only to show how graciously it can work with R. Let us thus go through the very basics to ensure we know enough to get started with the coming chapters.</p>
+<p>The easiest way to run JavaScript interactively is probably to create an HTML file (e.g.: <code>try.html</code>), write your code within a <code>&lt;script&gt;</code> tags and open the file in your web browser. The console output can be observed in the console of the browser, developer tools (more on that below).</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb44-1"><a href="prerequisites.html#cb44-1"></a><span class="er">&lt;</span>!–– index.html ––&gt;</span>
+<span id="cb44-2"><a href="prerequisites.html#cb44-2"></a><span class="kw">&lt;html&gt;</span></span>
+<span id="cb44-3"><a href="prerequisites.html#cb44-3"></a>  <span class="kw">&lt;head&gt;</span></span>
+<span id="cb44-4"><a href="prerequisites.html#cb44-4"></a>  <span class="kw">&lt;/head&gt;</span></span>
+<span id="cb44-5"><a href="prerequisites.html#cb44-5"></a>  <span class="kw">&lt;body&gt;</span></span>
+<span id="cb44-6"><a href="prerequisites.html#cb44-6"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb44-7"><a href="prerequisites.html#cb44-7"></a>  <span class="kw">&lt;/body&gt;</span></span>
+<span id="cb44-8"><a href="prerequisites.html#cb44-8"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb44-9"><a href="prerequisites.html#cb44-9"></a>    <span class="co">// place your JavaScript code here</span></span>
+<span id="cb44-10"><a href="prerequisites.html#cb44-10"></a>    <span class="va">console</span>.<span class="at">log</span>(<span class="st">&#39;Hello JavaScript!&#39;</span>)</span>
+<span id="cb44-11"><a href="prerequisites.html#cb44-11"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb44-12"><a href="prerequisites.html#cb44-12"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<p><img src="images/tryingjs.png" /></p>
 <div id="developer-tools" class="section level3 unnumbered" number="">
 <h3>Developer tools</h3>
 <p>Most of the JavaScript code written in this book is intended to be run in web browsers, it is thus vital that you have a great understanding of your web browser and its developer tools (devtools). In this section we discuss those available in Google Chrome and Chromium but such tools, albeit somewhat different, also exist in Mozilla Firefox.</p>
-<div class="note">
+<div class="rmdnote">
 <p>
 The RStudio IDE is built on Chromium, some of these tools will therefore also work in RStudio.
 </p>
@@ -661,92 +675,101 @@ The RStudio IDE is built on Chromium, some of these tools will therefore also wo
 <img src="images/devtools.png" alt="" />
 <p class="caption">Google Chrome Devtools</p>
 </div>
-<p>The developer tools pane consists of several tabs.</p>
+<p>The developer tools pane consists of several tabs but we will mainly use:</p>
+<ol style="list-style-type: decimal">
+<li>Elements: Presents the DOM Tree, the HTML document structure, great for inspecting the structure of the outputs generated from R.</li>
+<li>Console: The JavaScript console where messages, errors, and other such things are logged. Essential for debugging.</li>
+</ol>
 </div>
-<div id="variable-declaration" class="section level3 unnumbered" number="">
-<h3>Variable declaration</h3>
+<div id="variable-declaration-and-scope" class="section level3 unnumbered" number="">
+<h3>Variable declaration and scope</h3>
+<p>One major way JavaScript differs from R is that variables must be declared using one of three keywords, <code>var</code>, <code>let</code>, or <code>const</code> which mainly affect the scope where the declared variable will be accessible from.</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb45-1"><a href="prerequisites.html#cb45-1"></a>x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> <span class="co">// error</span></span>
+<span id="cb45-2"><a href="prerequisites.html#cb45-2"></a><span class="kw">var</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> <span class="co">// works</span></span></code></pre></div>
+<p>One can declare a variable without assigning a value to it, to then do so later on.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb46-1"><a href="prerequisites.html#cb46-1"></a><span class="kw">var</span> y<span class="op">;</span> <span class="co">// declare </span></span>
+<span id="cb46-2"><a href="prerequisites.html#cb46-2"></a>y <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span><span class="dv">2</span><span class="op">,</span><span class="dv">3</span>]<span class="op">;</span> <span class="co">// define it as array</span></span>
+<span id="cb46-3"><a href="prerequisites.html#cb46-3"></a>y <span class="op">=</span> <span class="st">&#39;string&#39;</span><span class="op">;</span> <span class="co">// change to character string</span></span></code></pre></div>
+<p>The <code>let</code> and <code>const</code> keywords were added in ES2015, the <code>const</code> is used to defined a constant: a variable that once declared cannot be changed.</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb47-1"><a href="prerequisites.html#cb47-1"></a><span class="kw">const</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> <span class="co">// declare constant</span></span>
+<span id="cb47-2"><a href="prerequisites.html#cb47-2"></a>x <span class="op">=</span> <span class="dv">2</span><span class="op">;</span> <span class="co">// error</span></span></code></pre></div>
+<p>Though this is probably only rarely done in R, one can produce something similar by locking the binding for a variable in its environment.</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="prerequisites.html#cb48-1"></a>x &lt;-<span class="st"> </span><span class="dv">1</span> <span class="co"># declare x</span></span>
+<span id="cb48-2"><a href="prerequisites.html#cb48-2"></a><span class="kw">lockBinding</span>(<span class="st">&quot;x&quot;</span>, <span class="dt">env =</span> .GlobalEnv) <span class="co"># make constant</span></span>
+<span id="cb48-3"><a href="prerequisites.html#cb48-3"></a>x &lt;-<span class="st"> </span><span class="dv">2</span> <span class="co"># error</span></span></code></pre></div>
+<pre><code>## Error in eval(expr, envir, enclos): cannot change value of locked binding for &#39;x&#39;</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="prerequisites.html#cb50-1"></a><span class="kw">unlockBinding</span>(<span class="st">&quot;x&quot;</span>, <span class="dt">env =</span> .GlobalEnv) <span class="co"># unlock binding</span></span>
+<span id="cb50-2"><a href="prerequisites.html#cb50-2"></a>x &lt;-<span class="st"> </span><span class="dv">2</span> <span class="co"># works</span></span></code></pre></div>
+<p>The <code>let</code> keyword is akin to declaring a variable with the <code>var</code> keyword, however <code>let</code> (and <code>const</code>) will declare the variable in the “block scope.” This in effect further narrows down the scope where the variable will be accessible, a block scope is generally the area within <code>if</code>, <code>switch</code> conditions or <code>for</code> and <code>while</code> loops: areas within curly brackets.</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb51-1"><a href="prerequisites.html#cb51-1"></a><span class="cf">if</span>(<span class="kw">true</span>)<span class="op">{</span></span>
+<span id="cb51-2"><a href="prerequisites.html#cb51-2"></a>  <span class="kw">let</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb51-3"><a href="prerequisites.html#cb51-3"></a>  <span class="kw">var</span> y <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb51-4"><a href="prerequisites.html#cb51-4"></a><span class="op">}</span></span>
+<span id="cb51-5"><a href="prerequisites.html#cb51-5"></a></span>
+<span id="cb51-6"><a href="prerequisites.html#cb51-6"></a><span class="va">console</span>.<span class="at">log</span>(x) <span class="co">// error x does not exist</span></span>
+<span id="cb51-7"><a href="prerequisites.html#cb51-7"></a><span class="va">console</span>.<span class="at">log</span>(y) <span class="co">// works</span></span></code></pre></div>
+<p>In the above example <code>x</code> is only accessible within the if statement as it is declared with <code>let</code>, <code>var</code> does not have a block scope.</p>
+<p>While on the subject of scope, in R like in JavaScript, variables can be accessed from the parent environment (often referred to as “context” in the latter). One immense difference though is that while it is seen as bad practice in R it is not in JavaScript where it is extremely useful.</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="prerequisites.html#cb52-1"></a><span class="co"># it works but don&#39;t do this in R</span></span>
+<span id="cb52-2"><a href="prerequisites.html#cb52-2"></a>x &lt;-<span class="st"> </span><span class="dv">123</span></span>
+<span id="cb52-3"><a href="prerequisites.html#cb52-3"></a>foo &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb52-4"><a href="prerequisites.html#cb52-4"></a>  <span class="kw">print</span>(x)</span>
+<span id="cb52-5"><a href="prerequisites.html#cb52-5"></a>}</span>
+<span id="cb52-6"><a href="prerequisites.html#cb52-6"></a><span class="kw">foo</span>()</span></code></pre></div>
+<pre><code>## [1] 123</code></pre>
+<p>The above R code can be re-written in JavaScript. Note the slight variation in the function declaration.</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb54-1"><a href="prerequisites.html#cb54-1"></a><span class="co">// this is perfectly fine</span></span>
+<span id="cb54-2"><a href="prerequisites.html#cb54-2"></a><span class="kw">var</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb54-3"><a href="prerequisites.html#cb54-3"></a></span>
+<span id="cb54-4"><a href="prerequisites.html#cb54-4"></a><span class="kw">function</span> <span class="at">foo</span>()<span class="op">{</span></span>
+<span id="cb54-5"><a href="prerequisites.html#cb54-5"></a>  <span class="va">console</span>.<span class="at">log</span>(x)<span class="op">;</span> <span class="co">// print to console</span></span>
+<span id="cb54-6"><a href="prerequisites.html#cb54-6"></a><span class="op">}</span></span>
+<span id="cb54-7"><a href="prerequisites.html#cb54-7"></a></span>
+<span id="cb54-8"><a href="prerequisites.html#cb54-8"></a><span class="at">foo</span>()<span class="op">;</span></span></code></pre></div>
+<div class="rmdnote">
+<p>
+Accessing variables from the parent environment (context) is useful in JavaScript but should not be done in R
+</p>
+</div>
 </div>
 <div id="document-object-model" class="section level3 unnumbered" number="">
 <h3>Document object model</h3>
-<p>In the event that you would want to try what we briefly explore here: the easiest way is to create an HTML file (e.g.: <code>index.html</code>), write your code within a script tag and open the file in your web browser. The output can be observed in the console of the browser which can be opened with a right click and selecting “inspect” then going to the “console” tab.</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb42-1"><a href="prerequisites.html#cb42-1"></a> <span class="er">&lt;</span>!–– index.html ––&gt;</span>
-<span id="cb42-2"><a href="prerequisites.html#cb42-2"></a><span class="kw">&lt;html&gt;</span></span>
-<span id="cb42-3"><a href="prerequisites.html#cb42-3"></a>  <span class="kw">&lt;head&gt;</span></span>
-<span id="cb42-4"><a href="prerequisites.html#cb42-4"></a>  <span class="kw">&lt;/head&gt;</span></span>
-<span id="cb42-5"><a href="prerequisites.html#cb42-5"></a>  <span class="kw">&lt;body&gt;</span></span>
-<span id="cb42-6"><a href="prerequisites.html#cb42-6"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb42-7"><a href="prerequisites.html#cb42-7"></a>  <span class="kw">&lt;/body&gt;</span></span>
-<span id="cb42-8"><a href="prerequisites.html#cb42-8"></a>  <span class="kw">&lt;script&gt;</span></span>
-<span id="cb42-9"><a href="prerequisites.html#cb42-9"></a>    <span class="co">// place your JavaScript code here</span></span>
-<span id="cb42-10"><a href="prerequisites.html#cb42-10"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb42-11"><a href="prerequisites.html#cb42-11"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
-<p>The first difference with R is that the end of every line should be marked with a semi-colon. JavaScript code will often work without but one should always include them to avoid future headaches. Below we use <code>console.log</code>, JavaScript equivalent of R’s <code>print</code> function.</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb43-1"><a href="prerequisites.html#cb43-1"></a><span class="va">console</span>.<span class="at">log</span>(<span class="st">&quot;hello JavaScript&quot;</span>) <span class="co">// bad</span></span>
-<span id="cb43-2"><a href="prerequisites.html#cb43-2"></a><span class="va">console</span>.<span class="at">log</span>(<span class="st">&quot;hello JavaScript&quot;</span>)<span class="op">;</span> <span class="co">// good</span></span></code></pre></div>
-<div class="figure">
-<img src="images/javascript-intro.png" alt="" />
-<p class="caption">Printing to the console</p>
-</div>
-<p>Another difference is that variables must be declared with keywords such as <code>var</code> or <code>const</code> to declare a constant.</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb44-1"><a href="prerequisites.html#cb44-1"></a>x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> <span class="co">// error</span></span>
-<span id="cb44-2"><a href="prerequisites.html#cb44-2"></a><span class="kw">var</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> <span class="co">// works</span></span></code></pre></div>
-<p>One can declare a variable without assigning a value to it, to then do so later on.</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb45-1"><a href="prerequisites.html#cb45-1"></a><span class="kw">var</span> y<span class="op">;</span> <span class="co">// declare </span></span>
-<span id="cb45-2"><a href="prerequisites.html#cb45-2"></a>y <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span><span class="dv">2</span><span class="op">,</span><span class="dv">3</span>]<span class="op">;</span> <span class="co">// define it as array</span></span>
-<span id="cb45-3"><a href="prerequisites.html#cb45-3"></a>y <span class="op">=</span> <span class="st">&#39;string&#39;</span><span class="op">;</span> <span class="co">// change to character string</span></span></code></pre></div>
-<p>In R like in JavaScript, variables can be accessed from the parent environment (often referred to as “context” in the latter). One immense difference though is that while it is seen as bad practice in R it is not in JavaScript where it is extremely useful.</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="prerequisites.html#cb46-1"></a><span class="co"># it works but don&#39;t do this in R</span></span>
-<span id="cb46-2"><a href="prerequisites.html#cb46-2"></a>x &lt;-<span class="st"> </span><span class="dv">123</span></span>
-<span id="cb46-3"><a href="prerequisites.html#cb46-3"></a>foo &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb46-4"><a href="prerequisites.html#cb46-4"></a>  <span class="kw">print</span>(x)</span>
-<span id="cb46-5"><a href="prerequisites.html#cb46-5"></a>}</span>
-<span id="cb46-6"><a href="prerequisites.html#cb46-6"></a><span class="kw">foo</span>()</span></code></pre></div>
-<pre><code>## [1] 123</code></pre>
-<p>The above R code can be re-written in JavaScript. Note the slight variation in the function declaration.</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb48-1"><a href="prerequisites.html#cb48-1"></a><span class="co">// this is perfectly fine</span></span>
-<span id="cb48-2"><a href="prerequisites.html#cb48-2"></a><span class="kw">var</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
-<span id="cb48-3"><a href="prerequisites.html#cb48-3"></a></span>
-<span id="cb48-4"><a href="prerequisites.html#cb48-4"></a><span class="kw">function</span> <span class="at">foo</span>()<span class="op">{</span></span>
-<span id="cb48-5"><a href="prerequisites.html#cb48-5"></a>  <span class="va">console</span>.<span class="at">log</span>(x)<span class="op">;</span> <span class="co">// print to console</span></span>
-<span id="cb48-6"><a href="prerequisites.html#cb48-6"></a><span class="op">}</span></span>
-<span id="cb48-7"><a href="prerequisites.html#cb48-7"></a></span>
-<span id="cb48-8"><a href="prerequisites.html#cb48-8"></a><span class="at">foo</span>()<span class="op">;</span></span></code></pre></div>
 <p>One concept which does not exist in R is that of the “DOM” which stands for Document Object Model. When a web page is loaded, the browser creates a Document Object Model of the web page which can be accessed in JavaScript from the <code>document</code> object. This lets the developer programmatically manipulate the page itself so one can for instance, add an element (e.g.: a button), change the text of another, and plenty more.</p>
 <p>The JavaScript code below grabs the element where <code>id='content'</code> from the <code>document</code> with <code>getElementById</code> and replaces the text (<code>innerText</code>). Even though the page only contains “Trying JavaScript!” when the page is opened (loaded) in the web browser JavaScript runs the code and changes it: this happens very fast so the original text cannot be seen.</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb49-1"><a href="prerequisites.html#cb49-1"></a> <span class="er">&lt;</span>!–– index.html ––&gt;</span>
-<span id="cb49-2"><a href="prerequisites.html#cb49-2"></a><span class="kw">&lt;html&gt;</span></span>
-<span id="cb49-3"><a href="prerequisites.html#cb49-3"></a>  <span class="kw">&lt;head&gt;</span></span>
-<span id="cb49-4"><a href="prerequisites.html#cb49-4"></a>  <span class="kw">&lt;/head&gt;</span></span>
-<span id="cb49-5"><a href="prerequisites.html#cb49-5"></a>  <span class="kw">&lt;body&gt;</span></span>
-<span id="cb49-6"><a href="prerequisites.html#cb49-6"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb49-7"><a href="prerequisites.html#cb49-7"></a>  <span class="kw">&lt;/body&gt;</span></span>
-<span id="cb49-8"><a href="prerequisites.html#cb49-8"></a>  <span class="kw">&lt;script&gt;</span></span>
-<span id="cb49-9"><a href="prerequisites.html#cb49-9"></a>    <span class="kw">var</span> cnt <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&quot;content&quot;</span>)<span class="op">;</span></span>
-<span id="cb49-10"><a href="prerequisites.html#cb49-10"></a>    <span class="va">cnt</span>.<span class="at">innerText</span> <span class="op">=</span> <span class="st">&quot;The text has changed&quot;</span><span class="op">;</span></span>
-<span id="cb49-11"><a href="prerequisites.html#cb49-11"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb49-12"><a href="prerequisites.html#cb49-12"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb55-1"><a href="prerequisites.html#cb55-1"></a> <span class="er">&lt;</span>!–– index.html ––&gt;</span>
+<span id="cb55-2"><a href="prerequisites.html#cb55-2"></a><span class="kw">&lt;html&gt;</span></span>
+<span id="cb55-3"><a href="prerequisites.html#cb55-3"></a>  <span class="kw">&lt;head&gt;</span></span>
+<span id="cb55-4"><a href="prerequisites.html#cb55-4"></a>  <span class="kw">&lt;/head&gt;</span></span>
+<span id="cb55-5"><a href="prerequisites.html#cb55-5"></a>  <span class="kw">&lt;body&gt;</span></span>
+<span id="cb55-6"><a href="prerequisites.html#cb55-6"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb55-7"><a href="prerequisites.html#cb55-7"></a>  <span class="kw">&lt;/body&gt;</span></span>
+<span id="cb55-8"><a href="prerequisites.html#cb55-8"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb55-9"><a href="prerequisites.html#cb55-9"></a>    <span class="kw">var</span> cnt <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&quot;content&quot;</span>)<span class="op">;</span></span>
+<span id="cb55-10"><a href="prerequisites.html#cb55-10"></a>    <span class="va">cnt</span>.<span class="at">innerText</span> <span class="op">=</span> <span class="st">&quot;The text has changed&quot;</span><span class="op">;</span></span>
+<span id="cb55-11"><a href="prerequisites.html#cb55-11"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb55-12"><a href="prerequisites.html#cb55-12"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
 <p>One final thing to note for future reference, though not limited to the ids or classes most such selection of elements from the DOM are done with those where the pound sign refers to an element’s id (<code>#id</code>) and a dot refers to an element’s class (<code>.class</code>), just like in CSS.</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb50-1"><a href="prerequisites.html#cb50-1"></a> <span class="er">&lt;</span>!–– index.html ––&gt;</span>
-<span id="cb50-2"><a href="prerequisites.html#cb50-2"></a><span class="kw">&lt;html&gt;</span></span>
-<span id="cb50-3"><a href="prerequisites.html#cb50-3"></a>  <span class="kw">&lt;head&gt;</span></span>
-<span id="cb50-4"><a href="prerequisites.html#cb50-4"></a>  <span class="kw">&lt;/head&gt;</span></span>
-<span id="cb50-5"><a href="prerequisites.html#cb50-5"></a>  <span class="kw">&lt;body&gt;</span></span>
-<span id="cb50-6"><a href="prerequisites.html#cb50-6"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="ot"> class=</span><span class="st">&quot;stuff&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb50-7"><a href="prerequisites.html#cb50-7"></a>  <span class="kw">&lt;/body&gt;</span></span>
-<span id="cb50-8"><a href="prerequisites.html#cb50-8"></a>  <span class="kw">&lt;script&gt;</span></span>
-<span id="cb50-9"><a href="prerequisites.html#cb50-9"></a>    <span class="co">// select by id</span></span>
-<span id="cb50-10"><a href="prerequisites.html#cb50-10"></a>    <span class="kw">var</span> x <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&quot;content&quot;</span>)<span class="op">;</span></span>
-<span id="cb50-11"><a href="prerequisites.html#cb50-11"></a>    <span class="kw">var</span> y <span class="op">=</span> <span class="va">document</span>.<span class="at">querySelector</span>(<span class="st">&quot;#content&quot;</span>)<span class="op">;</span></span>
-<span id="cb50-12"><a href="prerequisites.html#cb50-12"></a></span>
-<span id="cb50-13"><a href="prerequisites.html#cb50-13"></a>    <span class="va">console</span>.<span class="at">log</span>(x <span class="op">==</span> y)<span class="op">;</span> <span class="co">// true</span></span>
-<span id="cb50-14"><a href="prerequisites.html#cb50-14"></a></span>
-<span id="cb50-15"><a href="prerequisites.html#cb50-15"></a>    <span class="co">// select by class</span></span>
-<span id="cb50-16"><a href="prerequisites.html#cb50-16"></a>    <span class="kw">var</span> z <span class="op">=</span> <span class="va">document</span>.<span class="at">querySelector</span>(<span class="st">&quot;.stuff&quot;</span>)<span class="op">;</span></span>
-<span id="cb50-17"><a href="prerequisites.html#cb50-17"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb50-18"><a href="prerequisites.html#cb50-18"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb56-1"><a href="prerequisites.html#cb56-1"></a> <span class="er">&lt;</span>!–– index.html ––&gt;</span>
+<span id="cb56-2"><a href="prerequisites.html#cb56-2"></a><span class="kw">&lt;html&gt;</span></span>
+<span id="cb56-3"><a href="prerequisites.html#cb56-3"></a>  <span class="kw">&lt;head&gt;</span></span>
+<span id="cb56-4"><a href="prerequisites.html#cb56-4"></a>  <span class="kw">&lt;/head&gt;</span></span>
+<span id="cb56-5"><a href="prerequisites.html#cb56-5"></a>  <span class="kw">&lt;body&gt;</span></span>
+<span id="cb56-6"><a href="prerequisites.html#cb56-6"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="ot"> class=</span><span class="st">&quot;stuff&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb56-7"><a href="prerequisites.html#cb56-7"></a>  <span class="kw">&lt;/body&gt;</span></span>
+<span id="cb56-8"><a href="prerequisites.html#cb56-8"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb56-9"><a href="prerequisites.html#cb56-9"></a>    <span class="co">// select by id</span></span>
+<span id="cb56-10"><a href="prerequisites.html#cb56-10"></a>    <span class="kw">var</span> x <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&quot;content&quot;</span>)<span class="op">;</span></span>
+<span id="cb56-11"><a href="prerequisites.html#cb56-11"></a>    <span class="kw">var</span> y <span class="op">=</span> <span class="va">document</span>.<span class="at">querySelector</span>(<span class="st">&quot;#content&quot;</span>)<span class="op">;</span></span>
+<span id="cb56-12"><a href="prerequisites.html#cb56-12"></a></span>
+<span id="cb56-13"><a href="prerequisites.html#cb56-13"></a>    <span class="va">console</span>.<span class="at">log</span>(x <span class="op">==</span> y)<span class="op">;</span> <span class="co">// true</span></span>
+<span id="cb56-14"><a href="prerequisites.html#cb56-14"></a></span>
+<span id="cb56-15"><a href="prerequisites.html#cb56-15"></a>    <span class="co">// select by class</span></span>
+<span id="cb56-16"><a href="prerequisites.html#cb56-16"></a>    <span class="kw">var</span> z <span class="op">=</span> <span class="va">document</span>.<span class="at">querySelector</span>(<span class="st">&quot;.stuff&quot;</span>)<span class="op">;</span></span>
+<span id="cb56-17"><a href="prerequisites.html#cb56-17"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb56-18"><a href="prerequisites.html#cb56-18"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
 <p>Getting elements from the DOM is a very common operation in JavaScript. While a class can be applied to multiple elements which is useful to get and apply actions to multiple elements, the id attribute must be unique (no two elements can bear the same id in the HTML document) is useful to retrieve a specific element.</p>
 <p>Interestingly some of that mechanism is used by shiny to retrieve and manipulate inputs, the argument <code>inputId</code> of shiny inputs effectively define the HTML <code>id</code> attribute of said input. Shiny can then internally make use of functions the likes of <code>getElementById</code> in order to get those inputs, set or update their values, etc.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="prerequisites.html#cb51-1"></a>shiny<span class="op">::</span><span class="kw">actionButton</span>(<span class="dt">inputId =</span> <span class="st">&quot;theId&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;the label&quot;</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="prerequisites.html#cb57-1"></a>shiny<span class="op">::</span><span class="kw">actionButton</span>(<span class="dt">inputId =</span> <span class="st">&quot;theId&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;the label&quot;</span>) </span></code></pre></div>
 <button id="theId" type="button" class="btn btn-default action-button">the label</button>
 <p>This of course only scratches the surface of JavaScript thus this provides ample understanding of the language to keep up with the next chapters. Also, a somewhat interesting fact that will prove useful later in the book: the RStudio IDE is actually a browser, therefore, in the IDE, one can right-click and “inspect element” to view the rendered source code.</p>
 

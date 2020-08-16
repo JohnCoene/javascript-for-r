@@ -83,7 +83,7 @@ string_length <- function(string) {
 }
 ```
 
-```{block, type='note'}
+```{block, type='rmdnote'}
 Note that the function is preceded by its namespace with `::` (more on this later).
 ```
 
@@ -187,7 +187,7 @@ Above we import the function `str_length` from the `stringr` package using the `
 
 Finally, one can actually generate the `.Rd` documentation files and populate the `NAMESPACE` with either the `devtools::document()` function or `roxygen2::roxygenise()`.
 
-```{block, type='note'}
+```{block, type='rmdnote'}
 Remember to run `devtools::document()` after changing roxygen2 tags otherwise changes are not actually reflected in the `NAMESPACE` and documentation.
 ```
 
@@ -217,7 +217,7 @@ Note whilst this short guide will help you develop packages good enough for your
 
 JSON (JavaScript Object Notation) is a very popular data _interchange_ format with which we will work extensively throughout this book, it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together it is essential that we have a data format that can be understood by both---JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the [jsonlite package](https://CRAN.R-project.org/package=jsonlite) [@R-jsonlite], in fact it is the serialiser used internally by all the packages we shall explore in this book.
 
-```{block, type='note'}
+```{block, type='rmdnote'}
 "To serialise" is just jargon for converting data to JSON.
 ```
 
@@ -301,11 +301,30 @@ Jsonlite provides many more options and functions that will let you tune how JSO
 
 The book is not meant to teach one JavaScript, only to show how graciously it can work with R. Let us thus go through the very basics to ensure we know enough to get started with the coming chapters.
 
+The easiest way to run JavaScript interactively is probably to create an HTML file (e.g.: `try.html`), write your code within a `<script>` tags and open the file in your web browser. The console output can be observed in the console of the browser, developer tools (more on that below).
+
+```html
+<!–– index.html ––>
+<html>
+  <head>
+  </head>
+  <body>
+    <p id="content">Trying JavaScript!</p>
+  </body>
+  <script>
+    // place your JavaScript code here
+    console.log('Hello JavaScript!')
+  </script>
+</html>
+```
+
+![](images/tryingjs.png)
+
 ### Developer tools {-}
 
 Most of the JavaScript code written in this book is intended to be run in web browsers, it is thus vital that you have a great understanding of your web browser and its developer tools (devtools). In this section we discuss those available in Google Chrome and Chromium but such tools, albeit somewhat different, also exist in Mozilla Firefox.
 
-```{block, type='note'}
+```{block, type='rmdnote'}
 The RStudio IDE is built on Chromium, some of these tools will therefore also work in RStudio.
 ```
 
@@ -320,7 +339,7 @@ The developer tools pane consists of several tabs but we will mainly use:
 
 ### Variable declaration and scope {-}
 
-One major way JavaScript differs from R is that variables must be declared with keywords one of three keywords, `var`, `let`, or `const` which mainly affect the scope where the declared variable will be accessible from.
+One major way JavaScript differs from R is that variables must be declared using one of three keywords, `var`, `let`, or `const` which mainly affect the scope where the declared variable will be accessible from.
 
 ```js
 x = 1; // error
@@ -335,7 +354,7 @@ y = [1,2,3]; // define it as array
 y = 'string'; // change to character string
 ```
 
-The `let` and `const` keywords were added in 2015, the `const` is used to defined a constant: a variable that once declared cannot be changed.
+The `let` and `const` keywords were added in ES2015, the `const` is used to defined a constant: a variable that once declared cannot be changed.
 
 ```js
 const x = 1; // declare constant
@@ -344,7 +363,7 @@ x = 2; // error
 
 Though this is probably only rarely done in R, one can produce something similar by locking the binding for a variable in its environment.
 
-```r
+```{r, error=TRUE}
 x <- 1 # declare x
 lockBinding("x", env = .GlobalEnv) # make constant
 x <- 2 # error
@@ -352,38 +371,21 @@ unlockBinding("x", env = .GlobalEnv) # unlock binding
 x <- 2 # works
 ```
 
-The `let` keyword is akin to declaring a variable with the `var` keyword, however `let` (and `const`) will declare the variable in the "block scope."
-
-### Document object model {-}
-
-In the event that you would want to try what we briefly explore here: the easiest way is to create an HTML file (e.g.: `index.html`), write your code within a script tag and open the file in your web browser. The output can be observed in the console of the browser which can be opened with a right click and selecting "inspect" then going to the "console" tab.
-
-```html
- <!–– index.html ––>
-<html>
-  <head>
-  </head>
-  <body>
-    <p id="content">Trying JavaScript!</p>
-  </body>
-  <script>
-    // place your JavaScript code here
-  </script>
-</html>
-```
-
-The first difference with R is that the end of every line should be marked with a semi-colon. JavaScript code will often work without but one should always include them to avoid future headaches. Below we use `console.log`, JavaScript equivalent of R's `print` function.
+The `let` keyword is akin to declaring a variable with the `var` keyword, however `let` (and `const`) will declare the variable in the "block scope." This in effect further narrows down the scope where the variable will be accessible, a block scope is generally the area within `if`, `switch` conditions or `for` and `while` loops: areas within curly brackets.
 
 ```js
-console.log("hello JavaScript") // bad
-console.log("hello JavaScript"); // good
+if(true){
+  let x = 1;
+  var y = 1;
+}
+
+console.log(x) // error x does not exist
+console.log(y) // works
 ```
 
-![Printing to the console](images/javascript-intro.png)
+In the above example `x` is only accessible within the if statement as it is declared with `let`, `var` does not have a block scope. 
 
-
-
-In R like in JavaScript, variables can be accessed from the parent environment (often referred to as "context" in the latter). One immense difference though is that while it is seen as bad practice in R it is not in JavaScript where it is extremely useful.
+While on the subject of scope, in R like in JavaScript, variables can be accessed from the parent environment (often referred to as "context" in the latter). One immense difference though is that while it is seen as bad practice in R it is not in JavaScript where it is extremely useful.
 
 ```{r}
 # it works but don't do this in R
@@ -406,6 +408,12 @@ function foo(){
 
 foo();
 ```
+
+```{block, type='rmdnote'}
+Accessing variables from the parent environment (context) is useful in JavaScript but should not be done in R
+```
+
+### Document object model {-}
 
 One concept which does not exist in R is that of the "DOM" which stands for Document Object Model. When a web page is loaded, the browser creates a Document Object Model of the web page which can be accessed in JavaScript from the `document` object. This lets the developer programmatically manipulate the page itself so one can for instance, add an element (e.g.: a button), change the text of another, and plenty more.
 

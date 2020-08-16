@@ -9,5 +9,4 @@ echo "\e[33mCreating HTML\033[0m"
 Rscript -e "bookdown::render_book('.', 'bookdown::gitbook')"
 echo "\e[33mCreating PDF\033[0m"
 Rscript -e "bookdown::render_book('.', 'bookdown::pdf_book')"
-echo "\e[33mCreating epub\033[0m"
-Rscript -e "bookdown::render_book('.', 'bookdown::epub_book')"
+xdg-open ./_book/index.html
