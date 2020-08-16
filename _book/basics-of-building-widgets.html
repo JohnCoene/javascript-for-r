@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 6 A Realistic Widget | JavaScript for R</title>
+  <title>Chapter 4 Basics of building widgets | JavaScript for R</title>
   <meta name="description" content="Invite JavaScript into your Data Science workflow." />
   <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 6 A Realistic Widget | JavaScript for R" />
+  <meta property="og:title" content="Chapter 4 Basics of building widgets | JavaScript for R" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="JohnCoene/javascript-for-r" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 6 A Realistic Widget | JavaScript for R" />
+  <meta name="twitter:title" content="Chapter 4 Basics of building widgets | JavaScript for R" />
   
   <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="your-first-widget.html"/>
-<link rel="next" href="the-full-monty.html"/>
+<link rel="prev" href="introduction-to-htmlwidgets.html"/>
+<link rel="next" href="your-first-widget.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -386,180 +386,136 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="a-realistic-widget" class="section level1" number="6">
-<h1><span class="header-section-number">Chapter 6</span> A Realistic Widget</h1>
-<p>In this section we build a package called <code>typed</code>, which wraps the JavaScript library of the same name, <a href="https://github.com/mattboldt/typed.js/">typed.js</a> that mimics text being typed. This builds upon many things we explored in the playground package.</p>
-<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="a-realistic-widget.html#cb84-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;typed&quot;</span>)</span>
-<span id="cb84-2"><a href="a-realistic-widget.html#cb84-2"></a>htmlwidgets<span class="op">::</span><span class="kw">scaffoldWidget</span>(<span class="st">&quot;typed&quot;</span>)</span></code></pre></div>
-<p>As done with candidate libraries, let’s take a look at documentation of <a href="https://github.com/mattboldt/typed.js/">typed.js</a> to see how typed.js works.</p>
-<div class="sourceCode" id="cb85"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb85-1"><a href="a-realistic-widget.html#cb85-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
-<span id="cb85-2"><a href="a-realistic-widget.html#cb85-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb85-3"><a href="a-realistic-widget.html#cb85-3"></a></span>
-<span id="cb85-4"><a href="a-realistic-widget.html#cb85-4"></a><span class="kw">&lt;head&gt;</span></span>
-<span id="cb85-5"><a href="a-realistic-widget.html#cb85-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
-<span id="cb85-6"><a href="a-realistic-widget.html#cb85-6"></a>  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;typed.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb85-7"><a href="a-realistic-widget.html#cb85-7"></a><span class="kw">&lt;/head&gt;</span></span>
-<span id="cb85-8"><a href="a-realistic-widget.html#cb85-8"></a></span>
-<span id="cb85-9"><a href="a-realistic-widget.html#cb85-9"></a><span class="kw">&lt;body&gt;</span></span>
-<span id="cb85-10"><a href="a-realistic-widget.html#cb85-10"></a>  <span class="co">&lt;!-- div to hold visualisation --&gt;</span></span>
-<span id="cb85-11"><a href="a-realistic-widget.html#cb85-11"></a>  <span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;element&quot;</span><span class="kw">&gt;&lt;/div&gt;</span></span>
-<span id="cb85-12"><a href="a-realistic-widget.html#cb85-12"></a></span>
-<span id="cb85-13"><a href="a-realistic-widget.html#cb85-13"></a>  <span class="co">&lt;!-- Script to create visualisation --&gt;</span></span>
-<span id="cb85-14"><a href="a-realistic-widget.html#cb85-14"></a>  <span class="kw">&lt;script&gt;</span></span>
-<span id="cb85-15"><a href="a-realistic-widget.html#cb85-15"></a>    <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;.element&#39;</span><span class="op">,</span> <span class="op">{</span></span>
-<span id="cb85-16"><a href="a-realistic-widget.html#cb85-16"></a>      <span class="dt">strings</span><span class="op">:</span> [<span class="st">&#39;First sentence.&#39;</span><span class="op">,</span> <span class="st">&#39;And a second sentence.&#39;</span>]</span>
-<span id="cb85-17"><a href="a-realistic-widget.html#cb85-17"></a>    <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb85-18"><a href="a-realistic-widget.html#cb85-18"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb85-19"><a href="a-realistic-widget.html#cb85-19"></a><span class="kw">&lt;/body&gt;</span></span>
-<span id="cb85-20"><a href="a-realistic-widget.html#cb85-20"></a></span>
-<span id="cb85-21"><a href="a-realistic-widget.html#cb85-21"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
-<p>The code above is not very different from what was observed in other libraries: the library is imported, there is a <code>&lt;div&gt;</code> where the output will be generated, and a script which also takes a selector and a JSON of options.</p>
-<div id="dependency" class="section level2" number="6.1">
-<h2><span class="header-section-number">6.1</span> Dependency</h2>
-<p>Once the package created and the widget scaffold laid down we need to add the JavaScript dependency without which nothing can move forward. The <a href="https://github.com/mattboldt/typed.js">documentation in the README of typed.js</a> states that it can be imported like so.</p>
-<div class="sourceCode" id="cb86"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb86-1"><a href="a-realistic-widget.html#cb86-1"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;https://cdn.jsdelivr.net/npm/typed.js@2.0.11&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span></code></pre></div>
-<p>First, we will download the dependency, which consists of a single JavaScript file, instead of using the CDN as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Below we place the dependency in a “typed” directory within the “htmlwidgets” folder.</p>
-<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="a-realistic-widget.html#cb87-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;./inst/htmlwidgets/typed&quot;</span>)</span>
-<span id="cb87-2"><a href="a-realistic-widget.html#cb87-2"></a>cdn &lt;-<span class="st"> &quot;https://cdn.jsdelivr.net/npm/typed.js@2.0.11&quot;</span></span>
-<span id="cb87-3"><a href="a-realistic-widget.html#cb87-3"></a><span class="kw">download.file</span>(cdn, <span class="st">&quot;./inst/htmlwidgets/typed/typed.min.js&quot;</span>)</span></code></pre></div>
-<p>This produces a directory that looks like this:</p>
-<pre><code>.
-├── DESCRIPTION
-├── NAMESPACE
-├── R
-│   └── typed.R
-└── inst
-    └── htmlwidgets
-        ├── typed
-        │   └── typed.min.js
-        ├── typed.js
-        └── typed.yaml</code></pre>
-<p>In htmlwidgets packages dependencies are specified in the <code>.yml</code> file located at <code>inst/htmlwidgets</code> which at first contains a commented template.</p>
-<div class="sourceCode" id="cb89"><pre class="sourceCode yml"><code class="sourceCode yaml"><span id="cb89-1"><a href="a-realistic-widget.html#cb89-1"></a><span class="co"># (uncomment to add a dependency)</span></span>
-<span id="cb89-2"><a href="a-realistic-widget.html#cb89-2"></a><span class="co"># dependencies:</span></span>
-<span id="cb89-3"><a href="a-realistic-widget.html#cb89-3"></a><span class="co">#  - name:</span></span>
-<span id="cb89-4"><a href="a-realistic-widget.html#cb89-4"></a><span class="co">#    version:</span></span>
-<span id="cb89-5"><a href="a-realistic-widget.html#cb89-5"></a><span class="co">#    src:</span></span>
-<span id="cb89-6"><a href="a-realistic-widget.html#cb89-6"></a><span class="co">#    script:</span></span>
-<span id="cb89-7"><a href="a-realistic-widget.html#cb89-7"></a><span class="co">#    stylesheet:</span></span></code></pre></div>
-<p>Let’s uncomment those lines as instructed at the top of the file and fill it in.</p>
-<div class="sourceCode" id="cb90"><pre class="sourceCode yml"><code class="sourceCode yaml"><span id="cb90-1"><a href="a-realistic-widget.html#cb90-1"></a><span class="fu">dependencies</span><span class="kw">:</span></span>
-<span id="cb90-2"><a href="a-realistic-widget.html#cb90-2"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> typed.js</span></span>
-<span id="cb90-3"><a href="a-realistic-widget.html#cb90-3"></a><span class="at">    </span><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="fl">2.0.11</span></span>
-<span id="cb90-4"><a href="a-realistic-widget.html#cb90-4"></a><span class="at">    </span><span class="fu">src</span><span class="kw">:</span><span class="at"> htmlwidgets/typed</span></span>
-<span id="cb90-5"><a href="a-realistic-widget.html#cb90-5"></a><span class="at">    </span><span class="fu">script</span><span class="kw">:</span><span class="at"> typed.min.js</span></span></code></pre></div>
-<p>We remove the <code>stylesheet</code> entry as this package does not require any CSS files. The <code>src</code> specifies the path to the directory containing the scripts and stylesheets. This is akin to using the <code>system.file</code> function to return the full path to a file or directory within the package.</p>
-<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="a-realistic-widget.html#cb91-1"></a>devtools<span class="op">::</span><span class="kw">load_all</span>()</span>
-<span id="cb91-2"><a href="a-realistic-widget.html#cb91-2"></a><span class="kw">system.file</span>(<span class="st">&quot;htmlwidgets/typed&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;typed&quot;</span>)                                         </span>
-<span id="cb91-3"><a href="a-realistic-widget.html#cb91-3"></a><span class="co">#&gt; &quot;/home/me/packages/typed/inst/htmlwidgets/typed&quot;</span></span></code></pre></div>
-<p>We should verify that this is correct by using the one R function the package features and check the source code of the output to verify that the typed.js is indeed imported. We thus run <code>typed("test")</code>, open the output in the browser (<img src="images/open-in-browser.png" />) and look at the source code of the page (right click and select “View page source”). At the top of the page one should see <code>typed.min.js</code> imported, click the link to ensure it correctly points to the dependency.</p>
-<div class="sourceCode" id="cb92"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb92-1"><a href="a-realistic-widget.html#cb92-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
-<span id="cb92-2"><a href="a-realistic-widget.html#cb92-2"></a><span class="kw">&lt;html&gt;</span></span>
-<span id="cb92-3"><a href="a-realistic-widget.html#cb92-3"></a><span class="kw">&lt;head&gt;</span></span>
-<span id="cb92-4"><a href="a-realistic-widget.html#cb92-4"></a><span class="kw">&lt;meta</span><span class="ot"> charset=</span><span class="st">&quot;utf-8&quot;</span><span class="kw">/&gt;</span></span>
-<span id="cb92-5"><a href="a-realistic-widget.html#cb92-5"></a><span class="kw">&lt;style&gt;</span>body{<span class="kw">background-color</span>:<span class="cn">white</span><span class="op">;</span>}<span class="kw">&lt;/style&gt;</span></span>
-<span id="cb92-6"><a href="a-realistic-widget.html#cb92-6"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;lib/htmlwidgets-1.5.1/htmlwidgets.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb92-7"><a href="a-realistic-widget.html#cb92-7"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;lib/typed.js-2.0.11/typed.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb92-8"><a href="a-realistic-widget.html#cb92-8"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;lib/typed-binding-0.0.0.9000/typed.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb92-9"><a href="a-realistic-widget.html#cb92-9"></a>...</span></code></pre></div>
+<div id="basics-of-building-widgets" class="section level1" number="4">
+<h1><span class="header-section-number">Chapter 4</span> Basics of building widgets</h1>
+<p>Having explored existing packages that build on top of the htmlwidgets package gives some idea of the end product we learn to build but it does not give insights about where to start and much of how it works probably remains somewhat magical.</p>
+<div id="candidate-libraries" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Candidate Libraries</h2>
+<p>Before going down the rabbit hole it is good to take a look at the types of libraries one will work with. As htmlwidgets’ main clients are JavaScript visualisation libraries let us take a look at some such popular libraries and briefly analyse at how they work and what they have in common. This will greatly help conceptualise what one is trying to achieve in this chapter.</p>
+<div id="plotly" class="section level3" number="4.1.1">
+<h3><span class="header-section-number">4.1.1</span> Plotly</h3>
+<p><a href="https://plotly.com/javascript/">Plotly.js</a> is probably one of the more popular out there, it provides over 40 fully customiseable chart types, many of which are very sophisticated. This is indeed the JavaScript library used by the R package of the same name: plotly.</p>
+<p>Looking at the code presented in the “Get Started” guide reveals just how convenient the library is. One must import plotly, of course, then have a <code>&lt;div&gt;</code> where the visualisation will be placed, then, using <code>Plotly.newPlot</code>, create the actual visualisation by passing it first the element previously mentioned and a JSON of options that describe the chart.</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb58-1"><a href="basics-of-building-widgets.html#cb58-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
+<span id="cb58-2"><a href="basics-of-building-widgets.html#cb58-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb58-3"><a href="basics-of-building-widgets.html#cb58-3"></a></span>
+<span id="cb58-4"><a href="basics-of-building-widgets.html#cb58-4"></a><span class="kw">&lt;head&gt;</span></span>
+<span id="cb58-5"><a href="basics-of-building-widgets.html#cb58-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
+<span id="cb58-6"><a href="basics-of-building-widgets.html#cb58-6"></a>  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;plotly-latest.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb58-7"><a href="basics-of-building-widgets.html#cb58-7"></a><span class="kw">&lt;/head&gt;</span></span>
+<span id="cb58-8"><a href="basics-of-building-widgets.html#cb58-8"></a></span>
+<span id="cb58-9"><a href="basics-of-building-widgets.html#cb58-9"></a><span class="kw">&lt;body&gt;</span></span>
+<span id="cb58-10"><a href="basics-of-building-widgets.html#cb58-10"></a>  <span class="co">&lt;!-- div to hold visualisation --&gt;</span></span>
+<span id="cb58-11"><a href="basics-of-building-widgets.html#cb58-11"></a>  <span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&quot;chart&quot;</span><span class="ot"> style=</span><span class="st">&quot;width:600px;height:400px;&quot;</span><span class="kw">&gt;&lt;/div&gt;</span></span>
+<span id="cb58-12"><a href="basics-of-building-widgets.html#cb58-12"></a></span>
+<span id="cb58-13"><a href="basics-of-building-widgets.html#cb58-13"></a>  <span class="co">&lt;!-- Script to create visualisation --&gt;</span></span>
+<span id="cb58-14"><a href="basics-of-building-widgets.html#cb58-14"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb58-15"><a href="basics-of-building-widgets.html#cb58-15"></a>    el <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&#39;chart&#39;</span>)<span class="op">;</span></span>
+<span id="cb58-16"><a href="basics-of-building-widgets.html#cb58-16"></a>    <span class="va">Plotly</span>.<span class="at">newPlot</span>(el<span class="op">,</span> [<span class="op">{</span></span>
+<span id="cb58-17"><a href="basics-of-building-widgets.html#cb58-17"></a>      <span class="dt">x</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">5</span>]<span class="op">,</span></span>
+<span id="cb58-18"><a href="basics-of-building-widgets.html#cb58-18"></a>      <span class="dt">y</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">8</span><span class="op">,</span> <span class="dv">16</span>] <span class="op">}</span>]</span>
+<span id="cb58-19"><a href="basics-of-building-widgets.html#cb58-19"></a>    )<span class="op">;</span></span>
+<span id="cb58-20"><a href="basics-of-building-widgets.html#cb58-20"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb58-21"><a href="basics-of-building-widgets.html#cb58-21"></a><span class="kw">&lt;/body&gt;</span></span>
+<span id="cb58-22"><a href="basics-of-building-widgets.html#cb58-22"></a></span>
+<span id="cb58-23"><a href="basics-of-building-widgets.html#cb58-23"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="figure">
+<img src="images/candidate-plotly.png" alt="" />
+<p class="caption">Plotly.js example</p>
 </div>
-<div id="javascript" class="section level2" number="6.2">
-<h2><span class="header-section-number">6.2</span> JavaScript</h2>
-<p>On its <a href="https://mattboldt.com/demos/typed-js/">official website</a>, typed.js gives the following example. The JavaScript function <code>Typed</code> takes two arguments, first the selector, the element to hold the output, second a JSON of options to specify what is being typed and a myriad of other things.</p>
-<div class="sourceCode" id="cb93"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb93-1"><a href="a-realistic-widget.html#cb93-1"></a><span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;.element&#39;</span><span class="op">,</span> <span class="op">{</span></span>
-<span id="cb93-2"><a href="a-realistic-widget.html#cb93-2"></a>  <span class="dt">strings</span><span class="op">:</span> [<span class="st">&quot;First sentence.&quot;</span><span class="op">,</span> <span class="st">&quot;Second sentence.&quot;</span>]<span class="op">,</span></span>
-<span id="cb93-3"><a href="a-realistic-widget.html#cb93-3"></a>  <span class="dt">typeSpeed</span><span class="op">:</span> <span class="dv">30</span></span>
-<span id="cb93-4"><a href="a-realistic-widget.html#cb93-4"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
-<p>Let’s place it in the package by replacing the content of the <code>renderValue</code> in <code>typed.js</code> with the above.</p>
-<div class="sourceCode" id="cb94"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb94-1"><a href="a-realistic-widget.html#cb94-1"></a>...</span>
-<span id="cb94-2"><a href="a-realistic-widget.html#cb94-2"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb94-3"><a href="a-realistic-widget.html#cb94-3"></a></span>
-<span id="cb94-4"><a href="a-realistic-widget.html#cb94-4"></a>  <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;.element&#39;</span><span class="op">,</span> <span class="op">{</span></span>
-<span id="cb94-5"><a href="a-realistic-widget.html#cb94-5"></a>    <span class="dt">strings</span><span class="op">:</span> [<span class="st">&quot;First sentence.&quot;</span><span class="op">,</span> <span class="st">&quot;Second sentence.&quot;</span>]<span class="op">,</span></span>
-<span id="cb94-6"><a href="a-realistic-widget.html#cb94-6"></a>    <span class="dt">typeSpeed</span><span class="op">:</span> <span class="dv">30</span></span>
-<span id="cb94-7"><a href="a-realistic-widget.html#cb94-7"></a>  <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb94-8"><a href="a-realistic-widget.html#cb94-8"></a></span>
-<span id="cb94-9"><a href="a-realistic-widget.html#cb94-9"></a><span class="op">}</span></span>
-<span id="cb94-10"><a href="a-realistic-widget.html#cb94-10"></a>...</span></code></pre></div>
-<p>One could be tempted to run <code>devtools::load_all</code> but this will not work, namely because the function uses a selector that is will not return any object; it needs to be applied to the div created by the widget not <code>.element</code>. As hinted at in the playground, the selector of the element created is accessible from the <code>el</code> object. As a matter of fact, we did log in the browser console the id of the created div taken from <code>el.id</code>. Therefore concatenating the pound sign and the element id produces the select to said element. (<code>.class</code>, <code>#id</code>)</p>
-<div class="sourceCode" id="cb95"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb95-1"><a href="a-realistic-widget.html#cb95-1"></a><span class="co">// typed.js</span></span>
-<span id="cb95-2"><a href="a-realistic-widget.html#cb95-2"></a>...</span>
-<span id="cb95-3"><a href="a-realistic-widget.html#cb95-3"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb95-4"><a href="a-realistic-widget.html#cb95-4"></a></span>
-<span id="cb95-5"><a href="a-realistic-widget.html#cb95-5"></a>  <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;#&#39;</span> <span class="op">+</span> <span class="va">el</span>.<span class="at">id</span><span class="op">,</span> <span class="op">{</span></span>
-<span id="cb95-6"><a href="a-realistic-widget.html#cb95-6"></a>    <span class="dt">strings</span><span class="op">:</span> [<span class="st">&quot;First sentence.&quot;</span><span class="op">,</span> <span class="st">&quot;Second sentence.&quot;</span>]<span class="op">,</span></span>
-<span id="cb95-7"><a href="a-realistic-widget.html#cb95-7"></a>    <span class="dt">typeSpeed</span><span class="op">:</span> <span class="dv">30</span></span>
-<span id="cb95-8"><a href="a-realistic-widget.html#cb95-8"></a>  <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb95-9"><a href="a-realistic-widget.html#cb95-9"></a></span>
-<span id="cb95-10"><a href="a-realistic-widget.html#cb95-10"></a><span class="op">}</span></span>
-<span id="cb95-11"><a href="a-realistic-widget.html#cb95-11"></a>...</span></code></pre></div>
-<p>This should now work, run <code>devtools::load_all</code> followed by <code>typed("whatever")</code> and the JavaScript animated text will appear! It’s not of any use just yet as the options, including the text being typed is predefined: the package is currently not making any use the of the inputs passed from R. This can be changed by using <code>x.message</code> passed from R instead of the default strings.</p>
-<div class="sourceCode" id="cb96"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb96-1"><a href="a-realistic-widget.html#cb96-1"></a><span class="co">// typed.js</span></span>
-<span id="cb96-2"><a href="a-realistic-widget.html#cb96-2"></a>...</span>
-<span id="cb96-3"><a href="a-realistic-widget.html#cb96-3"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb96-4"><a href="a-realistic-widget.html#cb96-4"></a></span>
-<span id="cb96-5"><a href="a-realistic-widget.html#cb96-5"></a>  <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;#&#39;</span> <span class="op">+</span> <span class="va">el</span>.<span class="at">id</span><span class="op">,</span> <span class="op">{</span></span>
-<span id="cb96-6"><a href="a-realistic-widget.html#cb96-6"></a>    <span class="dt">strings</span><span class="op">:</span> <span class="va">x</span>.<span class="at">message</span><span class="op">,</span></span>
-<span id="cb96-7"><a href="a-realistic-widget.html#cb96-7"></a>    <span class="dt">typeSpeed</span><span class="op">:</span> <span class="dv">30</span></span>
-<span id="cb96-8"><a href="a-realistic-widget.html#cb96-8"></a>  <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb96-9"><a href="a-realistic-widget.html#cb96-9"></a></span>
-<span id="cb96-10"><a href="a-realistic-widget.html#cb96-10"></a><span class="op">}</span></span>
-<span id="cb96-11"><a href="a-realistic-widget.html#cb96-11"></a>...</span></code></pre></div>
-<p>This, however, will cause issues as the <code>strings</code> options expects and array (vector) and not a single string.</p>
-<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="a-realistic-widget.html#cb97-1"></a><span class="kw">typed</span>(<span class="st">&quot;does not work&quot;</span>) <span class="co"># length =  1</span></span>
-<span id="cb97-2"><a href="a-realistic-widget.html#cb97-2"></a><span class="kw">typed</span>(<span class="kw">c</span>(<span class="st">&quot;This&quot;</span>, <span class="st">&quot;will&quot;</span>, <span class="st">&quot;work&quot;</span>)) <span class="co"># length &gt; 1</span></span></code></pre></div>
-<p>One solution is to force the input into a list.</p>
-<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="a-realistic-widget.html#cb98-1"></a><span class="co"># typed.R</span></span>
-<span id="cb98-2"><a href="a-realistic-widget.html#cb98-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb98-3"><a href="a-realistic-widget.html#cb98-3"></a>  <span class="dt">message =</span> <span class="kw">as.list</span>(message)</span>
-<span id="cb98-4"><a href="a-realistic-widget.html#cb98-4"></a>)</span></code></pre></div>
-<p>At this juncture the package works but there is a salient issue with the way it handles options. Why build a list in R to reconstruct it in JavaScript manually. Since the options are serialised in R to JSON and that typed.js expects a JSON of options it is actually cleaner and more convenient to construct an R list that mirrors the JSON array so one can use it as-is in JavaScript.</p>
-<p>In fact, renaming the <code>message</code> to <code>strings</code> effectively does this.</p>
-<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="a-realistic-widget.html#cb99-1"></a><span class="co"># typed.R</span></span>
-<span id="cb99-2"><a href="a-realistic-widget.html#cb99-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb99-3"><a href="a-realistic-widget.html#cb99-3"></a>  <span class="dt">strings =</span> <span class="kw">as.list</span>(message)</span>
-<span id="cb99-4"><a href="a-realistic-widget.html#cb99-4"></a>)</span></code></pre></div>
-<p>This allows greatly simplifying the code JavaScript side, making it much easier to add other options down the line, maintain, debug, and read.</p>
-<div class="sourceCode" id="cb100"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb100-1"><a href="a-realistic-widget.html#cb100-1"></a><span class="co">// typed.js</span></span>
-<span id="cb100-2"><a href="a-realistic-widget.html#cb100-2"></a>...</span>
-<span id="cb100-3"><a href="a-realistic-widget.html#cb100-3"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb100-4"><a href="a-realistic-widget.html#cb100-4"></a></span>
-<span id="cb100-5"><a href="a-realistic-widget.html#cb100-5"></a>  <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;#&#39;</span> <span class="op">+</span> <span class="va">el</span>.<span class="at">id</span><span class="op">,</span> x)<span class="op">;</span></span>
-<span id="cb100-6"><a href="a-realistic-widget.html#cb100-6"></a></span>
-<span id="cb100-7"><a href="a-realistic-widget.html#cb100-7"></a><span class="op">}</span></span>
-<span id="cb100-8"><a href="a-realistic-widget.html#cb100-8"></a>...</span></code></pre></div>
-<p>One can now add more options from the R code without having to alter any of the JavaScript. Let us demonstrate with the <code>loop</code> option.</p>
-<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="a-realistic-widget.html#cb101-1"></a>typed &lt;-<span class="st"> </span><span class="cf">function</span>(message, <span class="dt">loop =</span> <span class="ot">FALSE</span>, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
-<span id="cb101-2"><a href="a-realistic-widget.html#cb101-2"></a></span>
-<span id="cb101-3"><a href="a-realistic-widget.html#cb101-3"></a>  <span class="co"># forward options using x</span></span>
-<span id="cb101-4"><a href="a-realistic-widget.html#cb101-4"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb101-5"><a href="a-realistic-widget.html#cb101-5"></a>    <span class="dt">loop =</span> loop,</span>
-<span id="cb101-6"><a href="a-realistic-widget.html#cb101-6"></a>    <span class="dt">strings =</span> <span class="kw">as.list</span>(message)</span>
-<span id="cb101-7"><a href="a-realistic-widget.html#cb101-7"></a>  )</span>
-<span id="cb101-8"><a href="a-realistic-widget.html#cb101-8"></a></span>
-<span id="cb101-9"><a href="a-realistic-widget.html#cb101-9"></a>  <span class="co"># create widget</span></span>
-<span id="cb101-10"><a href="a-realistic-widget.html#cb101-10"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
-<span id="cb101-11"><a href="a-realistic-widget.html#cb101-11"></a>    <span class="dt">name =</span> <span class="st">&#39;typed&#39;</span>,</span>
-<span id="cb101-12"><a href="a-realistic-widget.html#cb101-12"></a>    x,</span>
-<span id="cb101-13"><a href="a-realistic-widget.html#cb101-13"></a>    <span class="dt">width =</span> width,</span>
-<span id="cb101-14"><a href="a-realistic-widget.html#cb101-14"></a>    <span class="dt">height =</span> height,</span>
-<span id="cb101-15"><a href="a-realistic-widget.html#cb101-15"></a>    <span class="dt">package =</span> <span class="st">&#39;typed&#39;</span>,</span>
-<span id="cb101-16"><a href="a-realistic-widget.html#cb101-16"></a>    <span class="dt">elementId =</span> elementId</span>
-<span id="cb101-17"><a href="a-realistic-widget.html#cb101-17"></a>  )</span>
-<span id="cb101-18"><a href="a-realistic-widget.html#cb101-18"></a>}</span></code></pre></div>
+<p>Now let’s look at how another popular library does it.</p>
 </div>
-<div id="html-element" class="section level2" number="6.3">
-<h2><span class="header-section-number">6.3</span> HTML Element</h2>
-<p>As pointed out multiple times, the widget is generated in a <code>&lt;div&gt;</code>, which is works fine for most visualisation libraries. But we saw that chart.js requires placing it in a <code>&lt;canvas&gt;</code>, so one needs the ability to change that. It could be interesting to apply this to typed.js too as within a <code>&lt;div&gt;</code> it cannot be placed inline, using a <code>&lt;span&gt;</code>, however, this would work.</p>
-<p>This can be changed by placing a function named <code>nameOfWidget_html</code> which looked up by htmlwidgets and used if found. This function takes the three-dot construct <code>...</code> and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets needs be able to pass arguments, such as the all too critical <code>id</code>.</p>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="a-realistic-widget.html#cb102-1"></a>typed_html &lt;-<span class="st"> </span><span class="cf">function</span>(...){</span>
-<span id="cb102-2"><a href="a-realistic-widget.html#cb102-2"></a>  htmltools<span class="op">::</span>tags<span class="op">$</span><span class="kw">span</span>(...)</span>
-<span id="cb102-3"><a href="a-realistic-widget.html#cb102-3"></a>}</span></code></pre></div>
-<p>Note that this can also be used to force certain attributes onto the element. For instance we could use the code below to force all output to use a red font.</p>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="a-realistic-widget.html#cb103-1"></a>typed_html &lt;-<span class="st"> </span><span class="cf">function</span>(...){</span>
-<span id="cb103-2"><a href="a-realistic-widget.html#cb103-2"></a>  htmltools<span class="op">::</span>tags<span class="op">$</span><span class="kw">span</span>(..., <span class="dt">style =</span> <span class="st">&quot;color:red;&quot;</span>)</span>
-<span id="cb103-3"><a href="a-realistic-widget.html#cb103-3"></a>}</span></code></pre></div>
-<p>We shall leave it at that and move on to building another widget but completing the package makes for an interesting exercise.</p>
+<div id="highchart.js" class="section level3" number="4.1.2">
+<h3><span class="header-section-number">4.1.2</span> Highchart.js</h3>
+<p><a href="https://www.highcharts.com/">Highcharts</a> is another library which allows creating gorgeous visualisation, maps, and more, it’s also very popular albeit not being entirely open-source.</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb59-1"><a href="basics-of-building-widgets.html#cb59-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
+<span id="cb59-2"><a href="basics-of-building-widgets.html#cb59-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb59-3"><a href="basics-of-building-widgets.html#cb59-3"></a></span>
+<span id="cb59-4"><a href="basics-of-building-widgets.html#cb59-4"></a><span class="kw">&lt;head&gt;</span></span>
+<span id="cb59-5"><a href="basics-of-building-widgets.html#cb59-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
+<span id="cb59-6"><a href="basics-of-building-widgets.html#cb59-6"></a>  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;highcharts.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb59-7"><a href="basics-of-building-widgets.html#cb59-7"></a><span class="kw">&lt;/head&gt;</span></span>
+<span id="cb59-8"><a href="basics-of-building-widgets.html#cb59-8"></a></span>
+<span id="cb59-9"><a href="basics-of-building-widgets.html#cb59-9"></a><span class="kw">&lt;body&gt;</span></span>
+<span id="cb59-10"><a href="basics-of-building-widgets.html#cb59-10"></a>  <span class="co">&lt;!-- div to hold visualisation --&gt;</span></span>
+<span id="cb59-11"><a href="basics-of-building-widgets.html#cb59-11"></a>  <span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&quot;chart&quot;</span><span class="ot"> style=</span><span class="st">&quot;width:100%;height:400px;&quot;</span><span class="kw">&gt;&lt;/div&gt;</span></span>
+<span id="cb59-12"><a href="basics-of-building-widgets.html#cb59-12"></a></span>
+<span id="cb59-13"><a href="basics-of-building-widgets.html#cb59-13"></a>  <span class="co">&lt;!-- Script to create visualisation --&gt;</span></span>
+<span id="cb59-14"><a href="basics-of-building-widgets.html#cb59-14"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb59-15"><a href="basics-of-building-widgets.html#cb59-15"></a>    <span class="kw">var</span> myChart <span class="op">=</span> <span class="va">Highcharts</span>.<span class="at">chart</span>(<span class="st">&#39;chart&#39;</span><span class="op">,</span> <span class="op">{</span></span>
+<span id="cb59-16"><a href="basics-of-building-widgets.html#cb59-16"></a>        <span class="dt">xAxis</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb59-17"><a href="basics-of-building-widgets.html#cb59-17"></a>            <span class="dt">categories</span><span class="op">:</span> [<span class="st">&#39;Apples&#39;</span><span class="op">,</span> <span class="st">&#39;Bananas&#39;</span><span class="op">,</span> <span class="st">&#39;Oranges&#39;</span>]</span>
+<span id="cb59-18"><a href="basics-of-building-widgets.html#cb59-18"></a>        <span class="op">},</span></span>
+<span id="cb59-19"><a href="basics-of-building-widgets.html#cb59-19"></a>        <span class="dt">series</span><span class="op">:</span> [<span class="op">{</span></span>
+<span id="cb59-20"><a href="basics-of-building-widgets.html#cb59-20"></a>            <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;Jane&#39;</span><span class="op">,</span></span>
+<span id="cb59-21"><a href="basics-of-building-widgets.html#cb59-21"></a>            <span class="dt">data</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">4</span>]</span>
+<span id="cb59-22"><a href="basics-of-building-widgets.html#cb59-22"></a>        <span class="op">},</span> <span class="op">{</span></span>
+<span id="cb59-23"><a href="basics-of-building-widgets.html#cb59-23"></a>            <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;John&#39;</span><span class="op">,</span></span>
+<span id="cb59-24"><a href="basics-of-building-widgets.html#cb59-24"></a>            <span class="dt">data</span><span class="op">:</span> [<span class="dv">5</span><span class="op">,</span> <span class="dv">7</span><span class="op">,</span> <span class="dv">3</span>]</span>
+<span id="cb59-25"><a href="basics-of-building-widgets.html#cb59-25"></a>        <span class="op">}</span>]</span>
+<span id="cb59-26"><a href="basics-of-building-widgets.html#cb59-26"></a>    <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb59-27"><a href="basics-of-building-widgets.html#cb59-27"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb59-28"><a href="basics-of-building-widgets.html#cb59-28"></a><span class="kw">&lt;/body&gt;</span></span>
+<span id="cb59-29"><a href="basics-of-building-widgets.html#cb59-29"></a></span>
+<span id="cb59-30"><a href="basics-of-building-widgets.html#cb59-30"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="figure">
+<img src="images/candidate-highcharts.png" alt="" />
+<p class="caption">Highcharts example</p>
+</div>
+<p>The above is very similar to what plotly.js requires: import libraries, create a <code>&lt;div&gt;</code> where to put the visualisation, and, to create the chart, run a function which also takes the id of the div where to place the chart and a JSON of options defining the actual chart, including the data.</p>
+</div>
+<div id="chart.js" class="section level3" number="4.1.3">
+<h3><span class="header-section-number">4.1.3</span> Chart.js</h3>
+<p><a href="https://www.chartjs.org/">Chart.js</a> is yet another library which to draw standard charts popular for its permissive license and convenient API.</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb60-1"><a href="basics-of-building-widgets.html#cb60-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
+<span id="cb60-2"><a href="basics-of-building-widgets.html#cb60-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb60-3"><a href="basics-of-building-widgets.html#cb60-3"></a></span>
+<span id="cb60-4"><a href="basics-of-building-widgets.html#cb60-4"></a><span class="kw">&lt;head&gt;</span></span>
+<span id="cb60-5"><a href="basics-of-building-widgets.html#cb60-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
+<span id="cb60-6"><a href="basics-of-building-widgets.html#cb60-6"></a>  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;Chart.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb60-7"><a href="basics-of-building-widgets.html#cb60-7"></a><span class="kw">&lt;/head&gt;</span></span>
+<span id="cb60-8"><a href="basics-of-building-widgets.html#cb60-8"></a></span>
+<span id="cb60-9"><a href="basics-of-building-widgets.html#cb60-9"></a><span class="kw">&lt;body&gt;</span></span>
+<span id="cb60-10"><a href="basics-of-building-widgets.html#cb60-10"></a>  <span class="co">&lt;!-- canvas to hold visualisation --&gt;</span></span>
+<span id="cb60-11"><a href="basics-of-building-widgets.html#cb60-11"></a>  <span class="kw">&lt;canvas</span><span class="ot"> id=</span><span class="st">&quot;chart&quot;</span><span class="kw">&gt;&lt;/canvas&gt;</span></span>
+<span id="cb60-12"><a href="basics-of-building-widgets.html#cb60-12"></a></span>
+<span id="cb60-13"><a href="basics-of-building-widgets.html#cb60-13"></a>  <span class="co">&lt;!-- Script to create visualisation --&gt;</span></span>
+<span id="cb60-14"><a href="basics-of-building-widgets.html#cb60-14"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb60-15"><a href="basics-of-building-widgets.html#cb60-15"></a>    <span class="kw">var</span> el <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&#39;chart&#39;</span>).<span class="at">getContext</span>(<span class="st">&#39;2d&#39;</span>)<span class="op">;</span>    </span>
+<span id="cb60-16"><a href="basics-of-building-widgets.html#cb60-16"></a>    <span class="kw">var</span> myChart <span class="op">=</span> <span class="kw">new</span> <span class="at">Chart</span>(el<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb60-17"><a href="basics-of-building-widgets.html#cb60-17"></a>      <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;bar&#39;</span><span class="op">,</span></span>
+<span id="cb60-18"><a href="basics-of-building-widgets.html#cb60-18"></a>      <span class="dt">data</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb60-19"><a href="basics-of-building-widgets.html#cb60-19"></a>        <span class="dt">labels</span><span class="op">:</span> [<span class="st">&#39;Red&#39;</span><span class="op">,</span> <span class="st">&#39;Blue&#39;</span><span class="op">,</span> <span class="st">&#39;Yellow&#39;</span><span class="op">,</span> <span class="st">&#39;Green&#39;</span><span class="op">,</span> <span class="st">&#39;Purple&#39;</span><span class="op">,</span> <span class="st">&#39;Orange&#39;</span>]<span class="op">,</span></span>
+<span id="cb60-20"><a href="basics-of-building-widgets.html#cb60-20"></a>        <span class="dt">datasets</span><span class="op">:</span> [<span class="op">{</span></span>
+<span id="cb60-21"><a href="basics-of-building-widgets.html#cb60-21"></a>          <span class="dt">label</span><span class="op">:</span> <span class="st">&#39;# of Votes&#39;</span><span class="op">,</span></span>
+<span id="cb60-22"><a href="basics-of-building-widgets.html#cb60-22"></a>          <span class="dt">data</span><span class="op">:</span> [<span class="dv">12</span><span class="op">,</span> <span class="dv">19</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">5</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span>]</span>
+<span id="cb60-23"><a href="basics-of-building-widgets.html#cb60-23"></a>        <span class="op">}</span>]</span>
+<span id="cb60-24"><a href="basics-of-building-widgets.html#cb60-24"></a>      <span class="op">}</span></span>
+<span id="cb60-25"><a href="basics-of-building-widgets.html#cb60-25"></a>    <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb60-26"><a href="basics-of-building-widgets.html#cb60-26"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb60-27"><a href="basics-of-building-widgets.html#cb60-27"></a><span class="kw">&lt;/body&gt;</span></span>
+<span id="cb60-28"><a href="basics-of-building-widgets.html#cb60-28"></a></span>
+<span id="cb60-29"><a href="basics-of-building-widgets.html#cb60-29"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="figure">
+<img src="images/candidate-chartjs.png" alt="" />
+<p class="caption">Chart.js example</p>
+</div>
+<p>We again observe a very similar structure as with previous libraries. The library is imported, instead of a <code>div</code> chart.js uses a <code>canvas</code>, and the visualisation is also created from a single function which takes the canvas as first argument and a JSON of options as second.</p>
+<p>Hopefully this reveals the repeating structure such libraries tend to follow as well as demonstrate how little JavaScript code is actually involved. It also hints at what should be reproduced, to some extent at least, using R.</p>
+</div>
+</div>
+<div id="how-it-works" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> How it works</h2>
+<p>Imagine there is no such package as htmlwidgets to help create interactive visualisations from R: how would one attempt to go about it?</p>
+<p>As observed, an interactive visualisation using JavaScript will be contained within an HTML document, therefore it would probably have to be created first. Secondly, the visualisation that is yet to be created likely relies on external libraries, these would need to be imported in the document. The document should also include an HTML element (e.g.: <code>&lt;div&gt;</code>) to host said visualisation. Then data would have to be serialised in R and embedded into the document where it should be read by JavaScript code that uses it to create the visualisation. Finally all should be managed to work seamlessly across R markdown, shiny, and other environments.</p>
+<p>Thankfully the htmlwidgets package is there to handle most of this. Nonetheless, it is important to understand that these operations are undertaken (to some degree) by htmlwidgets.</p>
+<p>Must remember when building htmlwidgets:</p>
+<ul>
+<li>Import dependencies</li>
+<li>Create an html element to hold visualisation</li>
+<li>Serialise R data to JSON</li>
+<li>Handle JSON data to produce visualisation</li>
+</ul>
 
 </div>
 </div>
@@ -568,8 +524,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="your-first-widget.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="the-full-monty.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="introduction-to-htmlwidgets.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="your-first-widget.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -600,7 +556,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/JohnCoene/javascript-for-r/edit/master/3-23-htmlwidgets-typed.Rmd",
+"link": "https://github.com/JohnCoene/javascript-for-r/edit/master/3-21-htmlwidgets-basics.Rmd",
 "text": "Edit"
 },
 "history": {
