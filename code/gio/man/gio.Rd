@@ -2,10 +2,10 @@
 % Please edit documentation in R/gio.R
 \name{gio}
 \alias{gio}
-\title{<Add Title>}
+\title{Initialise globe}
 \usage{
 gio(data, width = NULL, height = NULL, elementId = NULL)
 }
 \description{
-<Add Description>
+Create the gio globe.
 }

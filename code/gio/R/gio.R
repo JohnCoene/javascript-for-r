@@ -1,16 +1,30 @@
-#' <Add Title>
+#' Initialise globe
 #'
-#' <Add Description>
+#' Create the gio globe.
 #'
 #' @import htmlwidgets
 #'
 #' @export
 gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
 
+  # defaults to NULL
+  key <- NULL
+  group <- NULL
+
+  if (is.SharedData(data)) {
+    key <- data$key()
+    group <- data$groupName()
+    data <- data$origData()
+  }
+
   # forward options using x
   x = list(
     data = data,
-    style = "default"
+    style = "default",
+    crosstalk = list(
+      key = key,
+      group = group
+    )
   )
 
   attr(x, 'TOJSON_ARGS') <- list(dataframe = "rows")
@@ -28,7 +42,8 @@ gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
       browser.fill = TRUE,
       defaultWidth = "100%"
     ),
-    preRenderHook = render_gio
+    preRenderHook = render_gio,
+    dependencies = crosstalk::crosstalkLibs()
   )
 }
 

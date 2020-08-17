@@ -9,12 +9,27 @@ HTMLWidgets.widget({
     // TODO: define shared variables for this instance
     var controller;
 
+    // selection handle
+    var sel_handle = new crosstalk.SelectionHandle();
+
+    sel_handle.on("change", function(e) {
+      console.log(e);
+      if (e.sender !== sel_handle) {
+        //controller.switchCountry(e.value);
+      }
+      controller.switchCountry(e.value);
+    });
+
+
     return {
 
       renderValue: function(x) {
 
         el.innerHTML = '';
         controller = new GIO.Controller(el);
+
+        // group
+        sel_handle.setGroup(x.crosstalk.group);
         
         // add data
         controller.addData(x.data);
@@ -25,6 +40,7 @@ HTMLWidgets.widget({
         controller.onCountryPicked( callback );
 
         function callback (selectedCountry, relatedCountries) {
+          sel_handle.set(selectedCountry.name);
           Shiny.setInputValue(el.id + '_selected', selectedCountry);
           Shiny.setInputValue(el.id + '_related:gio.related.countries', relatedCountries);
         }

@@ -8,9 +8,9 @@ The package allows users to create "shared datasets" that will respond to filter
 
 However crosstalk datasets will not be supported by widgets out of the box, some work needs to be done in order to bring support to it, therefore not all htmlwidgets will support such datasets.
 
-## Crosstalk prerequisites
+## Crosstalk candidates
 
-Crosstalk will not work with every kind of data.
+Crosstalk is will not work well with every widget and every dataset, in some cases it might not even be a good idea to support it.
 
 ```{block, type='rmdnote'}
 The application of crosstalk to the gio package is instructive but limited and somewhat faulty.
@@ -42,15 +42,14 @@ bscols(
 ```r
 gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
 
+  # defaults to NULL
+  key <- NULL
+  group <- NULL
+
   if (is.SharedData(data)) {
-    # Using Crosstalk
     key <- data$key()
     group <- data$groupName()
     data <- data$origData()
-  } else {
-    # Not using Crosstalk
-    key <- NULL
-    group <- NULL
   }
 
   # forward options using x
@@ -110,6 +109,9 @@ HTMLWidgets.widget({
 
         el.innerHTML = '';
         controller = new GIO.Controller(el);
+
+        // group
+        sel_handle.setGroup(x.crosstalk.group);
         
         // add data
         controller.addData(x.data);
@@ -148,4 +150,25 @@ HTMLWidgets.widget({
     };
   }
 });
+```
+
+```r
+library(DT)
+library(gio)
+library(crosstalk)
+
+url <- paste0(
+  "https://raw.githubusercontent.com/JohnCoene/",
+  "javascript-for-r/master/data/countries.json"
+)
+arcs <- jsonlite::fromJSON(url)
+
+# Wrap data frame in SharedData
+sd <- SharedData$new(arcs, key = arcs$e)
+
+# Use SharedData like a dataframe with Crosstalk-enabled widgets
+bscols(
+  gio(sd),
+  datatable(sd, width="100%", selection = "single")
+)
 ```
