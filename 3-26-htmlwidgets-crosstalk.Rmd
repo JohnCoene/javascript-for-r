@@ -1,24 +1,12 @@
 # Crosstalk
 
-Crosstalk[@R-crosstalk] is fantastic add-on for htmlwidgets.
+Crosstalk[@R-crosstalk] is fantastic add-on for htmlwidgets that implements cross-widget interactions, namely selection and filtering. This in effect allows the selection or filtering of data points in one widget is mirrored in another which is enabled by creating "shared datasets".
 
->  It extends htmlwidgets with a set of classes, functions, and conventions for implementing cross-widget interactions (currently, linked brushing and filtering). -- [Official crosstalk website](https://rstudio.github.io/crosstalk/index.html)
-
-The package allows users to create "shared datasets" that will respond to filtering and selections when used in htmlwidgets, akin to crossfilter for d3.js. So one can create a shared dataset to use in two different visualisations so that selecting a point in one scatter plot also highlights it in another.
-
-However crosstalk datasets will not be supported by widgets out of the box, some work needs to be done in order to bring support to it, therefore not all htmlwidgets will support such datasets.
-
-## Crosstalk candidates
-
-Crosstalk is will not work well with every widget and every dataset, in some cases it might not even be a good idea to support it.
-
-```{block, type='rmdnote'}
-The application of crosstalk to the gio package is instructive but limited and somewhat faulty.
-```
+Crosstalk provides a straightforward interface to the users and instead requires effort from the developers for their widgets to support the shared datasets.
 
 ## Crosstalk example
 
-Both the plotly and DT packages support crosstalk, we can use those to produce a scatter plot with the former and a table with the latter so that selection of data in one widget is reflected in the other.
+Both the plotly and DT packages support crosstalk, we can thus produce a scatter plot with the former and a table with the latter so that selection of data in one widget is reflected in the other.
 
 The shared dataset is created with the `SharedData` R6 class, this dataset is then used as one would use a standard dataframe in plotly and DT. The `bscols` function is just a helper to create columns from html elements (using bootstrap). It's ideal for examples but one should not have to use it in R markdown or Shiny---crosstalk will work without `bscols`.
 
@@ -36,6 +24,18 @@ bscols(
 ```
 
 ![Crosstalk Example](images/crosstalk.png)
+
+This hopefully demonstrates the ease with which users can make use of crosstalk.
+
+## Crosstalk candidates
+
+Crosstalk is will not work well with every widget and every dataset, in some cases it might not even be a good idea to support it.
+
+Crosstalk works best on rectangular data: dataframes or objects that resemble dataframes. This is important as crosstalk will treat the data rowwise, where each row is an observation that is ultimately selected, or filtered.
+
+```{block, type='rmdnote'}
+The application of crosstalk to the gio package is instructive but limited and somewhat faulty.
+```
 
 ## Crosstalk with gio
 
@@ -122,7 +122,7 @@ HTMLWidgets.widget({
         controller.onCountryPicked( callback );
 
         function callback (selectedCountry, relatedCountries) {
-          console.log(selectedCountry);
+          sel_handle.set(selectedCountry.name)
           Shiny.setInputValue(el.id + '_selected', selectedCountry);
           Shiny.setInputValue(el.id + '_related:gio.related.countries', relatedCountries);
         }
@@ -171,4 +171,11 @@ bscols(
   gio(sd),
   datatable(sd, width="100%", selection = "single")
 )
+```
+
+
+## Use it in Shiny
+
+```{block, type='rmdnote'}
+Create the shared dataset the server function.
 ```

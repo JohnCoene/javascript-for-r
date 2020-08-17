@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 21 Cookies | JavaScript for R</title>
+  <title>Chapter 9 Crosstalk | JavaScript for R</title>
   <meta name="description" content="Invite JavaScript into your Data Science workflow." />
   <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 21 Cookies | JavaScript for R" />
+  <meta property="og:title" content="Chapter 9 Crosstalk | JavaScript for R" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="JohnCoene/javascript-for-r" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 21 Cookies | JavaScript for R" />
+  <meta name="twitter:title" content="Chapter 9 Crosstalk | JavaScript for R" />
   
   <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="machine-learning.html"/>
-<link rel="next" href="conclusion.html"/>
+<link rel="prev" href="advanced-topics.html"/>
+<link rel="next" href="working-with-shiny.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -393,139 +393,191 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="cookies" class="section level1" number="21">
-<h1><span class="header-section-number">Chapter 21</span> Cookies</h1>
-<p>In this example we scout yet another great example of how JavaScript can enhance shiny applications. We use an HTTP cookie, a small piece of data sent from a application and stored in the user’s web browser, to track users returning to a shiny application.</p>
-<p>The application will prompt users to input their name, this will be stored in a cookie so that on their next visit they are welcomed to the app with a personalised message. Cookies are natively supported by web browsers and JavaScript, though we will use a library which greatly eases their handling: <a href="https://github.com/js-cookie/js-cookie">js-cookie</a>.</p>
-<div id="discover-js-cookie" class="section level2" number="21.1">
-<h2><span class="header-section-number">21.1</span> Discover js-cookie</h2>
-<p>The library is at its core very straightforward, it exports a <code>Cookie</code> object from which one can access the <code>set</code>, <code>get</code>, and <code>remove</code> methods.</p>
-<div class="sourceCode" id="cb419"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb419-1"><a href="cookies.html#cb419-1"></a><span class="co">// set a cookie</span></span>
-<span id="cb419-2"><a href="cookies.html#cb419-2"></a><span class="va">Cookies</span>.<span class="at">set</span>(<span class="st">&#39;name&#39;</span><span class="op">,</span> <span class="st">&#39;value&#39;</span>)</span>
-<span id="cb419-3"><a href="cookies.html#cb419-3"></a></span>
-<span id="cb419-4"><a href="cookies.html#cb419-4"></a><span class="co">// get cookies</span></span>
-<span id="cb419-5"><a href="cookies.html#cb419-5"></a><span class="va">Cookies</span>.<span class="at">get</span>()<span class="op">;</span></span>
-<span id="cb419-6"><a href="cookies.html#cb419-6"></a></span>
-<span id="cb419-7"><a href="cookies.html#cb419-7"></a><span class="co">// remove a cookie</span></span>
-<span id="cb419-8"><a href="cookies.html#cb419-8"></a><span class="va">Cookies</span>.<span class="at">remove</span>(<span class="st">&#39;name&#39;</span>)<span class="op">;</span></span></code></pre></div>
-<p>There is also the possibility to pass additional options when defining the cookie, such as how long it is valid for, but we won’t explore these here.</p>
-</div>
-<div id="setup" class="section level2" number="21.2">
-<h2><span class="header-section-number">21.2</span> Setup</h2>
-<p>Then again, it starts with the creation of a directory where we’ll place a JavaScript file containing the message handlers, we won’t download the dependency and use the CDN instead but feel free to do differently.</p>
-<div class="sourceCode" id="cb420"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb420-1"><a href="cookies.html#cb420-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
-<span id="cb420-2"><a href="cookies.html#cb420-2"></a><span class="kw">file.create</span>(<span class="st">&quot;www/script.js&quot;</span>)</span></code></pre></div>
-<p>We then lay down the skeleton of the application which features a text input to capture the name of the user, a button to save the cookie in their browsers, another to remove it and finally a dynamic output that will display the personalised message.</p>
-<div class="sourceCode" id="cb421"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb421-1"><a href="cookies.html#cb421-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb421-2"><a href="cookies.html#cb421-2"></a></span>
-<span id="cb421-3"><a href="cookies.html#cb421-3"></a><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
-<span id="cb421-4"><a href="cookies.html#cb421-4"></a></span>
-<span id="cb421-5"><a href="cookies.html#cb421-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb421-6"><a href="cookies.html#cb421-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb421-7"><a href="cookies.html#cb421-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb421-8"><a href="cookies.html#cb421-8"></a>      <span class="dt">src =</span> <span class="st">&quot;https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js&quot;</span></span>
-<span id="cb421-9"><a href="cookies.html#cb421-9"></a>    ),</span>
-<span id="cb421-10"><a href="cookies.html#cb421-10"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/script.js&quot;</span>)</span>
-<span id="cb421-11"><a href="cookies.html#cb421-11"></a>  ),</span>
-<span id="cb421-12"><a href="cookies.html#cb421-12"></a>  <span class="kw">textInput</span>(<span class="st">&quot;name_set&quot;</span>, <span class="st">&quot;What is your name?&quot;</span>),</span>
-<span id="cb421-13"><a href="cookies.html#cb421-13"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;save&quot;</span>, <span class="st">&quot;Save cookie&quot;</span>),</span>
-<span id="cb421-14"><a href="cookies.html#cb421-14"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;remove&quot;</span>, <span class="st">&quot;remove cookie&quot;</span>),</span>
-<span id="cb421-15"><a href="cookies.html#cb421-15"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;name_get&quot;</span>)</span>
-<span id="cb421-16"><a href="cookies.html#cb421-16"></a>)</span>
-<span id="cb421-17"><a href="cookies.html#cb421-17"></a></span>
-<span id="cb421-18"><a href="cookies.html#cb421-18"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb421-19"><a href="cookies.html#cb421-19"></a></span>
-<span id="cb421-20"><a href="cookies.html#cb421-20"></a>}</span>
-<span id="cb421-21"><a href="cookies.html#cb421-21"></a></span>
-<span id="cb421-22"><a href="cookies.html#cb421-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-</div>
-<div id="javascript" class="section level2" number="21.3">
-<h2><span class="header-section-number">21.3</span> JavaScript</h2>
-<p>First we define a JavaScript function that retrieves the cookies and sets the result as an input named <code>cookies</code>. The reason we do so is simply because we will have to execute this in multiple places, this will become clearer in just a second.</p>
-<div class="sourceCode" id="cb422"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb422-1"><a href="cookies.html#cb422-1"></a><span class="co">// script.js</span></span>
-<span id="cb422-2"><a href="cookies.html#cb422-2"></a><span class="kw">function</span> <span class="at">getCookies</span>()<span class="op">{</span></span>
-<span id="cb422-3"><a href="cookies.html#cb422-3"></a>  <span class="kw">var</span> res <span class="op">=</span> <span class="va">Cookies</span>.<span class="at">get</span>()<span class="op">;</span></span>
-<span id="cb422-4"><a href="cookies.html#cb422-4"></a>  <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&#39;cookies&#39;</span><span class="op">,</span> res)<span class="op">;</span></span>
-<span id="cb422-5"><a href="cookies.html#cb422-5"></a><span class="op">}</span></span></code></pre></div>
-<p>Then we define two message handlers, one that sets the cookie and another that removes it. Note that both of them run the <code>getCookies</code> function defined previously after they are done with their respective operations. The reason this is done is that we need the input to be updated with the new values after it is set and after it is removed. Otherwise setting or removing the cookie will leave the actual input value untouched and the result of the operation (setting or removing the cookie) will not be captured server-side.</p>
-<div class="sourceCode" id="cb423"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb423-1"><a href="cookies.html#cb423-1"></a><span class="co">// script.js</span></span>
-<span id="cb423-2"><a href="cookies.html#cb423-2"></a><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;cookie-set&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg)<span class="op">{</span></span>
-<span id="cb423-3"><a href="cookies.html#cb423-3"></a>  <span class="va">Cookies</span>.<span class="at">set</span>(<span class="va">msg</span>.<span class="at">name</span><span class="op">,</span> <span class="va">msg</span>.<span class="at">value</span>)<span class="op">;</span></span>
-<span id="cb423-4"><a href="cookies.html#cb423-4"></a>  <span class="at">getCookies</span>()<span class="op">;</span></span>
-<span id="cb423-5"><a href="cookies.html#cb423-5"></a><span class="op">}</span>)</span>
-<span id="cb423-6"><a href="cookies.html#cb423-6"></a></span>
-<span id="cb423-7"><a href="cookies.html#cb423-7"></a><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;cookie-remove&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg)<span class="op">{</span></span>
-<span id="cb423-8"><a href="cookies.html#cb423-8"></a>  <span class="va">Cookies</span>.<span class="at">remove</span>(<span class="va">msg</span>.<span class="at">name</span>)<span class="op">;</span></span>
-<span id="cb423-9"><a href="cookies.html#cb423-9"></a>  <span class="at">getCookies</span>()<span class="op">;</span></span>
-<span id="cb423-10"><a href="cookies.html#cb423-10"></a><span class="op">}</span>)</span></code></pre></div>
-<p>One more thing needs to be implemented JavaScript-side. The point of using the cookie is that when users comes back to the shiny app, even days later, they are presented with the personalised welcome message, this implies that when they open the application the input value is defined. Therefore, <code>getCookies</code> must at launch. One could be tempted to place it at the top of the JavaScript file so that it runs when it is imported but the issue there is that it will run too soon, it will run the shiny input is not yet available and fail to set it. Consequently, we instead observe the <code>shiny:connected</code> event, which is fired when the initial connection to the server is established.</p>
-<div class="sourceCode" id="cb424"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb424-1"><a href="cookies.html#cb424-1"></a><span class="co">// script.js</span></span>
-<span id="cb424-2"><a href="cookies.html#cb424-2"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:connected&#39;</span><span class="op">,</span> <span class="kw">function</span>(ev)<span class="op">{</span></span>
-<span id="cb424-3"><a href="cookies.html#cb424-3"></a>  <span class="at">getCookies</span>()<span class="op">;</span></span>
-<span id="cb424-4"><a href="cookies.html#cb424-4"></a><span class="op">}</span>)</span></code></pre></div>
-</div>
-<div id="r-code" class="section level2" number="21.4">
-<h2><span class="header-section-number">21.4</span> R Code</h2>
-<p>Then it’s a matter a completing the shiny server which was left empty. We add an <code>observeEvent</code> on the save button where we check that a name has actually been typed in the text box before saving the cookie. There is another similar observer on the remove button. The <code>renderUI</code> expression checks that the cookie has been set and displays a message accordingly.</p>
-<div class="sourceCode" id="cb425"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb425-1"><a href="cookies.html#cb425-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb425-2"><a href="cookies.html#cb425-2"></a></span>
-<span id="cb425-3"><a href="cookies.html#cb425-3"></a><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
-<span id="cb425-4"><a href="cookies.html#cb425-4"></a></span>
-<span id="cb425-5"><a href="cookies.html#cb425-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb425-6"><a href="cookies.html#cb425-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb425-7"><a href="cookies.html#cb425-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb425-8"><a href="cookies.html#cb425-8"></a>      <span class="dt">src =</span> <span class="st">&quot;https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js&quot;</span></span>
-<span id="cb425-9"><a href="cookies.html#cb425-9"></a>    ),</span>
-<span id="cb425-10"><a href="cookies.html#cb425-10"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/script.js&quot;</span>)</span>
-<span id="cb425-11"><a href="cookies.html#cb425-11"></a>  ),</span>
-<span id="cb425-12"><a href="cookies.html#cb425-12"></a>  <span class="kw">textInput</span>(<span class="st">&quot;name_set&quot;</span>, <span class="st">&quot;What is your name?&quot;</span>),</span>
-<span id="cb425-13"><a href="cookies.html#cb425-13"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;save&quot;</span>, <span class="st">&quot;Save cookie&quot;</span>),</span>
-<span id="cb425-14"><a href="cookies.html#cb425-14"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;remove&quot;</span>, <span class="st">&quot;remove cookie&quot;</span>),</span>
-<span id="cb425-15"><a href="cookies.html#cb425-15"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;name_get&quot;</span>)</span>
-<span id="cb425-16"><a href="cookies.html#cb425-16"></a>)</span>
-<span id="cb425-17"><a href="cookies.html#cb425-17"></a></span>
-<span id="cb425-18"><a href="cookies.html#cb425-18"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb425-19"><a href="cookies.html#cb425-19"></a></span>
-<span id="cb425-20"><a href="cookies.html#cb425-20"></a>  <span class="co"># save</span></span>
-<span id="cb425-21"><a href="cookies.html#cb425-21"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>save, {</span>
-<span id="cb425-22"><a href="cookies.html#cb425-22"></a>    <span class="cf">if</span>(input<span class="op">$</span>name_set <span class="op">!=</span><span class="st"> &quot;&quot;</span>)</span>
-<span id="cb425-23"><a href="cookies.html#cb425-23"></a>      session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;cookie-set&quot;</span>, <span class="kw">list</span>(<span class="dt">name =</span> <span class="st">&quot;name&quot;</span>, <span class="dt">value =</span> input<span class="op">$</span>name_set))</span>
-<span id="cb425-24"><a href="cookies.html#cb425-24"></a>  })</span>
-<span id="cb425-25"><a href="cookies.html#cb425-25"></a></span>
-<span id="cb425-26"><a href="cookies.html#cb425-26"></a>  <span class="co"># delete</span></span>
-<span id="cb425-27"><a href="cookies.html#cb425-27"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>remove, {</span>
-<span id="cb425-28"><a href="cookies.html#cb425-28"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;cookie-remove&quot;</span>, <span class="kw">list</span>(<span class="dt">name =</span> <span class="st">&quot;name&quot;</span>))</span>
-<span id="cb425-29"><a href="cookies.html#cb425-29"></a>  })</span>
-<span id="cb425-30"><a href="cookies.html#cb425-30"></a></span>
-<span id="cb425-31"><a href="cookies.html#cb425-31"></a>  <span class="co"># output if cookie is specified</span></span>
-<span id="cb425-32"><a href="cookies.html#cb425-32"></a>  output<span class="op">$</span>name_get &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
-<span id="cb425-33"><a href="cookies.html#cb425-33"></a>    <span class="cf">if</span>(<span class="op">!</span><span class="kw">is.null</span>(input<span class="op">$</span>cookies<span class="op">$</span>name))</span>
-<span id="cb425-34"><a href="cookies.html#cb425-34"></a>      <span class="kw">h3</span>(<span class="st">&quot;Hello,&quot;</span>, input<span class="op">$</span>cookies<span class="op">$</span>name)</span>
-<span id="cb425-35"><a href="cookies.html#cb425-35"></a>    <span class="cf">else</span></span>
-<span id="cb425-36"><a href="cookies.html#cb425-36"></a>      <span class="kw">h3</span>(<span class="st">&quot;Who are you?&quot;</span>)</span>
-<span id="cb425-37"><a href="cookies.html#cb425-37"></a>  })</span>
-<span id="cb425-38"><a href="cookies.html#cb425-38"></a></span>
-<span id="cb425-39"><a href="cookies.html#cb425-39"></a>}</span>
-<span id="cb425-40"><a href="cookies.html#cb425-40"></a></span>
-<span id="cb425-41"><a href="cookies.html#cb425-41"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div id="crosstalk" class="section level1" number="9">
+<h1><span class="header-section-number">Chapter 9</span> Crosstalk</h1>
+<p>Crosstalk<span class="citation">(Cheng <a href="#ref-R-crosstalk" role="doc-biblioref">2020</a>)</span> is fantastic add-on for htmlwidgets that implements cross-widget interactions, namely selection and filtering. This in effect allows the selection or filtering of data points in one widget is mirrored in another which is enabled by creating “shared datasets”.</p>
+<p>Crosstalk provides a straightforward interface to the users and instead requires effort from the developers for their widgets to support the shared datasets.</p>
+<div id="crosstalk-example" class="section level2" number="9.1">
+<h2><span class="header-section-number">9.1</span> Crosstalk example</h2>
+<p>Both the plotly and DT packages support crosstalk, we can thus produce a scatter plot with the former and a table with the latter so that selection of data in one widget is reflected in the other.</p>
+<p>The shared dataset is created with the <code>SharedData</code> R6 class, this dataset is then used as one would use a standard dataframe in plotly and DT. The <code>bscols</code> function is just a helper to create columns from html elements (using bootstrap). It’s ideal for examples but one should not have to use it in R markdown or Shiny—crosstalk will work without <code>bscols</code>.</p>
+<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="crosstalk.html#cb168-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb168-2"><a href="crosstalk.html#cb168-2"></a><span class="kw">library</span>(plotly)</span>
+<span id="cb168-3"><a href="crosstalk.html#cb168-3"></a><span class="kw">library</span>(crosstalk)</span>
+<span id="cb168-4"><a href="crosstalk.html#cb168-4"></a></span>
+<span id="cb168-5"><a href="crosstalk.html#cb168-5"></a>shared &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(cars)</span>
+<span id="cb168-6"><a href="crosstalk.html#cb168-6"></a></span>
+<span id="cb168-7"><a href="crosstalk.html#cb168-7"></a><span class="kw">bscols</span>(</span>
+<span id="cb168-8"><a href="crosstalk.html#cb168-8"></a>  <span class="kw">plot_ly</span>(shared, <span class="dt">x =</span> <span class="op">~</span>speed, <span class="dt">y=</span><span class="op">~</span>dist),</span>
+<span id="cb168-9"><a href="crosstalk.html#cb168-9"></a>  <span class="kw">datatable</span>(shared, <span class="dt">width =</span> <span class="st">&quot;100%&quot;</span>)</span>
+<span id="cb168-10"><a href="crosstalk.html#cb168-10"></a>)</span></code></pre></div>
 <div class="figure">
-<img src="images/shiny-cookies-2.png" alt="" />
-<p class="caption">Shiny cookies</p>
+<img src="images/crosstalk.png" alt="" />
+<p class="caption">Crosstalk Example</p>
 </div>
-<p>Run the application and save your name. You can then refresh the application and the welcome message will display your name. You can even kill the server entirely and re-run the app, the welcome message will still display!</p>
+<p>This hopefully demonstrates the ease with which users can make use of crosstalk.</p>
+</div>
+<div id="crosstalk-candidates" class="section level2" number="9.2">
+<h2><span class="header-section-number">9.2</span> Crosstalk candidates</h2>
+<p>Crosstalk is will not work well with every widget and every dataset, in some cases it might not even be a good idea to support it.</p>
+<p>Crosstalk works best on rectangular data: dataframes or objects that resemble dataframes. This is important as crosstalk will treat the data rowwise, where each row is an observation that is ultimately selected, or filtered.</p>
+<div class="rmdnote">
+<p>
+The application of crosstalk to the gio package is instructive but limited and somewhat faulty.
+</p>
+</div>
+</div>
+<div id="crosstalk-with-gio" class="section level2" number="9.3">
+<h2><span class="header-section-number">9.3</span> Crosstalk with gio</h2>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="crosstalk.html#cb169-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
+<span id="cb169-2"><a href="crosstalk.html#cb169-2"></a></span>
+<span id="cb169-3"><a href="crosstalk.html#cb169-3"></a>  <span class="co"># defaults to NULL</span></span>
+<span id="cb169-4"><a href="crosstalk.html#cb169-4"></a>  key &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb169-5"><a href="crosstalk.html#cb169-5"></a>  group &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb169-6"><a href="crosstalk.html#cb169-6"></a></span>
+<span id="cb169-7"><a href="crosstalk.html#cb169-7"></a>  <span class="cf">if</span> (<span class="kw">is.SharedData</span>(data)) {</span>
+<span id="cb169-8"><a href="crosstalk.html#cb169-8"></a>    key &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">key</span>()</span>
+<span id="cb169-9"><a href="crosstalk.html#cb169-9"></a>    group &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">groupName</span>()</span>
+<span id="cb169-10"><a href="crosstalk.html#cb169-10"></a>    data &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">origData</span>()</span>
+<span id="cb169-11"><a href="crosstalk.html#cb169-11"></a>  }</span>
+<span id="cb169-12"><a href="crosstalk.html#cb169-12"></a></span>
+<span id="cb169-13"><a href="crosstalk.html#cb169-13"></a>  <span class="co"># forward options using x</span></span>
+<span id="cb169-14"><a href="crosstalk.html#cb169-14"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb169-15"><a href="crosstalk.html#cb169-15"></a>    <span class="dt">data =</span> data,</span>
+<span id="cb169-16"><a href="crosstalk.html#cb169-16"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
+<span id="cb169-17"><a href="crosstalk.html#cb169-17"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(</span>
+<span id="cb169-18"><a href="crosstalk.html#cb169-18"></a>      <span class="dt">key =</span> key,</span>
+<span id="cb169-19"><a href="crosstalk.html#cb169-19"></a>      <span class="dt">group =</span> group</span>
+<span id="cb169-20"><a href="crosstalk.html#cb169-20"></a>    )</span>
+<span id="cb169-21"><a href="crosstalk.html#cb169-21"></a>  )</span>
+<span id="cb169-22"><a href="crosstalk.html#cb169-22"></a></span>
+<span id="cb169-23"><a href="crosstalk.html#cb169-23"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_ARGS&#39;</span>) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">dataframe =</span> <span class="st">&quot;rows&quot;</span>)</span>
+<span id="cb169-24"><a href="crosstalk.html#cb169-24"></a></span>
+<span id="cb169-25"><a href="crosstalk.html#cb169-25"></a>  <span class="co"># create widget</span></span>
+<span id="cb169-26"><a href="crosstalk.html#cb169-26"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
+<span id="cb169-27"><a href="crosstalk.html#cb169-27"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb169-28"><a href="crosstalk.html#cb169-28"></a>    x,</span>
+<span id="cb169-29"><a href="crosstalk.html#cb169-29"></a>    <span class="dt">width =</span> width,</span>
+<span id="cb169-30"><a href="crosstalk.html#cb169-30"></a>    <span class="dt">height =</span> height,</span>
+<span id="cb169-31"><a href="crosstalk.html#cb169-31"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb169-32"><a href="crosstalk.html#cb169-32"></a>    <span class="dt">elementId =</span> elementId,</span>
+<span id="cb169-33"><a href="crosstalk.html#cb169-33"></a>    <span class="dt">sizingPolicy =</span> htmlwidgets<span class="op">::</span><span class="kw">sizingPolicy</span>(</span>
+<span id="cb169-34"><a href="crosstalk.html#cb169-34"></a>      <span class="dt">padding =</span> <span class="dv">0</span>,</span>
+<span id="cb169-35"><a href="crosstalk.html#cb169-35"></a>      <span class="dt">browser.fill =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb169-36"><a href="crosstalk.html#cb169-36"></a>      <span class="dt">defaultWidth =</span> <span class="st">&quot;100%&quot;</span></span>
+<span id="cb169-37"><a href="crosstalk.html#cb169-37"></a>    ),</span>
+<span id="cb169-38"><a href="crosstalk.html#cb169-38"></a>    <span class="dt">preRenderHook =</span> render_gio</span>
+<span id="cb169-39"><a href="crosstalk.html#cb169-39"></a>  )</span>
+<span id="cb169-40"><a href="crosstalk.html#cb169-40"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb170"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb170-1"><a href="crosstalk.html#cb170-1"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
+<span id="cb170-2"><a href="crosstalk.html#cb170-2"></a></span>
+<span id="cb170-3"><a href="crosstalk.html#cb170-3"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;gio&#39;</span><span class="op">,</span></span>
+<span id="cb170-4"><a href="crosstalk.html#cb170-4"></a></span>
+<span id="cb170-5"><a href="crosstalk.html#cb170-5"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
+<span id="cb170-6"><a href="crosstalk.html#cb170-6"></a></span>
+<span id="cb170-7"><a href="crosstalk.html#cb170-7"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb170-8"><a href="crosstalk.html#cb170-8"></a></span>
+<span id="cb170-9"><a href="crosstalk.html#cb170-9"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
+<span id="cb170-10"><a href="crosstalk.html#cb170-10"></a>    <span class="kw">var</span> controller<span class="op">;</span></span>
+<span id="cb170-11"><a href="crosstalk.html#cb170-11"></a>    <span class="kw">var</span> sel_handle <span class="op">=</span> <span class="kw">new</span> <span class="va">crosstalk</span>.<span class="at">SelectionHandle</span>()<span class="op">;</span></span>
+<span id="cb170-12"><a href="crosstalk.html#cb170-12"></a></span>
+<span id="cb170-13"><a href="crosstalk.html#cb170-13"></a>    <span class="va">sel_handle</span>.<span class="at">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) <span class="op">{</span></span>
+<span id="cb170-14"><a href="crosstalk.html#cb170-14"></a>      <span class="va">console</span>.<span class="at">log</span>(e)<span class="op">;</span></span>
+<span id="cb170-15"><a href="crosstalk.html#cb170-15"></a>      <span class="cf">if</span> (<span class="va">e</span>.<span class="at">sender</span> <span class="op">!==</span> sel_handle) <span class="op">{</span></span>
+<span id="cb170-16"><a href="crosstalk.html#cb170-16"></a>        <span class="co">//controller.switchCountry(e.value);</span></span>
+<span id="cb170-17"><a href="crosstalk.html#cb170-17"></a>      <span class="op">}</span></span>
+<span id="cb170-18"><a href="crosstalk.html#cb170-18"></a>      <span class="va">controller</span>.<span class="at">switchCountry</span>(<span class="va">e</span>.<span class="at">value</span>)<span class="op">;</span></span>
+<span id="cb170-19"><a href="crosstalk.html#cb170-19"></a>    <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb170-20"><a href="crosstalk.html#cb170-20"></a></span>
+<span id="cb170-21"><a href="crosstalk.html#cb170-21"></a>    <span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb170-22"><a href="crosstalk.html#cb170-22"></a></span>
+<span id="cb170-23"><a href="crosstalk.html#cb170-23"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb170-24"><a href="crosstalk.html#cb170-24"></a></span>
+<span id="cb170-25"><a href="crosstalk.html#cb170-25"></a>        <span class="va">el</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="st">&#39;&#39;</span><span class="op">;</span></span>
+<span id="cb170-26"><a href="crosstalk.html#cb170-26"></a>        controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(el)<span class="op">;</span></span>
+<span id="cb170-27"><a href="crosstalk.html#cb170-27"></a></span>
+<span id="cb170-28"><a href="crosstalk.html#cb170-28"></a>        <span class="co">// group</span></span>
+<span id="cb170-29"><a href="crosstalk.html#cb170-29"></a>        <span class="va">sel_handle</span>.<span class="at">setGroup</span>(<span class="va">x</span>.<span class="va">crosstalk</span>.<span class="at">group</span>)<span class="op">;</span></span>
+<span id="cb170-30"><a href="crosstalk.html#cb170-30"></a>        </span>
+<span id="cb170-31"><a href="crosstalk.html#cb170-31"></a>        <span class="co">// add data</span></span>
+<span id="cb170-32"><a href="crosstalk.html#cb170-32"></a>        <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span></span>
+<span id="cb170-33"><a href="crosstalk.html#cb170-33"></a></span>
+<span id="cb170-34"><a href="crosstalk.html#cb170-34"></a>        <span class="va">controller</span>.<span class="at">setStyle</span>(<span class="va">x</span>.<span class="at">style</span>)<span class="op">;</span></span>
+<span id="cb170-35"><a href="crosstalk.html#cb170-35"></a></span>
+<span id="cb170-36"><a href="crosstalk.html#cb170-36"></a>        <span class="co">// callback</span></span>
+<span id="cb170-37"><a href="crosstalk.html#cb170-37"></a>        <span class="va">controller</span>.<span class="at">onCountryPicked</span>( callback )<span class="op">;</span></span>
+<span id="cb170-38"><a href="crosstalk.html#cb170-38"></a></span>
+<span id="cb170-39"><a href="crosstalk.html#cb170-39"></a>        <span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
+<span id="cb170-40"><a href="crosstalk.html#cb170-40"></a>          <span class="va">console</span>.<span class="at">log</span>(selectedCountry)<span class="op">;</span></span>
+<span id="cb170-41"><a href="crosstalk.html#cb170-41"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_selected&#39;</span><span class="op">,</span> selectedCountry)<span class="op">;</span></span>
+<span id="cb170-42"><a href="crosstalk.html#cb170-42"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_related:gio.related.countries&#39;</span><span class="op">,</span> relatedCountries)<span class="op">;</span></span>
+<span id="cb170-43"><a href="crosstalk.html#cb170-43"></a>        <span class="op">}</span></span>
+<span id="cb170-44"><a href="crosstalk.html#cb170-44"></a></span>
+<span id="cb170-45"><a href="crosstalk.html#cb170-45"></a>        <span class="co">// use stats</span></span>
+<span id="cb170-46"><a href="crosstalk.html#cb170-46"></a>        <span class="cf">if</span>(<span class="va">x</span>.<span class="at">stats</span>)</span>
+<span id="cb170-47"><a href="crosstalk.html#cb170-47"></a>          <span class="va">controller</span>.<span class="at">enableStats</span>()<span class="op">;</span></span>
+<span id="cb170-48"><a href="crosstalk.html#cb170-48"></a></span>
+<span id="cb170-49"><a href="crosstalk.html#cb170-49"></a>        <span class="co">// render</span></span>
+<span id="cb170-50"><a href="crosstalk.html#cb170-50"></a>        <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
+<span id="cb170-51"><a href="crosstalk.html#cb170-51"></a></span>
+<span id="cb170-52"><a href="crosstalk.html#cb170-52"></a>      <span class="op">},</span></span>
+<span id="cb170-53"><a href="crosstalk.html#cb170-53"></a></span>
+<span id="cb170-54"><a href="crosstalk.html#cb170-54"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb170-55"><a href="crosstalk.html#cb170-55"></a></span>
+<span id="cb170-56"><a href="crosstalk.html#cb170-56"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to re-render the widget with a new size</span></span>
+<span id="cb170-57"><a href="crosstalk.html#cb170-57"></a>        <span class="va">controller</span>.<span class="at">resizeUpdate</span>()</span>
+<span id="cb170-58"><a href="crosstalk.html#cb170-58"></a></span>
+<span id="cb170-59"><a href="crosstalk.html#cb170-59"></a>      <span class="op">},</span></span>
+<span id="cb170-60"><a href="crosstalk.html#cb170-60"></a></span>
+<span id="cb170-61"><a href="crosstalk.html#cb170-61"></a>      <span class="dt">getGlobe</span><span class="op">:</span> <span class="kw">function</span>()<span class="op">{</span></span>
+<span id="cb170-62"><a href="crosstalk.html#cb170-62"></a>        <span class="cf">return</span> controller<span class="op">;</span></span>
+<span id="cb170-63"><a href="crosstalk.html#cb170-63"></a>      <span class="op">}</span></span>
+<span id="cb170-64"><a href="crosstalk.html#cb170-64"></a></span>
+<span id="cb170-65"><a href="crosstalk.html#cb170-65"></a>    <span class="op">};</span></span>
+<span id="cb170-66"><a href="crosstalk.html#cb170-66"></a>  <span class="op">}</span></span>
+<span id="cb170-67"><a href="crosstalk.html#cb170-67"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="crosstalk.html#cb171-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb171-2"><a href="crosstalk.html#cb171-2"></a><span class="kw">library</span>(gio)</span>
+<span id="cb171-3"><a href="crosstalk.html#cb171-3"></a><span class="kw">library</span>(crosstalk)</span>
+<span id="cb171-4"><a href="crosstalk.html#cb171-4"></a></span>
+<span id="cb171-5"><a href="crosstalk.html#cb171-5"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb171-6"><a href="crosstalk.html#cb171-6"></a>  <span class="st">&quot;https://raw.githubusercontent.com/JohnCoene/&quot;</span>,</span>
+<span id="cb171-7"><a href="crosstalk.html#cb171-7"></a>  <span class="st">&quot;javascript-for-r/master/data/countries.json&quot;</span></span>
+<span id="cb171-8"><a href="crosstalk.html#cb171-8"></a>)</span>
+<span id="cb171-9"><a href="crosstalk.html#cb171-9"></a>arcs &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">fromJSON</span>(url)</span>
+<span id="cb171-10"><a href="crosstalk.html#cb171-10"></a></span>
+<span id="cb171-11"><a href="crosstalk.html#cb171-11"></a><span class="co"># Wrap data frame in SharedData</span></span>
+<span id="cb171-12"><a href="crosstalk.html#cb171-12"></a>sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(arcs, <span class="dt">key =</span> arcs<span class="op">$</span>e)</span>
+<span id="cb171-13"><a href="crosstalk.html#cb171-13"></a></span>
+<span id="cb171-14"><a href="crosstalk.html#cb171-14"></a><span class="co"># Use SharedData like a dataframe with Crosstalk-enabled widgets</span></span>
+<span id="cb171-15"><a href="crosstalk.html#cb171-15"></a><span class="kw">bscols</span>(</span>
+<span id="cb171-16"><a href="crosstalk.html#cb171-16"></a>  <span class="kw">gio</span>(sd),</span>
+<span id="cb171-17"><a href="crosstalk.html#cb171-17"></a>  <span class="kw">datatable</span>(sd, <span class="dt">width=</span><span class="st">&quot;100%&quot;</span>, <span class="dt">selection =</span> <span class="st">&quot;single&quot;</span>)</span>
+<span id="cb171-18"><a href="crosstalk.html#cb171-18"></a>)</span></code></pre></div>
+</div>
+<div id="use-it-in-shiny" class="section level2" number="9.4">
+<h2><span class="header-section-number">9.4</span> Use it in Shiny</h2>
+<div class="rmdnote">
+<p>
+Create the shared dataset the server function.
+</p>
+</div>
 
 </div>
 </div>
-
-
-
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-R-crosstalk">
+<p>Cheng, Joe. 2020. <em>Crosstalk: Inter-Widget Interactivity for Html Widgets</em>. <a href="https://CRAN.R-project.org/package=crosstalk">https://CRAN.R-project.org/package=crosstalk</a>.</p>
+</div>
+</div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="machine-learning.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="conclusion.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="advanced-topics.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="working-with-shiny.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -556,7 +608,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/JohnCoene/javascript-for-r/edit/master/7-35-examples-cookies.Rmd",
+"link": "https://github.com/JohnCoene/javascript-for-r/edit/master/3-26-htmlwidgets-crosstalk.Rmd",
 "text": "Edit"
 },
 "history": {
