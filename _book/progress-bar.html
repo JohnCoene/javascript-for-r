@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-08-17" />
+<meta name="date" content="2020-08-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -68,6 +68,9 @@
 <script src="libs/webcomponents/webcomponents.js"></script>
 <script src="libs/r2d3-binding/r2d3.js"></script>
 <script src="libs/d3v5/d3.min.js"></script>
+<script src="libs/viz/viz.js"></script>
+<link href="libs/DiagrammeR-styles/styles.css" rel="stylesheet" />
+<script src="libs/grViz-binding/grViz.js"></script>
 
 
 <style type="text/css">
@@ -258,9 +261,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="9" data-path="crosstalk.html"><a href="crosstalk.html"><i class="fa fa-check"></i><b>9</b> Crosstalk</a>
 <ul>
 <li class="chapter" data-level="9.1" data-path="crosstalk.html"><a href="crosstalk.html#crosstalk-example"><i class="fa fa-check"></i><b>9.1</b> Crosstalk example</a></li>
-<li class="chapter" data-level="9.2" data-path="crosstalk.html"><a href="crosstalk.html#crosstalk-candidates"><i class="fa fa-check"></i><b>9.2</b> Crosstalk candidates</a></li>
-<li class="chapter" data-level="9.3" data-path="crosstalk.html"><a href="crosstalk.html#crosstalk-with-gio"><i class="fa fa-check"></i><b>9.3</b> Crosstalk with gio</a></li>
-<li class="chapter" data-level="9.4" data-path="crosstalk.html"><a href="crosstalk.html#use-it-in-shiny"><i class="fa fa-check"></i><b>9.4</b> Use it in Shiny</a></li>
+<li class="chapter" data-level="9.2" data-path="crosstalk.html"><a href="crosstalk.html#crosstalk-requirements"><i class="fa fa-check"></i><b>9.2</b> Crosstalk requirements</a></li>
+<li class="chapter" data-level="9.3" data-path="basics-of-building-widgets.html"><a href="basics-of-building-widgets.html#how-it-works"><i class="fa fa-check"></i><b>9.3</b> How it works</a></li>
+<li class="chapter" data-level="9.4" data-path="crosstalk.html"><a href="crosstalk.html#crosstalk-with-gio"><i class="fa fa-check"></i><b>9.4</b> Crosstalk with gio</a></li>
+<li class="chapter" data-level="9.5" data-path="crosstalk.html"><a href="crosstalk.html#use-it-in-shiny"><i class="fa fa-check"></i><b>9.5</b> Use it in Shiny</a></li>
 </ul></li>
 <li class="chapter" data-level="10" data-path="working-with-shiny.html"><a href="working-with-shiny.html"><i class="fa fa-check"></i><b>10</b> Working with Shiny</a>
 <ul>
@@ -396,43 +400,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="progress-bar" class="section level1" number="19">
 <h1><span class="header-section-number">Chapter 19</span> Progress Bar</h1>
 <p>In this chapter we implement a loading bar via <a href="https://github.com/skt-t1-byungi/rsup-progress">Rsup-progress</a> that can be programmatically triggered from the server. The library can be customised to great lengths but the code remains very straightforward for simple use cases.</p>
-<div class="sourceCode" id="cb394"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb394-1"><a href="progress-bar.html#cb394-1"></a><span class="co">// initialise</span></span>
-<span id="cb394-2"><a href="progress-bar.html#cb394-2"></a><span class="kw">const</span> progress <span class="op">=</span> <span class="kw">new</span> <span class="at">RsupProgress</span>()<span class="op">;</span></span>
-<span id="cb394-3"><a href="progress-bar.html#cb394-3"></a></span>
-<span id="cb394-4"><a href="progress-bar.html#cb394-4"></a><span class="co">// customise</span></span>
-<span id="cb394-5"><a href="progress-bar.html#cb394-5"></a><span class="va">progress</span>.<span class="at">setOptions</span>(<span class="op">{</span><span class="dt">color</span><span class="op">:</span> <span class="st">&#39;blue&#39;</span><span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb394-6"><a href="progress-bar.html#cb394-6"></a></span>
-<span id="cb394-7"><a href="progress-bar.html#cb394-7"></a><span class="co">// start</span></span>
-<span id="cb394-8"><a href="progress-bar.html#cb394-8"></a><span class="va">progress</span>.<span class="at">start</span>()<span class="op">;</span></span>
-<span id="cb394-9"><a href="progress-bar.html#cb394-9"></a></span>
-<span id="cb394-10"><a href="progress-bar.html#cb394-10"></a><span class="co">// end</span></span>
-<span id="cb394-11"><a href="progress-bar.html#cb394-11"></a><span class="va">progress</span>.<span class="at">end</span>()<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb395"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb395-1"><a href="progress-bar.html#cb395-1"></a><span class="co">// initialise</span></span>
+<span id="cb395-2"><a href="progress-bar.html#cb395-2"></a><span class="kw">const</span> progress <span class="op">=</span> <span class="kw">new</span> <span class="at">RsupProgress</span>()<span class="op">;</span></span>
+<span id="cb395-3"><a href="progress-bar.html#cb395-3"></a></span>
+<span id="cb395-4"><a href="progress-bar.html#cb395-4"></a><span class="co">// customise</span></span>
+<span id="cb395-5"><a href="progress-bar.html#cb395-5"></a><span class="va">progress</span>.<span class="at">setOptions</span>(<span class="op">{</span><span class="dt">color</span><span class="op">:</span> <span class="st">&#39;blue&#39;</span><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb395-6"><a href="progress-bar.html#cb395-6"></a></span>
+<span id="cb395-7"><a href="progress-bar.html#cb395-7"></a><span class="co">// start</span></span>
+<span id="cb395-8"><a href="progress-bar.html#cb395-8"></a><span class="va">progress</span>.<span class="at">start</span>()<span class="op">;</span></span>
+<span id="cb395-9"><a href="progress-bar.html#cb395-9"></a></span>
+<span id="cb395-10"><a href="progress-bar.html#cb395-10"></a><span class="co">// end</span></span>
+<span id="cb395-11"><a href="progress-bar.html#cb395-11"></a><span class="va">progress</span>.<span class="at">end</span>()<span class="op">;</span></span></code></pre></div>
 <div id="r-code" class="section level2" number="19.1">
 <h2><span class="header-section-number">19.1</span> R code</h2>
 <p>Rsup-progress is hosted on a CDN so the dependency does not need to be downloaded, a file to hold the custom message handlers is however necessary.</p>
-<div class="sourceCode" id="cb395"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb395-1"><a href="progress-bar.html#cb395-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
-<span id="cb395-2"><a href="progress-bar.html#cb395-2"></a><span class="kw">file.create</span>(<span class="st">&quot;www/script.js&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb396-1"><a href="progress-bar.html#cb396-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
+<span id="cb396-2"><a href="progress-bar.html#cb396-2"></a><span class="kw">file.create</span>(<span class="st">&quot;www/script.js&quot;</span>)</span></code></pre></div>
 <p>We then create the skeleton of the application, leaving the sever function empty for now.</p>
-<div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb396-1"><a href="progress-bar.html#cb396-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb396-2"><a href="progress-bar.html#cb396-2"></a></span>
-<span id="cb396-3"><a href="progress-bar.html#cb396-3"></a>shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
-<span id="cb396-4"><a href="progress-bar.html#cb396-4"></a></span>
-<span id="cb396-5"><a href="progress-bar.html#cb396-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb396-6"><a href="progress-bar.html#cb396-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb396-7"><a href="progress-bar.html#cb396-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/rsup-progress&quot;</span>),</span>
-<span id="cb396-8"><a href="progress-bar.html#cb396-8"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/script.js&quot;</span>)</span>
-<span id="cb396-9"><a href="progress-bar.html#cb396-9"></a>  ),</span>
-<span id="cb396-10"><a href="progress-bar.html#cb396-10"></a>  <span class="kw">br</span>(),</span>
-<span id="cb396-11"><a href="progress-bar.html#cb396-11"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;start&quot;</span>, <span class="st">&quot;start&quot;</span>),</span>
-<span id="cb396-12"><a href="progress-bar.html#cb396-12"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;end&quot;</span>, <span class="st">&quot;end&quot;</span>)</span>
-<span id="cb396-13"><a href="progress-bar.html#cb396-13"></a>)</span>
-<span id="cb396-14"><a href="progress-bar.html#cb396-14"></a></span>
-<span id="cb396-15"><a href="progress-bar.html#cb396-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb396-16"><a href="progress-bar.html#cb396-16"></a></span>
-<span id="cb396-17"><a href="progress-bar.html#cb396-17"></a>}</span>
-<span id="cb396-18"><a href="progress-bar.html#cb396-18"></a></span>
-<span id="cb396-19"><a href="progress-bar.html#cb396-19"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>Then one can start designing the server; the buttons have to start/show and end/hide the loading bar. We also want to include a call to customise the loading bar from the server.</p>
 <div class="sourceCode" id="cb397"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb397-1"><a href="progress-bar.html#cb397-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb397-2"><a href="progress-bar.html#cb397-2"></a></span>
 <span id="cb397-3"><a href="progress-bar.html#cb397-3"></a>shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
@@ -449,40 +433,60 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb397-14"><a href="progress-bar.html#cb397-14"></a></span>
 <span id="cb397-15"><a href="progress-bar.html#cb397-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
 <span id="cb397-16"><a href="progress-bar.html#cb397-16"></a></span>
-<span id="cb397-17"><a href="progress-bar.html#cb397-17"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;rsup-options&#39;</span>, <span class="kw">list</span>(<span class="dt">color =</span> <span class="st">&quot;red&quot;</span>))</span>
+<span id="cb397-17"><a href="progress-bar.html#cb397-17"></a>}</span>
 <span id="cb397-18"><a href="progress-bar.html#cb397-18"></a></span>
-<span id="cb397-19"><a href="progress-bar.html#cb397-19"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>start, {</span>
-<span id="cb397-20"><a href="progress-bar.html#cb397-20"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;rsup-start&#39;</span>, <span class="kw">list</span>())</span>
-<span id="cb397-21"><a href="progress-bar.html#cb397-21"></a>  })</span>
-<span id="cb397-22"><a href="progress-bar.html#cb397-22"></a></span>
-<span id="cb397-23"><a href="progress-bar.html#cb397-23"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>end, {</span>
-<span id="cb397-24"><a href="progress-bar.html#cb397-24"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;rsup-end&#39;</span>, <span class="kw">list</span>())</span>
-<span id="cb397-25"><a href="progress-bar.html#cb397-25"></a>  })</span>
-<span id="cb397-26"><a href="progress-bar.html#cb397-26"></a></span>
-<span id="cb397-27"><a href="progress-bar.html#cb397-27"></a>}</span>
-<span id="cb397-28"><a href="progress-bar.html#cb397-28"></a></span>
-<span id="cb397-29"><a href="progress-bar.html#cb397-29"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<span id="cb397-19"><a href="progress-bar.html#cb397-19"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>Then one can start designing the server; the buttons have to start/show and end/hide the loading bar. We also want to include a call to customise the loading bar from the server.</p>
+<div class="sourceCode" id="cb398"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb398-1"><a href="progress-bar.html#cb398-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb398-2"><a href="progress-bar.html#cb398-2"></a></span>
+<span id="cb398-3"><a href="progress-bar.html#cb398-3"></a>shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb398-4"><a href="progress-bar.html#cb398-4"></a></span>
+<span id="cb398-5"><a href="progress-bar.html#cb398-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb398-6"><a href="progress-bar.html#cb398-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb398-7"><a href="progress-bar.html#cb398-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/rsup-progress&quot;</span>),</span>
+<span id="cb398-8"><a href="progress-bar.html#cb398-8"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/script.js&quot;</span>)</span>
+<span id="cb398-9"><a href="progress-bar.html#cb398-9"></a>  ),</span>
+<span id="cb398-10"><a href="progress-bar.html#cb398-10"></a>  <span class="kw">br</span>(),</span>
+<span id="cb398-11"><a href="progress-bar.html#cb398-11"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;start&quot;</span>, <span class="st">&quot;start&quot;</span>),</span>
+<span id="cb398-12"><a href="progress-bar.html#cb398-12"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;end&quot;</span>, <span class="st">&quot;end&quot;</span>)</span>
+<span id="cb398-13"><a href="progress-bar.html#cb398-13"></a>)</span>
+<span id="cb398-14"><a href="progress-bar.html#cb398-14"></a></span>
+<span id="cb398-15"><a href="progress-bar.html#cb398-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb398-16"><a href="progress-bar.html#cb398-16"></a></span>
+<span id="cb398-17"><a href="progress-bar.html#cb398-17"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;rsup-options&#39;</span>, <span class="kw">list</span>(<span class="dt">color =</span> <span class="st">&quot;red&quot;</span>))</span>
+<span id="cb398-18"><a href="progress-bar.html#cb398-18"></a></span>
+<span id="cb398-19"><a href="progress-bar.html#cb398-19"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>start, {</span>
+<span id="cb398-20"><a href="progress-bar.html#cb398-20"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;rsup-start&#39;</span>, <span class="kw">list</span>())</span>
+<span id="cb398-21"><a href="progress-bar.html#cb398-21"></a>  })</span>
+<span id="cb398-22"><a href="progress-bar.html#cb398-22"></a></span>
+<span id="cb398-23"><a href="progress-bar.html#cb398-23"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>end, {</span>
+<span id="cb398-24"><a href="progress-bar.html#cb398-24"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;rsup-end&#39;</span>, <span class="kw">list</span>())</span>
+<span id="cb398-25"><a href="progress-bar.html#cb398-25"></a>  })</span>
+<span id="cb398-26"><a href="progress-bar.html#cb398-26"></a></span>
+<span id="cb398-27"><a href="progress-bar.html#cb398-27"></a>}</span>
+<span id="cb398-28"><a href="progress-bar.html#cb398-28"></a></span>
+<span id="cb398-29"><a href="progress-bar.html#cb398-29"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="javascript-code" class="section level2" number="19.2">
 <h2><span class="header-section-number">19.2</span> JavaScript code</h2>
 <p>Before one can implement the JavaScript message handlers, the progress bar needs to be initialised</p>
-<div class="sourceCode" id="cb398"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb398-1"><a href="progress-bar.html#cb398-1"></a><span class="co">// script.js</span></span>
-<span id="cb398-2"><a href="progress-bar.html#cb398-2"></a><span class="kw">const</span> progress <span class="op">=</span> <span class="kw">new</span> <span class="at">RsupProgress</span>()<span class="op">;</span></span></code></pre></div>
-<p>The message handlers themselves are rather bare since only the <code>setOptions</code> method takes arguments.</p>
 <div class="sourceCode" id="cb399"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb399-1"><a href="progress-bar.html#cb399-1"></a><span class="co">// script.js</span></span>
-<span id="cb399-2"><a href="progress-bar.html#cb399-2"></a><span class="kw">const</span> progress <span class="op">=</span> <span class="kw">new</span> <span class="at">RsupProgress</span>()<span class="op">;</span></span>
-<span id="cb399-3"><a href="progress-bar.html#cb399-3"></a></span>
-<span id="cb399-4"><a href="progress-bar.html#cb399-4"></a><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;rsup-options&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg)<span class="op">{</span></span>
-<span id="cb399-5"><a href="progress-bar.html#cb399-5"></a>  <span class="va">progress</span>.<span class="at">setOptions</span>(msg)<span class="op">;</span></span>
-<span id="cb399-6"><a href="progress-bar.html#cb399-6"></a><span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb399-7"><a href="progress-bar.html#cb399-7"></a></span>
-<span id="cb399-8"><a href="progress-bar.html#cb399-8"></a><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;rsup-start&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg)<span class="op">{</span></span>
-<span id="cb399-9"><a href="progress-bar.html#cb399-9"></a>  <span class="va">progress</span>.<span class="at">start</span>()<span class="op">;</span></span>
-<span id="cb399-10"><a href="progress-bar.html#cb399-10"></a><span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb399-11"><a href="progress-bar.html#cb399-11"></a></span>
-<span id="cb399-12"><a href="progress-bar.html#cb399-12"></a><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;rsup-end&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg)<span class="op">{</span></span>
-<span id="cb399-13"><a href="progress-bar.html#cb399-13"></a>  <span class="va">progress</span>.<span class="at">end</span>()<span class="op">;</span></span>
-<span id="cb399-14"><a href="progress-bar.html#cb399-14"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<span id="cb399-2"><a href="progress-bar.html#cb399-2"></a><span class="kw">const</span> progress <span class="op">=</span> <span class="kw">new</span> <span class="at">RsupProgress</span>()<span class="op">;</span></span></code></pre></div>
+<p>The message handlers themselves are rather bare since only the <code>setOptions</code> method takes arguments.</p>
+<div class="sourceCode" id="cb400"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb400-1"><a href="progress-bar.html#cb400-1"></a><span class="co">// script.js</span></span>
+<span id="cb400-2"><a href="progress-bar.html#cb400-2"></a><span class="kw">const</span> progress <span class="op">=</span> <span class="kw">new</span> <span class="at">RsupProgress</span>()<span class="op">;</span></span>
+<span id="cb400-3"><a href="progress-bar.html#cb400-3"></a></span>
+<span id="cb400-4"><a href="progress-bar.html#cb400-4"></a><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;rsup-options&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg)<span class="op">{</span></span>
+<span id="cb400-5"><a href="progress-bar.html#cb400-5"></a>  <span class="va">progress</span>.<span class="at">setOptions</span>(msg)<span class="op">;</span></span>
+<span id="cb400-6"><a href="progress-bar.html#cb400-6"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb400-7"><a href="progress-bar.html#cb400-7"></a></span>
+<span id="cb400-8"><a href="progress-bar.html#cb400-8"></a><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;rsup-start&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg)<span class="op">{</span></span>
+<span id="cb400-9"><a href="progress-bar.html#cb400-9"></a>  <span class="va">progress</span>.<span class="at">start</span>()<span class="op">;</span></span>
+<span id="cb400-10"><a href="progress-bar.html#cb400-10"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb400-11"><a href="progress-bar.html#cb400-11"></a></span>
+<span id="cb400-12"><a href="progress-bar.html#cb400-12"></a><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;rsup-end&#39;</span><span class="op">,</span> <span class="kw">function</span>(msg)<span class="op">{</span></span>
+<span id="cb400-13"><a href="progress-bar.html#cb400-13"></a>  <span class="va">progress</span>.<span class="at">end</span>()<span class="op">;</span></span>
+<span id="cb400-14"><a href="progress-bar.html#cb400-14"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 <div class="figure">
 <img src="images/rsup.png" alt="" />
 <p class="caption">Example of Rsup-progress in shiny</p>
@@ -492,48 +496,48 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="events" class="section level2" number="19.3">
 <h2><span class="header-section-number">19.3</span> Events</h2>
 <p>The way rsup is set up is interesting in that the loading bar is shown or hidden from the R server. One could set it up differently however. Perhaps, instead of having to trigger the loading bar from the server it could all be handled automatically: showing the bar when the server is computing or redrawing things and hiding it when the server becomes idle again.</p>
-<div class="sourceCode" id="cb400"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb400-1"><a href="progress-bar.html#cb400-1"></a><span class="kw">file.create</span>(<span class="st">&quot;www/auto.js&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb401"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb401-1"><a href="progress-bar.html#cb401-1"></a><span class="kw">file.create</span>(<span class="st">&quot;www/auto.js&quot;</span>)</span></code></pre></div>
 <p>Below we declare the progress variable that will hold the Rsup-progress object. This is declared before it is created as this object needs to be accessible in various contexts.</p>
-<div class="sourceCode" id="cb401"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb401-1"><a href="progress-bar.html#cb401-1"></a><span class="co">// auto.js</span></span>
-<span id="cb401-2"><a href="progress-bar.html#cb401-2"></a><span class="kw">var</span> progress<span class="op">;</span></span></code></pre></div>
-<p>We can then observe for the <code>shiny:busy</code> and <code>shiny:idle</code> events to show and hide the progress bar automatically.</p>
 <div class="sourceCode" id="cb402"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb402-1"><a href="progress-bar.html#cb402-1"></a><span class="co">// auto.js</span></span>
-<span id="cb402-2"><a href="progress-bar.html#cb402-2"></a><span class="kw">var</span> progress<span class="op">;</span></span>
-<span id="cb402-3"><a href="progress-bar.html#cb402-3"></a></span>
-<span id="cb402-4"><a href="progress-bar.html#cb402-4"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:busy&#39;</span><span class="op">,</span> <span class="kw">function</span>(event)<span class="op">{</span></span>
-<span id="cb402-5"><a href="progress-bar.html#cb402-5"></a>  progress <span class="op">=</span> <span class="kw">new</span> <span class="at">RsupProgress</span>()<span class="op">;</span></span>
-<span id="cb402-6"><a href="progress-bar.html#cb402-6"></a>  <span class="va">progress</span>.<span class="at">start</span>()<span class="op">;</span></span>
-<span id="cb402-7"><a href="progress-bar.html#cb402-7"></a><span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb402-8"><a href="progress-bar.html#cb402-8"></a></span>
-<span id="cb402-9"><a href="progress-bar.html#cb402-9"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:idle&#39;</span><span class="op">,</span> <span class="kw">function</span>(event)<span class="op">{</span></span>
-<span id="cb402-10"><a href="progress-bar.html#cb402-10"></a>  <span class="va">progress</span>.<span class="at">end</span>()<span class="op">;</span></span>
-<span id="cb402-11"><a href="progress-bar.html#cb402-11"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<span id="cb402-2"><a href="progress-bar.html#cb402-2"></a><span class="kw">var</span> progress<span class="op">;</span></span></code></pre></div>
+<p>We can then observe for the <code>shiny:busy</code> and <code>shiny:idle</code> events to show and hide the progress bar automatically.</p>
+<div class="sourceCode" id="cb403"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb403-1"><a href="progress-bar.html#cb403-1"></a><span class="co">// auto.js</span></span>
+<span id="cb403-2"><a href="progress-bar.html#cb403-2"></a><span class="kw">var</span> progress<span class="op">;</span></span>
+<span id="cb403-3"><a href="progress-bar.html#cb403-3"></a></span>
+<span id="cb403-4"><a href="progress-bar.html#cb403-4"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:busy&#39;</span><span class="op">,</span> <span class="kw">function</span>(event)<span class="op">{</span></span>
+<span id="cb403-5"><a href="progress-bar.html#cb403-5"></a>  progress <span class="op">=</span> <span class="kw">new</span> <span class="at">RsupProgress</span>()<span class="op">;</span></span>
+<span id="cb403-6"><a href="progress-bar.html#cb403-6"></a>  <span class="va">progress</span>.<span class="at">start</span>()<span class="op">;</span></span>
+<span id="cb403-7"><a href="progress-bar.html#cb403-7"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb403-8"><a href="progress-bar.html#cb403-8"></a></span>
+<span id="cb403-9"><a href="progress-bar.html#cb403-9"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:idle&#39;</span><span class="op">,</span> <span class="kw">function</span>(event)<span class="op">{</span></span>
+<span id="cb403-10"><a href="progress-bar.html#cb403-10"></a>  <span class="va">progress</span>.<span class="at">end</span>()<span class="op">;</span></span>
+<span id="cb403-11"><a href="progress-bar.html#cb403-11"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 <p>With that done one can test that it works by placing <code>auto.js</code> in an application.</p>
-<div class="sourceCode" id="cb403"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb403-1"><a href="progress-bar.html#cb403-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb403-2"><a href="progress-bar.html#cb403-2"></a></span>
-<span id="cb403-3"><a href="progress-bar.html#cb403-3"></a>shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
-<span id="cb403-4"><a href="progress-bar.html#cb403-4"></a></span>
-<span id="cb403-5"><a href="progress-bar.html#cb403-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb403-6"><a href="progress-bar.html#cb403-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb403-7"><a href="progress-bar.html#cb403-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/rsup-progress&quot;</span>),</span>
-<span id="cb403-8"><a href="progress-bar.html#cb403-8"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/auto.js&quot;</span>)</span>
-<span id="cb403-9"><a href="progress-bar.html#cb403-9"></a>  ),</span>
-<span id="cb403-10"><a href="progress-bar.html#cb403-10"></a>  <span class="kw">br</span>(),</span>
-<span id="cb403-11"><a href="progress-bar.html#cb403-11"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;render&quot;</span>, <span class="st">&quot;render&quot;</span>),</span>
-<span id="cb403-12"><a href="progress-bar.html#cb403-12"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
-<span id="cb403-13"><a href="progress-bar.html#cb403-13"></a>)</span>
-<span id="cb403-14"><a href="progress-bar.html#cb403-14"></a></span>
-<span id="cb403-15"><a href="progress-bar.html#cb403-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb403-16"><a href="progress-bar.html#cb403-16"></a></span>
-<span id="cb403-17"><a href="progress-bar.html#cb403-17"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb403-18"><a href="progress-bar.html#cb403-18"></a>    input<span class="op">$</span>render</span>
-<span id="cb403-19"><a href="progress-bar.html#cb403-19"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">2</span>)</span>
-<span id="cb403-20"><a href="progress-bar.html#cb403-20"></a>    <span class="kw">hist</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>))</span>
-<span id="cb403-21"><a href="progress-bar.html#cb403-21"></a>  })</span>
-<span id="cb403-22"><a href="progress-bar.html#cb403-22"></a></span>
-<span id="cb403-23"><a href="progress-bar.html#cb403-23"></a>}</span>
-<span id="cb403-24"><a href="progress-bar.html#cb403-24"></a></span>
-<span id="cb403-25"><a href="progress-bar.html#cb403-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb404"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb404-1"><a href="progress-bar.html#cb404-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb404-2"><a href="progress-bar.html#cb404-2"></a></span>
+<span id="cb404-3"><a href="progress-bar.html#cb404-3"></a>shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb404-4"><a href="progress-bar.html#cb404-4"></a></span>
+<span id="cb404-5"><a href="progress-bar.html#cb404-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb404-6"><a href="progress-bar.html#cb404-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb404-7"><a href="progress-bar.html#cb404-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/rsup-progress&quot;</span>),</span>
+<span id="cb404-8"><a href="progress-bar.html#cb404-8"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/auto.js&quot;</span>)</span>
+<span id="cb404-9"><a href="progress-bar.html#cb404-9"></a>  ),</span>
+<span id="cb404-10"><a href="progress-bar.html#cb404-10"></a>  <span class="kw">br</span>(),</span>
+<span id="cb404-11"><a href="progress-bar.html#cb404-11"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;render&quot;</span>, <span class="st">&quot;render&quot;</span>),</span>
+<span id="cb404-12"><a href="progress-bar.html#cb404-12"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb404-13"><a href="progress-bar.html#cb404-13"></a>)</span>
+<span id="cb404-14"><a href="progress-bar.html#cb404-14"></a></span>
+<span id="cb404-15"><a href="progress-bar.html#cb404-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb404-16"><a href="progress-bar.html#cb404-16"></a></span>
+<span id="cb404-17"><a href="progress-bar.html#cb404-17"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb404-18"><a href="progress-bar.html#cb404-18"></a>    input<span class="op">$</span>render</span>
+<span id="cb404-19"><a href="progress-bar.html#cb404-19"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">2</span>)</span>
+<span id="cb404-20"><a href="progress-bar.html#cb404-20"></a>    <span class="kw">hist</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>))</span>
+<span id="cb404-21"><a href="progress-bar.html#cb404-21"></a>  })</span>
+<span id="cb404-22"><a href="progress-bar.html#cb404-22"></a></span>
+<span id="cb404-23"><a href="progress-bar.html#cb404-23"></a>}</span>
+<span id="cb404-24"><a href="progress-bar.html#cb404-24"></a></span>
+<span id="cb404-25"><a href="progress-bar.html#cb404-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 
 </div>
 </div>

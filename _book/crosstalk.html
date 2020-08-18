@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-08-17" />
+<meta name="date" content="2020-08-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -68,6 +68,9 @@
 <script src="libs/webcomponents/webcomponents.js"></script>
 <script src="libs/r2d3-binding/r2d3.js"></script>
 <script src="libs/d3v5/d3.min.js"></script>
+<script src="libs/viz/viz.js"></script>
+<link href="libs/DiagrammeR-styles/styles.css" rel="stylesheet" />
+<script src="libs/grViz-binding/grViz.js"></script>
 
 
 <style type="text/css">
@@ -258,9 +261,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="9" data-path="crosstalk.html"><a href="crosstalk.html"><i class="fa fa-check"></i><b>9</b> Crosstalk</a>
 <ul>
 <li class="chapter" data-level="9.1" data-path="crosstalk.html"><a href="crosstalk.html#crosstalk-example"><i class="fa fa-check"></i><b>9.1</b> Crosstalk example</a></li>
-<li class="chapter" data-level="9.2" data-path="crosstalk.html"><a href="crosstalk.html#crosstalk-candidates"><i class="fa fa-check"></i><b>9.2</b> Crosstalk candidates</a></li>
-<li class="chapter" data-level="9.3" data-path="crosstalk.html"><a href="crosstalk.html#crosstalk-with-gio"><i class="fa fa-check"></i><b>9.3</b> Crosstalk with gio</a></li>
-<li class="chapter" data-level="9.4" data-path="crosstalk.html"><a href="crosstalk.html#use-it-in-shiny"><i class="fa fa-check"></i><b>9.4</b> Use it in Shiny</a></li>
+<li class="chapter" data-level="9.2" data-path="crosstalk.html"><a href="crosstalk.html#crosstalk-requirements"><i class="fa fa-check"></i><b>9.2</b> Crosstalk requirements</a></li>
+<li class="chapter" data-level="9.3" data-path="basics-of-building-widgets.html"><a href="basics-of-building-widgets.html#how-it-works"><i class="fa fa-check"></i><b>9.3</b> How it works</a></li>
+<li class="chapter" data-level="9.4" data-path="crosstalk.html"><a href="crosstalk.html#crosstalk-with-gio"><i class="fa fa-check"></i><b>9.4</b> Crosstalk with gio</a></li>
+<li class="chapter" data-level="9.5" data-path="crosstalk.html"><a href="crosstalk.html#use-it-in-shiny"><i class="fa fa-check"></i><b>9.5</b> Use it in Shiny</a></li>
 </ul></li>
 <li class="chapter" data-level="10" data-path="working-with-shiny.html"><a href="working-with-shiny.html"><i class="fa fa-check"></i><b>10</b> Working with Shiny</a>
 <ul>
@@ -395,7 +399,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="crosstalk" class="section level1" number="9">
 <h1><span class="header-section-number">Chapter 9</span> Crosstalk</h1>
-<p>Crosstalk<span class="citation">(Cheng <a href="#ref-R-crosstalk" role="doc-biblioref">2020</a>)</span> is fantastic add-on for htmlwidgets that implements cross-widget interactions, namely selection and filtering. This in effect allows the selection or filtering of data points in one widget is mirrored in another which is enabled by creating “shared datasets”.</p>
+<p>Crosstalk <span class="citation">(Cheng <a href="#ref-R-crosstalk" role="doc-biblioref">2020</a>)</span> is fantastic add-on for htmlwidgets that implements cross-widget interactions, namely selection and filtering. This in effect allows the selection or filtering of data points in one widget is mirrored in another which is enabled by creating “shared datasets”.</p>
 <p>Crosstalk provides a straightforward interface to the users and instead requires effort from the developers for their widgets to support the shared datasets.</p>
 <div id="crosstalk-example" class="section level2" number="9.1">
 <h2><span class="header-section-number">9.1</span> Crosstalk example</h2>
@@ -415,148 +419,167 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <img src="images/crosstalk.png" alt="" />
 <p class="caption">Crosstalk Example</p>
 </div>
+<p>One dark concept of crosstalk that is probably seldom used but needs to be understood by widgets developers is that of “groups.” A group defines an instance of shared data.</p>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="crosstalk.html#cb169-1"></a>shared_cars &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(mtcars, <span class="dt">group =</span> <span class="st">&quot;cars&quot;</span>)</span>
+<span id="cb169-2"><a href="crosstalk.html#cb169-2"></a>shared_cars_four_cyl &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(mtcars, <span class="dt">group =</span> <span class="st">&quot;cars&quot;</span>)</span></code></pre></div>
+<p>The shared dataset above will be linked because they share the same <code>group</code>, event though they are different objects.</p>
 <p>This hopefully demonstrates the ease with which users can make use of crosstalk.</p>
 </div>
-<div id="crosstalk-candidates" class="section level2" number="9.2">
-<h2><span class="header-section-number">9.2</span> Crosstalk candidates</h2>
+<div id="crosstalk-requirements" class="section level2" number="9.2">
+<h2><span class="header-section-number">9.2</span> Crosstalk requirements</h2>
 <p>Crosstalk is will not work well with every widget and every dataset, in some cases it might not even be a good idea to support it.</p>
-<p>Crosstalk works best on rectangular data: dataframes or objects that resemble dataframes. This is important as crosstalk will treat the data rowwise, where each row is an observation that is ultimately selected, or filtered.</p>
+<p>Crosstalk works best on rectangular data: dataframes or objects that resemble dataframes like <code>tibble</code> or <code>SpatialPolygonsDataFrame</code>. This is important as crosstalk will treat the data rowwise, where each row is an observation that is ultimately selected, or filtered. If the underlying data is not tabular (e.g.: trees) then one might eventually encounter mismatch between widgets.</p>
+<p>Other tabular data, crosstalk will require the widget to have the necessary functions or methods to dispatch the selection and filtering that crosstalk enables, without which crosstalk support makes little sense.</p>
+</div>
+<div id="how-it-works" class="section level2" number="9.3">
+<h2><span class="header-section-number">9.3</span> How it works</h2>
+<p>As will be discovered later when we bring crosstalk support to gio, very little changes on the R side. As might be expected, crosstalk enables communication between widgets via JavaScript, hence much of what must be adapted by widgets developers happens in JavaScript too.</p>
+<div id="htmlwidget-70034dcddbbab3a3898f" style="width:672px;height:480px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-70034dcddbbab3a3898f">{"x":{"diagram":"\ndigraph G {\n\n  graph [rankdir = LR, compound=true]\n  node [shape=record fontsize=10];\n\n  # r stuff\n  subgraph cluster_1 {\n    \"Widget 1\" \"Widget 2\";\n    label = \"JavaScript\";\n    color=gold;\n  }\n\n  # js\n  subgraph cluster_0 {\n    node [width = 0.9]\n    Dataset \"Shared Dataset\"; \n    label=\"R\";\n    color=royalBlue;\n  }\n\n  \"Dataset\" -> \"Shared Dataset\";\n  \"Widget 1\" -> \"Widget 2\" [dir=both, color=dimGray];\n\n  # connect subgraphs\n  \"Shared Dataset\" -> \"Widget 1\";\n  \"Shared Dataset\" -> \"Widget 2\";\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p>Indeed the biderectional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. This, internally, works with a unique <code>key</code> that is assigned to every row of the data.frame. These unique keys can be explicitly set by the user and otherwise default to the row names of the data.frame, and if these are not available will create row numbers.</p>
+<p>In a sense, while crosstalk handles the lines of communication between widgets, developers of the respective widgets must handle what messages are sent to others and what to do with messages sent by other widgets. There are two types of such messages: filtering to actually narrow down the selection of data points displayed on a widget, and selection (what crosstalk refers to as “linked brushing”) to highlight certain data points. So whatever selection is made in another widget is communicated to other widgets where it is captured and reflected, same for the filtering, all of which takes place in JavaScript.</p>
+<div id="htmlwidget-cacb48581a943b5b28a0" style="width:672px;height:480px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-cacb48581a943b5b28a0">{"x":{"diagram":"\ndigraph G {\n  graph [rankdir = LR, compound=true]\n  node [shape=record fontsize=10];\n\n  subgraph cluster_0 {\n    \"Selection\"; \n    \"Filter\";\n    label=\"Another Widget\"\n    color=royalBlue\n  }\n\n  subgraph cluster_1 {\n    \"Filtered\";\n    \"Selected\"\n    label=\"Another Widget\"\n    color=gold\n  }\n\n  subgraph cluster_2 {\n    node [shape=none]\n    \"Your Widget\";\n  }\n\n  \"Selection\" -> \"Your Widget\";\n  \"Your Widget\" -> \"Selected\";\n  \"Filter\" -> \"Your Widget\";\n  \"Your Widget\" -> \"Filtered\"\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p>This selection or filtering is communicated with the aforementioned keys. In JavaScript, a widget “receives” the keys of selected and filtered data points and must, when filtering or selection is observed, “send” said selected or filtered keys so they can be applied in other widgets that make use of the shared dataset.</p>
+</div>
+<div id="crosstalk-with-gio" class="section level2" number="9.4">
+<h2><span class="header-section-number">9.4</span> Crosstalk with gio</h2>
+<p>The application of crosstalk to the gio library is somewhat amiss. As mentioned or hinted at before, in order for crosstalk to be properly implemented a widget must be a able to selected, deselect as well as filter and unfilter data points and this is not entirely the case of gio.</p>
 <div class="rmdnote">
 <p>
 The application of crosstalk to the gio package is instructive but limited and somewhat faulty.
 </p>
 </div>
-</div>
-<div id="crosstalk-with-gio" class="section level2" number="9.3">
-<h2><span class="header-section-number">9.3</span> Crosstalk with gio</h2>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="crosstalk.html#cb169-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
-<span id="cb169-2"><a href="crosstalk.html#cb169-2"></a></span>
-<span id="cb169-3"><a href="crosstalk.html#cb169-3"></a>  <span class="co"># defaults to NULL</span></span>
-<span id="cb169-4"><a href="crosstalk.html#cb169-4"></a>  key &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb169-5"><a href="crosstalk.html#cb169-5"></a>  group &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb169-6"><a href="crosstalk.html#cb169-6"></a></span>
-<span id="cb169-7"><a href="crosstalk.html#cb169-7"></a>  <span class="cf">if</span> (<span class="kw">is.SharedData</span>(data)) {</span>
-<span id="cb169-8"><a href="crosstalk.html#cb169-8"></a>    key &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">key</span>()</span>
-<span id="cb169-9"><a href="crosstalk.html#cb169-9"></a>    group &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">groupName</span>()</span>
-<span id="cb169-10"><a href="crosstalk.html#cb169-10"></a>    data &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">origData</span>()</span>
-<span id="cb169-11"><a href="crosstalk.html#cb169-11"></a>  }</span>
-<span id="cb169-12"><a href="crosstalk.html#cb169-12"></a></span>
-<span id="cb169-13"><a href="crosstalk.html#cb169-13"></a>  <span class="co"># forward options using x</span></span>
-<span id="cb169-14"><a href="crosstalk.html#cb169-14"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb169-15"><a href="crosstalk.html#cb169-15"></a>    <span class="dt">data =</span> data,</span>
-<span id="cb169-16"><a href="crosstalk.html#cb169-16"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
-<span id="cb169-17"><a href="crosstalk.html#cb169-17"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(</span>
-<span id="cb169-18"><a href="crosstalk.html#cb169-18"></a>      <span class="dt">key =</span> key,</span>
-<span id="cb169-19"><a href="crosstalk.html#cb169-19"></a>      <span class="dt">group =</span> group</span>
-<span id="cb169-20"><a href="crosstalk.html#cb169-20"></a>    )</span>
-<span id="cb169-21"><a href="crosstalk.html#cb169-21"></a>  )</span>
-<span id="cb169-22"><a href="crosstalk.html#cb169-22"></a></span>
-<span id="cb169-23"><a href="crosstalk.html#cb169-23"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_ARGS&#39;</span>) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">dataframe =</span> <span class="st">&quot;rows&quot;</span>)</span>
-<span id="cb169-24"><a href="crosstalk.html#cb169-24"></a></span>
-<span id="cb169-25"><a href="crosstalk.html#cb169-25"></a>  <span class="co"># create widget</span></span>
-<span id="cb169-26"><a href="crosstalk.html#cb169-26"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
-<span id="cb169-27"><a href="crosstalk.html#cb169-27"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
-<span id="cb169-28"><a href="crosstalk.html#cb169-28"></a>    x,</span>
-<span id="cb169-29"><a href="crosstalk.html#cb169-29"></a>    <span class="dt">width =</span> width,</span>
-<span id="cb169-30"><a href="crosstalk.html#cb169-30"></a>    <span class="dt">height =</span> height,</span>
-<span id="cb169-31"><a href="crosstalk.html#cb169-31"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
-<span id="cb169-32"><a href="crosstalk.html#cb169-32"></a>    <span class="dt">elementId =</span> elementId,</span>
-<span id="cb169-33"><a href="crosstalk.html#cb169-33"></a>    <span class="dt">sizingPolicy =</span> htmlwidgets<span class="op">::</span><span class="kw">sizingPolicy</span>(</span>
-<span id="cb169-34"><a href="crosstalk.html#cb169-34"></a>      <span class="dt">padding =</span> <span class="dv">0</span>,</span>
-<span id="cb169-35"><a href="crosstalk.html#cb169-35"></a>      <span class="dt">browser.fill =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb169-36"><a href="crosstalk.html#cb169-36"></a>      <span class="dt">defaultWidth =</span> <span class="st">&quot;100%&quot;</span></span>
-<span id="cb169-37"><a href="crosstalk.html#cb169-37"></a>    ),</span>
-<span id="cb169-38"><a href="crosstalk.html#cb169-38"></a>    <span class="dt">preRenderHook =</span> render_gio</span>
-<span id="cb169-39"><a href="crosstalk.html#cb169-39"></a>  )</span>
-<span id="cb169-40"><a href="crosstalk.html#cb169-40"></a>}</span></code></pre></div>
-<div class="sourceCode" id="cb170"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb170-1"><a href="crosstalk.html#cb170-1"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
+<p>First, gio’s underlying data is somewhat uncommon: it is a network defined only by its edges (the arcs leaving and coming into countries). Second, those edges themselves cannot be selected, as we’ve observed previously one cannot truly change what edges are drawn on the globe, only change which country is selected. Third, one can <em>change which country is selected</em> but cannot unselect a country as would be ideal with crosstalk.</p>
+<p>In any event, let us start by making the required changes to the R code first.</p>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="crosstalk.html#cb170-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
 <span id="cb170-2"><a href="crosstalk.html#cb170-2"></a></span>
-<span id="cb170-3"><a href="crosstalk.html#cb170-3"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;gio&#39;</span><span class="op">,</span></span>
-<span id="cb170-4"><a href="crosstalk.html#cb170-4"></a></span>
-<span id="cb170-5"><a href="crosstalk.html#cb170-5"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
+<span id="cb170-3"><a href="crosstalk.html#cb170-3"></a>  <span class="co"># defaults to NULL</span></span>
+<span id="cb170-4"><a href="crosstalk.html#cb170-4"></a>  key &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb170-5"><a href="crosstalk.html#cb170-5"></a>  group &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
 <span id="cb170-6"><a href="crosstalk.html#cb170-6"></a></span>
-<span id="cb170-7"><a href="crosstalk.html#cb170-7"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
-<span id="cb170-8"><a href="crosstalk.html#cb170-8"></a></span>
-<span id="cb170-9"><a href="crosstalk.html#cb170-9"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
-<span id="cb170-10"><a href="crosstalk.html#cb170-10"></a>    <span class="kw">var</span> controller<span class="op">;</span></span>
-<span id="cb170-11"><a href="crosstalk.html#cb170-11"></a>    <span class="kw">var</span> sel_handle <span class="op">=</span> <span class="kw">new</span> <span class="va">crosstalk</span>.<span class="at">SelectionHandle</span>()<span class="op">;</span></span>
+<span id="cb170-7"><a href="crosstalk.html#cb170-7"></a>  <span class="cf">if</span> (<span class="kw">is.SharedData</span>(data)) {</span>
+<span id="cb170-8"><a href="crosstalk.html#cb170-8"></a>    key &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">key</span>()</span>
+<span id="cb170-9"><a href="crosstalk.html#cb170-9"></a>    group &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">groupName</span>()</span>
+<span id="cb170-10"><a href="crosstalk.html#cb170-10"></a>    data &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">origData</span>()</span>
+<span id="cb170-11"><a href="crosstalk.html#cb170-11"></a>  }</span>
 <span id="cb170-12"><a href="crosstalk.html#cb170-12"></a></span>
-<span id="cb170-13"><a href="crosstalk.html#cb170-13"></a>    <span class="va">sel_handle</span>.<span class="at">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) <span class="op">{</span></span>
-<span id="cb170-14"><a href="crosstalk.html#cb170-14"></a>      <span class="va">console</span>.<span class="at">log</span>(e)<span class="op">;</span></span>
-<span id="cb170-15"><a href="crosstalk.html#cb170-15"></a>      <span class="cf">if</span> (<span class="va">e</span>.<span class="at">sender</span> <span class="op">!==</span> sel_handle) <span class="op">{</span></span>
-<span id="cb170-16"><a href="crosstalk.html#cb170-16"></a>        <span class="co">//controller.switchCountry(e.value);</span></span>
-<span id="cb170-17"><a href="crosstalk.html#cb170-17"></a>      <span class="op">}</span></span>
-<span id="cb170-18"><a href="crosstalk.html#cb170-18"></a>      <span class="va">controller</span>.<span class="at">switchCountry</span>(<span class="va">e</span>.<span class="at">value</span>)<span class="op">;</span></span>
-<span id="cb170-19"><a href="crosstalk.html#cb170-19"></a>    <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb170-20"><a href="crosstalk.html#cb170-20"></a></span>
-<span id="cb170-21"><a href="crosstalk.html#cb170-21"></a>    <span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb170-13"><a href="crosstalk.html#cb170-13"></a>  <span class="co"># forward options using x</span></span>
+<span id="cb170-14"><a href="crosstalk.html#cb170-14"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb170-15"><a href="crosstalk.html#cb170-15"></a>    <span class="dt">data =</span> data,</span>
+<span id="cb170-16"><a href="crosstalk.html#cb170-16"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
+<span id="cb170-17"><a href="crosstalk.html#cb170-17"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(</span>
+<span id="cb170-18"><a href="crosstalk.html#cb170-18"></a>      <span class="dt">key =</span> key,</span>
+<span id="cb170-19"><a href="crosstalk.html#cb170-19"></a>      <span class="dt">group =</span> group</span>
+<span id="cb170-20"><a href="crosstalk.html#cb170-20"></a>    )</span>
+<span id="cb170-21"><a href="crosstalk.html#cb170-21"></a>  )</span>
 <span id="cb170-22"><a href="crosstalk.html#cb170-22"></a></span>
-<span id="cb170-23"><a href="crosstalk.html#cb170-23"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb170-23"><a href="crosstalk.html#cb170-23"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_ARGS&#39;</span>) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">dataframe =</span> <span class="st">&quot;rows&quot;</span>)</span>
 <span id="cb170-24"><a href="crosstalk.html#cb170-24"></a></span>
-<span id="cb170-25"><a href="crosstalk.html#cb170-25"></a>        <span class="va">el</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="st">&#39;&#39;</span><span class="op">;</span></span>
-<span id="cb170-26"><a href="crosstalk.html#cb170-26"></a>        controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(el)<span class="op">;</span></span>
-<span id="cb170-27"><a href="crosstalk.html#cb170-27"></a></span>
-<span id="cb170-28"><a href="crosstalk.html#cb170-28"></a>        <span class="co">// group</span></span>
-<span id="cb170-29"><a href="crosstalk.html#cb170-29"></a>        <span class="va">sel_handle</span>.<span class="at">setGroup</span>(<span class="va">x</span>.<span class="va">crosstalk</span>.<span class="at">group</span>)<span class="op">;</span></span>
-<span id="cb170-30"><a href="crosstalk.html#cb170-30"></a>        </span>
-<span id="cb170-31"><a href="crosstalk.html#cb170-31"></a>        <span class="co">// add data</span></span>
-<span id="cb170-32"><a href="crosstalk.html#cb170-32"></a>        <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span></span>
-<span id="cb170-33"><a href="crosstalk.html#cb170-33"></a></span>
-<span id="cb170-34"><a href="crosstalk.html#cb170-34"></a>        <span class="va">controller</span>.<span class="at">setStyle</span>(<span class="va">x</span>.<span class="at">style</span>)<span class="op">;</span></span>
-<span id="cb170-35"><a href="crosstalk.html#cb170-35"></a></span>
-<span id="cb170-36"><a href="crosstalk.html#cb170-36"></a>        <span class="co">// callback</span></span>
-<span id="cb170-37"><a href="crosstalk.html#cb170-37"></a>        <span class="va">controller</span>.<span class="at">onCountryPicked</span>( callback )<span class="op">;</span></span>
-<span id="cb170-38"><a href="crosstalk.html#cb170-38"></a></span>
-<span id="cb170-39"><a href="crosstalk.html#cb170-39"></a>        <span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
-<span id="cb170-40"><a href="crosstalk.html#cb170-40"></a>          <span class="va">console</span>.<span class="at">log</span>(selectedCountry)<span class="op">;</span></span>
-<span id="cb170-41"><a href="crosstalk.html#cb170-41"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_selected&#39;</span><span class="op">,</span> selectedCountry)<span class="op">;</span></span>
-<span id="cb170-42"><a href="crosstalk.html#cb170-42"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_related:gio.related.countries&#39;</span><span class="op">,</span> relatedCountries)<span class="op">;</span></span>
-<span id="cb170-43"><a href="crosstalk.html#cb170-43"></a>        <span class="op">}</span></span>
-<span id="cb170-44"><a href="crosstalk.html#cb170-44"></a></span>
-<span id="cb170-45"><a href="crosstalk.html#cb170-45"></a>        <span class="co">// use stats</span></span>
-<span id="cb170-46"><a href="crosstalk.html#cb170-46"></a>        <span class="cf">if</span>(<span class="va">x</span>.<span class="at">stats</span>)</span>
-<span id="cb170-47"><a href="crosstalk.html#cb170-47"></a>          <span class="va">controller</span>.<span class="at">enableStats</span>()<span class="op">;</span></span>
-<span id="cb170-48"><a href="crosstalk.html#cb170-48"></a></span>
-<span id="cb170-49"><a href="crosstalk.html#cb170-49"></a>        <span class="co">// render</span></span>
-<span id="cb170-50"><a href="crosstalk.html#cb170-50"></a>        <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
-<span id="cb170-51"><a href="crosstalk.html#cb170-51"></a></span>
-<span id="cb170-52"><a href="crosstalk.html#cb170-52"></a>      <span class="op">},</span></span>
-<span id="cb170-53"><a href="crosstalk.html#cb170-53"></a></span>
-<span id="cb170-54"><a href="crosstalk.html#cb170-54"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
-<span id="cb170-55"><a href="crosstalk.html#cb170-55"></a></span>
-<span id="cb170-56"><a href="crosstalk.html#cb170-56"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to re-render the widget with a new size</span></span>
-<span id="cb170-57"><a href="crosstalk.html#cb170-57"></a>        <span class="va">controller</span>.<span class="at">resizeUpdate</span>()</span>
-<span id="cb170-58"><a href="crosstalk.html#cb170-58"></a></span>
-<span id="cb170-59"><a href="crosstalk.html#cb170-59"></a>      <span class="op">},</span></span>
-<span id="cb170-60"><a href="crosstalk.html#cb170-60"></a></span>
-<span id="cb170-61"><a href="crosstalk.html#cb170-61"></a>      <span class="dt">getGlobe</span><span class="op">:</span> <span class="kw">function</span>()<span class="op">{</span></span>
-<span id="cb170-62"><a href="crosstalk.html#cb170-62"></a>        <span class="cf">return</span> controller<span class="op">;</span></span>
-<span id="cb170-63"><a href="crosstalk.html#cb170-63"></a>      <span class="op">}</span></span>
-<span id="cb170-64"><a href="crosstalk.html#cb170-64"></a></span>
-<span id="cb170-65"><a href="crosstalk.html#cb170-65"></a>    <span class="op">};</span></span>
-<span id="cb170-66"><a href="crosstalk.html#cb170-66"></a>  <span class="op">}</span></span>
-<span id="cb170-67"><a href="crosstalk.html#cb170-67"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="crosstalk.html#cb171-1"></a><span class="kw">library</span>(DT)</span>
-<span id="cb171-2"><a href="crosstalk.html#cb171-2"></a><span class="kw">library</span>(gio)</span>
-<span id="cb171-3"><a href="crosstalk.html#cb171-3"></a><span class="kw">library</span>(crosstalk)</span>
+<span id="cb170-25"><a href="crosstalk.html#cb170-25"></a>  <span class="co"># create widget</span></span>
+<span id="cb170-26"><a href="crosstalk.html#cb170-26"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
+<span id="cb170-27"><a href="crosstalk.html#cb170-27"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb170-28"><a href="crosstalk.html#cb170-28"></a>    x,</span>
+<span id="cb170-29"><a href="crosstalk.html#cb170-29"></a>    <span class="dt">width =</span> width,</span>
+<span id="cb170-30"><a href="crosstalk.html#cb170-30"></a>    <span class="dt">height =</span> height,</span>
+<span id="cb170-31"><a href="crosstalk.html#cb170-31"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb170-32"><a href="crosstalk.html#cb170-32"></a>    <span class="dt">elementId =</span> elementId,</span>
+<span id="cb170-33"><a href="crosstalk.html#cb170-33"></a>    <span class="dt">sizingPolicy =</span> htmlwidgets<span class="op">::</span><span class="kw">sizingPolicy</span>(</span>
+<span id="cb170-34"><a href="crosstalk.html#cb170-34"></a>      <span class="dt">padding =</span> <span class="dv">0</span>,</span>
+<span id="cb170-35"><a href="crosstalk.html#cb170-35"></a>      <span class="dt">browser.fill =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb170-36"><a href="crosstalk.html#cb170-36"></a>      <span class="dt">defaultWidth =</span> <span class="st">&quot;100%&quot;</span></span>
+<span id="cb170-37"><a href="crosstalk.html#cb170-37"></a>    ),</span>
+<span id="cb170-38"><a href="crosstalk.html#cb170-38"></a>    <span class="dt">preRenderHook =</span> render_gio</span>
+<span id="cb170-39"><a href="crosstalk.html#cb170-39"></a>  )</span>
+<span id="cb170-40"><a href="crosstalk.html#cb170-40"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb171-1"><a href="crosstalk.html#cb171-1"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
+<span id="cb171-2"><a href="crosstalk.html#cb171-2"></a></span>
+<span id="cb171-3"><a href="crosstalk.html#cb171-3"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;gio&#39;</span><span class="op">,</span></span>
 <span id="cb171-4"><a href="crosstalk.html#cb171-4"></a></span>
-<span id="cb171-5"><a href="crosstalk.html#cb171-5"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb171-6"><a href="crosstalk.html#cb171-6"></a>  <span class="st">&quot;https://raw.githubusercontent.com/JohnCoene/&quot;</span>,</span>
-<span id="cb171-7"><a href="crosstalk.html#cb171-7"></a>  <span class="st">&quot;javascript-for-r/master/data/countries.json&quot;</span></span>
-<span id="cb171-8"><a href="crosstalk.html#cb171-8"></a>)</span>
-<span id="cb171-9"><a href="crosstalk.html#cb171-9"></a>arcs &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">fromJSON</span>(url)</span>
-<span id="cb171-10"><a href="crosstalk.html#cb171-10"></a></span>
-<span id="cb171-11"><a href="crosstalk.html#cb171-11"></a><span class="co"># Wrap data frame in SharedData</span></span>
-<span id="cb171-12"><a href="crosstalk.html#cb171-12"></a>sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(arcs, <span class="dt">key =</span> arcs<span class="op">$</span>e)</span>
-<span id="cb171-13"><a href="crosstalk.html#cb171-13"></a></span>
-<span id="cb171-14"><a href="crosstalk.html#cb171-14"></a><span class="co"># Use SharedData like a dataframe with Crosstalk-enabled widgets</span></span>
-<span id="cb171-15"><a href="crosstalk.html#cb171-15"></a><span class="kw">bscols</span>(</span>
-<span id="cb171-16"><a href="crosstalk.html#cb171-16"></a>  <span class="kw">gio</span>(sd),</span>
-<span id="cb171-17"><a href="crosstalk.html#cb171-17"></a>  <span class="kw">datatable</span>(sd, <span class="dt">width=</span><span class="st">&quot;100%&quot;</span>, <span class="dt">selection =</span> <span class="st">&quot;single&quot;</span>)</span>
-<span id="cb171-18"><a href="crosstalk.html#cb171-18"></a>)</span></code></pre></div>
+<span id="cb171-5"><a href="crosstalk.html#cb171-5"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
+<span id="cb171-6"><a href="crosstalk.html#cb171-6"></a></span>
+<span id="cb171-7"><a href="crosstalk.html#cb171-7"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb171-8"><a href="crosstalk.html#cb171-8"></a></span>
+<span id="cb171-9"><a href="crosstalk.html#cb171-9"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
+<span id="cb171-10"><a href="crosstalk.html#cb171-10"></a>    <span class="kw">var</span> controller<span class="op">;</span></span>
+<span id="cb171-11"><a href="crosstalk.html#cb171-11"></a>    <span class="kw">var</span> sel_handle <span class="op">=</span> <span class="kw">new</span> <span class="va">crosstalk</span>.<span class="at">SelectionHandle</span>()<span class="op">;</span></span>
+<span id="cb171-12"><a href="crosstalk.html#cb171-12"></a></span>
+<span id="cb171-13"><a href="crosstalk.html#cb171-13"></a>    <span class="va">sel_handle</span>.<span class="at">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) <span class="op">{</span></span>
+<span id="cb171-14"><a href="crosstalk.html#cb171-14"></a>      <span class="va">console</span>.<span class="at">log</span>(e)<span class="op">;</span></span>
+<span id="cb171-15"><a href="crosstalk.html#cb171-15"></a>      <span class="cf">if</span> (<span class="va">e</span>.<span class="at">sender</span> <span class="op">!==</span> sel_handle) <span class="op">{</span></span>
+<span id="cb171-16"><a href="crosstalk.html#cb171-16"></a>        <span class="co">//controller.switchCountry(e.value);</span></span>
+<span id="cb171-17"><a href="crosstalk.html#cb171-17"></a>      <span class="op">}</span></span>
+<span id="cb171-18"><a href="crosstalk.html#cb171-18"></a>      <span class="va">controller</span>.<span class="at">switchCountry</span>(<span class="va">e</span>.<span class="at">value</span>)<span class="op">;</span></span>
+<span id="cb171-19"><a href="crosstalk.html#cb171-19"></a>    <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb171-20"><a href="crosstalk.html#cb171-20"></a></span>
+<span id="cb171-21"><a href="crosstalk.html#cb171-21"></a>    <span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb171-22"><a href="crosstalk.html#cb171-22"></a></span>
+<span id="cb171-23"><a href="crosstalk.html#cb171-23"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb171-24"><a href="crosstalk.html#cb171-24"></a></span>
+<span id="cb171-25"><a href="crosstalk.html#cb171-25"></a>        <span class="va">el</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="st">&#39;&#39;</span><span class="op">;</span></span>
+<span id="cb171-26"><a href="crosstalk.html#cb171-26"></a>        controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(el)<span class="op">;</span></span>
+<span id="cb171-27"><a href="crosstalk.html#cb171-27"></a></span>
+<span id="cb171-28"><a href="crosstalk.html#cb171-28"></a>        <span class="co">// group</span></span>
+<span id="cb171-29"><a href="crosstalk.html#cb171-29"></a>        <span class="va">sel_handle</span>.<span class="at">setGroup</span>(<span class="va">x</span>.<span class="va">crosstalk</span>.<span class="at">group</span>)<span class="op">;</span></span>
+<span id="cb171-30"><a href="crosstalk.html#cb171-30"></a>        </span>
+<span id="cb171-31"><a href="crosstalk.html#cb171-31"></a>        <span class="co">// add data</span></span>
+<span id="cb171-32"><a href="crosstalk.html#cb171-32"></a>        <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span></span>
+<span id="cb171-33"><a href="crosstalk.html#cb171-33"></a></span>
+<span id="cb171-34"><a href="crosstalk.html#cb171-34"></a>        <span class="va">controller</span>.<span class="at">setStyle</span>(<span class="va">x</span>.<span class="at">style</span>)<span class="op">;</span></span>
+<span id="cb171-35"><a href="crosstalk.html#cb171-35"></a></span>
+<span id="cb171-36"><a href="crosstalk.html#cb171-36"></a>        <span class="co">// callback</span></span>
+<span id="cb171-37"><a href="crosstalk.html#cb171-37"></a>        <span class="va">controller</span>.<span class="at">onCountryPicked</span>( callback )<span class="op">;</span></span>
+<span id="cb171-38"><a href="crosstalk.html#cb171-38"></a></span>
+<span id="cb171-39"><a href="crosstalk.html#cb171-39"></a>        <span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
+<span id="cb171-40"><a href="crosstalk.html#cb171-40"></a>          <span class="va">sel_handle</span>.<span class="at">set</span>(<span class="va">selectedCountry</span>.<span class="at">name</span>)</span>
+<span id="cb171-41"><a href="crosstalk.html#cb171-41"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_selected&#39;</span><span class="op">,</span> selectedCountry)<span class="op">;</span></span>
+<span id="cb171-42"><a href="crosstalk.html#cb171-42"></a>          <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_related:gio.related.countries&#39;</span><span class="op">,</span> relatedCountries)<span class="op">;</span></span>
+<span id="cb171-43"><a href="crosstalk.html#cb171-43"></a>        <span class="op">}</span></span>
+<span id="cb171-44"><a href="crosstalk.html#cb171-44"></a></span>
+<span id="cb171-45"><a href="crosstalk.html#cb171-45"></a>        <span class="co">// use stats</span></span>
+<span id="cb171-46"><a href="crosstalk.html#cb171-46"></a>        <span class="cf">if</span>(<span class="va">x</span>.<span class="at">stats</span>)</span>
+<span id="cb171-47"><a href="crosstalk.html#cb171-47"></a>          <span class="va">controller</span>.<span class="at">enableStats</span>()<span class="op">;</span></span>
+<span id="cb171-48"><a href="crosstalk.html#cb171-48"></a></span>
+<span id="cb171-49"><a href="crosstalk.html#cb171-49"></a>        <span class="co">// render</span></span>
+<span id="cb171-50"><a href="crosstalk.html#cb171-50"></a>        <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
+<span id="cb171-51"><a href="crosstalk.html#cb171-51"></a></span>
+<span id="cb171-52"><a href="crosstalk.html#cb171-52"></a>      <span class="op">},</span></span>
+<span id="cb171-53"><a href="crosstalk.html#cb171-53"></a></span>
+<span id="cb171-54"><a href="crosstalk.html#cb171-54"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb171-55"><a href="crosstalk.html#cb171-55"></a></span>
+<span id="cb171-56"><a href="crosstalk.html#cb171-56"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to re-render the widget with a new size</span></span>
+<span id="cb171-57"><a href="crosstalk.html#cb171-57"></a>        <span class="va">controller</span>.<span class="at">resizeUpdate</span>()</span>
+<span id="cb171-58"><a href="crosstalk.html#cb171-58"></a></span>
+<span id="cb171-59"><a href="crosstalk.html#cb171-59"></a>      <span class="op">},</span></span>
+<span id="cb171-60"><a href="crosstalk.html#cb171-60"></a></span>
+<span id="cb171-61"><a href="crosstalk.html#cb171-61"></a>      <span class="dt">getGlobe</span><span class="op">:</span> <span class="kw">function</span>()<span class="op">{</span></span>
+<span id="cb171-62"><a href="crosstalk.html#cb171-62"></a>        <span class="cf">return</span> controller<span class="op">;</span></span>
+<span id="cb171-63"><a href="crosstalk.html#cb171-63"></a>      <span class="op">}</span></span>
+<span id="cb171-64"><a href="crosstalk.html#cb171-64"></a></span>
+<span id="cb171-65"><a href="crosstalk.html#cb171-65"></a>    <span class="op">};</span></span>
+<span id="cb171-66"><a href="crosstalk.html#cb171-66"></a>  <span class="op">}</span></span>
+<span id="cb171-67"><a href="crosstalk.html#cb171-67"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="crosstalk.html#cb172-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb172-2"><a href="crosstalk.html#cb172-2"></a><span class="kw">library</span>(gio)</span>
+<span id="cb172-3"><a href="crosstalk.html#cb172-3"></a><span class="kw">library</span>(crosstalk)</span>
+<span id="cb172-4"><a href="crosstalk.html#cb172-4"></a></span>
+<span id="cb172-5"><a href="crosstalk.html#cb172-5"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb172-6"><a href="crosstalk.html#cb172-6"></a>  <span class="st">&quot;https://raw.githubusercontent.com/JohnCoene/&quot;</span>,</span>
+<span id="cb172-7"><a href="crosstalk.html#cb172-7"></a>  <span class="st">&quot;javascript-for-r/master/data/countries.json&quot;</span></span>
+<span id="cb172-8"><a href="crosstalk.html#cb172-8"></a>)</span>
+<span id="cb172-9"><a href="crosstalk.html#cb172-9"></a>arcs &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">fromJSON</span>(url)</span>
+<span id="cb172-10"><a href="crosstalk.html#cb172-10"></a></span>
+<span id="cb172-11"><a href="crosstalk.html#cb172-11"></a><span class="co"># Wrap data frame in SharedData</span></span>
+<span id="cb172-12"><a href="crosstalk.html#cb172-12"></a>sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(arcs, <span class="dt">key =</span> arcs<span class="op">$</span>e)</span>
+<span id="cb172-13"><a href="crosstalk.html#cb172-13"></a></span>
+<span id="cb172-14"><a href="crosstalk.html#cb172-14"></a><span class="co"># Use SharedData like a dataframe with Crosstalk-enabled widgets</span></span>
+<span id="cb172-15"><a href="crosstalk.html#cb172-15"></a><span class="kw">bscols</span>(</span>
+<span id="cb172-16"><a href="crosstalk.html#cb172-16"></a>  <span class="kw">gio</span>(sd),</span>
+<span id="cb172-17"><a href="crosstalk.html#cb172-17"></a>  <span class="kw">datatable</span>(sd, <span class="dt">width=</span><span class="st">&quot;100%&quot;</span>, <span class="dt">selection =</span> <span class="st">&quot;single&quot;</span>)</span>
+<span id="cb172-18"><a href="crosstalk.html#cb172-18"></a>)</span></code></pre></div>
 </div>
-<div id="use-it-in-shiny" class="section level2" number="9.4">
-<h2><span class="header-section-number">9.4</span> Use it in Shiny</h2>
+<div id="use-it-in-shiny" class="section level2" number="9.5">
+<h2><span class="header-section-number">9.5</span> Use it in Shiny</h2>
 <div class="rmdnote">
 <p>
 Create the shared dataset the server function.
