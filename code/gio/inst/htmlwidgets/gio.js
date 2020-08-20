@@ -13,11 +13,10 @@ HTMLWidgets.widget({
     var sel_handle = new crosstalk.SelectionHandle();
 
     sel_handle.on("change", function(e) {
-      console.log(e);
       if (e.sender !== sel_handle) {
-        //controller.switchCountry(e.value);
+        // clear selection
       }
-      controller.switchCountry(e.value);
+      controller.switchCountry(e.value[0]);
     });
 
 

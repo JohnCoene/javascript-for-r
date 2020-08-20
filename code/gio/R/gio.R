@@ -8,11 +8,9 @@
 gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
 
   # defaults to NULL
-  key <- NULL
   group <- NULL
 
   if (is.SharedData(data)) {
-    key <- data$key()
     group <- data$groupName()
     data <- data$origData()
   }
@@ -21,10 +19,7 @@ gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
   x = list(
     data = data,
     style = "default",
-    crosstalk = list(
-      key = key,
-      group = group
-    )
+    crosstalk = list(group = group)
   )
 
   attr(x, 'TOJSON_ARGS') <- list(dataframe = "rows")
