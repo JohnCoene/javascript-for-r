@@ -44,16 +44,19 @@ bscols(
 
 ![Crosstalk Example](images/crosstalk.png)
 
-With crosstalk comes the concept of "groups," it defines an instance of shared data. The shared datasets created below will be linked because they share the same `group`, even though they are different objects.
+With crosstalk comes the concept of "groups," it defines an instance of shared data. The shared datasets created below will be linked because they share the same `group`, even though they are different R objects.
 
 ```r
 shared_cars <- SharedData$new(mtcars, group = "cars")
-shared_cars <- SharedData$new(head(cars), group = "cars")
+shared_cars_head <- SharedData$new(head(cars), group = "cars")
 ```
 
 We will later explore and demonstrate why and where this is useful.
 
-Basic usage of crosstalk datasets in shiny is very straightforward since one use reactive expressions to create shared datasets.
+Basic usage of crosstalk datasets in shiny is very straightforward since it accepts reactive expressions to create shared datasets. Note that it takes the expression itself (`reactive`) not the output of the expression (`expression()`).
+
+> If this feels foreign to you, think of how you pass a function name, not a function call, to `lapply`; that’s exactly analogous to what we’re doing here. 
+> --- Official Crosstalk documentation
 
 ```r
 library(DT)
@@ -89,14 +92,14 @@ shinyApp(ui, server)
 ```
 
 ```{block, type='rmdnote'}
-Create the shared dataset the server function or some things might not work as expected in shiny.
+Create the shared dataset in the server function or some things might not work as expected in shiny.
 ```
 
-One can also use the `data` method on the crosstalk object to use in reactive expressions, which is great to use in places where crosstalk is not directly supported, like below in a custom UI block. Note that the argument `withSelection` is set to `TRUE` in order to retrieve the selection state of the rows. 
+One can also use the `data` method on the crosstalk object in reactive expressions, which allows accessing the Javascript selection where crosstalk is not directly supported, like below in a custom UI block. Note that the argument `withSelection` is set to `TRUE` in order to retrieve the selection state of the rows. 
 
 ```r
+library(DT)
 library(shiny)
-library(plotly)
 library(crosstalk)
 
 ui <- fluidPage(
@@ -128,6 +131,38 @@ shinyApp(ui, server)
 ```
 
 ![Shiny with crosstalk](images/crosstalk-shiny.png)
+
+Using crosstalk with shiny one can also change the selection server-side with the `selection` method, passing it the keys to select.
+
+```r
+library(DT)
+library(shiny)
+library(crosstalk)
+
+ui <- fluidPage(
+  fluidRow(
+    column(4, actionButton("random", "Select a random row")),
+    column(8, DTOutput("table"))
+  )
+)
+
+server <- function(input, output) {
+  sd <- SharedData$new(cars)
+
+  output$table <- renderDT({
+    datatable(sd)
+  }, server = FALSE)
+
+  selected <- c()
+  observeEvent(input$random, {
+    smp <- c(1:50)[!1:50 %in% selected]
+    selected <<- append(selected, sample(smp, 1))
+    sd$selection(selected)
+  })
+}
+
+shinyApp(ui, server)
+```
 
 ## Crosstalk requirements
 
