@@ -36,10 +36,10 @@ HTMLWidgets.widget({
         controller.setStyle(x.style);
 
         // callback
-        controller.onCountryPicked( callback );
+        controller.onCountryPicked(callback);
 
         function callback (selectedCountry, relatedCountries) {
-          sel_handle.set(selectedCountry.name);
+          sel_handle.set([selectedCountry.ISOCode]);
           Shiny.setInputValue(el.id + '_selected', selectedCountry);
           Shiny.setInputValue(el.id + '_related:gio.related.countries', relatedCountries);
         }

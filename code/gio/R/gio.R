@@ -10,7 +10,7 @@ gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
   # defaults to NULL
   group <- NULL
 
-  if (is.SharedData(data)) {
+  if (crosstalk::is.SharedData(data)) {
     group <- data$groupName()
     data <- data$origData()
   }

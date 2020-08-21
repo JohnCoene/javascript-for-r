@@ -1,6 +1,5 @@
 #!/bin/sh
 
-Rscript -e "setwd('./code/test');devtools::install();"
 Rscript -e "setwd('./code/gio');devtools::install();"
 Rscript -e "setwd('./code/jbox');devtools::install();"
 Rscript -e "setwd('./code/ms');devtools::install();"

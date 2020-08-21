@@ -4,15 +4,30 @@ Crosstalk [@R-crosstalk] is fantastic add-on for htmlwidgets that implements cro
 
 Crosstalk provides a straightforward interface to the users and instead requires effort from the developers for their widgets to support the shared datasets.
 
-```{r, include = FALSE}
+```{r, echo = FALSE}
 library(crosstalk)
+
+arcs <- jsonlite::fromJSON(
+  '[
+    {
+      "e": "CN",
+      "i": "US",
+      "v": 3300000
+    },
+    {
+      "e": "CN",
+      "i": "RU",
+      "v": 10000
+    }
+  ]'
+)
 ```
 
 ## Crosstalk example
 
 Both the plotly and DT packages support crosstalk, we can thus produce a scatter plot with the former and a table with the latter so that selection of data in one widget is reflected in the other.
 
-The shared dataset is created with the `SharedData` R6 class, this dataset is then used as one would use a standard dataframe in plotly and DT. The `bscols` function is just a helper to create columns from html elements (using bootstrap). It's ideal for examples but one should not have to use it in R markdown or Shiny---crosstalk will work without `bscols`.
+The shared dataset is created with the `SharedData` R6 class, this dataset is then used as one would use a standard dataframe in plotly and DT. The `bscols` function is just a helper to create columns from html elements (using bootstrap). It's ideal for examples but one should not have to use it in Shiny---crosstalk will work without `bscols`.
 
 ```r
 library(DT)
@@ -33,10 +48,86 @@ With crosstalk comes the concept of "groups," it defines an instance of shared d
 
 ```r
 shared_cars <- SharedData$new(mtcars, group = "cars")
-shared_cars_four_cyl <- SharedData$new(mtcars, group = "cars")
+shared_cars <- SharedData$new(head(cars), group = "cars")
 ```
 
 We will later explore and demonstrate why and where this is useful.
+
+Basic usage of crosstalk datasets in shiny is very straightforward since one use reactive expressions to create shared datasets.
+
+```r
+library(DT)
+library(shiny)
+library(plotly)
+library(crosstalk)
+
+ui <- fluidPage(
+  selectInput("specie", "Specie", choices = c("setosa", "versicolor", "virginica")),
+  fluidRow(
+    column(6, DTOutput("table")),
+    column(6, plotlyOutput("plot"))
+  )
+)
+
+server <- function(input, output) {
+  reactive_data <- reactive({
+    iris[iris$Species == input$specie, ]
+  })
+
+  sd <- SharedData$new(reactive_data)
+
+  output$table <- renderDT({
+    datatable(sd)
+  }, server = FALSE)
+
+  output$plot <- renderPlotly({
+    plot_ly(sd, x = ~Sepal.Length, y = ~Sepal.Width)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+```{block, type='rmdnote'}
+Create the shared dataset the server function or some things might not work as expected in shiny.
+```
+
+One can also use the `data` method on the crosstalk object to use in reactive expressions, which is great to use in places where crosstalk is not directly supported, like below in a custom UI block. Note that the argument `withSelection` is set to `TRUE` in order to retrieve the selection state of the rows. 
+
+```r
+library(shiny)
+library(plotly)
+library(crosstalk)
+
+ui <- fluidPage(
+  fluidRow(
+    column(4, uiOutput("text")),
+    column(8, DTOutput("table"))
+  )
+)
+
+server <- function(input, output) {
+  sd <- SharedData$new(cars)
+
+  output$text <- renderUI({
+    # get selected rows
+    n_selected <- sd$data(withSelection = TRUE) %>% 
+      dplyr::filter(selected_ == TRUE) %>% 
+      nrow()
+
+    h3(n_selected, "selected items")
+    
+  })
+
+  output$table <- renderDT({
+    datatable(sd)
+  }, server = FALSE)
+}
+
+shinyApp(ui, server)
+```
+
+![Shiny with crosstalk](images/crosstalk-shiny.png)
 
 ## Crosstalk requirements
 
@@ -129,12 +220,18 @@ The application of crosstalk to the gio package is instructive but limited and s
 
 First, gio's underlying data is somewhat uncommon: it is a network defined only by its edges (the arcs leaving and coming into countries). Second, those edges themselves cannot be selected, as we've observed previously one cannot truly change what edges are drawn on the globe, only change which country is selected and by proxy which edges are shown. Third, while gio supports changing which country is selected it does not allow having not countries selected.
 
+The way crosstalk can work with gio is by setting the keys of the shared dataset to the country ISO codes that gio uses. Since data gio accepts consists of edges this ISO code could correspond to either source or the target country.
+
+```{r}
+shared_arcs <- SharedData$new(arcs, key = arcs$i)
+```
+
 ## Adapt the R code
 
 In any event, let us start by making the required changes to the R code first. The only changes that need to be made are in the `gio` function as it is the only that accepts a data object.
 
 ```{r}
-class(sd)
+class(shared_arcs)
 ```
 
 The shared datasets are R6 classes and therefore cannot simply be treated as dataframes. The `gio` function needs to check whether the `data` object it received is a shared dataset with `is.SharedData` and if so use its methods to extract data from it, namely:
@@ -145,19 +242,17 @@ The shared datasets are R6 classes and therefore cannot simply be treated as dat
 
 ```{r}
 # original data
-data <- sd$origData()
-head(data)
+shared_arcs$origData()
 ```
 
 Note that the name of the group was randomly generated since none were specified when the shared dataset was created.
 
 ```{r}
 # groupName
-sd$groupName()
+shared_arcs$groupName()
 
 # keys
-keys <- sd$key()
-head(keys)
+shared_arcs$key()
 ```
 
 The methods `origData` and `groupName` must be used in every widget, the original dataframe is still needed to produce the visualisation and the group will be needed JavaScript so we can tell crosstalk which group one is working with. The `key` method may not be useful with every widget if the visualisation library also comes with a key/id system so one can use it internally, we won't be using it with gio. Finally notice that we also add the JavaScript dependency with  `crosstalkLibs`.
@@ -203,7 +298,93 @@ gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
 }
 ```
 
-## Change JavaScript code
+The widget will now ship with the crosstalk dependencies and the group name will be serialised and accessible in JavaScript.
+
+## Change the JavaScript code
+
+What is left to do is to adapt the JavaScript code, as mentioned previously it must accept the keys selected in other widgets and share the selected key with other widgets.
+
+First we create the selection handler in the `factory` function, this is done by instantiating a new class from `crosstalk.SelectionHandle`.
+
+```js
+var sel_handle = new crosstalk.SelectionHandle();
+```
+
+Once the selection handle created it can be used in the `renderValue` function to define set the group.
+
+```js
+sel_handle.setGroup(x.crosstalk.group);
+```
+
+### Send selected keys
+
+In order to send the selected keys to crosstalk we shall need to use the one callback function that gio allows using. This callback function is fired every time a user selects a country on the globe and accepts two arguments, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). For this exercise only the selected country is of use. The callback function that one wants to have run every time a country is picked by the user can be passed to `controller.onCountryPicked`
+
+Let us first explore the what is within the object `selectedCountry` object by logging it to the console.
+
+```js
+// placed in renderValue function
+
+// create callback function
+function callback (selectedCountry) {
+  console.log(selectedCountry);
+}
+
+// pass it to gio.js
+controller.onCountryPicked(callback);
+```
+
+```json
+{name: "LIBYA", lat: 25, lon: 17, center: n, ISOCode: "LY"}
+```
+
+As mentioned at the beginning of this section, the keys used with the datasets for gio.js should be ISO codes, therefore one can consider the `ISOCode` variable as selected `key`. The `set` method from the selection handle can be used to share the selected key with other widgets. Note that this method expects either a `null` value or an array a scalar value will throw an error, hence `selectedCountry.ISOCode` is wrapped in square brackets.
+
+```js
+function callback (selectedCountry) {
+  sel_handle.set([selectedCountry.ISOCode]);
+}
+
+controller.onCountryPicked(callback);
+```
+
+### Set selected keys
+
+We have implemented the necessary to share the selected country with other widgets but are yet to implemented the opposite; when users select a country in another widget the selected country in gio should change too. 
+
+```js
+// placed in factory function
+sel_handle.on("change", function(e) {
+  console.log(e);
+});
+```
+
+```json
+{
+  oldValue: []
+  sender: n {_eventRelay: e, _emitter: t, _group: "SharedDatac7682f87", _var: r, _varOnChangeSub: "sub1", …}
+  value: ["AE"]
+}
+```
+
+1. `oldValue` - the value that was previously selected (if any), this may be useful if the widget wants to calculate differences between the currently and previously selected value.
+2. `sender` - the selection handle instance that made the change. This is useful to compare against the selection handle of the widget and know whether the change in selection was initiated by this widget or another. It is often used to clear the selection or filtering before applying a new one when the change comes from another widget.
+3. `value` - the array of selected keys.
+
+Therefore the listening to the change event on the selection would look like this. Note that 1) the selection cannot be cleared with gio.js, a country is always selected, and 2) one can only select one country a time, hence only accepting the first element of the selected keys with `e.value[0]`.
+
+```js
+// placed in factory function
+sel_handle.on("change", function(e) {
+  if (e.sender !== sel_handle) {
+    // clear the selection
+    // not possible with gio.js
+  }
+  controller.switchCountry(e.value[0]);
+});
+```
+
+To recap, this is what the JavaScript code should not look like.
 
 ```js
 HTMLWidgets.widget({
@@ -216,15 +397,18 @@ HTMLWidgets.widget({
 
     // TODO: define shared variables for this instance
     var controller;
+
+    // create selection handle
     var sel_handle = new crosstalk.SelectionHandle();
 
+    // listen to change
     sel_handle.on("change", function(e) {
-      console.log(e);
       if (e.sender !== sel_handle) {
         // clear selection
       }
-      controller.switchCountry(e.value);
+      controller.switchCountry(e.value[0]);
     });
+
 
     return {
 
@@ -242,13 +426,11 @@ HTMLWidgets.widget({
         controller.setStyle(x.style);
 
         // callback
-        controller.onCountryPicked(callback);
-
         function callback (selectedCountry, relatedCountries) {
-          sel_handle.set(selectedCountry.name)
-          Shiny.setInputValue(el.id + '_selected', selectedCountry);
-          Shiny.setInputValue(el.id + '_related:gio.related.countries', relatedCountries);
+          sel_handle.set([selectedCountry.ISOCode]); // send keys
         }
+
+        controller.onCountryPicked(callback);
 
         // use stats
         if(x.stats)
@@ -260,20 +442,19 @@ HTMLWidgets.widget({
       },
 
       resize: function(width, height) {
-
-        // TODO: code to re-render the widget with a new size
-        controller.resizeUpdate()
-
+        controller.resizeUpdate();
       },
-
-      getGlobe: function(){
-        return controller;
-      }
 
     };
   }
 });
 ```
+
+### Using crosstalk with gio
+
+Finally, now that gio supports we can create a few examples to demonstrate how it can be used. 
+
+The simplest way is probably to convert the edges to a shared dataset specifying either the source (`i`) or target (`e`) country codes as keys. However this is unlikely to be used this way out in the real world. In the example below selecting an edge highlights a node which is somewhat confusing.
 
 ```r
 library(DT)
@@ -297,6 +478,10 @@ bscols(
 )
 ```
 
+![Gio with DT using crosstalk](images/crosstalk-gio-1.png)
+
+Thankfully we can use the `group` argument in order to create edges and nodes that share keys and produce a more sensible linkage. Below we create two shared datasets with the same group name, one for the edges and another for the nodes and use one for the gio visualisation and the other for the plotly graph.
+
 ```r
 library(gio)
 library(plotly)
@@ -315,23 +500,17 @@ edges_sd <- SharedData$new(arcs, key = arcs$i, group = "gio")
 iso2c <- unique(arcs$i)
 nodes <- data.frame(
   country = iso2c,
-  x = 1:length(iso2c),
-  y = runif(iso2c)
+  y = rnorm(length(iso2c))
 )
 nodes_sd <- SharedData$new(nodes, key = nodes$country, group = "gio")
 
 # Use SharedData like a dataframe with Crosstalk-enabled widgets
 bscols(
-  plot_ly(data = nodes_sd, mode = "markers") %>% 
-    add_markers(x = ~x, y = ~y, text = ~country) %>% 
+  plot_ly(data = nodes_sd, type = "bar", x = ~country, y = ~y) %>% 
     config(displayModeBar = FALSE),
   gio(edges_sd)
 )
 ```
 
+![Gio with DT and plotly using crosstalk](images/crosstalk-gio-2.png)
 
-## Use it in Shiny
-
-```{block, type='rmdnote'}
-Create the shared dataset the server function.
-```
