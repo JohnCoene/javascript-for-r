@@ -7,7 +7,7 @@ boxxy <- function(title, value, color = "black"){
 boxxyOutput <- function(id){
   el <- shiny::tags$div(
     id = id, class = "boxxy",
-    h1(id = sprintf("%s-boxxy-counter", id), class = "boxxy-value"),
+    h1(id = sprintf("%s-boxxy-value", id), class = "boxxy-value"),
     p(id = sprintf("%s-boxxy-title", id), class = "boxxy-title")
   )
 
