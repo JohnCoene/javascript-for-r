@@ -131,7 +131,7 @@ Imagine there is no such package as htmlwidgets to help create interactive visua
 
 As observed, an interactive visualisation using JavaScript will be contained within an HTML document, therefore it would probably have to be created first. Secondly, the visualisation that is yet to be created likely relies on external libraries, these would need to be imported in the document. The document should also include an HTML element (e.g.: `<div>`) to host said visualisation. Then data would have to be serialised in R and embedded into the document where it should be read by JavaScript code that uses it to create the visualisation. Finally all should be managed to work seamlessly across R markdown, shiny, and other environments.
 
-```{r}
+```{r, echo=FALSE}
 DiagrammeR::grViz("
 digraph {
   graph [rankdir = LR]
@@ -142,7 +142,7 @@ digraph {
     'JSON'
     'JavaScript'
     'Dependencies'
-    label='HTML object'
+    label='HTML'
     color=gold
   }
 
@@ -150,28 +150,17 @@ digraph {
     node [shape=box]
     'Data'
     'Chart options'
-    'Function(s)'
     label = 'R environment'
     color=royalBlue
   }
 
-  'Data' -> 'Function(s)';
-  'Chart options' -> 'Function(s)'
-
-  'Function(s)' -> 'JSON' 
-  'Function(s)' -> 'HTML element'
+  'Data' -> 'JSON' 
+  'Chart options' -> 'JSON' [label='serialise' constraint=false]
   'JSON' -> 'JavaScript'
   'JavaScript' -> 'HTML element'
   'Dependencies' -> 'JavaScript'
 }
-")
+", width="100%", height=250)
 ```
 
 Thankfully the htmlwidgets package is there to handle most of this. Nonetheless, it is important to understand that these operations are undertaken (to some degree) by htmlwidgets.
-
-Must remember when building htmlwidgets:
-
-- Import dependencies
-- Create an html element to hold visualisation
-- Serialise R data to JSON
-- Handle JSON data to produce visualisation

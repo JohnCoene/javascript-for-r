@@ -150,13 +150,13 @@ chart.resize();
 
 Note that the `width` and `height` used in the functions above are obtained from the `resize` function itself (see arguments).
 
-That this is one of the reasons for ensuring the object containing the visualisation (`controller` in this case) is shared (declared in `factory`), if it is declared in the `renderValue` not then the `resize` function cannot access that object and thus cannot run the function required to resize the widget.
+That is one of the reasons for ensuring the instance of the visualisation (`controller` in this case) is shared (declared in `factory`), if declared in the `renderValue` function then the `resize` function cannot access that object and thus cannot run the function required to resize the widget.
 
 ## Pre Render Hooks & Security 
 
-The `createWidget` function also comes with a `preRenderHook` argument which accepts a function that is run just prior to the rendering, it accepts the entire widget object as input, and should return a modified widget object. This was not used in any of the widgets previously built but is extremely useful. It can be used to make checks on the object to ensure all is correct, or remove variables that should only be used internally, and much more.
+The `createWidget` function also comes with a `preRenderHook` argument which accepts a function that is run just prior to the rendering, this function should accept the entire widget object as input, and should return a modified widget object. This was not used in any of the widgets previously built but is extremely useful. It can be used to make checks on the object to ensure all is correct, or remove variables that should only be used internally, and much more.
 
-Currently, `gio` takes the data frame `data` and serialises it in its entirety which will cause security concerns as all the data used in the widget is visible in the source code of the package. What if the data used for the visualisation contained an additional column with sensitive information? We ought to ensure gio only serialises the data necessary to produce the visualisation.
+Currently, `gio` takes the data frame `data` and serialises it in its entirety which will cause security concerns as all the data used in the widget is visible in the source code of the output. What if the data used for the visualisation contained an additional column with sensitive information? We ought to ensure gio only serialises the data necessary to produce the visualisation.
 
 ```r
 # add a variable that should not be shared
@@ -209,6 +209,10 @@ htmlwidgets::JS("var x = 3;")
 
 This can be useful where the library requires the use of callback functions for instance.
 
+```{block, type='rmdnote'}
+Replacing the serialiser will break this feature.
+```
+
 ## Prepend & Append Content 
 
 There is the ability to append of prepend HTML content to the widget (shiny, htmltools tags, or a list of those). For instance, we could use `htmlwidgets::prependContent` to allow displaying a title to the visualisation as shown below.
@@ -228,11 +232,15 @@ gio(arcs) %>%
 
 ![Gio output with a title](images/gio-title.png)
 
-While the `prependContent` function places the content above the visualisation, the `appendContent` function places it below, as they accept any valid htmltools or shiny tag they can also be used for conditional CSS styling for instance. A caveat though, this will not work in Shiny with the `render*` and `*Output` functions.
+While the `prependContent` function places the content above the visualisation, the `appendContent` function places it below, as they accept any valid htmltools or shiny tag they can also be used for conditional CSS styling for instance. 
+
+```{block, type='rmdnote'}
+`prependContent` and `appendContent` do not work in shiny.
+```
 
 ## Dependencies 
 
-Thus far, this book has only covered one of two ways dependencies can be included in htmlwidgets. Though the one covered, using the `.yml` file, will likely be necessary for every widget it has one drawback: all dependencies listed in the file are always included with the output. Dependencies can greatly affect the load time of the output (be it a standalone visualisation, an R markdown document, or a shiny application) as these files may be large. Most large visualisation libraries will therefore allow to bundle those dependencies in separate files. For instance, ECharts.js provides a way to customise the bundle to only include dependencies for charts that one wants to draw (e.g.: bar chart, or boxplot), Highcharts also allows splitting dependencies so one can load those needed for maps, stock charts, and more, separately. It is thus good practice to do the same in widgets so only the required dependencies are loaded, e.g.: when the user produces a bar chart, only that dependency is loaded. It used in the leaflet package to load map tiles for instance.
+Thus far, this book has only covered one of two ways dependencies can be included in htmlwidgets. Though the one covered, using the `.yml` file, will likely be necessary for every widget it has one drawback: all dependencies listed in the file are always included with the output. Dependencies can greatly affect the load time of the output (be it a standalone visualisation, an R markdown document, or a shiny application) as these files may be large. Most large visualisation libraries will therefore allow to bundle those dependencies in separate files. For instance, ECharts.js provides a way to customise the bundle to only include dependencies for charts that one wants to draw (e.g.: bar chart, or boxplot), Highcharts also allows splitting dependencies so one can load those needed for maps, stock charts, and more, separately. It is thus good practice to do the same in widgets so only the required dependencies are loaded, e.g.: when the user produces a map, only the dependency for that map is loaded. It is used in the leaflet package to load map tiles for instance.
 
 The Google Chrome network tab shows information on resources downloaded by the browser (including dependencies) including how long it takes. It is advisable to take a look at it to ensure no dependency drags load time.
 
@@ -247,14 +255,18 @@ controller.enableStats();
 
 In htmlwidgets those additional dependencies can be specified via the `dependencies` argument in the `htmlwidgets::createWidget` function, or they can be appended to the output of that function.
 
-```{r}
+```
 # create gio object
 g <- gio::gio(arcs)
 
-str(g)
+is.null(g$dependencies)
 ```
 
-As shown above, the object created by `gio` includes dependencies, currently `NULL` as no such extra dependency is specified. One can therefore append those to that object in a fashion similar to the `gio_style` function.
+```
+[1] TRUE
+```
+
+As shown above, the object created by `gio` includes dependencies, currently `NULL` as no such extra dependency is specified. One can therefore append those to that object in a fashion similar to what the `gio_style` function does.
 
 From the root of the gio package we create a new directory for the stats.js dependency and download version `r17` from the CDN.
 
@@ -267,7 +279,7 @@ url <- paste0(
 download.file(url, destfile = "htmlwidgets/stats/stats.min.js")
 ```
 
-First we use the `system.file` function to retrieve the directory which contains the dependency (`stats.min.js`). It's important that it is the path to the directory and not the file itself.
+First we use the `system.file` function to retrieve _the path to the directory_ which contains the dependency (`stats.min.js`). It's important that it is the path to the directory and not the file itself.
 
 ```r
 # stats.R
@@ -370,6 +382,8 @@ arcs %>%
 
 ![Gio with stats output](images/stats.png)
 
+In brief, it is better to only place the hard dependencies in the `.yml` file; dependencies that are absolutely necessary to producing the visualisation and use dynamic dependencies where ever possible. Perhaps one can think of it as the difference between `Imports` and `Suggests` in an R package `DESCRIPTION` file.
+
 ## Compatibility   
 
 One issue that might arise is that of compatibility between widgets. What if someone else builds another htmlwidget for gio.js which uses a different version of the library and that a user decides to use both packages in a shiny app or R markdown document? Something is likely to fail as two different version of gio.js are imported and that one overrides the other. For instance, the package echarts4r [@R-echarts4r] allows working with leaflet but including the dependencies could clash with the leaflet package itself, therefore it uses the dependencies from the leaflet package instead.
@@ -378,12 +392,12 @@ The htmlwidgets package comes with a function to extract the dependencies from a
 
 ```{r}
 # get dependencies of the gio package
-htmlwidgets::getDependency("gio")
+htmlwidgets::getDependency("gio")[2:3]
 ```
 
 ## Unit Tests 
 
-The best way to write unit tests for htmlwidgets is to test the object created by `htmlwidgets::createWidget`. Below we provide an example using (testthat)[@R-testthat], running `expect*` functions on the output of `gio`.
+The best way to write unit tests for htmlwidgets is to test the object created by `htmlwidgets::createWidget`. Below we provide an example using testthat[@R-testthat], running `expect*` functions on the output of `gio`.
 
 ```r
 library(gio)
@@ -404,7 +418,7 @@ test_that("gio has correct data", {
 
 A few hints have already been given to ensure one does not drain the browser, consider assessing the performances of the widget as it is being built. Always try and imagine what happens under the hood of the htmlwidget as you build it, it often reveals potential bottlenecks and solutions.
 
-Remember that data passed to `htmlwidgets::createWidget` is 1) loaded into R, 2) serialised to JSON, 3) embedded into the HTML output, 4) read back in with JavaScript, which adds some overhead considering it might be read into JavaScript directly. This will not be a problem for most visualisations but might become one when that data is large. Indeed, there are sometimes shorter, more efficient ways to load data into browser where it is needed for the visualisation.
+Remember that data passed to `htmlwidgets::createWidget` is 1) loaded into R, 2) serialised to JSON, 3) embedded into the HTML output, 4) read back in with JavaScript, which adds some overhead considering it might be read into JavaScript directly. This will not be a problem for most visualisations but might become one when that data is large. Indeed, there are sometimes more efficient ways to load data into web browsers where it is needed for the visualisation.
 
 Consider for instance geographic features (topoJSON and GeoJSON), why load them into R if it is to then re-serialise it to JSON?
 
