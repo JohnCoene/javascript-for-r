@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>References | JavaScript for R</title>
+  <title>Chapter 10 Final Revisions | JavaScript for R</title>
   <meta name="description" content="Invite JavaScript into your Data Science workflow." />
   <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="References | JavaScript for R" />
+  <meta property="og:title" content="Chapter 10 Final Revisions | JavaScript for R" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="JohnCoene/javascript-for-r" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="References | JavaScript for R" />
+  <meta name="twitter:title" content="Chapter 10 Final Revisions | JavaScript for R" />
   
   <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="conclusion.html"/>
-
+<link rel="prev" href="crosstalk.html"/>
+<link rel="next" href="exercise-ploty.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -409,94 +409,135 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="references" class="section level1 unnumbered" number="">
-<h1>References</h1>
+<div id="final-revisions" class="section level1" number="10">
+<h1><span class="header-section-number">Chapter 10</span> Final Revisions</h1>
+<p>In this chapter we polish the API that gio presents its users and provide guidelines to best integrate other JavaScript libraries with R.</p>
+<div id="working-with-data" class="section level2" number="10.1">
+<h2><span class="header-section-number">10.1</span> Working with data</h2>
+<p>The gio package built thus far revolves around the <code>gio</code> function which expects a dataframe with three columns named <code>e</code>, <code>i</code>, and <code>v</code>, which is not great practice; there are great reasons why very few functions do that.</p>
+<p>First, it is unlikely that one comes across a dataset with such names in the real world thus users of the package will likely need to rename the columns of the dataset in order to use gio making the package rather unwieldy. Second, this makes understanding and approaching the gio package more complicated, it will not be evident by looking at the examples, and usage of gio.</p>
+<p>Instead <code>gio</code> should accept the dataframe as first argument and then the relevant columns to extract. This can be implemented in many ways ranging from arguments that accept the column names as strings to reproducing ggplot2’s <code>aes</code> function. Below we settle for a solution probably lying somewhere in between: using non-standard evaluation to provide arguments that accept the bare name of the columns.</p>
+<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="final-revisions.html#cb195-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, source, target, value, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
+<span id="cb195-2"><a href="final-revisions.html#cb195-2"></a></span>
+<span id="cb195-3"><a href="final-revisions.html#cb195-3"></a>  data &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(</span>
+<span id="cb195-4"><a href="final-revisions.html#cb195-4"></a>    data,</span>
+<span id="cb195-5"><a href="final-revisions.html#cb195-5"></a>    <span class="dt">i =</span> {{ source }},</span>
+<span id="cb195-6"><a href="final-revisions.html#cb195-6"></a>    <span class="dt">e =</span> {{ target }},</span>
+<span id="cb195-7"><a href="final-revisions.html#cb195-7"></a>    <span class="dt">v =</span> {{ value }}</span>
+<span id="cb195-8"><a href="final-revisions.html#cb195-8"></a>  )</span>
+<span id="cb195-9"><a href="final-revisions.html#cb195-9"></a></span>
+<span id="cb195-10"><a href="final-revisions.html#cb195-10"></a>  <span class="co"># forward options using x</span></span>
+<span id="cb195-11"><a href="final-revisions.html#cb195-11"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb195-12"><a href="final-revisions.html#cb195-12"></a>    <span class="dt">data =</span> data,</span>
+<span id="cb195-13"><a href="final-revisions.html#cb195-13"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span></span>
+<span id="cb195-14"><a href="final-revisions.html#cb195-14"></a>  )</span>
+<span id="cb195-15"><a href="final-revisions.html#cb195-15"></a></span>
+<span id="cb195-16"><a href="final-revisions.html#cb195-16"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_ARGS&#39;</span>) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">dataframe =</span> <span class="st">&quot;rows&quot;</span>)</span>
+<span id="cb195-17"><a href="final-revisions.html#cb195-17"></a></span>
+<span id="cb195-18"><a href="final-revisions.html#cb195-18"></a>  <span class="co"># create widget</span></span>
+<span id="cb195-19"><a href="final-revisions.html#cb195-19"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
+<span id="cb195-20"><a href="final-revisions.html#cb195-20"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb195-21"><a href="final-revisions.html#cb195-21"></a>    x,</span>
+<span id="cb195-22"><a href="final-revisions.html#cb195-22"></a>    <span class="dt">width =</span> width,</span>
+<span id="cb195-23"><a href="final-revisions.html#cb195-23"></a>    <span class="dt">height =</span> height,</span>
+<span id="cb195-24"><a href="final-revisions.html#cb195-24"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb195-25"><a href="final-revisions.html#cb195-25"></a>    <span class="dt">elementId =</span> elementId,</span>
+<span id="cb195-26"><a href="final-revisions.html#cb195-26"></a>    <span class="dt">sizingPolicy =</span> htmlwidgets<span class="op">::</span><span class="kw">sizingPolicy</span>(</span>
+<span id="cb195-27"><a href="final-revisions.html#cb195-27"></a>      <span class="dt">padding =</span> <span class="dv">0</span>,</span>
+<span id="cb195-28"><a href="final-revisions.html#cb195-28"></a>      <span class="dt">browser.fill =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb195-29"><a href="final-revisions.html#cb195-29"></a>      <span class="dt">defaultWidth =</span> <span class="st">&quot;100%&quot;</span></span>
+<span id="cb195-30"><a href="final-revisions.html#cb195-30"></a>    ),</span>
+<span id="cb195-31"><a href="final-revisions.html#cb195-31"></a>    <span class="dt">preRenderHook =</span> render_gio</span>
+<span id="cb195-32"><a href="final-revisions.html#cb195-32"></a>  )</span>
+<span id="cb195-33"><a href="final-revisions.html#cb195-33"></a>}</span></code></pre></div>
+<p>The above changes allows documentation the input that <code>gio</code> accepts more clearly and also makes its usage more transparent: it is now clear to users what data is required to create a visualisation and they are free to use dataframes of their choice.</p>
+<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="final-revisions.html#cb196-1"></a><span class="co"># mock up data</span></span>
+<span id="cb196-2"><a href="final-revisions.html#cb196-2"></a>countries &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;US&quot;</span>, <span class="st">&quot;BE&quot;</span>, <span class="st">&quot;FR&quot;</span>, <span class="st">&quot;DE&quot;</span>)</span>
+<span id="cb196-3"><a href="final-revisions.html#cb196-3"></a>df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb196-4"><a href="final-revisions.html#cb196-4"></a>  <span class="dt">from =</span> countries,</span>
+<span id="cb196-5"><a href="final-revisions.html#cb196-5"></a>  <span class="dt">to =</span> <span class="kw">rev</span>(countries),</span>
+<span id="cb196-6"><a href="final-revisions.html#cb196-6"></a>  <span class="dt">traded =</span> <span class="kw">runif</span>(<span class="dv">4</span>)</span>
+<span id="cb196-7"><a href="final-revisions.html#cb196-7"></a>)</span>
+<span id="cb196-8"><a href="final-revisions.html#cb196-8"></a></span>
+<span id="cb196-9"><a href="final-revisions.html#cb196-9"></a><span class="co"># use gio</span></span>
+<span id="cb196-10"><a href="final-revisions.html#cb196-10"></a><span class="kw">gio</span>(df, <span class="dt">source =</span> from, <span class="dt">target =</span> to, <span class="dt">value =</span> traded)</span></code></pre></div>
+<p>This small change makes the package a great deal easier to use and understand.</p>
+</div>
+<div id="plethora-of-options" class="section level2" number="10.2">
+<h2><span class="header-section-number">10.2</span> Plethora of options</h2>
+<p>Some JavaScript libraries can be extensive and come with thousands of options that can make the port to R rather bulky, never hesitate to make us of the three dots construct (<code>...</code>) to make these accessible yet saving you from having to hard-code thousands of arguments.</p>
+<p>For instance gio.js accepts a JSON of options to further customise the globe. One could port all of these manually, or allow users to specify those configurations via the three-dot construct.</p>
+<div class="sourceCode" id="cb197"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb197-1"><a href="final-revisions.html#cb197-1"></a><span class="kw">var</span> configs <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb197-2"><a href="final-revisions.html#cb197-2"></a>  <span class="dt">control</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb197-3"><a href="final-revisions.html#cb197-3"></a>    <span class="dt">stats</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb197-4"><a href="final-revisions.html#cb197-4"></a>    <span class="dt">disableUnmentioned</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb197-5"><a href="final-revisions.html#cb197-5"></a>    <span class="dt">lightenMentioned</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb197-6"><a href="final-revisions.html#cb197-6"></a>    <span class="dt">inOnly</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb197-7"><a href="final-revisions.html#cb197-7"></a>    <span class="dt">outOnly</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb197-8"><a href="final-revisions.html#cb197-8"></a>    <span class="dt">initCountry</span><span class="op">:</span> <span class="st">&quot;CN&quot;</span><span class="op">,</span></span>
+<span id="cb197-9"><a href="final-revisions.html#cb197-9"></a>    <span class="dt">halo</span><span class="op">:</span> <span class="kw">true</span></span>
+<span id="cb197-10"><a href="final-revisions.html#cb197-10"></a>  <span class="op">},</span></span>
+<span id="cb197-11"><a href="final-revisions.html#cb197-11"></a>  <span class="dt">color</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb197-12"><a href="final-revisions.html#cb197-12"></a>    <span class="dt">surface</span><span class="op">:</span> <span class="bn">0xFFFFFF</span><span class="op">,</span></span>
+<span id="cb197-13"><a href="final-revisions.html#cb197-13"></a>    <span class="dt">selected</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span></span>
+<span id="cb197-14"><a href="final-revisions.html#cb197-14"></a>    <span class="kw">in</span><span class="op">:</span> <span class="bn">0x154492</span><span class="op">,</span></span>
+<span id="cb197-15"><a href="final-revisions.html#cb197-15"></a>    <span class="dt">out</span><span class="op">:</span> <span class="bn">0xDD380C</span><span class="op">,</span></span>
+<span id="cb197-16"><a href="final-revisions.html#cb197-16"></a>    <span class="dt">halo</span><span class="op">:</span> <span class="bn">0xFFFFFF</span><span class="op">,</span></span>
+<span id="cb197-17"><a href="final-revisions.html#cb197-17"></a>    <span class="dt">background</span><span class="op">:</span> <span class="kw">null</span></span>
+<span id="cb197-18"><a href="final-revisions.html#cb197-18"></a>  <span class="op">},</span></span>
+<span id="cb197-19"><a href="final-revisions.html#cb197-19"></a>  <span class="dt">brightness</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb197-20"><a href="final-revisions.html#cb197-20"></a>    <span class="dt">ocean</span><span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span></span>
+<span id="cb197-21"><a href="final-revisions.html#cb197-21"></a>    <span class="dt">mentioned</span><span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span></span>
+<span id="cb197-22"><a href="final-revisions.html#cb197-22"></a>    <span class="dt">related</span><span class="op">:</span> <span class="fl">0.5</span></span>
+<span id="cb197-23"><a href="final-revisions.html#cb197-23"></a>  <span class="op">}</span></span>
+<span id="cb197-24"><a href="final-revisions.html#cb197-24"></a><span class="op">}</span></span>
+<span id="cb197-25"><a href="final-revisions.html#cb197-25"></a></span>
+<span id="cb197-26"><a href="final-revisions.html#cb197-26"></a>controller <span class="op">=</span> <span class="kw">new</span> <span class="va">Gio</span>.<span class="at">controller</span>(el<span class="op">,</span> configs)<span class="op">;</span></span></code></pre></div>
+<p>The three dots can be added to the <code>gio</code> function which internally captures them in a <code>list</code> named <code>configs</code> so it can be easily referenced in JavaScript.</p>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="final-revisions.html#cb198-1"></a><span class="co"># add ...three dots</span></span>
+<span id="cb198-2"><a href="final-revisions.html#cb198-2"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, source, target, value, ..., <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
+<span id="cb198-3"><a href="final-revisions.html#cb198-3"></a></span>
+<span id="cb198-4"><a href="final-revisions.html#cb198-4"></a>  <span class="co"># ... start of the function</span></span>
+<span id="cb198-5"><a href="final-revisions.html#cb198-5"></a></span>
+<span id="cb198-6"><a href="final-revisions.html#cb198-6"></a>  <span class="co"># forward options using x</span></span>
+<span id="cb198-7"><a href="final-revisions.html#cb198-7"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb198-8"><a href="final-revisions.html#cb198-8"></a>    <span class="dt">configs =</span> <span class="kw">list</span>(...), <span class="co"># pass to configs</span></span>
+<span id="cb198-9"><a href="final-revisions.html#cb198-9"></a>    <span class="dt">data =</span> data,</span>
+<span id="cb198-10"><a href="final-revisions.html#cb198-10"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
+<span id="cb198-11"><a href="final-revisions.html#cb198-11"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(<span class="dt">group =</span> group)</span>
+<span id="cb198-12"><a href="final-revisions.html#cb198-12"></a>  )</span>
+<span id="cb198-13"><a href="final-revisions.html#cb198-13"></a></span>
+<span id="cb198-14"><a href="final-revisions.html#cb198-14"></a>  <span class="co"># ... end of the function</span></span>
+<span id="cb198-15"><a href="final-revisions.html#cb198-15"></a>}</span></code></pre></div>
+<p>In JavaScript, use the <code>configs</code> when initialising the visualisation.</p>
+<div class="sourceCode" id="cb199"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb199-1"><a href="final-revisions.html#cb199-1"></a><span class="co">// use x.configs</span></span>
+<span id="cb199-2"><a href="final-revisions.html#cb199-2"></a>controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(el<span class="op">,</span> <span class="va">x</span>.<span class="at">configs</span>)<span class="op">;</span></span></code></pre></div>
+<p>Below those configuration options are now used to set the initially selected country to the United States and change the colour of the selected country to red.</p>
+<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="final-revisions.html#cb200-1"></a><span class="kw">gio</span>(</span>
+<span id="cb200-2"><a href="final-revisions.html#cb200-2"></a>  df, from, to, traded, </span>
+<span id="cb200-3"><a href="final-revisions.html#cb200-3"></a>  <span class="dt">control =</span> <span class="kw">list</span>(<span class="dt">initCountry =</span> <span class="st">&#39;US&#39;</span>), </span>
+<span id="cb200-4"><a href="final-revisions.html#cb200-4"></a>  <span class="dt">color =</span> <span class="kw">list</span>(<span class="dt">selected =</span> <span class="st">&#39;#ff4d4d&#39;</span>)</span>
+<span id="cb200-5"><a href="final-revisions.html#cb200-5"></a>) </span></code></pre></div>
+<p><img src="images/crosstalk-three-dots.png" /></p>
+</div>
+<div id="interface-design" class="section level2" number="10.3">
+<h2><span class="header-section-number">10.3</span> Interface design</h2>
+<p>As you develop a wrapper to an external visualisation library you will have to make design choices. In building gio we more or less mirrored the JavaScript code one to one: where there is a JavaScript function to change the theme of the visualisation there is one in R, etc. This might not scale properly as more and more functions are added to the package.</p>
+<p>As observed the gio.js library has a function named <code>setStyle</code> to change the theme of the visualisation but it has numerous others, <code>setSurfaceColor</code>, <code>addHalo</code>, <code>setHaloColor</code>, <code>removeHalo</code>, and plenty more. We might want to wrap all or some of these in a single function to provide a more convenient API to the R user.</p>
+<div class="rmdnote">
+<p>
+Always keep in mind the interface you make available to users of your package.
+</p>
+</div>
+<p>You can always go beyond what the underlying library provides. For instance, the country selected by default is always China, regardless of whether the data includes that country or not. This can lead to creating underwhelming visualisations as no arcs appear. One can consider adding to the <code>gio</code> function simple heuristics to ensure that is not the case, or have the function throw a warning when the initial country is not present in the dataset.</p>
+<p>Finally, consider R users’ expectations. There are many prominent visualisation packages on CRAN already, users of the gio package will likely have used ggplot2 <span class="citation">(Wickham, Chang, et al. <a href="#ref-R-ggplot2" role="doc-biblioref">2020</a>)</span>, plotly, or highcharter before. Though these provide somewhat different APIs they set precedents, the more the API of gio resembles those the easier it will be for new users to start using gio. However, do not let this restrict the package either, never hesitate to do differently than ggplot2 if you think it will provide a better interface to your users.</p>
 
-<div id="refs" class="references hanging-indent">
-<div>
-<p>Allaire, JJ, Yihui Xie, Jonathan McPherson, Javier Luraschi, Kevin Ushey, Aron Atkins, Hadley Wickham, Joe Cheng, Winston Chang, and Richard Iannone. 2020. <em>Rmarkdown: Dynamic Documents for R</em>. <a href="https://github.com/rstudio/rmarkdown">https://github.com/rstudio/rmarkdown</a>.</p>
 </div>
-<div>
-<p>Bache, Stefan Milton, and Hadley Wickham. 2014. <em>Magrittr: A Forward-Pipe Operator for R</em>. <a href="https://CRAN.R-project.org/package=magrittr">https://CRAN.R-project.org/package=magrittr</a>.</p>
 </div>
-<div>
-<p>Chamberlain, Scott, and Jeff Hollister. 2020. <em>Lawn: Client for ’Turfjs’ for ’Geospatial’ Analysis</em>.</p>
-</div>
-<div>
-<p>Chang, Winston. 2019. <em>R6: Encapsulated Classes with Reference Semantics</em>. <a href="https://CRAN.R-project.org/package=R6">https://CRAN.R-project.org/package=R6</a>.</p>
-</div>
-<div>
-<p>Chang, Winston, Joe Cheng, JJ Allaire, Yihui Xie, and Jonathan McPherson. 2020. <em>Shiny: Web Application Framework for R</em>. <a href="https://CRAN.R-project.org/package=shiny">https://CRAN.R-project.org/package=shiny</a>.</p>
-</div>
-<div>
-<p>Cheng, Joe. 2020. <em>Crosstalk: Inter-Widget Interactivity for Html Widgets</em>. <a href="https://CRAN.R-project.org/package=crosstalk">https://CRAN.R-project.org/package=crosstalk</a>.</p>
-</div>
-<div>
-<p>Cheng, Joe, Carson Sievert, Winston Chang, Yihui Xie, and Jeff Allen. 2020. <em>Htmltools: Tools for Html</em>. <a href="https://CRAN.R-project.org/package=htmltools">https://CRAN.R-project.org/package=htmltools</a>.</p>
-</div>
-<div>
-<p>Coene, John. 2020a. <em>Echarts4r: Create Interactive Graphs with ’Echarts Javascript’ Version 4</em>. <a href="http://echarts4r.john-coene.com/">http://echarts4r.john-coene.com/</a>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Waiter: Loading Screen for ’Shiny’</em>.</p>
-</div>
-<div>
-<p>Cooley, David. 2020. <em>Jsonify: Convert Between ’R’ Objects and Javascript Object Notation (Json)</em>. <a href="https://CRAN.R-project.org/package=jsonify">https://CRAN.R-project.org/package=jsonify</a>.</p>
-</div>
-<div>
-<p>Fay, Colin. 2020. <em>Bubble: Launch and Interact with a Nodejs Session</em>.</p>
-</div>
-<div>
-<p>Guyader, Vincent, Colin Fay, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://CRAN.R-project.org/package=golem">https://CRAN.R-project.org/package=golem</a>.</p>
-</div>
-<div>
-<p>Hester, Jim, Gábor Csárdi, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2020. <em>Remotes: R Package Installation from Remote Repositories, Including ’Github’</em>. <a href="https://CRAN.R-project.org/package=remotes">https://CRAN.R-project.org/package=remotes</a>.</p>
-</div>
-<div>
-<p>Inc, Facebook, Michel Weststrate, Kent Russell, and Alan Dipert. 2020. <em>ReactR: React Helpers</em>. <a href="https://CRAN.R-project.org/package=reactR">https://CRAN.R-project.org/package=reactR</a>.</p>
-</div>
-<div>
-<p>Kunst, Joshua. 2019. <em>Highcharter: A Wrapper for the ’Highcharts’ Library</em>. <a href="https://CRAN.R-project.org/package=highcharter">https://CRAN.R-project.org/package=highcharter</a>.</p>
-</div>
-<div>
-<p>Lin, Greg. 2020. <em>Reactable: Interactive Data Tables Based on ’React Table’</em>. <a href="https://CRAN.R-project.org/package=reactable">https://CRAN.R-project.org/package=reactable</a>.</p>
-</div>
-<div>
-<p>Luraschi, Javier, and JJ Allaire. 2018. <em>R2d3: Interface to ’D3’ Visualizations</em>. <a href="https://CRAN.R-project.org/package=r2d3">https://CRAN.R-project.org/package=r2d3</a>.</p>
-</div>
-<div>
-<p>Ooms, Jeroen. 2020. <em>Jsonlite: A Robust, High Performance Json Parser and Generator for R</em>. <a href="https://CRAN.R-project.org/package=jsonlite">https://CRAN.R-project.org/package=jsonlite</a>.</p>
-</div>
-<div>
-<p>Sievert, Carson, Chris Parmer, Toby Hocking, Scott Chamberlain, Karthik Ram, Marianne Corvellec, and Pedro Despouy. 2020. <em>Plotly: Create Interactive Web Graphics via ’Plotly.js’</em>. <a href="https://CRAN.R-project.org/package=plotly">https://CRAN.R-project.org/package=plotly</a>.</p>
-</div>
-<div>
-<p>Ushey, Kevin, JJ Allaire, and Yuan Tang. 2020. <em>Reticulate: Interface to ’Python’</em>. <a href="https://CRAN.R-project.org/package=reticulate">https://CRAN.R-project.org/package=reticulate</a>.</p>
-</div>
-<div>
-<p>Vaidyanathan, Ramnath, Yihui Xie, JJ Allaire, Joe Cheng, and Kenton Russell. 2019. <em>Htmlwidgets: HTML Widgets for R</em>. <a href="https://CRAN.R-project.org/package=htmlwidgets">https://CRAN.R-project.org/package=htmlwidgets</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley. 2019. <em>Stringr: Simple, Consistent Wrappers for Common String Operations</em>. <a href="https://CRAN.R-project.org/package=stringr">https://CRAN.R-project.org/package=stringr</a>.</p>
-</div>
-<div>
-<p>———. 2020. <em>Testthat: Unit Testing for R</em>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, and Jennifer Bryan. 2020. <em>Usethis: Automate Package and Project Setup</em>. <a href="https://CRAN.R-project.org/package=usethis">https://CRAN.R-project.org/package=usethis</a>.</p>
-</div>
-<div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-R-ggplot2">
 <p>Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen, Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, and Dewey Dunnington. 2020. <em>Ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics</em>. <a href="https://CRAN.R-project.org/package=ggplot2">https://CRAN.R-project.org/package=ggplot2</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Peter Danenberg, Gábor Csárdi, and Manuel Eugster. 2020. <em>Roxygen2: In-Line Documentation for R</em>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Jim Hester, and Winston Chang. 2020. <em>Devtools: Tools to Make Developing R Packages Easier</em>. <a href="https://CRAN.R-project.org/package=devtools">https://CRAN.R-project.org/package=devtools</a>.</p>
-</div>
-<div>
-<p>Xie, Yihui, Joe Cheng, and Xianying Tan. 2020. <em>DT: A Wrapper of the Javascript Library ’Datatables’</em>. <a href="https://CRAN.R-project.org/package=DT">https://CRAN.R-project.org/package=DT</a>.</p>
-</div>
 </div>
 </div>
             </section>
@@ -504,8 +545,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="conclusion.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="crosstalk.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="exercise-ploty.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -536,7 +577,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/JohnCoene/javascript-for-r/edit/master/99-references.Rmd",
+"link": "https://github.com/JohnCoene/javascript-for-r/edit/master/3-27-htmlwidgets-polish.Rmd",
 "text": "Edit"
 },
 "history": {
