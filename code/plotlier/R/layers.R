@@ -10,8 +10,8 @@ plot_marker <- function(p, x, y){
 
 add_scatter <- function(p, x, y, mode = "markers"){
   layer <- list(
-    x = p$x$data[[x]],
-    y = p$x$data[[y]],
+    x = dplyr::pull(p$x$data, {{ x }}),
+    y = dplyr::pull(p$x$data, {{ y }}),
     type = "scatter",
     mode = mode
   )

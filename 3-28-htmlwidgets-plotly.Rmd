@@ -1,4 +1,4 @@
-# Exercise - Ploty
+# Excercise - Ploty
 
 In this chapter we build a widget for plotly.js, or a tiny part of it; it'll allow drawing a scatter and line plot and have some additional functionalities in shiny. The aim of this chapter is to demonstrate how easily one can transfer take aways from building the gio widget to build another.
 
@@ -49,7 +49,7 @@ The aim is to obtain an R interface resembling the already existing R package. I
 
 ```r
 plotly(data = cars) %>% 
-  plot_line(x = dist, y = speed)
+  plot_marker(x = "dist", y = "speed")
 ```
 
 ## Basics 
@@ -150,8 +150,8 @@ We can then create a function that takes the name of the x and y columns to fetc
 #' @export
 plot_marker <- function(p, x, y){
   layer <- list(
-    x = dplyr::pull(p$x$data, {{ x }}),
-    y = dplyr::pull(p$x$data, {{ y }}),
+    x = p$x$data[[x]],
+    y = p$x$data[[y]],
     type = "scatter",
     mode = "markers"
   )
@@ -167,7 +167,7 @@ At this stage the functions `devtools::document` and `devtools::load_all` can be
 library(plotlier)
 
 plotly(cars) %>% 
-  plot_marker(dist, speed)
+  plot_marker("dist", "speed")
 ```
 
 ![Plotlier Scatter plot](images/plotlier-scatter.png)
@@ -207,7 +207,7 @@ server <- function(input, output){
 
   output$plot <- renderPlotly({
     plotly(cars) %>% 
-      plot_marker(dist, speed)
+      plot_marker("dist", "speed")
   })
 
   output$clicked <- renderPrint({
@@ -248,8 +248,8 @@ We then create a function that creates the trace and sends that data, together w
 #' @export
 plot_add_marker <- function(proxy, data, x, y){
   data <- list(
-    x = dplyr::pull(data, {{ x }}),
-    y = dplyr::pull(data, {{ y }}),
+    x = data[[x]],
+    y = data[[y]],
     type = "scatter",
     mode = "markers"
   )
@@ -290,7 +290,7 @@ server <- function(input, output){
   output$plot <- renderPlotly({
     df %>% 
       plotly() %>% 
-      plot_line(x, y)
+      plot_line("x", "y")
   })
 
   proxy <- plotlyProxy("plot")
@@ -301,7 +301,7 @@ server <- function(input, output){
     plot_add_marker(
       proxy,
       random,
-      x, y
+      "x", "y"
     )
   })
 

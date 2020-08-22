@@ -2300,7 +2300,7 @@ Note this means the data is read from the web browser and therefore the data mus
 
 <!--chapter:end:3-25-htmlwidgets-advanced.Rmd-->
 
-# Crosstalk
+# Crosstalk {#crosstalk}
 
 Crosstalk [@R-crosstalk] is fantastic add-on for htmlwidgets that implements cross-widget interactions, namely selection and filtering. This in effect allows the selection or filtering of data points in one widget to be mirrored in another. This is enabled by the creation of "shared datasets" that can be used across widgets.
 
@@ -2866,7 +2866,15 @@ First, it is unlikely that one comes across a dataset with such names in the rea
 Instead `gio` should accept the dataframe as first argument and then the relevant columns to extract. This can be implemented in many ways ranging from arguments that accept the column names as strings to reproducing ggplot2's `aes` function. Below we settle for a solution probably lying somewhere in between: using non-standard evaluation to provide arguments that accept the bare name of the columns.
 
 ```r
-gio <- function(data, source, target, value, width = NULL, height = NULL, elementId = NULL) {
+gio <- function(data, source, target, value, ..., width = NULL, height = NULL, elementId = NULL) {
+
+  # defaults to NULL
+  group <- NULL
+
+  if (crosstalk::is.SharedData(data)) {
+    group <- data$groupName()
+    data <- data$origData()
+  }
 
   data <- dplyr::select(
     data,
@@ -2877,8 +2885,10 @@ gio <- function(data, source, target, value, width = NULL, height = NULL, elemen
 
   # forward options using x
   x = list(
+    configs = list(...),
     data = data,
-    style = "default"
+    style = "default",
+    crosstalk = list(group = group)
   )
 
   attr(x, 'TOJSON_ARGS') <- list(dataframe = "rows")
@@ -2896,7 +2906,8 @@ gio <- function(data, source, target, value, width = NULL, height = NULL, elemen
       browser.fill = TRUE,
       defaultWidth = "100%"
     ),
-    preRenderHook = render_gio
+    preRenderHook = render_gio,
+    dependencies = crosstalk::crosstalkLibs()
   )
 }
 ```
@@ -2957,7 +2968,8 @@ The three dots can be added to the `gio` function which internally captures them
 
 ```r
 # add ...three dots
-gio <- function(data, source, target, value, ..., width = NULL, height = NULL, elementId = NULL) {
+gio <- function(data, source, target, value, ..., 
+  width = NULL, height = NULL, elementId = NULL) {
 
   # ... start of the function
 
@@ -3008,7 +3020,7 @@ Finally, consider R users' expectations. There are many prominent visualisation 
 
 <!--chapter:end:3-27-htmlwidgets-polish.Rmd-->
 
-# Exercise - Ploty
+# Excercise - Ploty
 
 In this chapter we build a widget for plotly.js, or a tiny part of it; it'll allow drawing a scatter and line plot and have some additional functionalities in shiny. The aim of this chapter is to demonstrate how easily one can transfer take aways from building the gio widget to build another.
 
@@ -3059,7 +3071,7 @@ The aim is to obtain an R interface resembling the already existing R package. I
 
 ```r
 plotly(data = cars) %>% 
-  plot_line(x = dist, y = speed)
+  plot_marker(x = "dist", y = "speed")
 ```
 
 ## Basics 
@@ -3160,8 +3172,8 @@ We can then create a function that takes the name of the x and y columns to fetc
 #' @export
 plot_marker <- function(p, x, y){
   layer <- list(
-    x = dplyr::pull(p$x$data, {{ x }}),
-    y = dplyr::pull(p$x$data, {{ y }}),
+    x = p$x$data[[x]],
+    y = p$x$data[[y]],
     type = "scatter",
     mode = "markers"
   )
@@ -3177,7 +3189,7 @@ At this stage the functions `devtools::document` and `devtools::load_all` can be
 library(plotlier)
 
 plotly(cars) %>% 
-  plot_marker(dist, speed)
+  plot_marker("dist", "speed")
 ```
 
 ![Plotlier Scatter plot](images/plotlier-scatter.png)
@@ -3217,7 +3229,7 @@ server <- function(input, output){
 
   output$plot <- renderPlotly({
     plotly(cars) %>% 
-      plot_marker(dist, speed)
+      plot_marker("dist", "speed")
   })
 
   output$clicked <- renderPrint({
@@ -3258,8 +3270,8 @@ We then create a function that creates the trace and sends that data, together w
 #' @export
 plot_add_marker <- function(proxy, data, x, y){
   data <- list(
-    x = dplyr::pull(data, {{ x }}),
-    y = dplyr::pull(data, {{ y }}),
+    x = data[[x]],
+    y = data[[y]],
     type = "scatter",
     mode = "markers"
   )
@@ -3300,7 +3312,7 @@ server <- function(input, output){
   output$plot <- renderPlotly({
     df %>% 
       plotly() %>% 
-      plot_line(x, y)
+      plot_line("x", "y")
   })
 
   proxy <- plotlyProxy("plot")
@@ -3311,7 +3323,7 @@ server <- function(input, output){
     plot_add_marker(
       proxy,
       random,
-      x, y
+      "x", "y"
     )
   })
 
@@ -5017,14 +5029,13 @@ To demonstrate how to integrate these functionalities in widgets we shall implem
 
 ## JavaScript to R 
 
-JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. Gio.js provides a callback that is fired when a country is selected on the globe, this callback function accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). These could send back to the R server where they could be used for many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
+JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. The [crosstalk](#crosstalk) chapter already explored gio.js' callback function: it is fired when a country is selected on the globe and accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). This is used to set the share selected key (country ISO code) with other widget already. This callback function could also send data back to the R server where they could be used for many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
 
-The [documentation of gio.js](https://giojs.org/html/docs/callbackPicked.html) gives the following example callback function.
+The [documentation of gio.js](https://giojs.org/html/docs/callbackPicked.html) gives the following example callback function. Note that we should already be making used of `selectedCountry` with crosstalk.
 
 ```js
 // define callback function
 function callback (selectedCountry, relatedCountries) {
-  sel_handle.set([selectedCountry.ISOCode])
   console.log(selectedCountry);
   console.log(relatedCountries);
 }
@@ -5039,7 +5050,7 @@ This defines a function named `callback` which takes the two aforementioned obje
 // gio.js
 // define callback function
 function callback (selectedCountry, relatedCountries) {
-  sel_handle.set([selectedCountry.ISOCode])
+  sel_handle.set([selectedCountry.ISOCode]);
   Shiny.setInputValue('selected', selectedCountry);
   Shiny.setInputValue('related', relatedCountries);
 }
@@ -5056,7 +5067,7 @@ renderValue: function(x) {
 
   // callback
   function callback (selectedCountry, relatedCountries) {
-    sel_handle.set([selectedCountry.ISOCode])
+    sel_handle.set([selectedCountry.ISOCode]);
     Shiny.setInputValue(el.id + '_selected', selectedCountry);
     Shiny.setInputValue(el.id + '_related', relatedCountries);
   }
@@ -5093,7 +5104,7 @@ ui <- fluidPage(
 server <- function(input, output){
 
   output$globe <- renderGio({
-    gio(arcs)
+    gio(arcs, source = i, target = e, value = v)
   })
 
   output$selectedCountry <- renderPrint({
@@ -5186,7 +5197,7 @@ ui <- fluidPage(
 server <- function(input, output){
 
   output$globe <- renderGio({
-    gio(arcs)
+    gio(arcs, i, e, v)
   })
 
   output$relatedCountries <- renderDT({
@@ -5242,7 +5253,7 @@ server <- function(input, output){
   })
 
   output$globe <- renderGio({
-    gio(reactive_arcs())
+    gio(reactive_arcs(), i, e, v)
   })
 
 }
@@ -5268,11 +5279,17 @@ This involves a few moving parts, thankfully some of them were already explored,
 
 ### Send Data 
 
-Let's start by creating the R function used to send data to JavaScript. This is hopefully reminiscent of a previous chapter, this function sends a message to JavaScript where it is paired with "message handler" that does something with said message.
+Let's start by creating the R function used to send data to JavaScript. This is hopefully reminiscent of a previous chapter, this function sends a message to JavaScript where it is paired with "message handler" that does something with said message. Note that for consistency the function uses the same arguments as the other function of the package which accepts data: `gio`.
 
 ```r
 #' @export
-gio_send_data <- function(id, data, session = shiny::getDefaultReactiveDomain()){
+gio_send_data <- function(id, data, source, target, value, session = shiny::getDefaultReactiveDomain()){
+  data <- dplyr::select(
+    data,
+    i = {{ source }},
+    e = {{ target }},
+    v = {{ value }}
+  )
   message <- list(id = id, data = data)
   session$sendCustomMessage("send-data", message)
 }
@@ -5291,7 +5308,13 @@ Unfortunately this serialiser cannot be changed, therefore we have to reformat t
 
 ```r
 #' @export
-gio_send_data <- function(id, data, session = shiny::getDefaultReactiveDomain()){
+gio_send_data <- function(id, data, source, target, value, session = shiny::getDefaultReactiveDomain()){
+  data <- dplyr::select(
+    data,
+    i = {{ source }},
+    e = {{ target }},
+    v = {{ value }}
+  )
   message <- list(id = id, data = apply(data, 1, as.list))
   session$sendCustomMessage("send-data", message)
 }
@@ -5310,14 +5333,29 @@ HTMLWidgets.widget({
 
   factory: function(el, width, height) {
 
+    // TODO: define shared variables for this instance
     var controller;
+
+    // selection handle
+    var sel_handle = new crosstalk.SelectionHandle();
+
+    sel_handle.on("change", function(e) {
+      if (e.sender !== sel_handle) {
+        // clear selection
+      }
+      controller.switchCountry(e.value[0]);
+    });
+
 
     return {
 
       renderValue: function(x) {
 
         el.innerHTML = '';
-        controller = new GIO.Controller(el);
+        controller = new GIO.Controller(el, x.configs);
+
+        // group
+        sel_handle.setGroup(x.crosstalk.group);
         
         // add data
         controller.addData(x.data);
@@ -5328,9 +5366,14 @@ HTMLWidgets.widget({
         controller.onCountryPicked(callback);
 
         function callback (selectedCountry, relatedCountries) {
+          sel_handle.set([selectedCountry.ISOCode]);
           Shiny.setInputValue(el.id + '_selected', selectedCountry);
           Shiny.setInputValue(el.id + '_related:gio.related.countries', relatedCountries);
         }
+
+        // use stats
+        if(x.stats)
+          controller.enableStats();
 
         // render
         controller.init();
@@ -5339,11 +5382,11 @@ HTMLWidgets.widget({
 
       resize: function(width, height) {
 
+        // TODO: code to re-render the widget with a new size
         controller.resizeUpdate()
 
       },
 
-      // add getGlobe to retrieve controller
       getGlobe: function(){
         return controller;
       }
@@ -5382,7 +5425,7 @@ if (HTMLWidgets.shinyMode){
 }
 ```
 
-What the currently empty `send-alert` message handler should do is fetch the widget using the `id` sent from R with the `get_gio` function and then use the `addData` method to override the previously define arcs.
+What the currently empty `send-data` message handler should do is fetch the widget using the `id` sent from R with the `get_gio` function and then use the `addData` method to override the previously define arcs.
 
 ```js
 // gio.js
@@ -5441,7 +5484,7 @@ server <- function(input, output){
   })
 
   output$globe <- renderGio({
-    gio(arcs1)
+    gio(arcs1, i, e, v)
   })
 
   observeEvent(input$dataset, {
@@ -5450,7 +5493,7 @@ server <- function(input, output){
     else
       data <- arcs2
     
-    gio_send_data("globe", data)
+    gio_send_data("globe", data, i, e, v)
   })
 
 }
@@ -5531,12 +5574,12 @@ ui <- fluidPage(
 server <- function(input, output){
 
   output$globe <- renderGio({
-    gio(arcs)
+    gio(arcs, i, e, v)
   })
 
   observeEvent(input$load, {
     gio_proxy("globe") %>% 
-      gio_send_data(arcs)
+      gio_send_data(arcs, i, e, v)
   })
 
   observeEvent(input$clear, {
@@ -5607,7 +5650,7 @@ ui <- fluidPage(
 
 server <- function(input, output){
   output$globe <- renderGio({
-    gio(arcs1)
+    gio(arcs1, i, e , v)
   })
 
   observeEvent(input$style, {

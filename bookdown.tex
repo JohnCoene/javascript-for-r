@@ -3340,7 +3340,7 @@ Note that the name of the group was randomly generated since none were specified
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "SharedData52cd8845"
+## [1] "SharedData546c230b"
 \end{verbatim}
 
 \begin{Shaded}
@@ -3671,7 +3671,15 @@ Instead \texttt{gio} should accept the dataframe as first argument and then the 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{gio <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, source, target, value, }\DataTypeTok{width =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{height =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{elementId =} \OtherTok{NULL}\NormalTok{) \{}
+\NormalTok{gio <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, source, target, value, ..., }\DataTypeTok{width =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{height =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{elementId =} \OtherTok{NULL}\NormalTok{) \{}
+
+  \CommentTok{\# defaults to NULL}
+\NormalTok{  group <{-}}\StringTok{ }\OtherTok{NULL}
+
+  \ControlFlowTok{if}\NormalTok{ (crosstalk}\OperatorTok{::}\KeywordTok{is.SharedData}\NormalTok{(data)) \{}
+\NormalTok{    group <{-}}\StringTok{ }\NormalTok{data}\OperatorTok{$}\KeywordTok{groupName}\NormalTok{()}
+\NormalTok{    data <{-}}\StringTok{ }\NormalTok{data}\OperatorTok{$}\KeywordTok{origData}\NormalTok{()}
+\NormalTok{  \}}
 
 \NormalTok{  data <{-}}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(}
 \NormalTok{    data,}
@@ -3682,8 +3690,10 @@ Instead \texttt{gio} should accept the dataframe as first argument and then the 
 
   \CommentTok{\# forward options using x}
 \NormalTok{  x =}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{configs =} \KeywordTok{list}\NormalTok{(...),}
     \DataTypeTok{data =}\NormalTok{ data,}
-    \DataTypeTok{style =} \StringTok{"default"}
+    \DataTypeTok{style =} \StringTok{"default"}\NormalTok{,}
+    \DataTypeTok{crosstalk =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{group =}\NormalTok{ group)}
 \NormalTok{  )}
 
   \KeywordTok{attr}\NormalTok{(x, }\StringTok{\textquotesingle{}TOJSON\_ARGS\textquotesingle{}}\NormalTok{) <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{dataframe =} \StringTok{"rows"}\NormalTok{)}
@@ -3701,7 +3711,8 @@ Instead \texttt{gio} should accept the dataframe as first argument and then the 
       \DataTypeTok{browser.fill =} \OtherTok{TRUE}\NormalTok{,}
       \DataTypeTok{defaultWidth =} \StringTok{"100\%"}
 \NormalTok{    ),}
-    \DataTypeTok{preRenderHook =}\NormalTok{ render\_gio}
+    \DataTypeTok{preRenderHook =}\NormalTok{ render\_gio,}
+    \DataTypeTok{dependencies =}\NormalTok{ crosstalk}\OperatorTok{::}\KeywordTok{crosstalkLibs}\NormalTok{()}
 \NormalTok{  )}
 \NormalTok{\}}
 \end{Highlighting}
@@ -3769,7 +3780,8 @@ The three dots can be added to the \texttt{gio} function which internally captur
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# add ...three dots}
-\NormalTok{gio <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, source, target, value, ..., }\DataTypeTok{width =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{height =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{elementId =} \OtherTok{NULL}\NormalTok{) \{}
+\NormalTok{gio <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, source, target, value, ..., }
+  \DataTypeTok{width =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{height =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{elementId =} \OtherTok{NULL}\NormalTok{) \{}
 
   \CommentTok{\# ... start of the function}
 
@@ -3825,8 +3837,8 @@ You can always go beyond what the underlying library provides. For instance, the
 
 Finally, consider R users' expectations. There are many prominent visualisation packages on CRAN already, users of the gio package will likely have used ggplot2 \citep{R-ggplot2}, plotly, or highcharter before. Though these provide somewhat different APIs they set precedents, the more the API of gio resembles those the easier it will be for new users to start using gio. However, do not let this restrict the package either, never hesitate to do differently than ggplot2 if you think it will provide a better interface to your users.
 
-\hypertarget{exercise---ploty}{%
-\chapter{Exercise - Ploty}\label{exercise---ploty}}
+\hypertarget{excercise---ploty}{%
+\chapter{Excercise - Ploty}\label{excercise---ploty}}
 
 In this chapter we build a widget for plotly.js, or a tiny part of it; it'll allow drawing a scatter and line plot and have some additional functionalities in shiny. The aim of this chapter is to demonstrate how easily one can transfer take aways from building the gio widget to build another.
 
@@ -3881,7 +3893,7 @@ The aim is to obtain an R interface resembling the already existing R package. I
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{plotly}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ cars) }\OperatorTok{\%>\%}\StringTok{ }
-\StringTok{  }\KeywordTok{plot\_line}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ dist, }\DataTypeTok{y =}\NormalTok{ speed)}
+\StringTok{  }\KeywordTok{plot\_marker}\NormalTok{(}\DataTypeTok{x =} \StringTok{"dist"}\NormalTok{, }\DataTypeTok{y =} \StringTok{"speed"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4011,8 +4023,8 @@ We can then create a function that takes the name of the x and y columns to fetc
 \CommentTok{\#\textquotesingle{} @export}
 \NormalTok{plot\_marker <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(p, x, y)\{}
 \NormalTok{  layer <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}
-    \DataTypeTok{x =}\NormalTok{ dplyr}\OperatorTok{::}\KeywordTok{pull}\NormalTok{(p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{data, \{\{ x \}\}),}
-    \DataTypeTok{y =}\NormalTok{ dplyr}\OperatorTok{::}\KeywordTok{pull}\NormalTok{(p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{data, \{\{ y \}\}),}
+    \DataTypeTok{x =}\NormalTok{ p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{data[[x]],}
+    \DataTypeTok{y =}\NormalTok{ p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{data[[y]],}
     \DataTypeTok{type =} \StringTok{"scatter"}\NormalTok{,}
     \DataTypeTok{mode =} \StringTok{"markers"}
 \NormalTok{  )}
@@ -4030,7 +4042,7 @@ At this stage the functions \texttt{devtools::document} and \texttt{devtools::lo
 \KeywordTok{library}\NormalTok{(plotlier)}
 
 \KeywordTok{plotly}\NormalTok{(cars) }\OperatorTok{\%>\%}\StringTok{ }
-\StringTok{  }\KeywordTok{plot\_marker}\NormalTok{(dist, speed)}
+\StringTok{  }\KeywordTok{plot\_marker}\NormalTok{(}\StringTok{"dist"}\NormalTok{, }\StringTok{"speed"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4079,7 +4091,7 @@ Finally, we load the package's functions using devtools to test the input.
 
 \NormalTok{  output}\OperatorTok{$}\NormalTok{plot <{-}}\StringTok{ }\KeywordTok{renderPlotly}\NormalTok{(\{}
     \KeywordTok{plotly}\NormalTok{(cars) }\OperatorTok{\%>\%}\StringTok{ }
-\StringTok{      }\KeywordTok{plot\_marker}\NormalTok{(dist, speed)}
+\StringTok{      }\KeywordTok{plot\_marker}\NormalTok{(}\StringTok{"dist"}\NormalTok{, }\StringTok{"speed"}\NormalTok{)}
 \NormalTok{  \})}
 
 \NormalTok{  output}\OperatorTok{$}\NormalTok{clicked <{-}}\StringTok{ }\KeywordTok{renderPrint}\NormalTok{(\{}
@@ -4127,8 +4139,8 @@ We then create a function that creates the trace and sends that data, together w
 \CommentTok{\#\textquotesingle{} @export}
 \NormalTok{plot\_add\_marker <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(proxy, data, x, y)\{}
 \NormalTok{  data <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}
-    \DataTypeTok{x =}\NormalTok{ dplyr}\OperatorTok{::}\KeywordTok{pull}\NormalTok{(data, \{\{ x \}\}),}
-    \DataTypeTok{y =}\NormalTok{ dplyr}\OperatorTok{::}\KeywordTok{pull}\NormalTok{(data, \{\{ y \}\}),}
+    \DataTypeTok{x =}\NormalTok{ data[[x]],}
+    \DataTypeTok{y =}\NormalTok{ data[[y]],}
     \DataTypeTok{type =} \StringTok{"scatter"}\NormalTok{,}
     \DataTypeTok{mode =} \StringTok{"markers"}
 \NormalTok{  )}
@@ -4173,7 +4185,7 @@ After installing the package, one can use the new proxy function in a shiny appl
 \NormalTok{  output}\OperatorTok{$}\NormalTok{plot <{-}}\StringTok{ }\KeywordTok{renderPlotly}\NormalTok{(\{}
 \NormalTok{    df }\OperatorTok{\%>\%}\StringTok{ }
 \StringTok{      }\KeywordTok{plotly}\NormalTok{() }\OperatorTok{\%>\%}\StringTok{ }
-\StringTok{      }\KeywordTok{plot\_line}\NormalTok{(x, y)}
+\StringTok{      }\KeywordTok{plot\_line}\NormalTok{(}\StringTok{"x"}\NormalTok{, }\StringTok{"y"}\NormalTok{)}
 \NormalTok{  \})}
 
 \NormalTok{  proxy <{-}}\StringTok{ }\KeywordTok{plotlyProxy}\NormalTok{(}\StringTok{"plot"}\NormalTok{)}
@@ -4184,7 +4196,7 @@ After installing the package, one can use the new proxy function in a shiny appl
     \KeywordTok{plot\_add\_marker}\NormalTok{(}
 \NormalTok{      proxy,}
 \NormalTok{      random,}
-\NormalTok{      x, y}
+      \StringTok{"x"}\NormalTok{, }\StringTok{"y"}
 \NormalTok{    )}
 \NormalTok{  \})}
 
@@ -6152,15 +6164,14 @@ To demonstrate how to integrate these functionalities in widgets we shall implem
 \hypertarget{javascript-to-r}{%
 \section{JavaScript to R}\label{javascript-to-r}}
 
-JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. Gio.js provides a callback that is fired when a country is selected on the globe, this callback function accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). These could send back to the R server where they could be used for many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
+JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. The \protect\hyperlink{crosstalk}{crosstalk} chapter already explored gio.js' callback function: it is fired when a country is selected on the globe and accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). This is used to set the share selected key (country ISO code) with other widget already. This callback function could also send data back to the R server where they could be used for many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
 
-The \href{https://giojs.org/html/docs/callbackPicked.html}{documentation of gio.js} gives the following example callback function.
+The \href{https://giojs.org/html/docs/callbackPicked.html}{documentation of gio.js} gives the following example callback function. Note that we should already be making used of \texttt{selectedCountry} with crosstalk.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{// define callback function}
 \KeywordTok{function} \AttributeTok{callback}\NormalTok{ (selectedCountry}\OperatorTok{,}\NormalTok{ relatedCountries) }\OperatorTok{\{}
-  \VariableTok{sel\_handle}\NormalTok{.}\AttributeTok{set}\NormalTok{([}\VariableTok{selectedCountry}\NormalTok{.}\AttributeTok{ISOCode}\NormalTok{])}
   \VariableTok{console}\NormalTok{.}\AttributeTok{log}\NormalTok{(selectedCountry)}\OperatorTok{;}
   \VariableTok{console}\NormalTok{.}\AttributeTok{log}\NormalTok{(relatedCountries)}\OperatorTok{;}
 \OperatorTok{\}}
@@ -6177,7 +6188,7 @@ This defines a function named \texttt{callback} which takes the two aforemention
 \CommentTok{// gio.js}
 \CommentTok{// define callback function}
 \KeywordTok{function} \AttributeTok{callback}\NormalTok{ (selectedCountry}\OperatorTok{,}\NormalTok{ relatedCountries) }\OperatorTok{\{}
-  \VariableTok{sel\_handle}\NormalTok{.}\AttributeTok{set}\NormalTok{([}\VariableTok{selectedCountry}\NormalTok{.}\AttributeTok{ISOCode}\NormalTok{])}
+  \VariableTok{sel\_handle}\NormalTok{.}\AttributeTok{set}\NormalTok{([}\VariableTok{selectedCountry}\NormalTok{.}\AttributeTok{ISOCode}\NormalTok{])}\OperatorTok{;}
   \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\StringTok{\textquotesingle{}selected\textquotesingle{}}\OperatorTok{,}\NormalTok{ selectedCountry)}\OperatorTok{;}
   \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\StringTok{\textquotesingle{}related\textquotesingle{}}\OperatorTok{,}\NormalTok{ relatedCountries)}\OperatorTok{;}
 \OperatorTok{\}}
@@ -6196,7 +6207,7 @@ However, this will generate an issue experienced in a previous chapter; multiple
 
   \CommentTok{// callback}
   \KeywordTok{function} \AttributeTok{callback}\NormalTok{ (selectedCountry}\OperatorTok{,}\NormalTok{ relatedCountries) }\OperatorTok{\{}
-    \VariableTok{sel\_handle}\NormalTok{.}\AttributeTok{set}\NormalTok{([}\VariableTok{selectedCountry}\NormalTok{.}\AttributeTok{ISOCode}\NormalTok{])}
+    \VariableTok{sel\_handle}\NormalTok{.}\AttributeTok{set}\NormalTok{([}\VariableTok{selectedCountry}\NormalTok{.}\AttributeTok{ISOCode}\NormalTok{])}\OperatorTok{;}
     \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_selected\textquotesingle{}}\OperatorTok{,}\NormalTok{ selectedCountry)}\OperatorTok{;}
     \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_related\textquotesingle{}}\OperatorTok{,}\NormalTok{ relatedCountries)}\OperatorTok{;}
   \OperatorTok{\}}
@@ -6235,7 +6246,7 @@ The package can then be installed with \texttt{devtools::install} so we can test
 \NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
 
 \NormalTok{  output}\OperatorTok{$}\NormalTok{globe <{-}}\StringTok{ }\KeywordTok{renderGio}\NormalTok{(\{}
-    \KeywordTok{gio}\NormalTok{(arcs)}
+    \KeywordTok{gio}\NormalTok{(arcs, }\DataTypeTok{source =}\NormalTok{ i, }\DataTypeTok{target =}\NormalTok{ e, }\DataTypeTok{value =}\NormalTok{ v)}
 \NormalTok{  \})}
 
 \NormalTok{  output}\OperatorTok{$}\NormalTok{selectedCountry <{-}}\StringTok{ }\KeywordTok{renderPrint}\NormalTok{(\{}
@@ -6345,7 +6356,7 @@ Finally, we can reinstall the package with \texttt{devtools::install} and create
 \NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
 
 \NormalTok{  output}\OperatorTok{$}\NormalTok{globe <{-}}\StringTok{ }\KeywordTok{renderGio}\NormalTok{(\{}
-    \KeywordTok{gio}\NormalTok{(arcs)}
+    \KeywordTok{gio}\NormalTok{(arcs, i, e, v)}
 \NormalTok{  \})}
 
 \NormalTok{  output}\OperatorTok{$}\NormalTok{relatedCountries <{-}}\StringTok{ }\KeywordTok{renderDT}\NormalTok{(\{}
@@ -6408,7 +6419,7 @@ Before we look into the implementation, let us create a shiny application which 
 \NormalTok{  \})}
 
 \NormalTok{  output}\OperatorTok{$}\NormalTok{globe <{-}}\StringTok{ }\KeywordTok{renderGio}\NormalTok{(\{}
-    \KeywordTok{gio}\NormalTok{(}\KeywordTok{reactive\_arcs}\NormalTok{())}
+    \KeywordTok{gio}\NormalTok{(}\KeywordTok{reactive\_arcs}\NormalTok{(), i, e, v)}
 \NormalTok{  \})}
 
 \NormalTok{\}}
@@ -6442,12 +6453,18 @@ This involves a few moving parts, thankfully some of them were already explored,
 \hypertarget{send-data}{%
 \subsection{Send Data}\label{send-data}}
 
-Let's start by creating the R function used to send data to JavaScript. This is hopefully reminiscent of a previous chapter, this function sends a message to JavaScript where it is paired with ``message handler'' that does something with said message.
+Let's start by creating the R function used to send data to JavaScript. This is hopefully reminiscent of a previous chapter, this function sends a message to JavaScript where it is paired with ``message handler'' that does something with said message. Note that for consistency the function uses the same arguments as the other function of the package which accepts data: \texttt{gio}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\#\textquotesingle{} @export}
-\NormalTok{gio\_send\_data <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id, data, }\DataTypeTok{session =}\NormalTok{ shiny}\OperatorTok{::}\KeywordTok{getDefaultReactiveDomain}\NormalTok{())\{}
+\NormalTok{gio\_send\_data <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id, data, source, target, value, }\DataTypeTok{session =}\NormalTok{ shiny}\OperatorTok{::}\KeywordTok{getDefaultReactiveDomain}\NormalTok{())\{}
+\NormalTok{  data <{-}}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(}
+\NormalTok{    data,}
+    \DataTypeTok{i =}\NormalTok{ \{\{ source \}\},}
+    \DataTypeTok{e =}\NormalTok{ \{\{ target \}\},}
+    \DataTypeTok{v =}\NormalTok{ \{\{ value \}\}}
+\NormalTok{  )}
 \NormalTok{  message <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{data =}\NormalTok{ data)}
 \NormalTok{  session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\StringTok{"send{-}data"}\NormalTok{, message)}
 \NormalTok{\}}
@@ -6474,7 +6491,13 @@ Unfortunately this serialiser cannot be changed, therefore we have to reformat t
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\#\textquotesingle{} @export}
-\NormalTok{gio\_send\_data <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id, data, }\DataTypeTok{session =}\NormalTok{ shiny}\OperatorTok{::}\KeywordTok{getDefaultReactiveDomain}\NormalTok{())\{}
+\NormalTok{gio\_send\_data <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id, data, source, target, value, }\DataTypeTok{session =}\NormalTok{ shiny}\OperatorTok{::}\KeywordTok{getDefaultReactiveDomain}\NormalTok{())\{}
+\NormalTok{  data <{-}}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(}
+\NormalTok{    data,}
+    \DataTypeTok{i =}\NormalTok{ \{\{ source \}\},}
+    \DataTypeTok{e =}\NormalTok{ \{\{ target \}\},}
+    \DataTypeTok{v =}\NormalTok{ \{\{ value \}\}}
+\NormalTok{  )}
 \NormalTok{  message <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{data =} \KeywordTok{apply}\NormalTok{(data, }\DecValTok{1}\NormalTok{, as.list))}
 \NormalTok{  session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\StringTok{"send{-}data"}\NormalTok{, message)}
 \NormalTok{\}}
@@ -6496,14 +6519,29 @@ We will need to be able to access the instance of the visualisation (\texttt{con
 
   \DataTypeTok{factory}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
 
+    \CommentTok{// }\AlertTok{TODO}\CommentTok{: define shared variables for this instance}
     \KeywordTok{var}\NormalTok{ controller}\OperatorTok{;}
+
+    \CommentTok{// selection handle}
+    \KeywordTok{var}\NormalTok{ sel\_handle }\OperatorTok{=} \KeywordTok{new} \VariableTok{crosstalk}\NormalTok{.}\AttributeTok{SelectionHandle}\NormalTok{()}\OperatorTok{;}
+
+    \VariableTok{sel\_handle}\NormalTok{.}\AttributeTok{on}\NormalTok{(}\StringTok{"change"}\OperatorTok{,} \KeywordTok{function}\NormalTok{(e) }\OperatorTok{\{}
+      \ControlFlowTok{if}\NormalTok{ (}\VariableTok{e}\NormalTok{.}\AttributeTok{sender} \OperatorTok{!==}\NormalTok{ sel\_handle) }\OperatorTok{\{}
+        \CommentTok{// clear selection}
+      \OperatorTok{\}}
+      \VariableTok{controller}\NormalTok{.}\AttributeTok{switchCountry}\NormalTok{(}\VariableTok{e}\NormalTok{.}\AttributeTok{value}\NormalTok{[}\DecValTok{0}\NormalTok{])}\OperatorTok{;}
+    \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+
 
     \ControlFlowTok{return} \OperatorTok{\{}
 
       \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
 
         \VariableTok{el}\NormalTok{.}\AttributeTok{innerHTML} \OperatorTok{=} \StringTok{\textquotesingle{}\textquotesingle{}}\OperatorTok{;}
-\NormalTok{        controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(el)}\OperatorTok{;}
+\NormalTok{        controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(el}\OperatorTok{,} \VariableTok{x}\NormalTok{.}\AttributeTok{configs}\NormalTok{)}\OperatorTok{;}
+
+        \CommentTok{// group}
+        \VariableTok{sel\_handle}\NormalTok{.}\AttributeTok{setGroup}\NormalTok{(}\VariableTok{x}\NormalTok{.}\VariableTok{crosstalk}\NormalTok{.}\AttributeTok{group}\NormalTok{)}\OperatorTok{;}
         
         \CommentTok{// add data}
         \VariableTok{controller}\NormalTok{.}\AttributeTok{addData}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;}
@@ -6514,9 +6552,14 @@ We will need to be able to access the instance of the visualisation (\texttt{con
         \VariableTok{controller}\NormalTok{.}\AttributeTok{onCountryPicked}\NormalTok{(callback)}\OperatorTok{;}
 
         \KeywordTok{function} \AttributeTok{callback}\NormalTok{ (selectedCountry}\OperatorTok{,}\NormalTok{ relatedCountries) }\OperatorTok{\{}
+          \VariableTok{sel\_handle}\NormalTok{.}\AttributeTok{set}\NormalTok{([}\VariableTok{selectedCountry}\NormalTok{.}\AttributeTok{ISOCode}\NormalTok{])}\OperatorTok{;}
           \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_selected\textquotesingle{}}\OperatorTok{,}\NormalTok{ selectedCountry)}\OperatorTok{;}
           \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_related:gio.related.countries\textquotesingle{}}\OperatorTok{,}\NormalTok{ relatedCountries)}\OperatorTok{;}
         \OperatorTok{\}}
+
+        \CommentTok{// use stats}
+        \ControlFlowTok{if}\NormalTok{(}\VariableTok{x}\NormalTok{.}\AttributeTok{stats}\NormalTok{)}
+          \VariableTok{controller}\NormalTok{.}\AttributeTok{enableStats}\NormalTok{()}\OperatorTok{;}
 
         \CommentTok{// render}
         \VariableTok{controller}\NormalTok{.}\AttributeTok{init}\NormalTok{()}\OperatorTok{;}
@@ -6525,11 +6568,11 @@ We will need to be able to access the instance of the visualisation (\texttt{con
 
       \DataTypeTok{resize}\OperatorTok{:} \KeywordTok{function}\NormalTok{(width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
 
+        \CommentTok{// }\AlertTok{TODO}\CommentTok{: code to re{-}render the widget with a new size}
         \VariableTok{controller}\NormalTok{.}\AttributeTok{resizeUpdate}\NormalTok{()}
 
       \OperatorTok{\},}
 
-      \CommentTok{// add getGlobe to retrieve controller}
       \DataTypeTok{getGlobe}\OperatorTok{:} \KeywordTok{function}\NormalTok{()}\OperatorTok{\{}
         \ControlFlowTok{return}\NormalTok{ controller}\OperatorTok{;}
       \OperatorTok{\}}
@@ -6574,7 +6617,7 @@ We can now turn the attention to actually applying the data sent from the R serv
 \end{Highlighting}
 \end{Shaded}
 
-What the currently empty \texttt{send-alert} message handler should do is fetch the widget using the \texttt{id} sent from R with the \texttt{get\_gio} function and then use the \texttt{addData} method to override the previously define arcs.
+What the currently empty \texttt{send-data} message handler should do is fetch the widget using the \texttt{id} sent from R with the \texttt{get\_gio} function and then use the \texttt{addData} method to override the previously define arcs.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6636,7 +6679,7 @@ We can then build a shiny application to test the new functionality.
 \NormalTok{  \})}
 
 \NormalTok{  output}\OperatorTok{$}\NormalTok{globe <{-}}\StringTok{ }\KeywordTok{renderGio}\NormalTok{(\{}
-    \KeywordTok{gio}\NormalTok{(arcs1)}
+    \KeywordTok{gio}\NormalTok{(arcs1, i, e, v)}
 \NormalTok{  \})}
 
   \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{dataset, \{}
@@ -6645,7 +6688,7 @@ We can then build a shiny application to test the new functionality.
     \ControlFlowTok{else}
 \NormalTok{      data <{-}}\StringTok{ }\NormalTok{arcs2}
     
-    \KeywordTok{gio\_send\_data}\NormalTok{(}\StringTok{"globe"}\NormalTok{, data)}
+    \KeywordTok{gio\_send\_data}\NormalTok{(}\StringTok{"globe"}\NormalTok{, data, i, e, v)}
 \NormalTok{  \})}
 
 \NormalTok{\}}
@@ -6738,12 +6781,12 @@ Then one can build an application to test that new function. We build a shiny ap
 \NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
 
 \NormalTok{  output}\OperatorTok{$}\NormalTok{globe <{-}}\StringTok{ }\KeywordTok{renderGio}\NormalTok{(\{}
-    \KeywordTok{gio}\NormalTok{(arcs)}
+    \KeywordTok{gio}\NormalTok{(arcs, i, e, v)}
 \NormalTok{  \})}
 
   \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{load, \{}
     \KeywordTok{gio\_proxy}\NormalTok{(}\StringTok{"globe"}\NormalTok{) }\OperatorTok{\%>\%}\StringTok{ }
-\StringTok{      }\KeywordTok{gio\_send\_data}\NormalTok{(arcs)}
+\StringTok{      }\KeywordTok{gio\_send\_data}\NormalTok{(arcs, i, e, v)}
 \NormalTok{  \})}
 
   \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{clear, \{}
@@ -6827,7 +6870,7 @@ This forces the chart to update, applying the new style. Below we write an appli
 
 \NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
 \NormalTok{  output}\OperatorTok{$}\NormalTok{globe <{-}}\StringTok{ }\KeywordTok{renderGio}\NormalTok{(\{}
-    \KeywordTok{gio}\NormalTok{(arcs1)}
+    \KeywordTok{gio}\NormalTok{(arcs1, i, e , v)}
 \NormalTok{  \})}
 
   \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{style, \{}
@@ -6994,7 +7037,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Aug 22 2020 17:59:48 GMT+0200 (Central European Summer Time)"
+## [1] "Sat Aug 22 2020 18:32:17 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -7004,7 +7047,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Aug 22 2020 17:59:48 GMT+0200 (Central European Summer Time)"
+## [1] "Sat Aug 22 2020 18:32:17 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -8216,7 +8259,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 34.9
+## [1] 18.32
 \end{verbatim}
 
 \begin{Shaded}

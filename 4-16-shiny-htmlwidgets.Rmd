@@ -6,14 +6,13 @@ To demonstrate how to integrate these functionalities in widgets we shall implem
 
 ## JavaScript to R 
 
-JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. Gio.js provides a callback that is fired when a country is selected on the globe, this callback function accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). These could send back to the R server where they could be used for many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
+JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. The [crosstalk](#crosstalk) chapter already explored gio.js' callback function: it is fired when a country is selected on the globe and accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). This is used to set the share selected key (country ISO code) with other widget already. This callback function could also send data back to the R server where they could be used for many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
 
-The [documentation of gio.js](https://giojs.org/html/docs/callbackPicked.html) gives the following example callback function.
+The [documentation of gio.js](https://giojs.org/html/docs/callbackPicked.html) gives the following example callback function. Note that we should already be making used of `selectedCountry` with crosstalk.
 
 ```js
 // define callback function
 function callback (selectedCountry, relatedCountries) {
-  sel_handle.set([selectedCountry.ISOCode])
   console.log(selectedCountry);
   console.log(relatedCountries);
 }
@@ -28,7 +27,7 @@ This defines a function named `callback` which takes the two aforementioned obje
 // gio.js
 // define callback function
 function callback (selectedCountry, relatedCountries) {
-  sel_handle.set([selectedCountry.ISOCode])
+  sel_handle.set([selectedCountry.ISOCode]);
   Shiny.setInputValue('selected', selectedCountry);
   Shiny.setInputValue('related', relatedCountries);
 }
@@ -45,7 +44,7 @@ renderValue: function(x) {
 
   // callback
   function callback (selectedCountry, relatedCountries) {
-    sel_handle.set([selectedCountry.ISOCode])
+    sel_handle.set([selectedCountry.ISOCode]);
     Shiny.setInputValue(el.id + '_selected', selectedCountry);
     Shiny.setInputValue(el.id + '_related', relatedCountries);
   }
@@ -82,7 +81,7 @@ ui <- fluidPage(
 server <- function(input, output){
 
   output$globe <- renderGio({
-    gio(arcs)
+    gio(arcs, source = i, target = e, value = v)
   })
 
   output$selectedCountry <- renderPrint({
@@ -175,7 +174,7 @@ ui <- fluidPage(
 server <- function(input, output){
 
   output$globe <- renderGio({
-    gio(arcs)
+    gio(arcs, i, e, v)
   })
 
   output$relatedCountries <- renderDT({
@@ -231,7 +230,7 @@ server <- function(input, output){
   })
 
   output$globe <- renderGio({
-    gio(reactive_arcs())
+    gio(reactive_arcs(), i, e, v)
   })
 
 }
@@ -257,11 +256,17 @@ This involves a few moving parts, thankfully some of them were already explored,
 
 ### Send Data 
 
-Let's start by creating the R function used to send data to JavaScript. This is hopefully reminiscent of a previous chapter, this function sends a message to JavaScript where it is paired with "message handler" that does something with said message.
+Let's start by creating the R function used to send data to JavaScript. This is hopefully reminiscent of a previous chapter, this function sends a message to JavaScript where it is paired with "message handler" that does something with said message. Note that for consistency the function uses the same arguments as the other function of the package which accepts data: `gio`.
 
 ```r
 #' @export
-gio_send_data <- function(id, data, session = shiny::getDefaultReactiveDomain()){
+gio_send_data <- function(id, data, source, target, value, session = shiny::getDefaultReactiveDomain()){
+  data <- dplyr::select(
+    data,
+    i = {{ source }},
+    e = {{ target }},
+    v = {{ value }}
+  )
   message <- list(id = id, data = data)
   session$sendCustomMessage("send-data", message)
 }
@@ -280,7 +285,13 @@ Unfortunately this serialiser cannot be changed, therefore we have to reformat t
 
 ```r
 #' @export
-gio_send_data <- function(id, data, session = shiny::getDefaultReactiveDomain()){
+gio_send_data <- function(id, data, source, target, value, session = shiny::getDefaultReactiveDomain()){
+  data <- dplyr::select(
+    data,
+    i = {{ source }},
+    e = {{ target }},
+    v = {{ value }}
+  )
   message <- list(id = id, data = apply(data, 1, as.list))
   session$sendCustomMessage("send-data", message)
 }
@@ -299,14 +310,29 @@ HTMLWidgets.widget({
 
   factory: function(el, width, height) {
 
+    // TODO: define shared variables for this instance
     var controller;
+
+    // selection handle
+    var sel_handle = new crosstalk.SelectionHandle();
+
+    sel_handle.on("change", function(e) {
+      if (e.sender !== sel_handle) {
+        // clear selection
+      }
+      controller.switchCountry(e.value[0]);
+    });
+
 
     return {
 
       renderValue: function(x) {
 
         el.innerHTML = '';
-        controller = new GIO.Controller(el);
+        controller = new GIO.Controller(el, x.configs);
+
+        // group
+        sel_handle.setGroup(x.crosstalk.group);
         
         // add data
         controller.addData(x.data);
@@ -317,9 +343,14 @@ HTMLWidgets.widget({
         controller.onCountryPicked(callback);
 
         function callback (selectedCountry, relatedCountries) {
+          sel_handle.set([selectedCountry.ISOCode]);
           Shiny.setInputValue(el.id + '_selected', selectedCountry);
           Shiny.setInputValue(el.id + '_related:gio.related.countries', relatedCountries);
         }
+
+        // use stats
+        if(x.stats)
+          controller.enableStats();
 
         // render
         controller.init();
@@ -328,11 +359,11 @@ HTMLWidgets.widget({
 
       resize: function(width, height) {
 
+        // TODO: code to re-render the widget with a new size
         controller.resizeUpdate()
 
       },
 
-      // add getGlobe to retrieve controller
       getGlobe: function(){
         return controller;
       }
@@ -371,7 +402,7 @@ if (HTMLWidgets.shinyMode){
 }
 ```
 
-What the currently empty `send-alert` message handler should do is fetch the widget using the `id` sent from R with the `get_gio` function and then use the `addData` method to override the previously define arcs.
+What the currently empty `send-data` message handler should do is fetch the widget using the `id` sent from R with the `get_gio` function and then use the `addData` method to override the previously define arcs.
 
 ```js
 // gio.js
@@ -430,7 +461,7 @@ server <- function(input, output){
   })
 
   output$globe <- renderGio({
-    gio(arcs1)
+    gio(arcs1, i, e, v)
   })
 
   observeEvent(input$dataset, {
@@ -439,7 +470,7 @@ server <- function(input, output){
     else
       data <- arcs2
     
-    gio_send_data("globe", data)
+    gio_send_data("globe", data, i, e, v)
   })
 
 }
@@ -520,12 +551,12 @@ ui <- fluidPage(
 server <- function(input, output){
 
   output$globe <- renderGio({
-    gio(arcs)
+    gio(arcs, i, e, v)
   })
 
   observeEvent(input$load, {
     gio_proxy("globe") %>% 
-      gio_send_data(arcs)
+      gio_send_data(arcs, i, e, v)
   })
 
   observeEvent(input$clear, {
@@ -596,7 +627,7 @@ ui <- fluidPage(
 
 server <- function(input, output){
   output$globe <- renderGio({
-    gio(arcs1)
+    gio(arcs1, i, e , v)
   })
 
   observeEvent(input$style, {

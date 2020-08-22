@@ -4,7 +4,14 @@ gio_proxy <- function(id, session = shiny::getDefaultReactiveDomain()){
 }
 
 #' @export
-gio_send_data <- function(proxy, data){
+gio_send_data <- function(proxy, data, source, target, value){
+  data <- dplyr::select(
+    data,
+    i = {{ source }},
+    e = {{ target }},
+    v = {{ value }}
+  )
+
   message <- list(id = proxy$id, data = apply(data, 1, as.list))
   proxy$session$sendCustomMessage("send-data", message)
   return(proxy)
