@@ -4,7 +4,16 @@
 \alias{gio}
 \title{Initialise globe}
 \usage{
-gio(data, width = NULL, height = NULL, elementId = NULL)
+gio(
+  data,
+  source,
+  target,
+  value,
+  ...,
+  width = NULL,
+  height = NULL,
+  elementId = NULL
+)
 }
 \description{
 Create the gio globe.

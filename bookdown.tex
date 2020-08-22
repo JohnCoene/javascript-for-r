@@ -1343,7 +1343,13 @@ Then, from the root of the package created, we scaffold a widget which we call `
 \end{Highlighting}
 \end{Shaded}
 
-This function puts together the minimalistic structure necessary to implement an HTML widget and opens \texttt{play.R}, \texttt{play.js} and \texttt{play.yaml} in the RStudio IDE or the default text editor. These files are named after the widget and will form the core of the package. The R file contains core functions of the R API, namely the \texttt{play} function which creates the widget itself, and the \texttt{render*} and \texttt{*output} functions that handle the widget in the shiny server and UI respectively. The \texttt{.js} file contains JavaScript functions that actually generate the visual output.
+This function puts together the minimalistic structure necessary to implement an HTML widget and opens \texttt{play.R}, \texttt{play.js} and \texttt{play.yaml} in the RStudio IDE or the default text editor.
+
+\begin{rmdnote}
+You can scaffold multiple widgets in a single package.
+\end{rmdnote}
+
+These files are named after the widget and will form the core of the package. The R file contains core functions of the R API, namely the \texttt{play} function which creates the widget itself, and the \texttt{render*} and \texttt{*output} functions that handle the widget in the shiny server and UI respectively. The \texttt{.js} file contains JavaScript functions that actually generate the visual output.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3058,6 +3064,8 @@ Below is an example of function that could be used within R markdown or shiny UI
 
 Using the above the data loaded would be accessible from the htmlwidgets JavaScript (e.g.: \texttt{gio.js}) with \texttt{window.globalData}. The \texttt{window} object is akin to the \texttt{document} object, while the latter pertains to the Document Object Model (DOM) and represents the page, the former pertains to the Browser Object Model (BOM) and represents the browser window. While \texttt{var\ x;} will only be accessible within the script where it is declared, \texttt{window.x} will be accessible anywhere.
 
+Note this means the data is read from the web browser and therefore the data must be accessible to the web browser, the \texttt{path\_to\_json} must thus be a served static file, e.g.: \texttt{www} directory in shiny.
+
 \hypertarget{crosstalk}{%
 \chapter{Crosstalk}\label{crosstalk}}
 
@@ -3242,7 +3250,7 @@ Other than tabular data, crosstalk will require the widget to have the necessary
 
 As will be discovered later when we bring crosstalk support to gio, very little changes on the R side. As might be expected, crosstalk enables communication between widgets via JavaScript, hence much of what must be adapted by widgets developers happens in JavaScript too.
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-34-1.png}
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-35-1.png}
 
 Indeed the biderectional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. This, internally, works with \texttt{key}s that are assigned to every row of the data.frame. These keys can be explicitly set by the user and otherwise default to the row names of the data.frame, and if these are not available will create row numbers.
 
@@ -3256,7 +3264,7 @@ Indeed the biderectional communication between widgets works in the RStudio view
 
 In a sense, while crosstalk handles the lines of communication between widgets, developers of the respective widgets must handle what messages are sent to others and what to do with messages coming from other widgets. There are two types of such messages: filtering to actually narrow down the selection of data points displayed on a widget, and selection (what crosstalk refers to as ``linked brushing'') to highlight certain data points.
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-36-1.png}
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-37-1.png}
 
 This selection or filtering is communicated with the aforementioned keys. In JavaScript, a widget ``receives'' the keys of selected and filtered data points and must, when filtering or selection is observed, ``send'' said selected or filtered keys to other widgets.
 
@@ -3332,7 +3340,7 @@ Note that the name of the group was randomly generated since none were specified
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "SharedDatab1617ca5"
+## [1] "SharedData70a24db6"
 \end{verbatim}
 
 \begin{Shaded}
@@ -3534,7 +3542,6 @@ To recap, this is what the JavaScript code should not look like.
 
       \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
 
-        \VariableTok{el}\NormalTok{.}\AttributeTok{innerHTML} \OperatorTok{=} \StringTok{\textquotesingle{}\textquotesingle{}}\OperatorTok{;}
 \NormalTok{        controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(el)}\OperatorTok{;}
 
         \CommentTok{// group}
@@ -3647,6 +3654,631 @@ Thankfully we can use the \texttt{group} argument in order to create edges and n
 \includegraphics{images/crosstalk-gio-2.png}
 \caption{Gio with DT and plotly using crosstalk}
 \end{figure}
+
+\hypertarget{wrap-up}{%
+\chapter{Wrap up}\label{wrap-up}}
+
+In this chapter we polish the API that gio presents its users and provide guidelines to best integrate other JavaScript libraries with R.
+
+\hypertarget{working-with-data}{%
+\section{Working with data}\label{working-with-data}}
+
+The gio package built thus far revolves around the \texttt{gio} function which expects a dataframe with three columns named \texttt{e}, \texttt{i}, and \texttt{v}, which is not great practice; there are great reasons why very few functions do that.
+
+First, it is unlikely that one comes across a dataset with such names in the real world thus users of the package will likely need to rename the columns of the dataset in order to use gio making the package rather unwieldy. Second, this makes understanding and approaching the gio package more complicated, it will not be evident by looking at the examples, and usage of gio.
+
+Instead \texttt{gio} should accept the dataframe as first argument and then the relevant columns to extract. This can be implemented in many ways ranging from arguments that accept the column names as strings to reproducing ggplot2's \texttt{aes} function. Below we settle for a solution probably lying somewhere in between: using non-standard evaluation to provide arguments that accept the bare name of the columns.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gio <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, source, target, value, }\DataTypeTok{width =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{height =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{elementId =} \OtherTok{NULL}\NormalTok{) \{}
+
+\NormalTok{  data <{-}}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(}
+\NormalTok{    data,}
+    \DataTypeTok{i =}\NormalTok{ \{\{ source \}\},}
+    \DataTypeTok{e =}\NormalTok{ \{\{ target \}\},}
+    \DataTypeTok{v =}\NormalTok{ \{\{ value \}\}}
+\NormalTok{  )}
+
+  \CommentTok{\# forward options using x}
+\NormalTok{  x =}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{data =}\NormalTok{ data,}
+    \DataTypeTok{style =} \StringTok{"default"}
+\NormalTok{  )}
+
+  \KeywordTok{attr}\NormalTok{(x, }\StringTok{\textquotesingle{}TOJSON\_ARGS\textquotesingle{}}\NormalTok{) <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{dataframe =} \StringTok{"rows"}\NormalTok{)}
+
+  \CommentTok{\# create widget}
+\NormalTok{  htmlwidgets}\OperatorTok{::}\KeywordTok{createWidget}\NormalTok{(}
+    \DataTypeTok{name =} \StringTok{\textquotesingle{}gio\textquotesingle{}}\NormalTok{,}
+\NormalTok{    x,}
+    \DataTypeTok{width =}\NormalTok{ width,}
+    \DataTypeTok{height =}\NormalTok{ height,}
+    \DataTypeTok{package =} \StringTok{\textquotesingle{}gio\textquotesingle{}}\NormalTok{,}
+    \DataTypeTok{elementId =}\NormalTok{ elementId,}
+    \DataTypeTok{sizingPolicy =}\NormalTok{ htmlwidgets}\OperatorTok{::}\KeywordTok{sizingPolicy}\NormalTok{(}
+      \DataTypeTok{padding =} \DecValTok{0}\NormalTok{,}
+      \DataTypeTok{browser.fill =} \OtherTok{TRUE}\NormalTok{,}
+      \DataTypeTok{defaultWidth =} \StringTok{"100\%"}
+\NormalTok{    ),}
+    \DataTypeTok{preRenderHook =}\NormalTok{ render\_gio}
+\NormalTok{  )}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The above changes allows documentation the input that \texttt{gio} accepts more clearly and also makes its usage more transparent: it is now clear to users what data is required to create a visualisation and they are free to use dataframes of their choice.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# mock up data}
+\NormalTok{countries <{-}}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"US"}\NormalTok{, }\StringTok{"BE"}\NormalTok{, }\StringTok{"FR"}\NormalTok{, }\StringTok{"DE"}\NormalTok{)}
+\NormalTok{df <{-}}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}
+  \DataTypeTok{from =}\NormalTok{ countries,}
+  \DataTypeTok{to =} \KeywordTok{rev}\NormalTok{(countries),}
+  \DataTypeTok{traded =} \KeywordTok{runif}\NormalTok{(}\DecValTok{4}\NormalTok{)}
+\NormalTok{)}
+
+\CommentTok{\# use gio}
+\KeywordTok{gio}\NormalTok{(df, }\DataTypeTok{source =}\NormalTok{ from, }\DataTypeTok{target =}\NormalTok{ to, }\DataTypeTok{value =}\NormalTok{ traded)}
+\end{Highlighting}
+\end{Shaded}
+
+This small change makes the package a great deal easier to use and understand.
+
+\hypertarget{plethora-of-options}{%
+\section{Plethora of options}\label{plethora-of-options}}
+
+Some JavaScript libraries can be extensive and come with thousands of options that can make the port to R rather bulky, never hesitate to make us of the three dots construct (\texttt{...}) to make these accessible yet saving you from having to hard-code thousands of arguments.
+
+For instance gio.js accepts a JSON of options to further customise the globe. One could port all of these manually, or allow users to specify those configurations via the three-dot construct.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{var}\NormalTok{ configs }\OperatorTok{=} \OperatorTok{\{}
+  \DataTypeTok{control}\OperatorTok{:} \OperatorTok{\{}
+    \DataTypeTok{stats}\OperatorTok{:} \KeywordTok{false}\OperatorTok{,}
+    \DataTypeTok{disableUnmentioned}\OperatorTok{:} \KeywordTok{false}\OperatorTok{,}
+    \DataTypeTok{lightenMentioned}\OperatorTok{:} \KeywordTok{false}\OperatorTok{,}
+    \DataTypeTok{inOnly}\OperatorTok{:} \KeywordTok{false}\OperatorTok{,}
+    \DataTypeTok{outOnly}\OperatorTok{:} \KeywordTok{false}\OperatorTok{,}
+    \DataTypeTok{initCountry}\OperatorTok{:} \StringTok{"CN"}\OperatorTok{,}
+    \DataTypeTok{halo}\OperatorTok{:} \KeywordTok{true}
+  \OperatorTok{\},}
+  \DataTypeTok{color}\OperatorTok{:} \OperatorTok{\{}
+    \DataTypeTok{surface}\OperatorTok{:} \BaseNTok{0xFFFFFF}\OperatorTok{,}
+    \DataTypeTok{selected}\OperatorTok{:} \KeywordTok{null}\OperatorTok{,}
+    \KeywordTok{in}\OperatorTok{:} \BaseNTok{0x154492}\OperatorTok{,}
+    \DataTypeTok{out}\OperatorTok{:} \BaseNTok{0xDD380C}\OperatorTok{,}
+    \DataTypeTok{halo}\OperatorTok{:} \BaseNTok{0xFFFFFF}\OperatorTok{,}
+    \DataTypeTok{background}\OperatorTok{:} \KeywordTok{null}
+  \OperatorTok{\},}
+  \DataTypeTok{brightness}\OperatorTok{:} \OperatorTok{\{}
+    \DataTypeTok{ocean}\OperatorTok{:} \FloatTok{0.5}\OperatorTok{,}
+    \DataTypeTok{mentioned}\OperatorTok{:} \FloatTok{0.5}\OperatorTok{,}
+    \DataTypeTok{related}\OperatorTok{:} \FloatTok{0.5}
+  \OperatorTok{\}}
+\OperatorTok{\}}
+
+\NormalTok{controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{Gio}\NormalTok{.}\AttributeTok{controller}\NormalTok{(el}\OperatorTok{,}\NormalTok{ configs)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+The three dots can be added to the \texttt{gio} function which internally captures them in a \texttt{list} named \texttt{configs} so it can be easily referenced in JavaScript.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# add ...three dots}
+\NormalTok{gio <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, source, target, value, ..., }\DataTypeTok{width =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{height =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{elementId =} \OtherTok{NULL}\NormalTok{) \{}
+
+  \CommentTok{\# ... start of the function}
+
+  \CommentTok{\# forward options using x}
+\NormalTok{  x =}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{configs =} \KeywordTok{list}\NormalTok{(...), }\CommentTok{\# pass to configs}
+    \DataTypeTok{data =}\NormalTok{ data,}
+    \DataTypeTok{style =} \StringTok{"default"}\NormalTok{,}
+    \DataTypeTok{crosstalk =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{group =}\NormalTok{ group)}
+\NormalTok{  )}
+
+  \CommentTok{\# ... end of the function}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+In JavaScript, use the \texttt{configs} when initialising the visualisation.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// use x.configs}
+\NormalTok{controller }\OperatorTok{=} \KeywordTok{new} \VariableTok{GIO}\NormalTok{.}\AttributeTok{Controller}\NormalTok{(el}\OperatorTok{,} \VariableTok{x}\NormalTok{.}\AttributeTok{configs}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+Below those configuration options are now used to set the initially selected country to the United States and change the colour of the selected country to red.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{gio}\NormalTok{(}
+\NormalTok{  df, from, to, traded, }
+  \DataTypeTok{control =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{initCountry =} \StringTok{\textquotesingle{}US\textquotesingle{}}\NormalTok{), }
+  \DataTypeTok{color =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{selected =} \StringTok{\textquotesingle{}\#ff4d4d\textquotesingle{}}\NormalTok{)}
+\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{images/crosstalk-three-dots.png}
+
+\hypertarget{interface-design}{%
+\section{Interface design}\label{interface-design}}
+
+As you develop a wrapper to an external visualisation library you will have to make design choices. In building gio we more or less mirrored the JavaScript code one to one: where there is a JavaScript function to change the theme of the visualisation there is one in R, etc. This might not scale properly as more and more functions are added to the package.
+
+As observed the gio.js library has a function named \texttt{setStyle} to change the theme of the visualisation but it has numerous others, \texttt{setSurfaceColor}, \texttt{addHalo}, \texttt{setHaloColor}, \texttt{removeHalo}, and plenty more. We might want to wrap all or some of these in a single function to provide a more convenient API to the R user.
+
+\begin{rmdnote}
+Always keep in mind the interface you make available to users of your
+package.
+\end{rmdnote}
+
+You can always go beyond what the underlying library provides. For instance, the country selected by default is always China, regardless of whether the data includes that country or not. This can lead to creating underwhelming visualisations as no arcs appear. One can consider adding to the \texttt{gio} function simple heuristics to ensure that is not the case, or have the function throw a warning when the initial country is not present in the dataset.
+
+Finally, consider R users' expectations. There are many prominent visualisation packages on CRAN already, users of the gio package will likely have used ggplot2 \citep{R-ggplot2}, plotly, or highcharter before. Though these provide somewhat different APIs they set precedents, the more the API of gio resembles those the easier it will be for new users to start using gio. However, do not let this restrict the package either, never hesitate to do differently than ggplot2 if you think it will provide a better interface to your users.
+
+\hypertarget{ploty}{%
+\chapter{Ploty}\label{ploty}}
+
+In this chapter we build a widget for plotly.js, or a tiny part of it; it'll allow drawing a scatter and line plot and have some additional functionalities in shiny. The aim of this chapter is to demonstrate how easily one can transfer take aways from building the gio widget to build another.
+
+\hypertarget{discover}{%
+\section{Discover}\label{discover}}
+
+Below is a basic example from the \href{https://plotly.com/javascript/line-and-scatter/}{plotly website}. We will aim to reproduce it using htmlwidgets before improving upon it.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DataTypeTok{<!DOCTYPE }\NormalTok{html}\DataTypeTok{>}
+\KeywordTok{<html}\OtherTok{ xmlns=}\StringTok{"http://www.w3.org/1999/xhtml"}\OtherTok{ lang=}\StringTok{""}\OtherTok{ xml:lang=}\StringTok{""}\KeywordTok{>}
+
+\KeywordTok{<head>}
+  \CommentTok{<!{-}{-} Import library {-}{-}>}
+  \KeywordTok{<script}\OtherTok{ src=}\StringTok{"plotly{-}latest.min.js"}\KeywordTok{></script>}
+\KeywordTok{</head>}
+
+\KeywordTok{<body>}
+  \CommentTok{<!{-}{-} div to hold visualisation {-}{-}>}
+  \KeywordTok{<div}\OtherTok{ id=}\StringTok{"chart"}\OtherTok{ style=}\StringTok{"width:600px;height:250px;"}\KeywordTok{></div>}
+
+  \CommentTok{<!{-}{-} Script to create visualisation {-}{-}>}
+  \KeywordTok{<script>}
+    \KeywordTok{var}\NormalTok{ trace1 }\OperatorTok{=} \OperatorTok{\{}
+      \DataTypeTok{x}\OperatorTok{:}\NormalTok{ [}\DecValTok{1}\OperatorTok{,} \DecValTok{2}\OperatorTok{,} \DecValTok{3}\OperatorTok{,} \DecValTok{4}\NormalTok{]}\OperatorTok{,}
+      \DataTypeTok{y}\OperatorTok{:}\NormalTok{ [}\DecValTok{10}\OperatorTok{,} \DecValTok{15}\OperatorTok{,} \DecValTok{13}\OperatorTok{,} \DecValTok{17}\NormalTok{]}\OperatorTok{,}
+      \DataTypeTok{mode}\OperatorTok{:} \StringTok{\textquotesingle{}markers\textquotesingle{}}\OperatorTok{,}
+      \DataTypeTok{type}\OperatorTok{:} \StringTok{\textquotesingle{}scatter\textquotesingle{}}
+    \OperatorTok{\};}
+
+    \KeywordTok{var}\NormalTok{ trace2 }\OperatorTok{=} \OperatorTok{\{}
+      \DataTypeTok{x}\OperatorTok{:}\NormalTok{ [}\DecValTok{2}\OperatorTok{,} \DecValTok{3}\OperatorTok{,} \DecValTok{4}\OperatorTok{,} \DecValTok{5}\NormalTok{]}\OperatorTok{,}
+      \DataTypeTok{y}\OperatorTok{:}\NormalTok{ [}\DecValTok{16}\OperatorTok{,} \DecValTok{5}\OperatorTok{,} \DecValTok{11}\OperatorTok{,} \DecValTok{9}\NormalTok{]}\OperatorTok{,}
+      \DataTypeTok{mode}\OperatorTok{:} \StringTok{\textquotesingle{}lines\textquotesingle{}}\OperatorTok{,}
+      \DataTypeTok{type}\OperatorTok{:} \StringTok{\textquotesingle{}scatter\textquotesingle{}}
+    \OperatorTok{\};}
+
+    \KeywordTok{var}\NormalTok{ data }\OperatorTok{=}\NormalTok{ [trace1}\OperatorTok{,}\NormalTok{ trace2}\OperatorTok{,}\NormalTok{ trace3]}\OperatorTok{;}
+
+    \VariableTok{Plotly}\NormalTok{.}\AttributeTok{newPlot}\NormalTok{(}\StringTok{\textquotesingle{}chart\textquotesingle{}}\OperatorTok{,}\NormalTok{ data)}\OperatorTok{;}
+\NormalTok{    )}\OperatorTok{;}
+  \KeywordTok{</script>}
+\KeywordTok{</body>}
+
+\KeywordTok{</html>}
+\end{Highlighting}
+\end{Shaded}
+
+The aim is to obtain an R interface resembling the already existing R package. It'll allow initialising the visualisation with the \texttt{plotly} function and add a line or scatter plot with \texttt{plot\_line} and \texttt{plot\_marker}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plotly}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ cars) }\OperatorTok{\%>\%}\StringTok{ }
+\StringTok{  }\KeywordTok{plot\_line}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ dist, }\DataTypeTok{y =}\NormalTok{ speed)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{basics}{%
+\section{Basics}\label{basics}}
+
+The story starts like all other widgets: create a package and scaffold the widget. We name the package plotlier so as to not override the local installation of the actual plotly package. We also add the magrittr pipe (\texttt{\%\textgreater{}\%}) while we're at it.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{create\_package}\NormalTok{(}\StringTok{"plotlier"}\NormalTok{) }\CommentTok{\# create package}
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{scaffoldWidget}\NormalTok{(}\StringTok{"plotly"}\NormalTok{) }\CommentTok{\# scaffold plotly}
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use\_pipe}\NormalTok{() }\CommentTok{\# export pipe}
+\end{Highlighting}
+\end{Shaded}
+
+Then we download the dependency from the CDN, the latest version at the time of writing this is \texttt{1.54.2}, and edit the \texttt{plotly.yml} file to point to the downloaded file.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dir.create}\NormalTok{(}\StringTok{"inst/htmlwidgets/plotly"}\NormalTok{, }\DataTypeTok{recursive =} \OtherTok{TRUE}\NormalTok{)}
+\NormalTok{url <{-}}\StringTok{ "https://cdn.plot.ly/plotly{-}1.54.2.min.js"}
+\KeywordTok{download.file}\NormalTok{(url, }\StringTok{"inst/htmlwidgets/plotly/plotly.min.js"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{dependencies}\KeywordTok{:}
+\AttributeTok{ }\KeywordTok{{-}}\AttributeTok{ }\FunctionTok{name}\KeywordTok{:}\AttributeTok{ plotly}
+\AttributeTok{   }\FunctionTok{version}\KeywordTok{:}\AttributeTok{ }\FloatTok{1.54.2}
+\AttributeTok{   }\FunctionTok{src}\KeywordTok{:}\AttributeTok{ htmlwidgets/plotly}
+\AttributeTok{   }\FunctionTok{script}\KeywordTok{:}\AttributeTok{ plotly.min.js}
+\end{Highlighting}
+\end{Shaded}
+
+We start by editing the \texttt{plotly} function to accept a data frame which will be stored in the \texttt{x} object. The data will not be used in this very function but will be required when adding a line or marker plot.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export}
+\NormalTok{plotly <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, }\DataTypeTok{width =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{height =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{elementId =} \OtherTok{NULL}\NormalTok{) \{}
+
+  \CommentTok{\# forward options using x}
+\NormalTok{  x =}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{data =}\NormalTok{ data,}
+    \DataTypeTok{options =} \KeywordTok{list}\NormalTok{()}
+\NormalTok{  )}
+
+  \CommentTok{\# create widget}
+\NormalTok{  htmlwidgets}\OperatorTok{::}\KeywordTok{createWidget}\NormalTok{(}
+    \DataTypeTok{name =} \StringTok{\textquotesingle{}plotly\textquotesingle{}}\NormalTok{,}
+\NormalTok{    x,}
+    \DataTypeTok{width =}\NormalTok{ width,}
+    \DataTypeTok{height =}\NormalTok{ height,}
+    \DataTypeTok{package =} \StringTok{\textquotesingle{}plotlier\textquotesingle{}}\NormalTok{,}
+    \DataTypeTok{elementId =}\NormalTok{ elementId}
+\NormalTok{  )}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The JavaScript would look like the code below. It's actually much easier than what had to be written for gio.js as the function to generate a new plot accepts 1) the id of the \texttt{\textless{}div\textgreater{}} where the plot should be created and 2) a JSON object of options (containing the data) which describes the plot.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{widget}\NormalTok{(}\OperatorTok{\{}
+
+  \DataTypeTok{name}\OperatorTok{:} \StringTok{\textquotesingle{}plotly\textquotesingle{}}\OperatorTok{,}
+
+  \DataTypeTok{type}\OperatorTok{:} \StringTok{\textquotesingle{}output\textquotesingle{}}\OperatorTok{,}
+
+  \DataTypeTok{factory}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
+
+    \ControlFlowTok{return} \OperatorTok{\{}
+
+      \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+
+        \CommentTok{// create plot}
+        \VariableTok{Plotly}\NormalTok{.}\AttributeTok{newPlot}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\OperatorTok{,} \VariableTok{x}\NormalTok{.}\AttributeTok{options}\NormalTok{)}\OperatorTok{;}
+
+      \OperatorTok{\},}
+
+      \DataTypeTok{resize}\OperatorTok{:} \KeywordTok{function}\NormalTok{(width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
+
+        \CommentTok{// }\AlertTok{TODO}\CommentTok{: code to re{-}render the widget with a new size}
+
+      \OperatorTok{\}}
+
+    \OperatorTok{\};}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+Then it's a matter of reproducing the JSON that defines what plotly defines as a ``trace'' and what more or less corresponds to a ``geom'' in ggplot2. A trace for a scatter plot is defined with the JSON below, which we can read in R to understand the shape of the list to reproduce.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{jsonlite}\OperatorTok{::}\KeywordTok{fromJSON}\NormalTok{(}\StringTok{\textquotesingle{}\{}
+\StringTok{	"x": [1, 2, 3, 4],}
+\StringTok{	"y": [10, 15, 13, 17],}
+\StringTok{	"mode": "markers",}
+\StringTok{	"type": "scatter"}
+\StringTok{\}\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $x
+## [1] 1 2 3 4
+## 
+## $y
+## [1] 10 15 13 17
+## 
+## $mode
+## [1] "markers"
+## 
+## $type
+## [1] "scatter"
+\end{verbatim}
+
+We can then create a function that takes the name of the x and y columns to fetch from the data which is accessible from the plotly object with \texttt{p\$x\$data}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export}
+\NormalTok{plot\_marker <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(p, x, y)\{}
+\NormalTok{  layer <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{x =}\NormalTok{ dplyr}\OperatorTok{::}\KeywordTok{pull}\NormalTok{(p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{data, \{\{ x \}\}),}
+    \DataTypeTok{y =}\NormalTok{ dplyr}\OperatorTok{::}\KeywordTok{pull}\NormalTok{(p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{data, \{\{ y \}\}),}
+    \DataTypeTok{type =} \StringTok{"scatter"}\NormalTok{,}
+    \DataTypeTok{mode =} \StringTok{"markers"}
+\NormalTok{  )}
+
+\NormalTok{  p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{options <{-}}\StringTok{ }\KeywordTok{append}\NormalTok{(p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{options, }\KeywordTok{list}\NormalTok{(layer))}
+  \KeywordTok{return}\NormalTok{(p)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+At this stage the functions \texttt{devtools::document} and \texttt{devtools::load\_all} can be run so the package can be tested.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(plotlier)}
+
+\KeywordTok{plotly}\NormalTok{(cars) }\OperatorTok{\%>\%}\StringTok{ }
+\StringTok{  }\KeywordTok{plot\_marker}\NormalTok{(dist, speed)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/plotlier-scatter.png}
+\caption{Plotlier Scatter plot}
+\end{figure}
+
+\hypertarget{javascript-to-r}{%
+\section{JavaScript to R}\label{javascript-to-r}}
+
+We can now look up plotly's documentation on \href{https://plotly.com/javascript/plotlyjs-events/}{callback} to send data to the R server when a point is clicked.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{...}
+\NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
+
+\NormalTok{  plot }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
+  \VariableTok{Plotly}\NormalTok{.}\AttributeTok{newPlot}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\OperatorTok{,} \VariableTok{x}\NormalTok{.}\AttributeTok{options}\NormalTok{)}\OperatorTok{;}
+
+  \VariableTok{plot}\NormalTok{.}\AttributeTok{on}\NormalTok{(}\StringTok{\textquotesingle{}plotly\_click\textquotesingle{}}\OperatorTok{,} \KeywordTok{function}\NormalTok{(data)}\OperatorTok{\{}
+    \KeywordTok{var}\NormalTok{ coords }\OperatorTok{=}\NormalTok{ [}\VariableTok{data}\NormalTok{.}\AttributeTok{points}\NormalTok{[}\DecValTok{0}\NormalTok{].}\AttributeTok{x}\OperatorTok{,} \VariableTok{data}\NormalTok{.}\AttributeTok{points}\NormalTok{[}\DecValTok{0}\NormalTok{].}\AttributeTok{y}\NormalTok{]}\OperatorTok{;}
+    \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_clicked\textquotesingle{}}\OperatorTok{,}\NormalTok{ coords)}\OperatorTok{;}
+  \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+
+\OperatorTok{\}}
+\NormalTok{...}
+\end{Highlighting}
+\end{Shaded}
+
+Finally, we load the package's functions using devtools to test the input.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(shiny)}
+\KeywordTok{library}\NormalTok{(plotlier)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+  \KeywordTok{plotlyOutput}\NormalTok{(}\StringTok{"plot"}\NormalTok{),}
+  \KeywordTok{verbatimTextOutput}\NormalTok{(}\StringTok{"clicked"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{plot <{-}}\StringTok{ }\KeywordTok{renderPlotly}\NormalTok{(\{}
+    \KeywordTok{plotly}\NormalTok{(cars) }\OperatorTok{\%>\%}\StringTok{ }
+\StringTok{      }\KeywordTok{plot\_marker}\NormalTok{(dist, speed)}
+\NormalTok{  \})}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{clicked <{-}}\StringTok{ }\KeywordTok{renderPrint}\NormalTok{(\{}
+    \KeywordTok{print}\NormalTok{(input}\OperatorTok{$}\NormalTok{plot\_clicked)}
+\NormalTok{  \})}
+
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{r-to-javascript}{%
+\section{R to JavaScript}\label{r-to-javascript}}
+
+Here we implement an example of passing data from R to JavaScript, name the JavaScript \texttt{addTraces} function which allows dynamically adding traces to the chart without redrawing it in its entirety.
+
+The JavaScript \texttt{addTraces} function takes the id of the chart to add the trace to and a JSON object that defines the trace.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// addTraces example}
+\VariableTok{Plotly}\NormalTok{.}\AttributeTok{addTraces}\NormalTok{(}\StringTok{\textquotesingle{}plot\textquotesingle{}}\OperatorTok{,} \OperatorTok{\{}\DataTypeTok{y}\OperatorTok{:}\NormalTok{ [}\DecValTok{2}\OperatorTok{,}\DecValTok{1}\OperatorTok{,}\DecValTok{2}\NormalTok{]}\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+We start, as done previously, by defining a ``proxy,'' a function that returns an object containing information necessary to add traces to the chart, namely the \texttt{id} of the chart to apply to and the \texttt{session} object which will be used to send the data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export}
+\NormalTok{plotlyProxy <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id, }\DataTypeTok{session =}\NormalTok{ shiny}\OperatorTok{::}\KeywordTok{getDefaultReactiveDomain}\NormalTok{())\{}
+  \KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{id =}\NormalTok{ id,}
+    \DataTypeTok{session =}\NormalTok{ session}
+\NormalTok{  )}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+We then create a function that creates the trace and sends that data, together with the plot \texttt{id}, to JavaScript as a message of type ``add-traces.''
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export}
+\NormalTok{plot\_add\_marker <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(proxy, data, x, y)\{}
+\NormalTok{  data <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{x =}\NormalTok{ dplyr}\OperatorTok{::}\KeywordTok{pull}\NormalTok{(data, \{\{ x \}\}),}
+    \DataTypeTok{y =}\NormalTok{ dplyr}\OperatorTok{::}\KeywordTok{pull}\NormalTok{(data, \{\{ y \}\}),}
+    \DataTypeTok{type =} \StringTok{"scatter"}\NormalTok{,}
+    \DataTypeTok{mode =} \StringTok{"markers"}
+\NormalTok{  )}
+
+\NormalTok{  msg <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ proxy}\OperatorTok{$}\NormalTok{id, }\DataTypeTok{data =}\NormalTok{ data)}
+\NormalTok{  proxy}\OperatorTok{$}\NormalTok{session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\StringTok{"add{-}traces"}\NormalTok{, msg)}
+  \KeywordTok{return}\NormalTok{(proxy)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Finally, we add a message handler to handle the data sent to \texttt{add-traces} and use the JavaScript method \texttt{addTraces} to add a trace to the plot.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{if}\NormalTok{(}\VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{shinyMode}\NormalTok{)}\OperatorTok{\{}
+
+  \VariableTok{Shiny}\NormalTok{.}\AttributeTok{addCustomMessageHandler}\NormalTok{(type }\OperatorTok{=} \StringTok{\textquotesingle{}add{-}traces\textquotesingle{}}\OperatorTok{,} \KeywordTok{function}\NormalTok{(msg)}\OperatorTok{\{}
+    \VariableTok{Plotly}\NormalTok{.}\AttributeTok{addTraces}\NormalTok{(}\VariableTok{msg}\NormalTok{.}\AttributeTok{id}\OperatorTok{,} \VariableTok{msg}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\}}\NormalTok{)}
+
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+After installing the package, one can use the new proxy function in a shiny application, below we provide a button that adds a trace of random data to the chart.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(shiny)}
+\KeywordTok{library}\NormalTok{(plotlier)}
+
+\NormalTok{df <{-}}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x =} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{, }\DataTypeTok{y =} \KeywordTok{runif}\NormalTok{(}\DecValTok{10}\NormalTok{))}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+  \KeywordTok{actionButton}\NormalTok{(}\StringTok{"add"}\NormalTok{, }\StringTok{"Add random trace"}\NormalTok{),}
+  \KeywordTok{plotlyOutput}\NormalTok{(}\StringTok{"plot"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{plot <{-}}\StringTok{ }\KeywordTok{renderPlotly}\NormalTok{(\{}
+\NormalTok{    df }\OperatorTok{\%>\%}\StringTok{ }
+\StringTok{      }\KeywordTok{plotly}\NormalTok{() }\OperatorTok{\%>\%}\StringTok{ }
+\StringTok{      }\KeywordTok{plot\_line}\NormalTok{(x, y)}
+\NormalTok{  \})}
+
+\NormalTok{  proxy <{-}}\StringTok{ }\KeywordTok{plotlyProxy}\NormalTok{(}\StringTok{"plot"}\NormalTok{)}
+
+  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{add, \{}
+\NormalTok{    random <{-}}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{runif}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{10}\NormalTok{), }\DataTypeTok{y =} \KeywordTok{runif}\NormalTok{(}\DecValTok{10}\NormalTok{))}
+    
+    \KeywordTok{plot\_add\_marker}\NormalTok{(}
+\NormalTok{      proxy,}
+\NormalTok{      random,}
+\NormalTok{      x, y}
+\NormalTok{    )}
+\NormalTok{  \})}
+
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/plotlier-add.png}
+\caption{Plotly with dynamic traces}
+\end{figure}
+
+\hypertarget{size-resize}{%
+\section{Size \& Resize}\label{size-resize}}
+
+At this stage the plotlier package does yet provide responsive visualisation: resizing the screen does not resize the visualisation. In order to ensure that it is we have to define a default width that is not defined in pixel but percentage (such as 100\%) and implement the resize method.
+
+As mentioned in a previous chapter, the default size can be changed with the \texttt{sizingPolicy} function, below we set it to \texttt{100\%}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# create widget}
+\NormalTok{htmlwidgets}\OperatorTok{::}\KeywordTok{createWidget}\NormalTok{(}
+  \DataTypeTok{name =} \StringTok{\textquotesingle{}plotly\textquotesingle{}}\NormalTok{,}
+\NormalTok{  x,}
+  \DataTypeTok{width =}\NormalTok{ width,}
+  \DataTypeTok{height =}\NormalTok{ height,}
+  \DataTypeTok{package =} \StringTok{\textquotesingle{}plotlier\textquotesingle{}}\NormalTok{,}
+  \DataTypeTok{elementId =}\NormalTok{ elementId,}
+  \DataTypeTok{preRenderHook =}\NormalTok{ render\_plotlier,}
+  \DataTypeTok{sizingPolicy =} \KeywordTok{sizingPolicy}\NormalTok{(}
+    \DataTypeTok{defaultWidth =} \StringTok{"100\%"}
+\NormalTok{  )}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Next we can use the plotly function \texttt{relayout} to resize the visualisation when the size of its container changes.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{resize}\OperatorTok{:} \KeywordTok{function}\NormalTok{(width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
+  \VariableTok{Plotly}\NormalTok{.}\AttributeTok{relayout}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\OperatorTok{,} \OperatorTok{\{}\DataTypeTok{width}\OperatorTok{:}\NormalTok{ width}\OperatorTok{,} \DataTypeTok{height}\OperatorTok{:}\NormalTok{ height}\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+One can test this by resizing the browser or RStudio viewer window.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plotly}\NormalTok{(cars) }\OperatorTok{\%>\%}\StringTok{  }
+\StringTok{      }\KeywordTok{plot\_marker}\NormalTok{(}\StringTok{"dist"}\NormalTok{, }\StringTok{"speed"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/plotlier-responsive.png}
+\caption{Responsive plotly output}
+\end{figure}
+
+\hypertarget{performance-security}{%
+\section{Performance \& Security}\label{performance-security}}
+
+The package stores the data passed to the \texttt{plotly} function in the widget object, however, as explained in a previous chapter this is insecure and a drain on performances. First, this data serialised to JSON but not used in JavaScript and thus leads to unnecessary computations. Second, this data is visible on the resulting visualisation which may cause security concerns given the user may not deliberately use all the data in the visualisation. This can be remedied to by use the \texttt{preRenderHook}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{render\_plotlier <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(p)\{}
+\NormalTok{  p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{data <{-}}\StringTok{ }\OtherTok{NULL}
+  \KeywordTok{return}\NormalTok{(p)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The function define above can then be used in the \texttt{htmlwidgets::createWidget} function so it is run just before the visualisation renders.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{htmlwidgets}\OperatorTok{::}\KeywordTok{createWidget}\NormalTok{(}
+  \DataTypeTok{name =} \StringTok{\textquotesingle{}plotly\textquotesingle{}}\NormalTok{,}
+\NormalTok{  x,}
+  \DataTypeTok{width =}\NormalTok{ width,}
+  \DataTypeTok{height =}\NormalTok{ height,}
+  \DataTypeTok{package =} \StringTok{\textquotesingle{}plotlier\textquotesingle{}}\NormalTok{,}
+  \DataTypeTok{elementId =}\NormalTok{ elementId,}
+  \DataTypeTok{preRenderHook =}\NormalTok{ render\_plotlier}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{part-web-development-with-shiny}{%
 \part{Web Development with Shiny}\label{part-web-development-with-shiny}}
@@ -6192,7 +6824,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Aug 22 2020 11:17:31 GMT+0200 (Central European Summer Time)"
+## [1] "Sat Aug 22 2020 17:44:00 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -6202,7 +6834,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Aug 22 2020 11:17:31 GMT+0200 (Central European Summer Time)"
+## [1] "Sat Aug 22 2020 17:44:00 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -6734,462 +7366,6 @@ Above we assess the sentiment of the sentence ``I love bubbles'' using the afinn
 
 \hypertarget{part-examples}{%
 \part{Examples}\label{part-examples}}
-
-\hypertarget{ploty}{%
-\chapter{Ploty}\label{ploty}}
-
-In this chapter we build a widget for plotly.js, or a tiny part of it; it'll allow drawing a scatter and line plot and have some additional functionalities in shiny.
-
-\hypertarget{discover}{%
-\section{Discover}\label{discover}}
-
-Below is a basic example from the \href{https://plotly.com/javascript/line-and-scatter/}{plotly website}. We will aim to reproduce it using htmlwidgets before improving upon it.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\DataTypeTok{<!DOCTYPE }\NormalTok{html}\DataTypeTok{>}
-\KeywordTok{<html}\OtherTok{ xmlns=}\StringTok{"http://www.w3.org/1999/xhtml"}\OtherTok{ lang=}\StringTok{""}\OtherTok{ xml:lang=}\StringTok{""}\KeywordTok{>}
-
-\KeywordTok{<head>}
-  \CommentTok{<!{-}{-} Import library {-}{-}>}
-  \KeywordTok{<script}\OtherTok{ src=}\StringTok{"plotly{-}latest.min.js"}\KeywordTok{></script>}
-\KeywordTok{</head>}
-
-\KeywordTok{<body>}
-  \CommentTok{<!{-}{-} div to hold visualisation {-}{-}>}
-  \KeywordTok{<div}\OtherTok{ id=}\StringTok{"chart"}\OtherTok{ style=}\StringTok{"width:600px;height:250px;"}\KeywordTok{></div>}
-
-  \CommentTok{<!{-}{-} Script to create visualisation {-}{-}>}
-  \KeywordTok{<script>}
-    \KeywordTok{var}\NormalTok{ trace1 }\OperatorTok{=} \OperatorTok{\{}
-      \DataTypeTok{x}\OperatorTok{:}\NormalTok{ [}\DecValTok{1}\OperatorTok{,} \DecValTok{2}\OperatorTok{,} \DecValTok{3}\OperatorTok{,} \DecValTok{4}\NormalTok{]}\OperatorTok{,}
-      \DataTypeTok{y}\OperatorTok{:}\NormalTok{ [}\DecValTok{10}\OperatorTok{,} \DecValTok{15}\OperatorTok{,} \DecValTok{13}\OperatorTok{,} \DecValTok{17}\NormalTok{]}\OperatorTok{,}
-      \DataTypeTok{mode}\OperatorTok{:} \StringTok{\textquotesingle{}markers\textquotesingle{}}\OperatorTok{,}
-      \DataTypeTok{type}\OperatorTok{:} \StringTok{\textquotesingle{}scatter\textquotesingle{}}
-    \OperatorTok{\};}
-
-    \KeywordTok{var}\NormalTok{ trace2 }\OperatorTok{=} \OperatorTok{\{}
-      \DataTypeTok{x}\OperatorTok{:}\NormalTok{ [}\DecValTok{2}\OperatorTok{,} \DecValTok{3}\OperatorTok{,} \DecValTok{4}\OperatorTok{,} \DecValTok{5}\NormalTok{]}\OperatorTok{,}
-      \DataTypeTok{y}\OperatorTok{:}\NormalTok{ [}\DecValTok{16}\OperatorTok{,} \DecValTok{5}\OperatorTok{,} \DecValTok{11}\OperatorTok{,} \DecValTok{9}\NormalTok{]}\OperatorTok{,}
-      \DataTypeTok{mode}\OperatorTok{:} \StringTok{\textquotesingle{}lines\textquotesingle{}}\OperatorTok{,}
-      \DataTypeTok{type}\OperatorTok{:} \StringTok{\textquotesingle{}scatter\textquotesingle{}}
-    \OperatorTok{\};}
-
-    \KeywordTok{var}\NormalTok{ data }\OperatorTok{=}\NormalTok{ [trace1}\OperatorTok{,}\NormalTok{ trace2}\OperatorTok{,}\NormalTok{ trace3]}\OperatorTok{;}
-
-    \VariableTok{Plotly}\NormalTok{.}\AttributeTok{newPlot}\NormalTok{(}\StringTok{\textquotesingle{}chart\textquotesingle{}}\OperatorTok{,}\NormalTok{ data)}\OperatorTok{;}
-\NormalTok{    )}\OperatorTok{;}
-  \KeywordTok{</script>}
-\KeywordTok{</body>}
-
-\KeywordTok{</html>}
-\end{Highlighting}
-\end{Shaded}
-
-The aim is to obtain an R API like the pseudo code below. It'll allow initialising the visualisation with the \texttt{plotly} function and add a line or scatter plot with \texttt{plot\_line} and \texttt{plot\_marker}.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{plotly}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ cars) }\OperatorTok{\%>\%}\StringTok{ }
-\StringTok{  }\KeywordTok{plot\_line}\NormalTok{(}\DataTypeTok{x =} \StringTok{"dist"}\NormalTok{, }\DataTypeTok{y =} \StringTok{"speed"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\hypertarget{basics}{%
-\section{Basics}\label{basics}}
-
-The story starts like all other widgets: create a package and scaffold the widget. We name the package plotlier so as not to override the local installation of the actual plotly package. We also add the magrittr pipe (\texttt{\%\textgreater{}\%}) while we're at it.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{usethis}\OperatorTok{::}\KeywordTok{create\_package}\NormalTok{(}\StringTok{"plotlier"}\NormalTok{) }\CommentTok{\# create package}
-\NormalTok{usethis}\OperatorTok{::}\KeywordTok{scaffoldWidget}\NormalTok{(}\StringTok{"plotly"}\NormalTok{) }\CommentTok{\# scaffold plotly}
-\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use\_pipe}\NormalTok{() }\CommentTok{\# export pipe}
-\end{Highlighting}
-\end{Shaded}
-
-Then we download the dependency from the CDN, the latest version at the time of writing this is \texttt{1.54.2}, and edit the \texttt{plotly.yml} file to point to the downloaded file.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{dir.create}\NormalTok{(}\StringTok{"inst/htmlwidgets/plotly"}\NormalTok{, }\DataTypeTok{recursive =} \OtherTok{TRUE}\NormalTok{)}
-\NormalTok{url <{-}}\StringTok{ "https://cdn.plot.ly/plotly{-}1.54.2.min.js"}
-\KeywordTok{download.file}\NormalTok{(url, }\StringTok{"inst/htmlwidgets/plotly/plotly.min.js"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{dependencies}\KeywordTok{:}
-\AttributeTok{ }\KeywordTok{{-}}\AttributeTok{ }\FunctionTok{name}\KeywordTok{:}\AttributeTok{ plotly}
-\AttributeTok{   }\FunctionTok{version}\KeywordTok{:}\AttributeTok{ }\FloatTok{1.54.2}
-\AttributeTok{   }\FunctionTok{src}\KeywordTok{:}\AttributeTok{ htmlwidgets/plotly}
-\AttributeTok{   }\FunctionTok{script}\KeywordTok{:}\AttributeTok{ plotly.min.js}
-\end{Highlighting}
-\end{Shaded}
-
-We start by editing the \texttt{plotly} function to accept a data frame which will be stored in the \texttt{x} object.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#\textquotesingle{} @export}
-\NormalTok{plotly <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, }\DataTypeTok{width =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{height =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{elementId =} \OtherTok{NULL}\NormalTok{) \{}
-
-  \CommentTok{\# forward options using x}
-\NormalTok{  x =}\StringTok{ }\KeywordTok{list}\NormalTok{(}
-    \DataTypeTok{data =}\NormalTok{ data,}
-    \DataTypeTok{options =} \KeywordTok{list}\NormalTok{()}
-\NormalTok{  )}
-
-  \CommentTok{\# create widget}
-\NormalTok{  htmlwidgets}\OperatorTok{::}\KeywordTok{createWidget}\NormalTok{(}
-    \DataTypeTok{name =} \StringTok{\textquotesingle{}plotly\textquotesingle{}}\NormalTok{,}
-\NormalTok{    x,}
-    \DataTypeTok{width =}\NormalTok{ width,}
-    \DataTypeTok{height =}\NormalTok{ height,}
-    \DataTypeTok{package =} \StringTok{\textquotesingle{}plotlier\textquotesingle{}}\NormalTok{,}
-    \DataTypeTok{elementId =}\NormalTok{ elementId}
-\NormalTok{  )}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-The JavaScript would look like the code below. Declaring a shared \texttt{plot} variable that is assigned the plotly output created from the \texttt{options}.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{widget}\NormalTok{(}\OperatorTok{\{}
-
-  \DataTypeTok{name}\OperatorTok{:} \StringTok{\textquotesingle{}plotly\textquotesingle{}}\OperatorTok{,}
-
-  \DataTypeTok{type}\OperatorTok{:} \StringTok{\textquotesingle{}output\textquotesingle{}}\OperatorTok{,}
-
-  \DataTypeTok{factory}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
-
-    \CommentTok{// shared variable}
-    \KeywordTok{var}\NormalTok{ plot}\OperatorTok{;}
-
-    \ControlFlowTok{return} \OperatorTok{\{}
-
-      \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
-
-\NormalTok{        plot }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
-        \VariableTok{Plotly}\NormalTok{.}\AttributeTok{newPlot}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\OperatorTok{,} \VariableTok{x}\NormalTok{.}\AttributeTok{options}\NormalTok{)}\OperatorTok{;}
-
-      \OperatorTok{\},}
-
-      \DataTypeTok{resize}\OperatorTok{:} \KeywordTok{function}\NormalTok{(width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
-
-        \CommentTok{// }\AlertTok{TODO}\CommentTok{: code to re{-}render the widget with a new size}
-
-      \OperatorTok{\}}
-
-    \OperatorTok{\};}
-  \OperatorTok{\}}
-\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
-\end{Highlighting}
-\end{Shaded}
-
-Then it's a matter of reproducing the JSON that defines what plotly defines as a ``trace'' and what more or less corresponds to a ``geom'' in ggplot2 \citep{R-ggplot2}. A trace for a scatter plot is defined with the JSON below, which we can read in R to understand the shape of the list to reproduce.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{jsonlite}\OperatorTok{::}\KeywordTok{fromJSON}\NormalTok{(}\StringTok{\textquotesingle{}\{}
-\StringTok{	"x": [1, 2, 3, 4],}
-\StringTok{	"y": [10, 15, 13, 17],}
-\StringTok{	"mode": "markers",}
-\StringTok{	"type": "scatter"}
-\StringTok{\}\textquotesingle{}}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## $x
-## [1] 1 2 3 4
-## 
-## $y
-## [1] 10 15 13 17
-## 
-## $mode
-## [1] "markers"
-## 
-## $type
-## [1] "scatter"
-\end{verbatim}
-
-We can then create a function that takes the name of the x and y columns to fetch from the data which is accessible from the plotly object with \texttt{p\$x\$data}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#\textquotesingle{} @export}
-\NormalTok{plot\_marker <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(p, x, y)\{}
-\NormalTok{  layer <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}
-    \DataTypeTok{x =}\NormalTok{ p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{data[[x]],}
-    \DataTypeTok{y =}\NormalTok{ p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{data[[y]],}
-    \DataTypeTok{type =} \StringTok{"scatter"}\NormalTok{,}
-    \DataTypeTok{mode =} \StringTok{"markers"}
-\NormalTok{  )}
-
-\NormalTok{  p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{options <{-}}\StringTok{ }\KeywordTok{append}\NormalTok{(p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{options, }\KeywordTok{list}\NormalTok{(layer))}
-  \KeywordTok{return}\NormalTok{(p)}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(plotlier)}
-
-\KeywordTok{plotly}\NormalTok{(cars) }\OperatorTok{\%>\%}\StringTok{ }
-\StringTok{  }\KeywordTok{plot\_marker}\NormalTok{(}\StringTok{"dist"}\NormalTok{, }\StringTok{"speed"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{figure}
-\centering
-\includegraphics{images/plotlier-scatter.png}
-\caption{Plotlier Scatter plot}
-\end{figure}
-
-\hypertarget{javascript-to-r}{%
-\section{JavaScript to R}\label{javascript-to-r}}
-
-We can now look up plotly's documentation on \href{https://plotly.com/javascript/plotlyjs-events/}{callback} to send data to the R server when a point is clicked.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{...}
-\NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
-
-\NormalTok{  plot }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
-  \VariableTok{Plotly}\NormalTok{.}\AttributeTok{newPlot}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\OperatorTok{,} \VariableTok{x}\NormalTok{.}\AttributeTok{options}\NormalTok{)}\OperatorTok{;}
-
-  \VariableTok{plot}\NormalTok{.}\AttributeTok{on}\NormalTok{(}\StringTok{\textquotesingle{}plotly\_click\textquotesingle{}}\OperatorTok{,} \KeywordTok{function}\NormalTok{(data)}\OperatorTok{\{}
-    \KeywordTok{var}\NormalTok{ coords }\OperatorTok{=}\NormalTok{ [}\VariableTok{data}\NormalTok{.}\AttributeTok{points}\NormalTok{[}\DecValTok{0}\NormalTok{].}\AttributeTok{x}\OperatorTok{,} \VariableTok{data}\NormalTok{.}\AttributeTok{points}\NormalTok{[}\DecValTok{0}\NormalTok{].}\AttributeTok{y}\NormalTok{]}\OperatorTok{;}
-    \VariableTok{Shiny}\NormalTok{.}\AttributeTok{setInputValue}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}\_clicked\textquotesingle{}}\OperatorTok{,}\NormalTok{ coords)}\OperatorTok{;}
-  \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
-
-\OperatorTok{\}}
-\NormalTok{...}
-\end{Highlighting}
-\end{Shaded}
-
-Finally, we load the package's functions using devtools to test the input.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(shiny)}
-\KeywordTok{library}\NormalTok{(plotlier)}
-
-\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
-  \KeywordTok{plotlyOutput}\NormalTok{(}\StringTok{"plot"}\NormalTok{),}
-  \KeywordTok{verbatimTextOutput}\NormalTok{(}\StringTok{"clicked"}\NormalTok{)}
-\NormalTok{)}
-
-\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
-
-\NormalTok{  output}\OperatorTok{$}\NormalTok{plot <{-}}\StringTok{ }\KeywordTok{renderPlotly}\NormalTok{(\{}
-    \KeywordTok{plotly}\NormalTok{(cars) }\OperatorTok{\%>\%}\StringTok{ }
-\StringTok{      }\KeywordTok{plot\_marker}\NormalTok{(}\StringTok{"dist"}\NormalTok{, }\StringTok{"speed"}\NormalTok{)}
-\NormalTok{  \})}
-
-\NormalTok{  output}\OperatorTok{$}\NormalTok{clicked <{-}}\StringTok{ }\KeywordTok{renderPrint}\NormalTok{(\{}
-    \KeywordTok{print}\NormalTok{(input}\OperatorTok{$}\NormalTok{plot\_clicked)}
-\NormalTok{  \})}
-
-\NormalTok{\}}
-
-\KeywordTok{shinyApp}\NormalTok{(ui, server)}
-\end{Highlighting}
-\end{Shaded}
-
-\hypertarget{r-to-javascript}{%
-\section{R to JavaScript}\label{r-to-javascript}}
-
-Here we implement an example of passing data from R to JavaScript, name the JavaScript \texttt{addTraces} function which allows dynamically adding traces to the chart without redrawing it in its entirety.
-
-The JavaScript \texttt{addTraces} function takes the id of the chart to add the trace to and a JSON object that defines the trace.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{// addTraces example}
-\VariableTok{Plotly}\NormalTok{.}\AttributeTok{addTraces}\NormalTok{(}\StringTok{\textquotesingle{}plot\textquotesingle{}}\OperatorTok{,} \OperatorTok{\{}\DataTypeTok{y}\OperatorTok{:}\NormalTok{ [}\DecValTok{2}\OperatorTok{,}\DecValTok{1}\OperatorTok{,}\DecValTok{2}\NormalTok{]}\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
-\end{Highlighting}
-\end{Shaded}
-
-We start, as done previously, by defining a ``proxy,'' a function that returns an object containing information necessary to add traces to the chart, namely the \texttt{id} of the chart to apply to and the \texttt{session} object which will be used to send the data.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#\textquotesingle{} @export}
-\NormalTok{plotlyProxy <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id, }\DataTypeTok{session =}\NormalTok{ shiny}\OperatorTok{::}\KeywordTok{getDefaultReactiveDomain}\NormalTok{())\{}
-  \KeywordTok{list}\NormalTok{(}
-    \DataTypeTok{id =}\NormalTok{ id,}
-    \DataTypeTok{session =}\NormalTok{ session}
-\NormalTok{  )}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-We then create a function that creates the trace and sends that data, together with the plot \texttt{id}, to JavaScript as a message of type ``add-traces.''
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#\textquotesingle{} @export}
-\NormalTok{plot\_add\_marker <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(proxy, data, x, y)\{}
-\NormalTok{  data <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}
-    \DataTypeTok{x =}\NormalTok{ data[[x]],}
-    \DataTypeTok{y =}\NormalTok{ data[[y]],}
-    \DataTypeTok{type =} \StringTok{"scatter"}\NormalTok{,}
-    \DataTypeTok{mode =} \StringTok{"markers"}
-\NormalTok{  )}
-
-\NormalTok{  msg <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ proxy}\OperatorTok{$}\NormalTok{id, }\DataTypeTok{data =}\NormalTok{ data)}
-\NormalTok{  proxy}\OperatorTok{$}\NormalTok{session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\StringTok{"add{-}traces"}\NormalTok{, msg)}
-  \KeywordTok{return}\NormalTok{(proxy)}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-Finally, we add a message handler to handle the data sent to \texttt{add-traces} and use the JavaScript method \texttt{addTraces} to add a trace to the plot.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ControlFlowTok{if}\NormalTok{(}\VariableTok{HTMLWidgets}\NormalTok{.}\AttributeTok{shinyMode}\NormalTok{)}\OperatorTok{\{}
-
-  \VariableTok{Shiny}\NormalTok{.}\AttributeTok{addCustomMessageHandler}\NormalTok{(type }\OperatorTok{=} \StringTok{\textquotesingle{}add{-}traces\textquotesingle{}}\OperatorTok{,} \KeywordTok{function}\NormalTok{(msg)}\OperatorTok{\{}
-    \VariableTok{Plotly}\NormalTok{.}\AttributeTok{addTraces}\NormalTok{(}\VariableTok{msg}\NormalTok{.}\AttributeTok{id}\OperatorTok{,} \VariableTok{msg}\NormalTok{.}\AttributeTok{data}\NormalTok{)}\OperatorTok{;}
-  \OperatorTok{\}}\NormalTok{)}
-
-\OperatorTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-After installing the package, one can use the new proxy function in a shiny application, below we provide a button that adds a trace of random data to the chart.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(shiny)}
-\KeywordTok{library}\NormalTok{(plotlier)}
-
-\NormalTok{df <{-}}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x =} \DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{, }\DataTypeTok{y =} \KeywordTok{runif}\NormalTok{(}\DecValTok{10}\NormalTok{))}
-
-\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
-  \KeywordTok{actionButton}\NormalTok{(}\StringTok{"add"}\NormalTok{, }\StringTok{"Add random trace"}\NormalTok{),}
-  \KeywordTok{plotlyOutput}\NormalTok{(}\StringTok{"plot"}\NormalTok{)}
-\NormalTok{)}
-
-\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
-
-\NormalTok{  output}\OperatorTok{$}\NormalTok{plot <{-}}\StringTok{ }\KeywordTok{renderPlotly}\NormalTok{(\{}
-\NormalTok{    df }\OperatorTok{\%>\%}\StringTok{ }
-\StringTok{      }\KeywordTok{plotly}\NormalTok{() }\OperatorTok{\%>\%}\StringTok{ }
-\StringTok{      }\KeywordTok{plot\_line}\NormalTok{(}\StringTok{"x"}\NormalTok{, }\StringTok{"y"}\NormalTok{)}
-\NormalTok{  \})}
-
-\NormalTok{  proxy <{-}}\StringTok{ }\KeywordTok{plotlyProxy}\NormalTok{(}\StringTok{"plot"}\NormalTok{)}
-
-  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{add, \{}
-\NormalTok{    random <{-}}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{runif}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{10}\NormalTok{), }\DataTypeTok{y =} \KeywordTok{runif}\NormalTok{(}\DecValTok{10}\NormalTok{))}
-    
-    \KeywordTok{plot\_add\_marker}\NormalTok{(}
-\NormalTok{      proxy,}
-\NormalTok{      random,}
-      \StringTok{"x"}\NormalTok{, }\StringTok{"y"}
-\NormalTok{    )}
-\NormalTok{  \})}
-
-\NormalTok{\}}
-
-\KeywordTok{shinyApp}\NormalTok{(ui, server)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{figure}
-\centering
-\includegraphics{images/plotlier-add.png}
-\caption{Plotly with dynamic traces}
-\end{figure}
-
-\hypertarget{size-resize}{%
-\section{Size \& Resize}\label{size-resize}}
-
-At this stage the plotlier package does yet provide responsive visualisation: resizing the screen does not resize the visualisation. In order to ensure that it is we have to define a default width that is not defined in pixel but percentage (such as 100\%) and implement the resize method.
-
-As mentioned in a previous chapter, the default size can be changed with the \texttt{sizingPolicy} function, below we set it to \texttt{100\%}.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# create widget}
-\NormalTok{htmlwidgets}\OperatorTok{::}\KeywordTok{createWidget}\NormalTok{(}
-  \DataTypeTok{name =} \StringTok{\textquotesingle{}plotly\textquotesingle{}}\NormalTok{,}
-\NormalTok{  x,}
-  \DataTypeTok{width =}\NormalTok{ width,}
-  \DataTypeTok{height =}\NormalTok{ height,}
-  \DataTypeTok{package =} \StringTok{\textquotesingle{}plotlier\textquotesingle{}}\NormalTok{,}
-  \DataTypeTok{elementId =}\NormalTok{ elementId,}
-  \DataTypeTok{preRenderHook =}\NormalTok{ render\_plotlier,}
-  \DataTypeTok{sizingPolicy =} \KeywordTok{sizingPolicy}\NormalTok{(}
-    \DataTypeTok{defaultWidth =} \StringTok{"100\%"}
-\NormalTok{  )}
-\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-Next we can use the plotly function \texttt{relayout} to resize the visualisation when the size of its container changes.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{resize}\OperatorTok{:} \KeywordTok{function}\NormalTok{(width}\OperatorTok{,}\NormalTok{ height) }\OperatorTok{\{}
-  \VariableTok{Plotly}\NormalTok{.}\AttributeTok{relayout}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\OperatorTok{,} \OperatorTok{\{}\DataTypeTok{width}\OperatorTok{:}\NormalTok{ width}\OperatorTok{,} \DataTypeTok{height}\OperatorTok{:}\NormalTok{ height}\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
-\OperatorTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-One can test this by resizing the browser or RStudio viewer window.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{plotly}\NormalTok{(cars) }\OperatorTok{\%>\%}\StringTok{  }
-\StringTok{      }\KeywordTok{plot\_marker}\NormalTok{(}\StringTok{"dist"}\NormalTok{, }\StringTok{"speed"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{figure}
-\centering
-\includegraphics{images/plotlier-responsive.png}
-\caption{Responsive plotly output}
-\end{figure}
-
-\hypertarget{performance-security}{%
-\section{Performance \& Security}\label{performance-security}}
-
-The package stores the data passed to the \texttt{plotly} function in the widget object, however, as explained in a previous chapter this is insecure and a drain on performances. First, this data serialised to JSON but not used in JavaScript and thus leads to unnecessary computations. Second, this data is visible on the resulting visualisation which may cause security concerns given the user may not deliberately use all the data in the visualisation. This can be remedied to by use the \texttt{preRenderHook}.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{render\_plotlier <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(p)\{}
-\NormalTok{  p}\OperatorTok{$}\NormalTok{x}\OperatorTok{$}\NormalTok{data <{-}}\StringTok{ }\OtherTok{NULL}
-  \KeywordTok{return}\NormalTok{(p)}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-The function define above can then be used in the \texttt{htmlwidgets::createWidget} function so it is run just before the visualisation renders.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{htmlwidgets}\OperatorTok{::}\KeywordTok{createWidget}\NormalTok{(}
-  \DataTypeTok{name =} \StringTok{\textquotesingle{}plotly\textquotesingle{}}\NormalTok{,}
-\NormalTok{  x,}
-  \DataTypeTok{width =}\NormalTok{ width,}
-  \DataTypeTok{height =}\NormalTok{ height,}
-  \DataTypeTok{package =} \StringTok{\textquotesingle{}plotlier\textquotesingle{}}\NormalTok{,}
-  \DataTypeTok{elementId =}\NormalTok{ elementId,}
-  \DataTypeTok{preRenderHook =}\NormalTok{ render\_plotlier}
-\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
 
 \hypertarget{image-classifier}{%
 \chapter{Image Classifier}\label{image-classifier}}
@@ -7870,7 +8046,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] -91.68
+## [1] 42.4
 \end{verbatim}
 
 \begin{Shaded}

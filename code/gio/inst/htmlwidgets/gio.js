@@ -25,7 +25,7 @@ HTMLWidgets.widget({
       renderValue: function(x) {
 
         el.innerHTML = '';
-        controller = new GIO.Controller(el);
+        controller = new GIO.Controller(el, x.configs);
 
         // group
         sel_handle.setGroup(x.crosstalk.group);

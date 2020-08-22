@@ -5,7 +5,7 @@
 #' @import htmlwidgets
 #'
 #' @export
-gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
+gio <- function(data, source, target, value, ..., width = NULL, height = NULL, elementId = NULL) {
 
   # defaults to NULL
   group <- NULL
@@ -15,8 +15,16 @@ gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
     data <- data$origData()
   }
 
+  data <- dplyr::select(
+    data,
+    i = {{ source }},
+    e = {{ target }},
+    v = {{ value }}
+  )
+
   # forward options using x
   x = list(
+    configs = list(...),
     data = data,
     style = "default",
     crosstalk = list(group = group)
