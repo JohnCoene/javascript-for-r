@@ -1,6 +1,6 @@
 library(shiny)
 
-boxxy <- function(title, value, color = "black"){
+boxxy <- function(title, value, color = "#ef476f"){
   list(title = title, value = value, color = color)
 }
 

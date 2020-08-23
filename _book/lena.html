@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 22 Machine Learning | JavaScript for R</title>
+  <title>Chapter 23 Lena | JavaScript for R</title>
   <meta name="description" content="Invite JavaScript into your Data Science workflow." />
   <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 22 Machine Learning | JavaScript for R" />
+  <meta property="og:title" content="Chapter 23 Lena | JavaScript for R" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="JohnCoene/javascript-for-r" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 22 Machine Learning | JavaScript for R" />
+  <meta name="twitter:title" content="Chapter 23 Lena | JavaScript for R" />
   
   <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="progress-bar.html"/>
-<link rel="next" href="lena.html"/>
+<link rel="prev" href="machine-learning.html"/>
+<link rel="next" href="conclusion.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -427,140 +427,257 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="machine-learning" class="section level1" number="22">
-<h1><span class="header-section-number">Chapter 22</span> Machine Learning</h1>
-<p>In this chapter we build a package that, via V8, wraps <a href="https://github.com/mljs/ml">ml.js</a>, a library which brings machine learning to JavaScript. It covers quite a few models, in this chapter we only include one: the linear regression. This is an interesting example because it reveals some proceedings that one is likely to run into when creating packages using V8.</p>
-<div class="sourceCode" id="cb444"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb444-1"><a href="machine-learning.html#cb444-1"></a><span class="kw">const</span> x <span class="op">=</span> [<span class="fl">0.5</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="fl">1.5</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="fl">2.5</span>]<span class="op">;</span></span>
-<span id="cb444-2"><a href="machine-learning.html#cb444-2"></a><span class="kw">const</span> y <span class="op">=</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span>]<span class="op">;</span></span>
-<span id="cb444-3"><a href="machine-learning.html#cb444-3"></a></span>
-<span id="cb444-4"><a href="machine-learning.html#cb444-4"></a><span class="kw">const</span> regression <span class="op">=</span> <span class="kw">new</span> <span class="va">ml</span>.<span class="at">SimpleLinearRegression</span>(x<span class="op">,</span> y)<span class="op">;</span></span></code></pre></div>
-<div id="dependency" class="section level2" number="22.1">
-<h2><span class="header-section-number">22.1</span> Dependency</h2>
-<p>We start by creating a package and add the V8 package as dependency.</p>
-<div class="sourceCode" id="cb445"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb445-1"><a href="machine-learning.html#cb445-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;ml&quot;</span>)</span>
-<span id="cb445-2"><a href="machine-learning.html#cb445-2"></a>usethis<span class="op">::</span><span class="kw">use_package</span>(<span class="st">&quot;V8&quot;</span>)</span></code></pre></div>
-<p>Then we create the <code>inst</code> directory in which we place the ml.js file downloaded from the CDN.</p>
-<div class="sourceCode" id="cb446"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb446-1"><a href="machine-learning.html#cb446-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;inst&quot;</span>)</span>
-<span id="cb446-2"><a href="machine-learning.html#cb446-2"></a><span class="kw">download.file</span>(<span class="st">&quot;https://www.lactame.com/lib/ml/4.0.0/ml.min.js&quot;</span>, <span class="st">&quot;inst/ml.min.js&quot;</span>)</span></code></pre></div>
-<p>With the dependency downloaded one can start working on the R code. First, a new V8 context needs to be created and the ml.js file need to be imported in it.</p>
-<div class="sourceCode" id="cb447"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb447-1"><a href="machine-learning.html#cb447-1"></a><span class="co"># zzz.R</span></span>
-<span id="cb447-2"><a href="machine-learning.html#cb447-2"></a>ml &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb447-3"><a href="machine-learning.html#cb447-3"></a></span>
-<span id="cb447-4"><a href="machine-learning.html#cb447-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
-<span id="cb447-5"><a href="machine-learning.html#cb447-5"></a>  ml &lt;&lt;-<span class="st"> </span>V8<span class="op">::</span><span class="kw">v8</span>()</span>
-<span id="cb447-6"><a href="machine-learning.html#cb447-6"></a>  mljs &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ml.min.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;ml&quot;</span>)</span>
-<span id="cb447-7"><a href="machine-learning.html#cb447-7"></a>  ml<span class="op">$</span><span class="kw">source</span>(mljs)</span>
-<span id="cb447-8"><a href="machine-learning.html#cb447-8"></a>}</span></code></pre></div>
+<div id="lena" class="section level1" number="23">
+<h1><span class="header-section-number">Chapter 23</span> Lena</h1>
+<p>In this chapter we create a custom shiny output, in practical terms, custom <code>render*</code> and <code>*Output</code> functions to use in Shiny. Note that this is destined for the curious who want to grasp some understanding of how these functions work under the hood as it is <em>often easier to create an htmlwidgets package.</em>
+We will demonstrate by creating a wrapper for <a href="https://github.com/davidsonfellipe/lena.js">lena.js</a>, a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs, there are much easier ways to apply such filters ina shiny application (e.g.: CSS).</p>
+<div id="inner-workings" class="section level2" number="23.1">
+<h2><span class="header-section-number">23.1</span> Inner-workings</h2>
+<p>At the core, this consists in creating a <code>lena</code>, <code>renderLena</code> and <code>lenaOutput</code> functions (analogous to <code>plot</code>, <code>renderPlot</code>, <code>plotOutput</code>) which are linked by an “output binding” in JavaScript. The latter function essentially creates an HTML element (e.g.: <code>&lt;div&gt;</code>) with its dependencies attached, the former <code>render*</code> rather straightforward, unlike previous examples, the data does not need to be explicitly sent to the front-end using <code>session$sendCustomMessage</code> as this is handled by shiny itself under the hood.</p>
+<p>Previous work with shiny and JavaScript covered in this book had no dedicated “output” element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: <code>usejBox</code>). However, since this is not the case here the dependencies can be attached together with the output.</p>
+<p>Finally, the two R functions are “bound” JavaScript-side with an “output binding” that renders the data from the <code>render*</code> function with its <code>*output</code>.</p>
 </div>
-<div id="simple-regression" class="section level2" number="22.2">
-<h2><span class="header-section-number">22.2</span> Simple Regression</h2>
-<p>First model we make available is the <a href="https://github.com/mljs/regression-simple-linear">“simple linear regression”</a>, which consists of a simple function that takes two arrays. We can thus create a function that takes two vectors, <code>x</code>, and <code>y</code>, and runs the regression.</p>
-<div class="sourceCode" id="cb448"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb448-1"><a href="machine-learning.html#cb448-1"></a><span class="co">#&#39; @export </span></span>
-<span id="cb448-2"><a href="machine-learning.html#cb448-2"></a>ml_simple_lm &lt;-<span class="st"> </span><span class="cf">function</span>(y, x){</span>
-<span id="cb448-3"><a href="machine-learning.html#cb448-3"></a>  <span class="co"># assign x and y</span></span>
-<span id="cb448-4"><a href="machine-learning.html#cb448-4"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;x&quot;</span>, x)</span>
-<span id="cb448-5"><a href="machine-learning.html#cb448-5"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;y&quot;</span>, y)</span>
-<span id="cb448-6"><a href="machine-learning.html#cb448-6"></a></span>
-<span id="cb448-7"><a href="machine-learning.html#cb448-7"></a>  <span class="co"># run regression</span></span>
-<span id="cb448-8"><a href="machine-learning.html#cb448-8"></a>  ml<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;var regression = new ML.SimpleLinearRegression(x, y);&quot;</span>)</span>
-<span id="cb448-9"><a href="machine-learning.html#cb448-9"></a>  </span>
-<span id="cb448-10"><a href="machine-learning.html#cb448-10"></a>  <span class="co"># return results</span></span>
-<span id="cb448-11"><a href="machine-learning.html#cb448-11"></a>  ml<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;regression&quot;</span>)</span>
-<span id="cb448-12"><a href="machine-learning.html#cb448-12"></a>}</span></code></pre></div>
-<p>Then we can document and load the model to the function.</p>
-<div class="sourceCode" id="cb449"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb449-1"><a href="machine-learning.html#cb449-1"></a><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
-<span id="cb449-2"><a href="machine-learning.html#cb449-2"></a><span class="co">## $name</span></span>
-<span id="cb449-3"><a href="machine-learning.html#cb449-3"></a><span class="co">## [1] &quot;simpleLinearRegression&quot;</span></span>
-<span id="cb449-4"><a href="machine-learning.html#cb449-4"></a><span class="co">## </span></span>
-<span id="cb449-5"><a href="machine-learning.html#cb449-5"></a><span class="co">## $slope</span></span>
-<span id="cb449-6"><a href="machine-learning.html#cb449-6"></a><span class="co">## [1] 0.1655676</span></span>
-<span id="cb449-7"><a href="machine-learning.html#cb449-7"></a><span class="co">## </span></span>
-<span id="cb449-8"><a href="machine-learning.html#cb449-8"></a><span class="co">## $intercept</span></span>
-<span id="cb449-9"><a href="machine-learning.html#cb449-9"></a><span class="co">## [1] 8.283906</span></span></code></pre></div>
-<p>This works but has a few issues, namely running two or more regression internally will override the variable <code>regression</code> in the V8 context. Let us demonstrate by implementing a function to predict.</p>
-<div class="sourceCode" id="cb450"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb450-1"><a href="machine-learning.html#cb450-1"></a><span class="co">#&#39; @export</span></span>
-<span id="cb450-2"><a href="machine-learning.html#cb450-2"></a>ml_predict &lt;-<span class="st"> </span><span class="cf">function</span>(x){</span>
-<span id="cb450-3"><a href="machine-learning.html#cb450-3"></a>  ml<span class="op">$</span><span class="kw">call</span>(<span class="st">&quot;regression.predict&quot;</span>, x)</span>
-<span id="cb450-4"><a href="machine-learning.html#cb450-4"></a>}</span></code></pre></div>
-<p>We then document and load the functions to then run two regressions in a row and observe the issue. Unlike R the model we created only exists in JavaScript, unlike the <code>lm</code>, the function <code>ml_simple_lm</code> does not return the model. Therefore, <code>ml_simple_lm</code> does not distinguish between models, unlike <code>predict</code> which takes the model as first argument and runs the prediction on it.</p>
-<p>This implementation of ml.js is indeed very dangerous.</p>
-<div class="sourceCode" id="cb451"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb451-1"><a href="machine-learning.html#cb451-1"></a><span class="co"># first model</span></span>
-<span id="cb451-2"><a href="machine-learning.html#cb451-2"></a><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
-<span id="cb451-3"><a href="machine-learning.html#cb451-3"></a><span class="kw">ml_predict</span>(<span class="dv">15</span>)</span>
-<span id="cb451-4"><a href="machine-learning.html#cb451-4"></a><span class="co">## 25.18405</span></span>
-<span id="cb451-5"><a href="machine-learning.html#cb451-5"></a></span>
-<span id="cb451-6"><a href="machine-learning.html#cb451-6"></a><span class="co"># overrides model</span></span>
-<span id="cb451-7"><a href="machine-learning.html#cb451-7"></a><span class="kw">ml_simple_lm</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="kw">runif</span>(<span class="dv">10</span>))</span>
-<span id="cb451-8"><a href="machine-learning.html#cb451-8"></a></span>
-<span id="cb451-9"><a href="machine-learning.html#cb451-9"></a><span class="co"># produces different predictions</span></span>
-<span id="cb451-10"><a href="machine-learning.html#cb451-10"></a><span class="kw">ml_predict</span>(<span class="dv">15</span>)</span>
-<span id="cb451-11"><a href="machine-learning.html#cb451-11"></a><span class="co">## 10.76742</span></span></code></pre></div>
-<p>The package ml currently under construction should emulate R in that respect, the <code>ml_simple_lm</code> should return the model which should be usable with the <code>predict</code> function. In order to do we are going to need to track regressions internally in V8 so the <code>ml_simple_lm</code> return a proxy of the model that <code>predict</code> can use to predict on the intended model.</p>
-<p>In order to track and store regressions internally we are going to declare an empty array when the package is loaded.</p>
-<div class="sourceCode" id="cb452"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb452-1"><a href="machine-learning.html#cb452-1"></a><span class="co"># zzz.R</span></span>
-<span id="cb452-2"><a href="machine-learning.html#cb452-2"></a>ml &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb452-3"><a href="machine-learning.html#cb452-3"></a></span>
-<span id="cb452-4"><a href="machine-learning.html#cb452-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
-<span id="cb452-5"><a href="machine-learning.html#cb452-5"></a>  ml &lt;&lt;-<span class="st"> </span>V8<span class="op">::</span><span class="kw">v8</span>()</span>
-<span id="cb452-6"><a href="machine-learning.html#cb452-6"></a>  mljs &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ml.min.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;ml&quot;</span>)</span>
-<span id="cb452-7"><a href="machine-learning.html#cb452-7"></a>  ml<span class="op">$</span><span class="kw">source</span>(mljs)</span>
-<span id="cb452-8"><a href="machine-learning.html#cb452-8"></a>  ml<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;var regressions = [];&quot;</span>)</span>
-<span id="cb452-9"><a href="machine-learning.html#cb452-9"></a>}</span></code></pre></div>
-<p>Then, one can track regressions by creating an R object which is incremented every time <code>ml_simple_lm</code> runs, this can be used as variable name in the JavaScript <code>regressions</code> array declare in <code>.onLoad</code>. This variable name must be stored in the object we intend to return so the <code>predict</code> method we will create later on can access the model and run predictions. Finally, in order to declare a new method on the <code>predict</code> function we need to return an object bearing a unique class, below we use <code>mlSimpleRegression</code>.</p>
-<div class="sourceCode" id="cb453"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb453-1"><a href="machine-learning.html#cb453-1"></a>counter &lt;-<span class="st"> </span><span class="kw">new.env</span>(<span class="dt">parent =</span> <span class="kw">emptyenv</span>())</span>
-<span id="cb453-2"><a href="machine-learning.html#cb453-2"></a>counter<span class="op">$</span>regressions &lt;-<span class="st"> </span><span class="dv">0</span></span>
-<span id="cb453-3"><a href="machine-learning.html#cb453-3"></a></span>
-<span id="cb453-4"><a href="machine-learning.html#cb453-4"></a><span class="co">#&#39; @export </span></span>
-<span id="cb453-5"><a href="machine-learning.html#cb453-5"></a>ml_simple_lm &lt;-<span class="st"> </span><span class="cf">function</span>(y, x){</span>
-<span id="cb453-6"><a href="machine-learning.html#cb453-6"></a>  counter<span class="op">$</span>regressions &lt;-<span class="st"> </span>counter<span class="op">$</span>regressions <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb453-7"><a href="machine-learning.html#cb453-7"></a></span>
-<span id="cb453-8"><a href="machine-learning.html#cb453-8"></a>  <span class="co"># assign variables</span></span>
-<span id="cb453-9"><a href="machine-learning.html#cb453-9"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;x&quot;</span>, x)</span>
-<span id="cb453-10"><a href="machine-learning.html#cb453-10"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;y&quot;</span>, y)</span>
-<span id="cb453-11"><a href="machine-learning.html#cb453-11"></a></span>
-<span id="cb453-12"><a href="machine-learning.html#cb453-12"></a>  <span class="co"># address</span></span>
-<span id="cb453-13"><a href="machine-learning.html#cb453-13"></a>  address &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;regressions[&#39;&quot;</span>, counter<span class="op">$</span>regressions, <span class="st">&quot;&#39;]&quot;</span>)</span>
-<span id="cb453-14"><a href="machine-learning.html#cb453-14"></a></span>
-<span id="cb453-15"><a href="machine-learning.html#cb453-15"></a>  <span class="co"># create regression</span></span>
-<span id="cb453-16"><a href="machine-learning.html#cb453-16"></a>  code &lt;-<span class="st"> </span><span class="kw">paste0</span>(address, <span class="st">&quot; = new ML.SimpleLinearRegression(x, y);&quot;</span>)</span>
-<span id="cb453-17"><a href="machine-learning.html#cb453-17"></a>  ml<span class="op">$</span><span class="kw">eval</span>(code)</span>
-<span id="cb453-18"><a href="machine-learning.html#cb453-18"></a></span>
-<span id="cb453-19"><a href="machine-learning.html#cb453-19"></a>  <span class="co"># retrieve and append address</span></span>
-<span id="cb453-20"><a href="machine-learning.html#cb453-20"></a>  regression &lt;-<span class="st"> </span>ml<span class="op">$</span><span class="kw">get</span>(address)</span>
-<span id="cb453-21"><a href="machine-learning.html#cb453-21"></a>  regression<span class="op">$</span>address &lt;-<span class="st"> </span>address</span>
-<span id="cb453-22"><a href="machine-learning.html#cb453-22"></a></span>
-<span id="cb453-23"><a href="machine-learning.html#cb453-23"></a>  <span class="co"># create object of new class</span></span>
-<span id="cb453-24"><a href="machine-learning.html#cb453-24"></a>  <span class="kw">structure</span>(regression, <span class="dt">class =</span> <span class="kw">c</span>(<span class="st">&quot;mlSimpleRegression&quot;</span>, <span class="kw">class</span>(regression)))</span>
-<span id="cb453-25"><a href="machine-learning.html#cb453-25"></a>}</span></code></pre></div>
-<p>Then on can implement the <code>predict</code> method for <code>mlSimpleRegression</code>. The function uses the <code>address</code> of the model to run the JavaScript <code>predict</code> method on that object.</p>
-<div class="sourceCode" id="cb454"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb454-1"><a href="machine-learning.html#cb454-1"></a><span class="co">#&#39; @export </span></span>
-<span id="cb454-2"><a href="machine-learning.html#cb454-2"></a>predict.mlSimpleRegression &lt;-<span class="st"> </span><span class="cf">function</span>(object, newdata, ...){</span>
-<span id="cb454-3"><a href="machine-learning.html#cb454-3"></a>  code &lt;-<span class="st"> </span><span class="kw">paste0</span>(object<span class="op">$</span>address, <span class="st">&quot;.predict&quot;</span>)</span>
-<span id="cb454-4"><a href="machine-learning.html#cb454-4"></a>  ml<span class="op">$</span><span class="kw">call</span>(code, newdata)</span>
-<span id="cb454-5"><a href="machine-learning.html#cb454-5"></a>}</span></code></pre></div>
-<p>We can then build and load the package to it in action.</p>
-<div class="sourceCode" id="cb455"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb455-1"><a href="machine-learning.html#cb455-1"></a><span class="kw">library</span>(ml)</span>
-<span id="cb455-2"><a href="machine-learning.html#cb455-2"></a></span>
-<span id="cb455-3"><a href="machine-learning.html#cb455-3"></a><span class="co"># first model</span></span>
-<span id="cb455-4"><a href="machine-learning.html#cb455-4"></a>model_cars &lt;-<span class="st"> </span><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
-<span id="cb455-5"><a href="machine-learning.html#cb455-5"></a></span>
-<span id="cb455-6"><a href="machine-learning.html#cb455-6"></a><span class="co"># second model</span></span>
-<span id="cb455-7"><a href="machine-learning.html#cb455-7"></a>model_random &lt;-<span class="st"> </span><span class="kw">ml_simple_lm</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="kw">runif</span>(<span class="dv">10</span>))</span>
-<span id="cb455-8"><a href="machine-learning.html#cb455-8"></a></span>
-<span id="cb455-9"><a href="machine-learning.html#cb455-9"></a><span class="kw">predict</span>(model_random, <span class="dv">15</span>)</span></code></pre></div>
-<pre><code>## [1] 117.5</code></pre>
-<div class="sourceCode" id="cb457"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb457-1"><a href="machine-learning.html#cb457-1"></a><span class="kw">predict</span>(model_cars, <span class="dv">15</span>)</span></code></pre></div>
-<pre><code>## [1] 10.77</code></pre>
+<div id="discover-lena.js" class="section level2" number="23.2">
+<h2><span class="header-section-number">23.2</span> Discover Lena.js</h2>
+<p>Let us take a look at an example of lena.js. The library reads the original image and outputs the filtered image in a <code>&lt;canvas&gt;</code>. There are many filters to chose from.</p>
+<div class="sourceCode" id="cb459"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb459-1"><a href="lena.html#cb459-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
+<span id="cb459-2"><a href="lena.html#cb459-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb459-3"><a href="lena.html#cb459-3"></a></span>
+<span id="cb459-4"><a href="lena.html#cb459-4"></a><span class="kw">&lt;head&gt;</span></span>
+<span id="cb459-5"><a href="lena.html#cb459-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
+<span id="cb459-6"><a href="lena.html#cb459-6"></a>  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;lena.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb459-7"><a href="lena.html#cb459-7"></a><span class="kw">&lt;/head&gt;</span></span>
+<span id="cb459-8"><a href="lena.html#cb459-8"></a></span>
+<span id="cb459-9"><a href="lena.html#cb459-9"></a><span class="kw">&lt;body&gt;</span></span>
+<span id="cb459-10"><a href="lena.html#cb459-10"></a>  <span class="co">&lt;!-- Image to apply filter --&gt;</span></span>
+<span id="cb459-11"><a href="lena.html#cb459-11"></a>  <span class="kw">&lt;img</span><span class="ot"> id=</span><span class="st">&quot;original-image&quot;</span><span class="ot"> src=</span><span class="st">&quot;./image.png&quot;</span> <span class="kw">/&gt;</span></span>
+<span id="cb459-12"><a href="lena.html#cb459-12"></a></span>
+<span id="cb459-13"><a href="lena.html#cb459-13"></a>  <span class="co">&lt;!-- div to hold visualisation --&gt;</span></span>
+<span id="cb459-14"><a href="lena.html#cb459-14"></a>  <span class="kw">&lt;canvas</span><span class="ot"> id=</span><span class="st">&quot;lena&quot;</span><span class="kw">&gt;&lt;/canvas&gt;</span></span>
+<span id="cb459-15"><a href="lena.html#cb459-15"></a></span>
+<span id="cb459-16"><a href="lena.html#cb459-16"></a>  <span class="co">&lt;!-- Script to create visualisation --&gt;</span></span>
+<span id="cb459-17"><a href="lena.html#cb459-17"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb459-18"><a href="lena.html#cb459-18"></a>    <span class="co">// Get the image</span></span>
+<span id="cb459-19"><a href="lena.html#cb459-19"></a>    <span class="kw">var</span> originalImage <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&quot;original-image&quot;</span>)<span class="op">;</span></span>
+<span id="cb459-20"><a href="lena.html#cb459-20"></a></span>
+<span id="cb459-21"><a href="lena.html#cb459-21"></a>    <span class="co">// The canvas where the processed image will be rendered (With filter)</span></span>
+<span id="cb459-22"><a href="lena.html#cb459-22"></a>    <span class="kw">var</span> filteredImageCanvas <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="st">&quot;lena&quot;</span>)<span class="op">;</span></span>
+<span id="cb459-23"><a href="lena.html#cb459-23"></a></span>
+<span id="cb459-24"><a href="lena.html#cb459-24"></a>    <span class="co">// Filter to apply, in this case the red filter</span></span>
+<span id="cb459-25"><a href="lena.html#cb459-25"></a>    <span class="kw">var</span> filter <span class="op">=</span> LenaJS[<span class="st">&quot;invert&quot;</span>]<span class="op">;</span></span>
+<span id="cb459-26"><a href="lena.html#cb459-26"></a></span>
+<span id="cb459-27"><a href="lena.html#cb459-27"></a>    <span class="co">// Apply the filter</span></span>
+<span id="cb459-28"><a href="lena.html#cb459-28"></a>    <span class="va">LenaJS</span>.<span class="at">filterImage</span>(filteredImageCanvas<span class="op">,</span> filter<span class="op">,</span> originalImage)<span class="op">;</span></span>
+<span id="cb459-29"><a href="lena.html#cb459-29"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb459-30"><a href="lena.html#cb459-30"></a><span class="kw">&lt;/body&gt;</span></span>
+<span id="cb459-31"><a href="lena.html#cb459-31"></a></span>
+<span id="cb459-32"><a href="lena.html#cb459-32"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="figure">
+<img src="images/lena-demo.png" alt="" />
+<p class="caption">Demo of lena.js - inverted colors</p>
+</div>
+<p>Therefore, there should be a <code>lenaOutput</code> function that creates the <code>&lt;canvas&gt;</code>, a <code>renderLena</code> function that sends the output of <code>lena</code> which itself accepts the id of the image to filter as well as the filter to apply. Finally, there will be a “output binding” which will include the JavaScript code included in the <code>&lt;script&gt;</code> tags above.</p>
+</div>
+<div id="setup" class="section level2" number="23.3">
+<h2><span class="header-section-number">23.3</span> Setup</h2>
+<p>Start by creating a package called “lena.”</p>
+<div class="sourceCode" id="cb460"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb460-1"><a href="lena.html#cb460-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;lena&quot;</span>)</span></code></pre></div>
+<p>Then, from the root of the package, create the <code>inst</code> directory and <code>assets</code> subdirectory then download and place the <code>lena.js</code> dependency within it.</p>
+<div class="sourceCode" id="cb461"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb461-1"><a href="lena.html#cb461-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;inst/assets&quot;</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb461-2"><a href="lena.html#cb461-2"></a></span>
+<span id="cb461-3"><a href="lena.html#cb461-3"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb461-4"><a href="lena.html#cb461-4"></a>  <span class="st">&quot;https://raw.githubusercontent.com/davidsonfellipe/&quot;</span>,</span>
+<span id="cb461-5"><a href="lena.html#cb461-5"></a>  <span class="st">&quot;lena.js/master/dist/lena.min.js&quot;</span></span>
+<span id="cb461-6"><a href="lena.html#cb461-6"></a>)</span>
+<span id="cb461-7"><a href="lena.html#cb461-7"></a><span class="kw">download.file</span>(url, <span class="st">&quot;inst/assets/lena.min.js&quot;</span>)</span></code></pre></div>
+<p>We also need to create a JavaScript file that will include the custom JavaScript code that will eventually generate the custom output.</p>
+<div class="sourceCode" id="cb462"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb462-1"><a href="lena.html#cb462-1"></a><span class="kw">file.create</span>(<span class="st">&quot;inst/assets/custom.js&quot;</span>)</span></code></pre></div>
+<p>At this point one should have a package directory looking like the tree below.</p>
+<pre><code>.
+├── DESCRIPTION
+├── NAMESPACE
+├── R
+├── inst
+│   └── assets
+│       ├── custom.js
+│       └── lena.min.js
+└── man</code></pre>
+</div>
+<div id="output" class="section level2" number="23.4">
+<h2><span class="header-section-number">23.4</span> Output</h2>
+<p>We can then create the <code>lenaOutput</code> function. This function should return an HTML tag which bears an <code>id</code>, or a <code>data-input-id</code> attribute (more on that later) and a <code>class</code>. This is to be used by the user of the function in Shiny just like any other such outputs. For instance, <code>plotOutput</code> creates a <code>&lt;div&gt;</code> the <code>id</code> of which is actually the <code>id</code> used in the <code>plotOutput</code> function.</p>
+<div class="sourceCode" id="cb464"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb464-1"><a href="lena.html#cb464-1"></a><span class="co"># the id is used as id to the element</span></span>
+<span id="cb464-2"><a href="lena.html#cb464-2"></a>shiny<span class="op">::</span><span class="kw">plotOutput</span>(<span class="dt">id =</span> <span class="st">&quot;myPlotId&quot;</span>)</span></code></pre></div>
+<pre><code>## &lt;div id=&quot;myPlotId&quot; class=&quot;shiny-plot-output&quot; style=&quot;width: 100% ; height: 400px&quot;&gt;&lt;/div&gt;</code></pre>
+<p>The <code>class</code> is used JavaScript-side to “find” the outputs in the DOM (document object model) and generate the output. The function <code>lenaOutput</code> could thus be as shown below, the <code>id</code> is passed along to the <code>&lt;canvas&gt;</code> which is created with a <code>lena</code> class that will be used in the output binding to find that element and generate the output within that very canvas.</p>
+<div class="sourceCode" id="cb466"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb466-1"><a href="lena.html#cb466-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb466-2"><a href="lena.html#cb466-2"></a>lenaOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
+<span id="cb466-3"><a href="lena.html#cb466-3"></a>  tags<span class="op">$</span><span class="kw">canvas</span>(<span class="dt">id =</span> id, <span class="dt">class =</span> <span class="st">&quot;lena&quot;</span>)</span>
+<span id="cb466-4"><a href="lena.html#cb466-4"></a>}</span></code></pre></div>
+<p>The dependencies should be added to the above, since this function must be placed in the UI for anything to work we can have the dependencies piggyback on the output element. This works using the htmltools package. The function <code>htmltools::htmlDependency</code> is used to create a dependency that is then attached with <code>htmltools::attachDependencies</code>. While the former creates an object that shiny can understand and translate into <code>&lt;script&gt;</code> or <code>&lt;style&gt;</code> tags, the former attaches them to the output object and ensures dependencies are not imported multiple times (e.g.: when <code>lenaOutput</code> is used more than once).</p>
+<div class="sourceCode" id="cb467"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb467-1"><a href="lena.html#cb467-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb467-2"><a href="lena.html#cb467-2"></a>lenaOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
+<span id="cb467-3"><a href="lena.html#cb467-3"></a>  el &lt;-<span class="st"> </span>shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">canvas</span>(<span class="dt">id =</span> id, <span class="dt">class =</span> <span class="st">&quot;lena&quot;</span>)</span>
+<span id="cb467-4"><a href="lena.html#cb467-4"></a></span>
+<span id="cb467-5"><a href="lena.html#cb467-5"></a>  path &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;assets&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;lena&quot;</span>)</span>
+<span id="cb467-6"><a href="lena.html#cb467-6"></a></span>
+<span id="cb467-7"><a href="lena.html#cb467-7"></a>  deps &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb467-8"><a href="lena.html#cb467-8"></a>    htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
+<span id="cb467-9"><a href="lena.html#cb467-9"></a>      <span class="dt">name =</span> <span class="st">&quot;lena&quot;</span>,</span>
+<span id="cb467-10"><a href="lena.html#cb467-10"></a>      <span class="dt">version =</span> <span class="st">&quot;0.2.0&quot;</span>,</span>
+<span id="cb467-11"><a href="lena.html#cb467-11"></a>      <span class="dt">src =</span> <span class="kw">c</span>(<span class="dt">file =</span> path),</span>
+<span id="cb467-12"><a href="lena.html#cb467-12"></a>      <span class="dt">script =</span> <span class="kw">c</span>(<span class="st">&quot;lena.min.js&quot;</span>, <span class="st">&quot;custom.js&quot;</span>)</span>
+<span id="cb467-13"><a href="lena.html#cb467-13"></a>    )</span>
+<span id="cb467-14"><a href="lena.html#cb467-14"></a>  )</span>
+<span id="cb467-15"><a href="lena.html#cb467-15"></a></span>
+<span id="cb467-16"><a href="lena.html#cb467-16"></a>  htmltools<span class="op">::</span><span class="kw">attachDependencies</span>(el, deps)</span>
+<span id="cb467-17"><a href="lena.html#cb467-17"></a></span>
+<span id="cb467-18"><a href="lena.html#cb467-18"></a>}</span></code></pre></div>
+</div>
+<div id="render" class="section level2" number="23.5">
+<h2><span class="header-section-number">23.5</span> Render</h2>
+<p>Onto coding the server-side functions, we first define a function called “lena” which takes two arguments and return them as a list (which will eventually be used in JavaScript). First, the id of the image to apply the filter to and second the name of the filter to apply. Again, were we not creating a custom output we could use <code>session$sendCustomMessage</code> to send that list of options JavaScript directly. Here we do not as it will be indirectly handled by the <code>render</code> function we are creating next.</p>
+<div class="sourceCode" id="cb468"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb468-1"><a href="lena.html#cb468-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb468-2"><a href="lena.html#cb468-2"></a>lena &lt;-<span class="st"> </span><span class="cf">function</span>(img_id, <span class="dt">filter =</span> <span class="st">&quot;red&quot;</span>){</span>
+<span id="cb468-3"><a href="lena.html#cb468-3"></a>  <span class="kw">list</span>(<span class="dt">img_id =</span> img_id, <span class="dt">filter =</span> filter)</span>
+<span id="cb468-4"><a href="lena.html#cb468-4"></a>}</span></code></pre></div>
+<p>The function <code>renderLena</code> should accept an expression, like other such <code>render*</code> function. For instance in the example below the <code>renderPlot</code> function does accept an expression which uses, amongst other functions, <code>plot</code>.</p>
+<div class="sourceCode" id="cb469"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb469-1"><a href="lena.html#cb469-1"></a>output<span class="op">$</span>myPlot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb469-2"><a href="lena.html#cb469-2"></a>  <span class="co"># this is an expression</span></span>
+<span id="cb469-3"><a href="lena.html#cb469-3"></a>  cars <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb469-4"><a href="lena.html#cb469-4"></a><span class="st">    </span><span class="kw">head</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb469-5"><a href="lena.html#cb469-5"></a><span class="st">    </span><span class="kw">plot</span>()</span>
+<span id="cb469-6"><a href="lena.html#cb469-6"></a>})</span></code></pre></div>
+<p>The function <code>renderLena</code> takes an expression and other arguments that are passed to <code>shiny::exprToFunction</code> this does pretty much what it says on the tin: it returns a function from an expression (unless that expression is a function, in which case it returns the expression). This function must be further wrapped in another as the render function must itself return a function.</p>
+<div class="sourceCode" id="cb470"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb470-1"><a href="lena.html#cb470-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb470-2"><a href="lena.html#cb470-2"></a>renderLena &lt;-<span class="st"> </span><span class="cf">function</span>(expr, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), <span class="dt">quoted =</span> <span class="ot">FALSE</span>) {</span>
+<span id="cb470-3"><a href="lena.html#cb470-3"></a>  <span class="co"># Convert the expression + environment into a function</span></span>
+<span id="cb470-4"><a href="lena.html#cb470-4"></a>  func &lt;-<span class="st"> </span>shiny<span class="op">::</span><span class="kw">exprToFunction</span>(expr, env, quoted)</span>
+<span id="cb470-5"><a href="lena.html#cb470-5"></a></span>
+<span id="cb470-6"><a href="lena.html#cb470-6"></a>  <span class="cf">function</span>(){</span>
+<span id="cb470-7"><a href="lena.html#cb470-7"></a>    <span class="kw">func</span>()</span>
+<span id="cb470-8"><a href="lena.html#cb470-8"></a>  }</span>
+<span id="cb470-9"><a href="lena.html#cb470-9"></a>}</span></code></pre></div>
+<p>This covers all R-related code, what’s yet missing is the JavaScript binding.</p>
+</div>
+<div id="javascript-binding" class="section level2" number="23.6">
+<h2><span class="header-section-number">23.6</span> JavaScript Binding</h2>
+<p>Here we create an “output binding,” it tells Shiny how to find the component and how to interact with it. An output binding is initialised from <code>Shiny.OutputBinding</code>. Below we initialise a new binding.</p>
+<div class="sourceCode" id="cb471"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb471-1"><a href="lena.html#cb471-1"></a><span class="co">// custom.js</span></span>
+<span id="cb471-2"><a href="lena.html#cb471-2"></a><span class="kw">var</span> lenaBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span></code></pre></div>
+<p>Then, this must be “extended” by specifying a number of methods, a very necessary one being <code>find</code>. The first is used to look for the output HTML element in the document (<code>scope</code>), and return them as an array (<code>HTMLcollection</code>). Other methods all take an el argument; that value will always be an element that was returned from <code>find</code>. A very straightforward way to accomplish this is to use jQuery’s find method to identify elements with the <code>lena</code> class used in <code>lenaOutput</code>. You are by no means forced to use a CSS class to identify the elements but there is no reason not to.</p>
+<div class="sourceCode" id="cb472"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb472-1"><a href="lena.html#cb472-1"></a><span class="co">// custom.js</span></span>
+<span id="cb472-2"><a href="lena.html#cb472-2"></a><span class="kw">var</span> lenaBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
+<span id="cb472-3"><a href="lena.html#cb472-3"></a></span>
+<span id="cb472-4"><a href="lena.html#cb472-4"></a><span class="va">$</span>.<span class="at">extend</span>(lenaBinding<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb472-5"><a href="lena.html#cb472-5"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
+<span id="cb472-6"><a href="lena.html#cb472-6"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.lena&quot;</span>)<span class="op">;</span></span>
+<span id="cb472-7"><a href="lena.html#cb472-7"></a>  <span class="op">}</span></span>
+<span id="cb472-8"><a href="lena.html#cb472-8"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<p>One might then want to use the <code>getId</code>, a method to return the <code>id</code> of the element, by default, as can be seen in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js">source code</a> (below), shiny looks for the id as the <code>data-input-id</code> attribute and if that is not found it looks for the element’s <code>id</code>.</p>
+<div class="sourceCode" id="cb473"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb473-1"><a href="lena.html#cb473-1"></a><span class="co">// getId default</span></span>
+<span id="cb473-2"><a href="lena.html#cb473-2"></a><span class="kw">this</span>.<span class="at">getId</span> <span class="op">=</span> <span class="kw">function</span>(el) <span class="op">{</span></span>
+<span id="cb473-3"><a href="lena.html#cb473-3"></a>  <span class="cf">return</span> el[<span class="st">&#39;data-input-id&#39;</span>] <span class="op">||</span> <span class="va">el</span>.<span class="at">id</span><span class="op">;</span></span>
+<span id="cb473-4"><a href="lena.html#cb473-4"></a><span class="op">}</span></span></code></pre></div>
+<p>Since we use the element id the default will work and this can be skipped entirely. Next, one needs to implement the <code>renderValue</code> function which is the very function that generates the output based on data used in <code>lena</code> and sent to the front-end with <code>renderLena</code>. The <code>renderValue</code> accepts two arguments, first <code>el</code> the element where the output should be generated, this is effectively the output of <code>lenaOutput</code> which the binding found using <code>find</code> and <code>getId</code>. Second, <code>data</code>, this is the output of <code>lena</code> sent by <code>renderLena</code>.</p>
+<div class="sourceCode" id="cb474"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb474-1"><a href="lena.html#cb474-1"></a><span class="co">// custom.js</span></span>
+<span id="cb474-2"><a href="lena.html#cb474-2"></a><span class="kw">var</span> lenaBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
+<span id="cb474-3"><a href="lena.html#cb474-3"></a></span>
+<span id="cb474-4"><a href="lena.html#cb474-4"></a><span class="va">$</span>.<span class="at">extend</span>(lenaBinding<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb474-5"><a href="lena.html#cb474-5"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
+<span id="cb474-6"><a href="lena.html#cb474-6"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.lena&quot;</span>)<span class="op">;</span></span>
+<span id="cb474-7"><a href="lena.html#cb474-7"></a>  <span class="op">},</span></span>
+<span id="cb474-8"><a href="lena.html#cb474-8"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
+<span id="cb474-9"><a href="lena.html#cb474-9"></a></span>
+<span id="cb474-10"><a href="lena.html#cb474-10"></a>    <span class="at">$</span>(document).<span class="at">ready</span>(<span class="kw">function</span>()<span class="op">{</span></span>
+<span id="cb474-11"><a href="lena.html#cb474-11"></a>      <span class="co">// Get the image</span></span>
+<span id="cb474-12"><a href="lena.html#cb474-12"></a>      <span class="kw">var</span> originalImage <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">data</span>.<span class="at">img_id</span>)<span class="op">;</span></span>
+<span id="cb474-13"><a href="lena.html#cb474-13"></a></span>
+<span id="cb474-14"><a href="lena.html#cb474-14"></a>      <span class="co">// Filter to apply, in this case the red filter</span></span>
+<span id="cb474-15"><a href="lena.html#cb474-15"></a>      <span class="kw">var</span> filter <span class="op">=</span> LenaJS[<span class="va">data</span>.<span class="at">filter</span>]<span class="op">;</span></span>
+<span id="cb474-16"><a href="lena.html#cb474-16"></a></span>
+<span id="cb474-17"><a href="lena.html#cb474-17"></a>      <span class="co">// Apply the filter</span></span>
+<span id="cb474-18"><a href="lena.html#cb474-18"></a>      <span class="va">LenaJS</span>.<span class="at">filterImage</span>(el<span class="op">,</span> filter<span class="op">,</span> originalImage)<span class="op">;</span></span>
+<span id="cb474-19"><a href="lena.html#cb474-19"></a>    <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb474-20"><a href="lena.html#cb474-20"></a>  </span>
+<span id="cb474-21"><a href="lena.html#cb474-21"></a>  <span class="op">}</span></span>
+<span id="cb474-22"><a href="lena.html#cb474-22"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<p>Finally, the output binding is registered with shiny. Note that it uses a unique string identifier, the <a href="https://shiny.rstudio.com/articles/building-outputs.html">documentation</a> states:</p>
+<blockquote>
+<p>At the moment it is unused but future features may depend on it.</p>
+</blockquote>
+<div class="sourceCode" id="cb475"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb475-1"><a href="lena.html#cb475-1"></a><span class="co">// custom.js</span></span>
+<span id="cb475-2"><a href="lena.html#cb475-2"></a><span class="kw">var</span> lenaBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
+<span id="cb475-3"><a href="lena.html#cb475-3"></a></span>
+<span id="cb475-4"><a href="lena.html#cb475-4"></a><span class="va">$</span>.<span class="at">extend</span>(lenaBinding<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb475-5"><a href="lena.html#cb475-5"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
+<span id="cb475-6"><a href="lena.html#cb475-6"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.lena&quot;</span>)<span class="op">;</span></span>
+<span id="cb475-7"><a href="lena.html#cb475-7"></a>  <span class="op">},</span></span>
+<span id="cb475-8"><a href="lena.html#cb475-8"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
+<span id="cb475-9"><a href="lena.html#cb475-9"></a></span>
+<span id="cb475-10"><a href="lena.html#cb475-10"></a>    <span class="at">$</span>(document).<span class="at">ready</span>(<span class="kw">function</span>()<span class="op">{</span></span>
+<span id="cb475-11"><a href="lena.html#cb475-11"></a>      <span class="co">// Get the image</span></span>
+<span id="cb475-12"><a href="lena.html#cb475-12"></a>      <span class="kw">var</span> originalImage <span class="op">=</span> <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">data</span>.<span class="at">img_id</span>)<span class="op">;</span></span>
+<span id="cb475-13"><a href="lena.html#cb475-13"></a></span>
+<span id="cb475-14"><a href="lena.html#cb475-14"></a>      <span class="co">// Filter to apply, in this case the red filter</span></span>
+<span id="cb475-15"><a href="lena.html#cb475-15"></a>      <span class="kw">var</span> filter <span class="op">=</span> LenaJS[<span class="va">data</span>.<span class="at">filter</span>]<span class="op">;</span></span>
+<span id="cb475-16"><a href="lena.html#cb475-16"></a></span>
+<span id="cb475-17"><a href="lena.html#cb475-17"></a>      <span class="co">// Apply the filter</span></span>
+<span id="cb475-18"><a href="lena.html#cb475-18"></a>      <span class="va">LenaJS</span>.<span class="at">filterImage</span>(el<span class="op">,</span> filter<span class="op">,</span> originalImage)<span class="op">;</span></span>
+<span id="cb475-19"><a href="lena.html#cb475-19"></a>    <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb475-20"><a href="lena.html#cb475-20"></a>  </span>
+<span id="cb475-21"><a href="lena.html#cb475-21"></a>  <span class="op">}</span></span>
+<span id="cb475-22"><a href="lena.html#cb475-22"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb475-23"><a href="lena.html#cb475-23"></a></span>
+<span id="cb475-24"><a href="lena.html#cb475-24"></a><span class="va">Shiny</span>.<span class="va">outputBindings</span>.<span class="at">register</span>(lenaBinding<span class="op">,</span> <span class="st">&quot;lenaPackage.lenaBinding&quot;</span>)<span class="op">;</span></span></code></pre></div>
+<p>Ensure that string uniquely identifies the binding to avoid future clash with other such bindings.</p>
+</div>
+<div id="test" class="section level2" number="23.7">
+<h2><span class="header-section-number">23.7</span> Test</h2>
+<p>In order to test the package, an image needs to be downloaded in order to test it otherwise a Cross-Origin Resource Sharing (CORS) error will occur. Below we create a directory for the static files and download the R logo to test lena.</p>
+<div class="sourceCode" id="cb476"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb476-1"><a href="lena.html#cb476-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
+<span id="cb476-2"><a href="lena.html#cb476-2"></a><span class="kw">download.file</span>(<span class="st">&quot;https://www.r-project.org/Rlogo.png&quot;</span>, <span class="st">&quot;www/r-logo.png&quot;</span>)</span></code></pre></div>
+<p>After running <code>devtools::document</code> and <code>devtools::install</code> one is ready to test the package.</p>
+<div class="sourceCode" id="cb477"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb477-1"><a href="lena.html#cb477-1"></a><span class="kw">library</span>(lena)</span>
+<span id="cb477-2"><a href="lena.html#cb477-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb477-3"><a href="lena.html#cb477-3"></a></span>
+<span id="cb477-4"><a href="lena.html#cb477-4"></a><span class="co"># serve static files</span></span>
+<span id="cb477-5"><a href="lena.html#cb477-5"></a>shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb477-6"><a href="lena.html#cb477-6"></a></span>
+<span id="cb477-7"><a href="lena.html#cb477-7"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb477-8"><a href="lena.html#cb477-8"></a>  <span class="co"># original logo</span></span>
+<span id="cb477-9"><a href="lena.html#cb477-9"></a>  tags<span class="op">$</span><span class="kw">img</span>(<span class="dt">src =</span> <span class="st">&quot;www/r-logo.png&quot;</span>, <span class="dt">id =</span> <span class="st">&quot;r-logo&quot;</span>),</span>
+<span id="cb477-10"><a href="lena.html#cb477-10"></a>  <span class="co"># custom output</span></span>
+<span id="cb477-11"><a href="lena.html#cb477-11"></a>  <span class="kw">lenaOutput</span>(<span class="st">&quot;filtered&quot;</span>)</span>
+<span id="cb477-12"><a href="lena.html#cb477-12"></a>)</span>
+<span id="cb477-13"><a href="lena.html#cb477-13"></a></span>
+<span id="cb477-14"><a href="lena.html#cb477-14"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb477-15"><a href="lena.html#cb477-15"></a></span>
+<span id="cb477-16"><a href="lena.html#cb477-16"></a>  output<span class="op">$</span>filtered &lt;-<span class="st"> </span><span class="kw">renderLena</span>({</span>
+<span id="cb477-17"><a href="lena.html#cb477-17"></a>    <span class="kw">lena</span>(<span class="dt">img_id =</span> <span class="st">&quot;r-logo&quot;</span>, <span class="dt">filter =</span> <span class="st">&quot;invert&quot;</span>)</span>
+<span id="cb477-18"><a href="lena.html#cb477-18"></a>  })</span>
+<span id="cb477-19"><a href="lena.html#cb477-19"></a></span>
+<span id="cb477-20"><a href="lena.html#cb477-20"></a>}</span>
+<span id="cb477-21"><a href="lena.html#cb477-21"></a></span>
+<span id="cb477-22"><a href="lena.html#cb477-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="figure">
+<img src="images/lena-test.png" alt="" />
+<p class="caption">Lena test with R logo</p>
+</div>
+<p>As mentioned at the start of this chapter, this was really intended as a learning experience. There are great limitations to the package created, namely it cannot be used outside of shiny (when it should). As will be demonstrated in the following chapters, using htmlwidgets with lena would be far easier.</p>
 
 </div>
 </div>
+
+
+
             </section>
 
           </div>
         </div>
       </div>
-<a href="progress-bar.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="lena.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="machine-learning.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="conclusion.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -591,7 +708,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/JohnCoene/javascript-for-r/edit/master/7-34-examples-ml.Rmd",
+"link": "https://github.com/JohnCoene/javascript-for-r/edit/master/7-35-examples-lena.Rmd",
 "text": "Edit"
 },
 "history": {

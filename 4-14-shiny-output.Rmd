@@ -20,7 +20,7 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-![Boxxy - custom output](images/custom-output-boxxy.png)
+![Custom output example](images/boxxy-example.png)
 
 ## Custom outputs inner-workings 
 
@@ -83,7 +83,7 @@ The `boxxy` function takes three arguments, a `title`, a `value` that will be an
 # app.R
 library(shiny)
 
-boxxy <- function(title, value, color = "black"){
+boxxy <- function(title, value, color = "#ef476f"){
   list(title = title, value = value, color = color)
 }
 ```
@@ -155,9 +155,11 @@ Finally, we also used classes in the output so every element it comprises can be
 
 The dependencies should be added to the above, since this function must be placed in the UI for anything to work the dependencies can piggyback on the output element. This works using the htmltools package. The function `htmltools::htmlDependency` is used to create a dependency that is then attached with `htmltools::attachDependencies`. While the former creates an object that shiny can understand and translate into `<script>` or `<style>` tags, the former attaches them to the output object and ensures dependencies are not imported multiple times (e.g.: when `boxxyOutput` is used more than once).
 
+Notice the use of `normalizePath` to retrieve the full path to the `assets` directory as this will not work with a relative path (e.g.: `./assets`). The dependencies consist of the three files previously created and necessary to generate the output: `countup.js` the dependency that was downloaded as well as `binding.js` and `styles.css`. 
+
 ```r
 boxxyOutput <- function(id){
-  el <- shiny::tags$div(
+  el <- tags$div(
     id = id, class = "boxxy",
     h1(
       id = sprintf("%s-boxxy-counter", id), 
@@ -169,6 +171,7 @@ boxxyOutput <- function(id){
     )
   )
 
+  # get full path
   path <- normalizePath("assets")
 
   deps <- list(
@@ -185,7 +188,18 @@ boxxyOutput <- function(id){
 }
 ```
 
-Note the use of `normalizePath` to retrieve the full path to the `assets` directory as this will not work with a relative path (e.g.: `./assets`). The dependencies consist of the three files previously created and necessary to generate the output: `countup.js` the dependency that was downloaded as well as `binding.js` and `styles.css`. 
+Running the function reveals the HTML it generates at the exception of the dependencies which htmltools does not print to the console.
+
+```r
+boxxyOutput("myID")
+```
+
+```html
+<div id="myID" class="boxxy">
+  <h1 id="myID-boxxy-counter" class="boxxy-value"></h1>
+  <p id="myID-boxxy-title" class="boxxy-title"></p>
+</div>
+```
 
 ## Render
 
@@ -252,7 +266,12 @@ Next, one needs to implement the `renderValue` function which is the very functi
 The `renderValue` is in effect very similar if not identical to the JavaScript function of the same name involved in creating htmlwidgets.
 ```
 
-Let's now tackle the first of the three core aspect of the boxxy output: the title. The `title` should be placed in the previously created placeholder which bears the `id-boxxy-title`.
+### Boxxy title
+
+Let's now tackle the first of the three core aspect of the boxxy output: the title. The `title` should be placed in the previously created placeholder which bears the `id-boxxy-title`; exactly as was done with htmlwidgets previously we insert title (`data.title`) in the element with `innerText`. The dynamically generated id for the title is built in the same way it is in R, by concatenating the `id` with `-boxxy-title`
+
+- In R `sprintf("%s-boxxy-title", id)`
+- In JavaScript `el.id + '-boxxy-title'`
 
 ```js
 var boxxyBinding = new Shiny.OutputBinding();
@@ -269,7 +288,20 @@ $.extend(boxxyBinding, {
 });
 ```
 
+### Boxxy value
 
+Though the custom output could be limited to a static value generated in a fashion similar to how the title is placed, we opted for a more fancy animated value using countUp.js. 
+
+Initialise a new counter, specifying the id of the element where it should be created, then as second argument the starting value from which the counter should start and finally the value to count up to. Note that there is a fourth argument to pass a JSON of options which we do not use here.
+
+```js
+// place counter in elementId
+// start at 0 and count up to 123
+const counter = new CountUp('elementId', 0, 123);
+counter.start();
+```
+
+The counter has to be generated in the `<h1>` placeholder bearing the `id-boxxy-value`, while the value to count up to is stored in `data.value` meaning the counter can be initialised with `new CountUp(el.id + '-boxxy-value', 0, data.value);`.
 
 ```js
 var boxxyBinding = new Shiny.OutputBinding();
@@ -290,6 +322,10 @@ $.extend(boxxyBinding, {
 });
 ```
 
+## Background color
+
+Then we can set the background color that was passed to `boxxy` (`data.color`).
+
 ```js
 var boxxyBinding = new Shiny.OutputBinding();
 
@@ -299,13 +335,131 @@ $.extend(boxxyBinding, {
   },
   renderValue: function(el, data) {
 
-    el.style.backgroundColor = data.color;
+    // insert the title
+    document.getElementById(el.id + '-boxxy-title').innerText = data.title;
 
+    // counter start at 0
     var counter = new CountUp(el.id + '-boxxy-value', 0, data.value);
     counter.start();
+
+    // background color 
+    el.style.backgroundColor = data.color;
+  }
+});
+```
+
+### Register the output binding
+
+Finally, the output binding must be registered with shiny. Note that it uses a unique string identifier, the [documentation](https://shiny.rstudio.com/articles/building-outputs.html) states:
+
+> At the moment it is unused but future features may depend on it.
+
+```js
+var boxxyBinding = new Shiny.OutputBinding();
+
+$.extend(boxxyBinding, {
+  find: function(scope) {
+    return $(scope).find(".boxxy");
+  },
+  renderValue: function(el, data) {
+
+    // insert the title
     document.getElementById(el.id + '-boxxy-title').innerText = data.title;
+
+    // counter start at 0
+    var counter = new CountUp(el.id + '-boxxy-value', 0, data.value);
+    counter.start();
+
+    // background color 
+    el.style.backgroundColor = data.color;
   }
 });
 
+// register
 Shiny.outputBindings.register(boxxyBinding, "john.boxxy");
 ```
+
+Ensure that string uniquely identifies the binding to avoid future clash with other such bindings.
+
+## Boxxy usage
+
+With all of this in place one can use boxxy in a shiny application.
+
+```r
+library(shiny)
+
+boxxy <- function(title, value, color = "black"){
+  list(title = title, value = value, color = color)
+}
+
+boxxyOutput <- function(id){
+  el <- shiny::tags$div(
+    id = id, class = "boxxy",
+    h1(id = sprintf("%s-boxxy-value", id), class = "boxxy-value"),
+    p(id = sprintf("%s-boxxy-title", id), class = "boxxy-title")
+  )
+
+  path <- normalizePath("assets")
+
+  deps <- list(
+    htmltools::htmlDependency(
+      name = "boxxy",
+      version = "1.0.0",
+      src = c(file = path),
+      script = c("countup.js", "binding.js"),
+      stylesheet = "styles.css"
+    )
+  )
+
+  htmltools::attachDependencies(el, deps)
+}
+
+renderBoxxy <- function(expr, env = parent.frame(), quoted = FALSE) {
+  # Convert the expression + environment into a function
+  func <- shiny::exprToFunction(expr, env, quoted)
+
+  function(){
+    func()
+  }
+}
+
+ui <- fluidPage(
+  h2("Custom outputs"),
+  fluidRow(
+    column(
+      3, boxxyOutput("countries")
+    ),
+    column(
+      3, boxxyOutput("employees")
+    ),
+    column(
+      3, boxxyOutput("customers")
+    ),
+    column(
+      3, boxxyOutput("subs")
+    )
+  )
+)
+
+server <- function(input, output){
+  output$countries <- renderBoxxy({
+    boxxy("Countries", 95, color = "#ef476f")
+  })
+
+  output$employees <- renderBoxxy({
+    boxxy("Thing", 650, color = "#06d6a0")
+  })
+
+  output$customers <- renderBoxxy({
+    boxxy("Customers", 13592, color = "#118ab2")
+  })
+
+  output$subs <- renderBoxxy({
+    boxxy("Subscriptions", 16719, color = "#ffd166")
+  })
+}
+
+shinyApp(ui, server)
+```
+
+![Shiny application with boxxy](images/custom-output-boxxy.png)

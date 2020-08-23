@@ -201,7 +201,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2020-08-22}
+\date{2020-08-23}
 
 \begin{document}
 \maketitle
@@ -236,7 +236,7 @@ without whom I should have finished this book two years earlier
 
 {Photo by davisco on Unsplash}
 
-The R programming language has seen the integration of many programming languages; C, C++, Python, to name a few, can be seamlessly embedded into R so one can easily call code written in other languages from the R console. Little known to many, R works just as well with JavaScript---this book delves into the various ways both languages can work together.
+The R programming language has seen the integration of many languages; C, C++, Python, to name a few, can be seamlessly embedded into R so one can easily call code written in other languages from the R console. Little known to many, R works just as well with JavaScript---this book delves into the various ways both languages can work together.
 
 The ultimate aim of this work is to demonstrate to the reader the many great benefits one can reap by inviting JavaScript into their data science workflow. In that respect the book is not teaching one JavaScript but rather demonstrates how little JavaScript can greatly support and enhance R code. Therefore focus is on integrating external JavaScript libraries and only limited knowledge of JavaScript is required in order to learn from the book. Moreover, the book focuses on generalisable learnings so the reader can transfer takeaways from the book to solve real-world problems.
 
@@ -248,7 +248,7 @@ Throughout the book several shiny applications and R packages are put together a
 
 The R programming language has been propelled into web browsers with the introduction of packages such as \href{https://shiny.rstudio.com/}{shiny} \citep{R-shiny} and \href{https://rmarkdown.rstudio.com/}{rmarkdown} \citep{R-rmarkdown} which have greatly improved how R users can communicate complex insights by building interactive web applications and interactive documents. Yet most R developers are not familiar with one of web browsers' core technology: JavaScript. This books aims to remedy to that.
 
-The book is nonetheless not about learning JavaScript, even though it is aimed at R developers with little knowledge of the language. This statement might appear counter-intuitive at first but, we hope, the book gradually reveals just how little JavaScript is actually needed in order to observe immense benefits otherwise locked away from R developers. This can be achieved by using Javascript only to do what R cannot, and rely on R, a language familiar to us, to do the heavy lifting. This, it must be said, might, in a few places, lead to code that will appear inefficient to trained JavaScript developer as instead of doing everything in the browser with JavaScript data might be passed from it to the server where R can be used but rest assured that the impact this has on performances is largely unnoticeable.
+The book is nonetheless not about learning JavaScript, even though it is aimed at R developers with little knowledge of the language. This statement might appear counter-intuitive at first but, we hope, the book gradually reveals just how little JavaScript is actually needed in order to observe immense benefits otherwise locked away from R developers.
 
 Importantly, the focus of the book truly is the integration of JavaScript with R where both languages either actively interact with one another, or where JavaScript enables doing things otherwise not accessible to R users---it is not merely about including JavaScript code that works alongside R.
 
@@ -3340,7 +3340,7 @@ Note that the name of the group was randomly generated since none were specified
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "SharedData546c230b"
+## [1] "SharedData272dcf46"
 \end{verbatim}
 
 \begin{Shaded}
@@ -3989,7 +3989,7 @@ The JavaScript would look like the code below. It's actually much easier than wh
 \end{Highlighting}
 \end{Shaded}
 
-Then it's a matter of reproducing the JSON that defines what plotly defines as a ``trace'' and what more or less corresponds to a ``geom'' in ggplot2. A trace for a scatter plot is defined with the JSON below, which we can read in R to understand the shape of the list to reproduce.
+Then it's a matter of reproducing the JSON that defines what plotly describes as a ``trace'' and what more or less corresponds to a ``geom'' in ggplot2. A trace for a scatter plot is defined with the JSON below, which we can read in R to understand the shape of the list to reproduce.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4062,7 +4062,6 @@ We can now look up plotly's documentation on \href{https://plotly.com/javascript
 \NormalTok{...}
 \NormalTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(x) }\OperatorTok{\{}
 
-\NormalTok{  plot }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}
   \VariableTok{Plotly}\NormalTok{.}\AttributeTok{newPlot}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id}\OperatorTok{,} \VariableTok{x}\NormalTok{.}\AttributeTok{options}\NormalTok{)}\OperatorTok{;}
 
   \VariableTok{plot}\NormalTok{.}\AttributeTok{on}\NormalTok{(}\StringTok{\textquotesingle{}plotly\_click\textquotesingle{}}\OperatorTok{,} \KeywordTok{function}\NormalTok{(data)}\OperatorTok{\{}
@@ -5625,119 +5624,120 @@ This is something where, again, R is leveraged in order to make it easier on the
 \hypertarget{custom-outputs}{%
 \chapter{Custom Outputs}\label{custom-outputs}}
 
-In this chapter we create a custom shiny output, in practical terms, custom \texttt{render*} and \texttt{*Output} functions to use in Shiny. Note that this is destined for the curious who want to grasp some understanding of how these functions work under the hood as it is \emph{often easier to create an htmlwidgets package.}
-We will demonstrate by creating a wrapper for \href{https://github.com/davidsonfellipe/lena.js}{lena.js}, a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs, there are much easier ways to apply such filters ina shiny application (e.g.: CSS).
+In this chapter we create a custom shiny output, in practical terms this creates custom \texttt{render*} and \texttt{*Output} functions to use in Shiny. This will be demonstrated by creating something akin to the \texttt{valueBox} available in the shinydashboard \citep{R-shinydashboard} package. While similar to what shinydashboard provides this box will 1) be fully customisable and 2) available in any shiny application.
 
-\hypertarget{inner-workings}{%
-\section{Inner-workings}\label{inner-workings}}
-
-At the core, this consists in creating a \texttt{lena}, \texttt{renderLena} and \texttt{lenaOutput} functions (analogous to \texttt{plot}, \texttt{renderPlot}, \texttt{plotOutput}) which are linked by an ``output binding'' in JavaScript. The latter function essentially creates an HTML element (e.g.: \texttt{\textless{}div\textgreater{}}) with its dependencies attached, the former \texttt{render*} rather straightforward, unlike previous examples, the data does not need to be explicitly sent to the front-end using \texttt{session\$sendCustomMessage} as this is handled by shiny itself under the hood.
-
-Previous work with shiny and JavaScript covered in this book had no dedicated ``output'' element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: \texttt{usejBox}). However, since this is not the case here the dependencies can be attached together with the output.
-
-Finally, the two R functions are ``bound'' JavaScript-side with an ``output binding'' that renders the data from the \texttt{render*} function with its \texttt{*output}.
-
-\hypertarget{discover-lena.js}{%
-\section{Discover Lena.js}\label{discover-lena.js}}
-
-Let us take a look at an example of lena.js. The library reads the original image and outputs the filtered image in a \texttt{\textless{}canvas\textgreater{}}. There are many filters to chose from.
+The \texttt{valueBox} equivalent we shall build in this chapter is named ``boxxy,'' and allows creating simple but colourful value boxes with animated numbers (by counting up to it) using \href{https://github.com/inorganik/countUp.js}{countUp.js}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\DataTypeTok{<!DOCTYPE }\NormalTok{html}\DataTypeTok{>}
-\KeywordTok{<html}\OtherTok{ xmlns=}\StringTok{"http://www.w3.org/1999/xhtml"}\OtherTok{ lang=}\StringTok{""}\OtherTok{ xml:lang=}\StringTok{""}\KeywordTok{>}
+\KeywordTok{library}\NormalTok{(shiny)}
 
-\KeywordTok{<head>}
-  \CommentTok{<!{-}{-} Import library {-}{-}>}
-  \KeywordTok{<script}\OtherTok{ src=}\StringTok{"lena.js"}\KeywordTok{></script>}
-\KeywordTok{</head>}
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+  \KeywordTok{boxxyOutput}\NormalTok{(}\StringTok{"countries"}\NormalTok{)}
+\NormalTok{)}
 
-\KeywordTok{<body>}
-  \CommentTok{<!{-}{-} Image to apply filter {-}{-}>}
-  \KeywordTok{<img}\OtherTok{ id=}\StringTok{"original{-}image"}\OtherTok{ src=}\StringTok{"./image.png"} \KeywordTok{/>}
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
+\NormalTok{  output}\OperatorTok{$}\NormalTok{countries <{-}}\StringTok{ }\KeywordTok{renderBoxxy}\NormalTok{(\{}
+    \KeywordTok{boxxy}\NormalTok{(}\StringTok{"Countries"}\NormalTok{, }\DecValTok{95}\NormalTok{)}
+\NormalTok{  \})}
+\NormalTok{\}}
 
-  \CommentTok{<!{-}{-} div to hold visualisation {-}{-}>}
-  \KeywordTok{<canvas}\OtherTok{ id=}\StringTok{"lena"}\KeywordTok{></canvas>}
-
-  \CommentTok{<!{-}{-} Script to create visualisation {-}{-}>}
-  \KeywordTok{<script>}
-    \CommentTok{// Get the image}
-    \KeywordTok{var}\NormalTok{ originalImage }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\StringTok{"original{-}image"}\NormalTok{)}\OperatorTok{;}
-
-    \CommentTok{// The canvas where the processed image will be rendered (With filter)}
-    \KeywordTok{var}\NormalTok{ filteredImageCanvas }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\StringTok{"lena"}\NormalTok{)}\OperatorTok{;}
-
-    \CommentTok{// Filter to apply, in this case the red filter}
-    \KeywordTok{var}\NormalTok{ filter }\OperatorTok{=}\NormalTok{ LenaJS[}\StringTok{"invert"}\NormalTok{]}\OperatorTok{;}
-
-    \CommentTok{// Apply the filter}
-    \VariableTok{LenaJS}\NormalTok{.}\AttributeTok{filterImage}\NormalTok{(filteredImageCanvas}\OperatorTok{,}\NormalTok{ filter}\OperatorTok{,}\NormalTok{ originalImage)}\OperatorTok{;}
-  \KeywordTok{</script>}
-\KeywordTok{</body>}
-
-\KeywordTok{</html>}
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{figure}
 \centering
-\includegraphics{images/lena-demo.png}
-\caption{Demo of lena.js - inverted colors}
+\includegraphics{images/boxxy-example.png}
+\caption{Custom output example}
 \end{figure}
 
-Therefore, there should be a \texttt{lenaOutput} function that creates the \texttt{\textless{}canvas\textgreater{}}, a \texttt{renderLena} function that sends the output of \texttt{lena} which itself accepts the id of the image to filter as well as the filter to apply. Finally, there will be a ``output binding'' which will include the JavaScript code included in the \texttt{\textless{}script\textgreater{}} tags above.
+\hypertarget{custom-outputs-inner-workings}{%
+\section{Custom outputs inner-workings}\label{custom-outputs-inner-workings}}
+
+At the core, this consists in creating three functions; \texttt{boxxy}, \texttt{renderBoxxy} and \texttt{boxxyOutput} (analogous to \texttt{plot}, \texttt{renderPlot}, \texttt{plotOutput}) which are linked by an ``output binding'' in JavaScript.
+
+The first function, \texttt{boxxy} will accept arguments that help define what is in the box. This function is generally useful to preprocess any of the arguments that are meant to produce the custom output. The \texttt{boxxyOutput} function essentially creates the scaffold of the HTML output (e.g.: \texttt{\textless{}div\textgreater{}}) as well as the dependencies. The \texttt{render*} function is perhaps more peculiar it should accept an expression and return a function.
+
+Previous work with shiny and JavaScript covered in this book had no dedicated ``output'' element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: \texttt{usejBox}). However, since this is not the case here the dependencies can be attached together with the output.
+
+Finally, the two R functions are ``bound'' JavaScript-side with an ``output binding'' that renders the data from the \texttt{render*} function with its \texttt{*output}.
 
 \hypertarget{setup}{%
 \section{Setup}\label{setup}}
 
-Start by creating a package called ``lena.''
+The custom output will be part of a shiny application, let us thus create the basic skeleton of an application and download the dependencies. Create a project in RStudio or an empty directory, then:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Create an \texttt{app.R} file that will hold the code for the application and \texttt{boxxy}, \texttt{boxxyOutput}, and \texttt{renderBoxxy} functions
+\item
+  Create an \texttt{assets} directory that will contain the CSS and JavaScript files.
+\item
+  Download the countUp.js dependency.
+\item
+  Create a \texttt{binding.js} JavaScript file for the JavaScript binding within the previously created \texttt{assets} directory.
+\item
+  Create a \texttt{styles.css} file in the \texttt{assets} directory.
+\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{usethis}\OperatorTok{::}\KeywordTok{create\_package}\NormalTok{(}\StringTok{"lena"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\CommentTok{\# application file}
+\KeywordTok{file.create}\NormalTok{(}\StringTok{"app.R"}\NormalTok{)}
 
-Then, from the root of the package, create the \texttt{inst} directory and \texttt{assets} subdirectory then download and place the \texttt{lena.js} dependency within it.
+\CommentTok{\# static file directory}
+\KeywordTok{dir.create}\NormalTok{(}\StringTok{"assets"}\NormalTok{)}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{dir.create}\NormalTok{(}\StringTok{"inst/assets"}\NormalTok{, }\DataTypeTok{recursive =} \OtherTok{TRUE}\NormalTok{)}
-
+\CommentTok{\# countup dependency}
 \NormalTok{url <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(}
-  \StringTok{"https://raw.githubusercontent.com/davidsonfellipe/"}\NormalTok{,}
-  \StringTok{"lena.js/master/dist/lena.min.js"}
+  \StringTok{"https://cdn.jsdelivr.net/npm/"}\NormalTok{,}
+  \StringTok{"countup@1.8.2/countUp.js"}
 \NormalTok{)}
-\KeywordTok{download.file}\NormalTok{(url, }\StringTok{"inst/assets/lena.min.js"}\NormalTok{)}
+
+\KeywordTok{download.file}\NormalTok{(url, }\StringTok{"assets/countup.js"}\NormalTok{)}
+
+\CommentTok{\# create binding file}
+\KeywordTok{file.create}\NormalTok{(}\StringTok{"assets/binding.js"}\NormalTok{)}
+
+\CommentTok{\# CSS file}
+\KeywordTok{file.create}\NormalTok{(}\StringTok{"assets/styles.css"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-We also need to create a JavaScript file that will include the custom JavaScript code that will eventually generate the custom output.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{file.create}\NormalTok{(}\StringTok{"inst/assets/custom.js"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-At this point one should have a package directory looking like the tree below.
+This should produce the following directory structure.
 
 \begin{verbatim}
 .
-├── DESCRIPTION
-├── NAMESPACE
-├── R
-├── inst
-│   └── assets
-│       ├── custom.js
-│       └── lena.min.js
-└── man
+├── app.R
+└── assets
+    ├── binding.js
+    ├── countup.js
+    └── styles.css
 \end{verbatim}
+
+\hypertarget{r-function}{%
+\section{R function}\label{r-function}}
+
+The \texttt{boxxy} function takes three arguments, a \texttt{title}, a \texttt{value} that will be animated and the background \texttt{color} to use for the box. The function, at this stage at least, does not preprocess the arguments and simply returns them as a named \texttt{list}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# app.R}
+\KeywordTok{library}\NormalTok{(shiny)}
+
+\NormalTok{boxxy <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(title, value, }\DataTypeTok{color =} \StringTok{"\#ef476f"}\NormalTok{)\{}
+  \KeywordTok{list}\NormalTok{(}\DataTypeTok{title =}\NormalTok{ title, }\DataTypeTok{value =}\NormalTok{ value, }\DataTypeTok{color =}\NormalTok{ color)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{output}{%
 \section{Output}\label{output}}
 
-We can then create the \texttt{lenaOutput} function. This function should return an HTML tag which bears an \texttt{id}, or a \texttt{data-input-id} attribute (more on that later) and a \texttt{class}. This is to be used by the user of the function in Shiny just like any other such outputs. For instance, \texttt{plotOutput} creates a \texttt{\textless{}div\textgreater{}} the \texttt{id} of which is actually the \texttt{id} used in the \texttt{plotOutput} function.
+The \texttt{boxxyOutput} function, like all such functions (\texttt{plotOutput}, \texttt{uiOutput}, etc.) takes an \texttt{id}. This function should return an HTML tag which bears an \texttt{id}, or a \texttt{data-input-id} attribute (more on that later) and a \texttt{class}. The \texttt{id} is to be defined by the user of the function in Shiny just like any other such outputs. For instance, \texttt{plotOutput} creates a \texttt{\textless{}div\textgreater{}} the \texttt{id} of which is actually the \texttt{id} used in the \texttt{plotOutput} function.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5750,57 +5750,123 @@ We can then create the \texttt{lenaOutput} function. This function should return
 ## <div id="myPlotId" class="shiny-plot-output" style="width: 100% ; height: 400px"></div>
 \end{verbatim}
 
-The \texttt{class} is used JavaScript-side to ``find'' the outputs in the DOM (document object model) and generate the output. The function \texttt{lenaOutput} could thus be as shown below, the \texttt{id} is passed along to the \texttt{\textless{}canvas\textgreater{}} which is created with a \texttt{lena} class that will be used in the output binding to find that element and generate the output within that very canvas.
+The \texttt{class} is used JavaScript-side to ``find'' the outputs in the DOM (document object model) and generate the output. The function \texttt{boxxyOutput} could thus be as shown below, the \texttt{id} is passed along to the \texttt{\textless{}div\textgreater{}} which is created with a \texttt{boxxy} class that will be used in the output binding to find that element and generate the output within that very \texttt{\textless{}div\textgreater{}} using data that will be passed from the server.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\#\textquotesingle{} @export}
-\NormalTok{lenaOutput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id)\{}
-\NormalTok{  tags}\OperatorTok{$}\KeywordTok{canvas}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{class =} \StringTok{"lena"}\NormalTok{)}
+\NormalTok{boxxyOutput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id)\{}
+  \CommentTok{\# the HTML output}
+\NormalTok{  shiny}\OperatorTok{::}\NormalTok{tags}\OperatorTok{$}\KeywordTok{div}\NormalTok{(}
+    \DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{class =} \StringTok{"boxxy"}
+\NormalTok{  )}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
 
-The dependencies should be added to the above, since this function must be placed in the UI for anything to work we can have the dependencies piggyback on the output element. This works using the htmltools package. The function \texttt{htmltools::htmlDependency} is used to create a dependency that is then attached with \texttt{htmltools::attachDependencies}. While the former creates an object that shiny can understand and translate into \texttt{\textless{}script\textgreater{}} or \texttt{\textless{}style\textgreater{}} tags, the former attaches them to the output object and ensures dependencies are not imported multiple times (e.g.: when \texttt{lenaOutput} is used more than once).
+\begin{rmdnote}
+Make sure you use unique class names so they are not accidentally
+overridden by the user.
+\end{rmdnote}
+
+As shown previously the box should include a title and an animated value. These could be generated entirely in JavaScript but it's actually easier to create placeholders with htmltools tags, we generate dynamic ids for those so they can easily be referenced later on in JavaScript: \texttt{id-boxxy-value} for the value and \texttt{id-boxxy-title} for the title.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\#\textquotesingle{} @export}
-\NormalTok{lenaOutput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id)\{}
-\NormalTok{  el <{-}}\StringTok{ }\NormalTok{shiny}\OperatorTok{::}\NormalTok{tags}\OperatorTok{$}\KeywordTok{canvas}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{class =} \StringTok{"lena"}\NormalTok{)}
+\NormalTok{boxxyOutput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id)\{}
+  \CommentTok{\# the HTML output}
+\NormalTok{  shiny}\OperatorTok{::}\NormalTok{tags}\OperatorTok{$}\KeywordTok{div}\NormalTok{(}
+    \DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{class =} \StringTok{"boxxy"}\NormalTok{,}
+    \KeywordTok{h1}\NormalTok{(}
+      \DataTypeTok{id =} \KeywordTok{sprintf}\NormalTok{(}\StringTok{"\%s{-}boxxy{-}value"}\NormalTok{, id), }
+      \DataTypeTok{class =} \StringTok{"boxxy{-}value"}
+\NormalTok{    ),}
+    \KeywordTok{p}\NormalTok{(}
+      \DataTypeTok{id =} \KeywordTok{sprintf}\NormalTok{(}\StringTok{"\%s{-}boxxy{-}title"}\NormalTok{, id), }
+      \DataTypeTok{class =} \StringTok{"boxxy{-}title"}
+\NormalTok{    )}
+\NormalTok{  )}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
 
-\NormalTok{  path <{-}}\StringTok{ }\KeywordTok{system.file}\NormalTok{(}\StringTok{"assets"}\NormalTok{, }\DataTypeTok{package =} \StringTok{"lena"}\NormalTok{)}
+Finally, we also used classes in the output so every element it comprises can be styled with ease.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{.boxxy}\NormalTok{\{}
+  \KeywordTok{text{-}align}\NormalTok{: }\DecValTok{center}\OperatorTok{;}
+  \KeywordTok{border{-}left}\NormalTok{: }\DecValTok{6}\DataTypeTok{px} \DecValTok{solid} \ConstantTok{\#073b4c}\OperatorTok{;}
+  \KeywordTok{padding}\NormalTok{: }\DecValTok{1}\DataTypeTok{em}\OperatorTok{;}
+\NormalTok{\}}
+
+\FunctionTok{.boxxy{-}title}\NormalTok{\{}
+  \KeywordTok{text{-}transform}\NormalTok{: }\DecValTok{uppercase}\OperatorTok{;}
+\NormalTok{\}}
+
+\FunctionTok{.boxxy{-}value}\NormalTok{\{}
+  \KeywordTok{font{-}size}\NormalTok{: }\DecValTok{3}\DataTypeTok{em}\OperatorTok{;}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The dependencies should be added to the above, since this function must be placed in the UI for anything to work the dependencies can piggyback on the output element. This works using the htmltools package. The function \texttt{htmltools::htmlDependency} is used to create a dependency that is then attached with \texttt{htmltools::attachDependencies}. While the former creates an object that shiny can understand and translate into \texttt{\textless{}script\textgreater{}} or \texttt{\textless{}style\textgreater{}} tags, the former attaches them to the output object and ensures dependencies are not imported multiple times (e.g.: when \texttt{boxxyOutput} is used more than once).
+
+Notice the use of \texttt{normalizePath} to retrieve the full path to the \texttt{assets} directory as this will not work with a relative path (e.g.: \texttt{./assets}). The dependencies consist of the three files previously created and necessary to generate the output: \texttt{countup.js} the dependency that was downloaded as well as \texttt{binding.js} and \texttt{styles.css}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{boxxyOutput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id)\{}
+\NormalTok{  el <{-}}\StringTok{ }\NormalTok{tags}\OperatorTok{$}\KeywordTok{div}\NormalTok{(}
+    \DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{class =} \StringTok{"boxxy"}\NormalTok{,}
+    \KeywordTok{h1}\NormalTok{(}
+      \DataTypeTok{id =} \KeywordTok{sprintf}\NormalTok{(}\StringTok{"\%s{-}boxxy{-}counter"}\NormalTok{, id), }
+      \DataTypeTok{class =} \StringTok{"boxxy{-}value"}
+\NormalTok{    ),}
+    \KeywordTok{p}\NormalTok{(}
+      \DataTypeTok{id =} \KeywordTok{sprintf}\NormalTok{(}\StringTok{"\%s{-}boxxy{-}title"}\NormalTok{, id), }
+      \DataTypeTok{class =} \StringTok{"boxxy{-}title"}
+\NormalTok{    )}
+\NormalTok{  )}
+
+  \CommentTok{\# get full path}
+\NormalTok{  path <{-}}\StringTok{ }\KeywordTok{normalizePath}\NormalTok{(}\StringTok{"assets"}\NormalTok{)}
 
 \NormalTok{  deps <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}
 \NormalTok{    htmltools}\OperatorTok{::}\KeywordTok{htmlDependency}\NormalTok{(}
-      \DataTypeTok{name =} \StringTok{"lena"}\NormalTok{,}
-      \DataTypeTok{version =} \StringTok{"0.2.0"}\NormalTok{,}
+      \DataTypeTok{name =} \StringTok{"boxxy"}\NormalTok{,}
+      \DataTypeTok{version =} \StringTok{"1.0.0"}\NormalTok{,}
       \DataTypeTok{src =} \KeywordTok{c}\NormalTok{(}\DataTypeTok{file =}\NormalTok{ path),}
-      \DataTypeTok{script =} \KeywordTok{c}\NormalTok{(}\StringTok{"lena.min.js"}\NormalTok{, }\StringTok{"custom.js"}\NormalTok{)}
+      \DataTypeTok{script =} \KeywordTok{c}\NormalTok{(}\StringTok{"countup.js"}\NormalTok{, }\StringTok{"binding.js"}\NormalTok{),}
+      \DataTypeTok{stylesheet =} \StringTok{"styles.css"}
 \NormalTok{    )}
 \NormalTok{  )}
 
 \NormalTok{  htmltools}\OperatorTok{::}\KeywordTok{attachDependencies}\NormalTok{(el, deps)}
-
 \NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Running the function reveals the HTML it generates at the exception of the dependencies which htmltools does not print to the console.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{boxxyOutput}\NormalTok{(}\StringTok{"myID"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{<div}\OtherTok{ id=}\StringTok{"myID"}\OtherTok{ class=}\StringTok{"boxxy"}\KeywordTok{>}
+  \KeywordTok{<h1}\OtherTok{ id=}\StringTok{"myID{-}boxxy{-}counter"}\OtherTok{ class=}\StringTok{"boxxy{-}value"}\KeywordTok{></h1>}
+  \KeywordTok{<p}\OtherTok{ id=}\StringTok{"myID{-}boxxy{-}title"}\OtherTok{ class=}\StringTok{"boxxy{-}title"}\KeywordTok{></p>}
+\KeywordTok{</div>}
 \end{Highlighting}
 \end{Shaded}
 
 \hypertarget{render}{%
 \section{Render}\label{render}}
 
-Onto coding the server-side functions, we first define a function called ``lena'' which takes two arguments and return them as a list (which will eventually be used in JavaScript). First, the id of the image to apply the filter to and second the name of the filter to apply. Again, were we not creating a custom output we could use \texttt{session\$sendCustomMessage} to send that list of options JavaScript directly. Here we do not as it will be indirectly handled by the \texttt{render} function we are creating next.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\#\textquotesingle{} @export}
-\NormalTok{lena <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(img\_id, }\DataTypeTok{filter =} \StringTok{"red"}\NormalTok{)\{}
-  \KeywordTok{list}\NormalTok{(}\DataTypeTok{img\_id =}\NormalTok{ img\_id, }\DataTypeTok{filter =}\NormalTok{ filter)}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-The function \texttt{renderLena} should accept an expression, like other such \texttt{render*} function. For instance in the example below the \texttt{renderPlot} function does accept an expression which uses, amongst other functions, \texttt{plot}.
+The function \texttt{renderBoxxy} should accept an expression, like other such \texttt{render*} function. For instance in the example below the \texttt{renderPlot} function does accept an expression which uses, amongst other functions, \texttt{plot}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5813,12 +5879,11 @@ The function \texttt{renderLena} should accept an expression, like other such \t
 \end{Highlighting}
 \end{Shaded}
 
-The function \texttt{renderLena} takes an expression and other arguments that are passed to \texttt{shiny::exprToFunction} this does pretty much what it says on the tin: it returns a function from an expression (unless that expression is a function, in which case it returns the expression). This function must be further wrapped in another as the render function must itself return a function.
+The function \texttt{renderBoxxy} takes an expression and other arguments that are passed to \texttt{shiny::exprToFunction} this does pretty much what it says on the tin: it returns a function from an expression (unless that expression is a function, in which case it returns the expression). This function must be further wrapped in another as render functions must return functions.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\#\textquotesingle{} @export}
-\NormalTok{renderLena <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(expr, }\DataTypeTok{env =} \KeywordTok{parent.frame}\NormalTok{(), }\DataTypeTok{quoted =} \OtherTok{FALSE}\NormalTok{) \{}
+\NormalTok{renderBoxxy <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(expr, }\DataTypeTok{env =} \KeywordTok{parent.frame}\NormalTok{(), }\DataTypeTok{quoted =} \OtherTok{FALSE}\NormalTok{) \{}
   \CommentTok{\# Convert the expression + environment into a function}
 \NormalTok{  func <{-}}\StringTok{ }\NormalTok{shiny}\OperatorTok{::}\KeywordTok{exprToFunction}\NormalTok{(expr, env, quoted)}
 
@@ -5829,36 +5894,34 @@ The function \texttt{renderLena} takes an expression and other arguments that ar
 \end{Highlighting}
 \end{Shaded}
 
-This covers all R-related code, what's yet missing is the JavaScript binding.
-
-\hypertarget{javascript-binding}{%
-\section{JavaScript Binding}\label{javascript-binding}}
+\hypertarget{javascript-output-binding}{%
+\section{JavaScript output binding}\label{javascript-output-binding}}
 
 Here we create an ``output binding,'' it tells Shiny how to find the component and how to interact with it. An output binding is initialised from \texttt{Shiny.OutputBinding}. Below we initialise a new binding.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{// custom.js}
-\KeywordTok{var}\NormalTok{ lenaBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
+\KeywordTok{var}\NormalTok{ boxxyBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
 \end{Highlighting}
 \end{Shaded}
 
-Then, this must be ``extended'' by specifying a number of methods, a very necessary one being \texttt{find}. The first is used to look for the output HTML element in the document (\texttt{scope}), and return them as an array (\texttt{HTMLcollection}). Other methods all take an el argument; that value will always be an element that was returned from \texttt{find}. A very straightforward way to accomplish this is to use jQuery's find method to identify elements with the \texttt{lena} class used in \texttt{lenaOutput}. You are by no means forced to use a CSS class to identify the elements but there is no reason not to.
+Then, this must be ``extended'' by specifying a number of methods, a very necessary one being \texttt{find}. It is used to look for the output HTML element in the document (\texttt{scope}), and return them as an array (\texttt{HTMLcollection}). Other methods all take an \texttt{el} argument; that value will always be an element that was returned from \texttt{find}. A very straightforward way to accomplish this is to use jQuery's find method to identify elements with the \texttt{boxxy} class used in \texttt{boxxyOutput}. You are by no means forced to use a CSS class to identify the elements but there is no reason not to.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{// custom.js}
-\KeywordTok{var}\NormalTok{ lenaBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
+\KeywordTok{var}\NormalTok{ boxxyBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
 
-\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(lenaBinding}\OperatorTok{,} \OperatorTok{\{}
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(boxxyBinding}\OperatorTok{,} \OperatorTok{\{}
   \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
-    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".lena"}\NormalTok{)}\OperatorTok{;}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".boxxy"}\NormalTok{)}\OperatorTok{;}
   \OperatorTok{\}}
 \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
 \end{Highlighting}
 \end{Shaded}
 
-One might then want to use the \texttt{getId}, a method to return the \texttt{id} of the element, by default, as can be seen in the \href{https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js}{source code} (below), shiny looks for the id as the \texttt{data-input-id} attribute and if that is not found it looks for the element's \texttt{id}.
+One might then want to use the \texttt{getId} method which returns the \texttt{id} of the element, by default, as can be seen in the \href{https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js}{source code} (below), the binding returns the id as the \texttt{data-input-id} attribute and if that is falsy it returns the element's \texttt{id}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5869,36 +5932,118 @@ One might then want to use the \texttt{getId}, a method to return the \texttt{id
 \end{Highlighting}
 \end{Shaded}
 
-Since we use the element id the default will work and this can be skipped entirely. Next, one needs to implement the \texttt{renderValue} function which is the very function that generates the output based on data used in \texttt{lena} and sent to the front-end with \texttt{renderLena}. The \texttt{renderValue} accepts two arguments, first \texttt{el} the element where the output should be generated, this is effectively the output of \texttt{lenaOutput} which the binding found using \texttt{find} and \texttt{getId}. Second, \texttt{data}, this is the output of \texttt{lena} sent by \texttt{renderLena}.
+Since boxxy uses the element id the default will work and this can be skipped entirely.
+
+Next, one needs to implement the \texttt{renderValue} function which is the very function that generates the output based on data used in \texttt{boxxy} and sent to the front-end with \texttt{renderBoxxy}. The \texttt{renderValue} method accepts two arguments, first \texttt{el} the element where the output should be generated, this is effectively the output of \texttt{boxxyOutput} which the binding found using \texttt{find}, the second argument is \texttt{data} which is the data passed to \texttt{boxxy} and serialised via \texttt{renderBoxxy}.
+
+\begin{rmdnote}
+The \texttt{renderValue} is in effect very similar if not identical to
+the JavaScript function of the same name involved in creating
+htmlwidgets.
+\end{rmdnote}
+
+\hypertarget{boxxy-title}{%
+\subsection{Boxxy title}\label{boxxy-title}}
+
+Let's now tackle the first of the three core aspect of the boxxy output: the title. The \texttt{title} should be placed in the previously created placeholder which bears the \texttt{id-boxxy-title}; exactly as was done with htmlwidgets previously we insert title (\texttt{data.title}) in the element with \texttt{innerText}. The dynamically generated id for the title is built in the same way it is in R, by concatenating the \texttt{id} with \texttt{-boxxy-title}
+
+\begin{itemize}
+\tightlist
+\item
+  In R \texttt{sprintf("\%s-boxxy-title",\ id)}
+\item
+  In JavaScript \texttt{el.id\ +\ \textquotesingle{}-boxxy-title\textquotesingle{}}
+\end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{// custom.js}
-\KeywordTok{var}\NormalTok{ lenaBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
+\KeywordTok{var}\NormalTok{ boxxyBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
 
-\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(lenaBinding}\OperatorTok{,} \OperatorTok{\{}
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(boxxyBinding}\OperatorTok{,} \OperatorTok{\{}
   \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
-    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".lena"}\NormalTok{)}\OperatorTok{;}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".boxxy"}\NormalTok{)}\OperatorTok{;}
   \OperatorTok{\},}
   \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ data) }\OperatorTok{\{}
 
-    \AttributeTok{$}\NormalTok{(document).}\AttributeTok{ready}\NormalTok{(}\KeywordTok{function}\NormalTok{()}\OperatorTok{\{}
-      \CommentTok{// Get the image}
-      \KeywordTok{var}\NormalTok{ originalImage }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{data}\NormalTok{.}\AttributeTok{img\_id}\NormalTok{)}\OperatorTok{;}
-
-      \CommentTok{// Filter to apply, in this case the red filter}
-      \KeywordTok{var}\NormalTok{ filter }\OperatorTok{=}\NormalTok{ LenaJS[}\VariableTok{data}\NormalTok{.}\AttributeTok{filter}\NormalTok{]}\OperatorTok{;}
-
-      \CommentTok{// Apply the filter}
-      \VariableTok{LenaJS}\NormalTok{.}\AttributeTok{filterImage}\NormalTok{(el}\OperatorTok{,}\NormalTok{ filter}\OperatorTok{,}\NormalTok{ originalImage)}\OperatorTok{;}
-    \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
-  
+    \CommentTok{// insert the title}
+    \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}{-}boxxy{-}title\textquotesingle{}}\NormalTok{).}\AttributeTok{innerText} \OperatorTok{=} \VariableTok{data}\NormalTok{.}\AttributeTok{title}
   \OperatorTok{\}}
 \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
 \end{Highlighting}
 \end{Shaded}
 
-Finally, the output binding is registered with shiny. Note that it uses a unique string identifier, the \href{https://shiny.rstudio.com/articles/building-outputs.html}{documentation} states:
+\hypertarget{boxxy-value}{%
+\subsection{Boxxy value}\label{boxxy-value}}
+
+Though the custom output could be limited to a static value generated in a fashion similar to how the title is placed, we opted for a more fancy animated value using countUp.js.
+
+Initialise a new counter, specifying the id of the element where it should be created, then as second argument the starting value from which the counter should start and finally the value to count up to. Note that there is a fourth argument to pass a JSON of options which we do not use here.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// place counter in elementId}
+\CommentTok{// start at 0 and count up to 123}
+\KeywordTok{const}\NormalTok{ counter }\OperatorTok{=} \KeywordTok{new} \AttributeTok{CountUp}\NormalTok{(}\StringTok{\textquotesingle{}elementId\textquotesingle{}}\OperatorTok{,} \DecValTok{0}\OperatorTok{,} \DecValTok{123}\NormalTok{)}\OperatorTok{;}
+\VariableTok{counter}\NormalTok{.}\AttributeTok{start}\NormalTok{()}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+The counter has to be generated in the \texttt{\textless{}h1\textgreater{}} placeholder bearing the \texttt{id-boxxy-value}, while the value to count up to is stored in \texttt{data.value} meaning the counter can be initialised with \texttt{new\ CountUp(el.id\ +\ \textquotesingle{}-boxxy-value\textquotesingle{},\ 0,\ data.value);}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{var}\NormalTok{ boxxyBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(boxxyBinding}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".boxxy"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ data) }\OperatorTok{\{}
+
+    \CommentTok{// insert the title}
+    \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}{-}boxxy{-}title\textquotesingle{}}\NormalTok{).}\AttributeTok{innerText} \OperatorTok{=} \VariableTok{data}\NormalTok{.}\AttributeTok{title}\OperatorTok{;}
+
+    \CommentTok{// counter start at 0}
+    \KeywordTok{var}\NormalTok{ counter }\OperatorTok{=} \KeywordTok{new} \AttributeTok{CountUp}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}{-}boxxy{-}value\textquotesingle{}}\OperatorTok{,} \DecValTok{0}\OperatorTok{,} \VariableTok{data}\NormalTok{.}\AttributeTok{value}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{counter}\NormalTok{.}\AttributeTok{start}\NormalTok{()}\OperatorTok{;}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{boxxy-background-color}{%
+\section{Boxxy background color}\label{boxxy-background-color}}
+
+Then we can set the background color that was passed to \texttt{boxxy} (\texttt{data.color}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{var}\NormalTok{ boxxyBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(boxxyBinding}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".boxxy"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ data) }\OperatorTok{\{}
+
+    \CommentTok{// insert the title}
+    \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}{-}boxxy{-}title\textquotesingle{}}\NormalTok{).}\AttributeTok{innerText} \OperatorTok{=} \VariableTok{data}\NormalTok{.}\AttributeTok{title}\OperatorTok{;}
+
+    \CommentTok{// counter start at 0}
+    \KeywordTok{var}\NormalTok{ counter }\OperatorTok{=} \KeywordTok{new} \AttributeTok{CountUp}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}{-}boxxy{-}value\textquotesingle{}}\OperatorTok{,} \DecValTok{0}\OperatorTok{,} \VariableTok{data}\NormalTok{.}\AttributeTok{value}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{counter}\NormalTok{.}\AttributeTok{start}\NormalTok{()}\OperatorTok{;}
+
+    \CommentTok{// background color }
+    \VariableTok{el}\NormalTok{.}\VariableTok{style}\NormalTok{.}\AttributeTok{backgroundColor} \OperatorTok{=} \VariableTok{data}\NormalTok{.}\AttributeTok{color}\OperatorTok{;}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{register-the-binding}{%
+\subsection{Register the binding}\label{register-the-binding}}
+
+Finally, the output binding must be registered with shiny. Note that it uses a unique string identifier, the \href{https://shiny.rstudio.com/articles/building-outputs.html}{documentation} states:
 
 \begin{quote}
 At the moment it is unused but future features may depend on it.
@@ -5906,70 +6051,111 @@ At the moment it is unused but future features may depend on it.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{// custom.js}
-\KeywordTok{var}\NormalTok{ lenaBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
+\KeywordTok{var}\NormalTok{ boxxyBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
 
-\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(lenaBinding}\OperatorTok{,} \OperatorTok{\{}
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(boxxyBinding}\OperatorTok{,} \OperatorTok{\{}
   \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
-    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".lena"}\NormalTok{)}\OperatorTok{;}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".boxxy"}\NormalTok{)}\OperatorTok{;}
   \OperatorTok{\},}
   \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ data) }\OperatorTok{\{}
 
-    \AttributeTok{$}\NormalTok{(document).}\AttributeTok{ready}\NormalTok{(}\KeywordTok{function}\NormalTok{()}\OperatorTok{\{}
-      \CommentTok{// Get the image}
-      \KeywordTok{var}\NormalTok{ originalImage }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{data}\NormalTok{.}\AttributeTok{img\_id}\NormalTok{)}\OperatorTok{;}
+    \CommentTok{// insert the title}
+    \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}{-}boxxy{-}title\textquotesingle{}}\NormalTok{).}\AttributeTok{innerText} \OperatorTok{=} \VariableTok{data}\NormalTok{.}\AttributeTok{title}\OperatorTok{;}
 
-      \CommentTok{// Filter to apply, in this case the red filter}
-      \KeywordTok{var}\NormalTok{ filter }\OperatorTok{=}\NormalTok{ LenaJS[}\VariableTok{data}\NormalTok{.}\AttributeTok{filter}\NormalTok{]}\OperatorTok{;}
+    \CommentTok{// counter start at 0}
+    \KeywordTok{var}\NormalTok{ counter }\OperatorTok{=} \KeywordTok{new} \AttributeTok{CountUp}\NormalTok{(}\VariableTok{el}\NormalTok{.}\AttributeTok{id} \OperatorTok{+} \StringTok{\textquotesingle{}{-}boxxy{-}value\textquotesingle{}}\OperatorTok{,} \DecValTok{0}\OperatorTok{,} \VariableTok{data}\NormalTok{.}\AttributeTok{value}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{counter}\NormalTok{.}\AttributeTok{start}\NormalTok{()}\OperatorTok{;}
 
-      \CommentTok{// Apply the filter}
-      \VariableTok{LenaJS}\NormalTok{.}\AttributeTok{filterImage}\NormalTok{(el}\OperatorTok{,}\NormalTok{ filter}\OperatorTok{,}\NormalTok{ originalImage)}\OperatorTok{;}
-    \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
-  
+    \CommentTok{// background color }
+    \VariableTok{el}\NormalTok{.}\VariableTok{style}\NormalTok{.}\AttributeTok{backgroundColor} \OperatorTok{=} \VariableTok{data}\NormalTok{.}\AttributeTok{color}\OperatorTok{;}
   \OperatorTok{\}}
 \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
 
-\VariableTok{Shiny}\NormalTok{.}\VariableTok{outputBindings}\NormalTok{.}\AttributeTok{register}\NormalTok{(lenaBinding}\OperatorTok{,} \StringTok{"lenaPackage.lenaBinding"}\NormalTok{)}\OperatorTok{;}
+\CommentTok{// register}
+\VariableTok{Shiny}\NormalTok{.}\VariableTok{outputBindings}\NormalTok{.}\AttributeTok{register}\NormalTok{(boxxyBinding}\OperatorTok{,} \StringTok{"john.boxxy"}\NormalTok{)}\OperatorTok{;}
 \end{Highlighting}
 \end{Shaded}
 
 Ensure that string uniquely identifies the binding to avoid future clash with other such bindings.
 
-\hypertarget{test}{%
-\section{Test}\label{test}}
+\hypertarget{boxxy-usage}{%
+\section{Boxxy usage}\label{boxxy-usage}}
 
-In order to test the package, an image needs to be downloaded in order to test it otherwise a Cross-Origin Resource Sharing (CORS) error will occur. Below we create a directory for the static files and download the R logo to test lena.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{dir.create}\NormalTok{(}\StringTok{"www"}\NormalTok{)}
-\KeywordTok{download.file}\NormalTok{(}\StringTok{"https://www.r{-}project.org/Rlogo.png"}\NormalTok{, }\StringTok{"www/r{-}logo.png"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-After running \texttt{devtools::document} and \texttt{devtools::install} one is ready to test the package.
+With all of this in place one can use boxxy in a shiny application.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(lena)}
 \KeywordTok{library}\NormalTok{(shiny)}
 
-\CommentTok{\# serve static files}
-\NormalTok{shiny}\OperatorTok{::}\KeywordTok{addResourcePath}\NormalTok{(}\StringTok{"www"}\NormalTok{, }\StringTok{"www"}\NormalTok{)}
+\NormalTok{boxxy <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(title, value, }\DataTypeTok{color =} \StringTok{"black"}\NormalTok{)\{}
+  \KeywordTok{list}\NormalTok{(}\DataTypeTok{title =}\NormalTok{ title, }\DataTypeTok{value =}\NormalTok{ value, }\DataTypeTok{color =}\NormalTok{ color)}
+\NormalTok{\}}
+
+\NormalTok{boxxyOutput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id)\{}
+\NormalTok{  el <{-}}\StringTok{ }\NormalTok{shiny}\OperatorTok{::}\NormalTok{tags}\OperatorTok{$}\KeywordTok{div}\NormalTok{(}
+    \DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{class =} \StringTok{"boxxy"}\NormalTok{,}
+    \KeywordTok{h1}\NormalTok{(}\DataTypeTok{id =} \KeywordTok{sprintf}\NormalTok{(}\StringTok{"\%s{-}boxxy{-}value"}\NormalTok{, id), }\DataTypeTok{class =} \StringTok{"boxxy{-}value"}\NormalTok{),}
+    \KeywordTok{p}\NormalTok{(}\DataTypeTok{id =} \KeywordTok{sprintf}\NormalTok{(}\StringTok{"\%s{-}boxxy{-}title"}\NormalTok{, id), }\DataTypeTok{class =} \StringTok{"boxxy{-}title"}\NormalTok{)}
+\NormalTok{  )}
+
+\NormalTok{  path <{-}}\StringTok{ }\KeywordTok{normalizePath}\NormalTok{(}\StringTok{"assets"}\NormalTok{)}
+
+\NormalTok{  deps <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+\NormalTok{    htmltools}\OperatorTok{::}\KeywordTok{htmlDependency}\NormalTok{(}
+      \DataTypeTok{name =} \StringTok{"boxxy"}\NormalTok{,}
+      \DataTypeTok{version =} \StringTok{"1.0.0"}\NormalTok{,}
+      \DataTypeTok{src =} \KeywordTok{c}\NormalTok{(}\DataTypeTok{file =}\NormalTok{ path),}
+      \DataTypeTok{script =} \KeywordTok{c}\NormalTok{(}\StringTok{"countup.js"}\NormalTok{, }\StringTok{"binding.js"}\NormalTok{),}
+      \DataTypeTok{stylesheet =} \StringTok{"styles.css"}
+\NormalTok{    )}
+\NormalTok{  )}
+
+\NormalTok{  htmltools}\OperatorTok{::}\KeywordTok{attachDependencies}\NormalTok{(el, deps)}
+\NormalTok{\}}
+
+\NormalTok{renderBoxxy <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(expr, }\DataTypeTok{env =} \KeywordTok{parent.frame}\NormalTok{(), }\DataTypeTok{quoted =} \OtherTok{FALSE}\NormalTok{) \{}
+  \CommentTok{\# Convert the expression + environment into a function}
+\NormalTok{  func <{-}}\StringTok{ }\NormalTok{shiny}\OperatorTok{::}\KeywordTok{exprToFunction}\NormalTok{(expr, env, quoted)}
+
+  \ControlFlowTok{function}\NormalTok{()\{}
+    \KeywordTok{func}\NormalTok{()}
+\NormalTok{  \}}
+\NormalTok{\}}
 
 \NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
-  \CommentTok{\# original logo}
-\NormalTok{  tags}\OperatorTok{$}\KeywordTok{img}\NormalTok{(}\DataTypeTok{src =} \StringTok{"www/r{-}logo.png"}\NormalTok{, }\DataTypeTok{id =} \StringTok{"r{-}logo"}\NormalTok{),}
-  \CommentTok{\# custom output}
-  \KeywordTok{lenaOutput}\NormalTok{(}\StringTok{"filtered"}\NormalTok{)}
+  \KeywordTok{h2}\NormalTok{(}\StringTok{"Custom outputs"}\NormalTok{),}
+  \KeywordTok{fluidRow}\NormalTok{(}
+    \KeywordTok{column}\NormalTok{(}
+      \DecValTok{3}\NormalTok{, }\KeywordTok{boxxyOutput}\NormalTok{(}\StringTok{"countries"}\NormalTok{)}
+\NormalTok{    ),}
+    \KeywordTok{column}\NormalTok{(}
+      \DecValTok{3}\NormalTok{, }\KeywordTok{boxxyOutput}\NormalTok{(}\StringTok{"employees"}\NormalTok{)}
+\NormalTok{    ),}
+    \KeywordTok{column}\NormalTok{(}
+      \DecValTok{3}\NormalTok{, }\KeywordTok{boxxyOutput}\NormalTok{(}\StringTok{"customers"}\NormalTok{)}
+\NormalTok{    ),}
+    \KeywordTok{column}\NormalTok{(}
+      \DecValTok{3}\NormalTok{, }\KeywordTok{boxxyOutput}\NormalTok{(}\StringTok{"subs"}\NormalTok{)}
+\NormalTok{    )}
+\NormalTok{  )}
 \NormalTok{)}
 
 \NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
-
-\NormalTok{  output}\OperatorTok{$}\NormalTok{filtered <{-}}\StringTok{ }\KeywordTok{renderLena}\NormalTok{(\{}
-    \KeywordTok{lena}\NormalTok{(}\DataTypeTok{img\_id =} \StringTok{"r{-}logo"}\NormalTok{, }\DataTypeTok{filter =} \StringTok{"invert"}\NormalTok{)}
+\NormalTok{  output}\OperatorTok{$}\NormalTok{countries <{-}}\StringTok{ }\KeywordTok{renderBoxxy}\NormalTok{(\{}
+    \KeywordTok{boxxy}\NormalTok{(}\StringTok{"Countries"}\NormalTok{, }\DecValTok{95}\NormalTok{, }\DataTypeTok{color =} \StringTok{"\#ef476f"}\NormalTok{)}
 \NormalTok{  \})}
 
+\NormalTok{  output}\OperatorTok{$}\NormalTok{employees <{-}}\StringTok{ }\KeywordTok{renderBoxxy}\NormalTok{(\{}
+    \KeywordTok{boxxy}\NormalTok{(}\StringTok{"Thing"}\NormalTok{, }\DecValTok{650}\NormalTok{, }\DataTypeTok{color =} \StringTok{"\#06d6a0"}\NormalTok{)}
+\NormalTok{  \})}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{customers <{-}}\StringTok{ }\KeywordTok{renderBoxxy}\NormalTok{(\{}
+    \KeywordTok{boxxy}\NormalTok{(}\StringTok{"Customers"}\NormalTok{, }\DecValTok{13592}\NormalTok{, }\DataTypeTok{color =} \StringTok{"\#118ab2"}\NormalTok{)}
+\NormalTok{  \})}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{subs <{-}}\StringTok{ }\KeywordTok{renderBoxxy}\NormalTok{(\{}
+    \KeywordTok{boxxy}\NormalTok{(}\StringTok{"Subscriptions"}\NormalTok{, }\DecValTok{16719}\NormalTok{, }\DataTypeTok{color =} \StringTok{"\#ffd166"}\NormalTok{)}
+\NormalTok{  \})}
 \NormalTok{\}}
 
 \KeywordTok{shinyApp}\NormalTok{(ui, server)}
@@ -5978,11 +6164,9 @@ After running \texttt{devtools::document} and \texttt{devtools::install} one is 
 
 \begin{figure}
 \centering
-\includegraphics{images/lena-test.png}
-\caption{Lena test with R logo}
+\includegraphics{images/custom-output-boxxy.png}
+\caption{Shiny application with boxxy}
 \end{figure}
-
-As mentioned at the start of this chapter, this was really intended as a learning experience. There are great limitations to the package created, namely it cannot be used outside of shiny (when it should). As will be demonstrated in the following chapters, using htmlwidgets with lena would be far easier.
 
 \hypertarget{cookies}{%
 \chapter{Cookies}\label{cookies}}
@@ -7037,7 +7221,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Aug 22 2020 18:32:17 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Aug 23 2020 11:37:56 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -7047,7 +7231,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sat Aug 22 2020 18:32:17 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Aug 23 2020 11:37:56 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -8259,7 +8443,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 18.32
+## [1] 23.2
 \end{verbatim}
 
 \begin{Shaded}
@@ -8271,6 +8455,368 @@ We can then build and load the package to it in action.
 \begin{verbatim}
 ## [1] 10.77
 \end{verbatim}
+
+\hypertarget{lena}{%
+\chapter{Lena}\label{lena}}
+
+In this chapter we create a custom shiny output, in practical terms, custom \texttt{render*} and \texttt{*Output} functions to use in Shiny. Note that this is destined for the curious who want to grasp some understanding of how these functions work under the hood as it is \emph{often easier to create an htmlwidgets package.}
+We will demonstrate by creating a wrapper for \href{https://github.com/davidsonfellipe/lena.js}{lena.js}, a JavaScript library to apply filters to images. Note that this is just for the purpose of demonstrating how to create custom outputs, there are much easier ways to apply such filters ina shiny application (e.g.: CSS).
+
+\hypertarget{inner-workings}{%
+\section{Inner-workings}\label{inner-workings}}
+
+At the core, this consists in creating a \texttt{lena}, \texttt{renderLena} and \texttt{lenaOutput} functions (analogous to \texttt{plot}, \texttt{renderPlot}, \texttt{plotOutput}) which are linked by an ``output binding'' in JavaScript. The latter function essentially creates an HTML element (e.g.: \texttt{\textless{}div\textgreater{}}) with its dependencies attached, the former \texttt{render*} rather straightforward, unlike previous examples, the data does not need to be explicitly sent to the front-end using \texttt{session\$sendCustomMessage} as this is handled by shiny itself under the hood.
+
+Previous work with shiny and JavaScript covered in this book had no dedicated ``output'' element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: \texttt{usejBox}). However, since this is not the case here the dependencies can be attached together with the output.
+
+Finally, the two R functions are ``bound'' JavaScript-side with an ``output binding'' that renders the data from the \texttt{render*} function with its \texttt{*output}.
+
+\hypertarget{discover-lena.js}{%
+\section{Discover Lena.js}\label{discover-lena.js}}
+
+Let us take a look at an example of lena.js. The library reads the original image and outputs the filtered image in a \texttt{\textless{}canvas\textgreater{}}. There are many filters to chose from.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DataTypeTok{<!DOCTYPE }\NormalTok{html}\DataTypeTok{>}
+\KeywordTok{<html}\OtherTok{ xmlns=}\StringTok{"http://www.w3.org/1999/xhtml"}\OtherTok{ lang=}\StringTok{""}\OtherTok{ xml:lang=}\StringTok{""}\KeywordTok{>}
+
+\KeywordTok{<head>}
+  \CommentTok{<!{-}{-} Import library {-}{-}>}
+  \KeywordTok{<script}\OtherTok{ src=}\StringTok{"lena.js"}\KeywordTok{></script>}
+\KeywordTok{</head>}
+
+\KeywordTok{<body>}
+  \CommentTok{<!{-}{-} Image to apply filter {-}{-}>}
+  \KeywordTok{<img}\OtherTok{ id=}\StringTok{"original{-}image"}\OtherTok{ src=}\StringTok{"./image.png"} \KeywordTok{/>}
+
+  \CommentTok{<!{-}{-} div to hold visualisation {-}{-}>}
+  \KeywordTok{<canvas}\OtherTok{ id=}\StringTok{"lena"}\KeywordTok{></canvas>}
+
+  \CommentTok{<!{-}{-} Script to create visualisation {-}{-}>}
+  \KeywordTok{<script>}
+    \CommentTok{// Get the image}
+    \KeywordTok{var}\NormalTok{ originalImage }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\StringTok{"original{-}image"}\NormalTok{)}\OperatorTok{;}
+
+    \CommentTok{// The canvas where the processed image will be rendered (With filter)}
+    \KeywordTok{var}\NormalTok{ filteredImageCanvas }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\StringTok{"lena"}\NormalTok{)}\OperatorTok{;}
+
+    \CommentTok{// Filter to apply, in this case the red filter}
+    \KeywordTok{var}\NormalTok{ filter }\OperatorTok{=}\NormalTok{ LenaJS[}\StringTok{"invert"}\NormalTok{]}\OperatorTok{;}
+
+    \CommentTok{// Apply the filter}
+    \VariableTok{LenaJS}\NormalTok{.}\AttributeTok{filterImage}\NormalTok{(filteredImageCanvas}\OperatorTok{,}\NormalTok{ filter}\OperatorTok{,}\NormalTok{ originalImage)}\OperatorTok{;}
+  \KeywordTok{</script>}
+\KeywordTok{</body>}
+
+\KeywordTok{</html>}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/lena-demo.png}
+\caption{Demo of lena.js - inverted colors}
+\end{figure}
+
+Therefore, there should be a \texttt{lenaOutput} function that creates the \texttt{\textless{}canvas\textgreater{}}, a \texttt{renderLena} function that sends the output of \texttt{lena} which itself accepts the id of the image to filter as well as the filter to apply. Finally, there will be a ``output binding'' which will include the JavaScript code included in the \texttt{\textless{}script\textgreater{}} tags above.
+
+\hypertarget{setup}{%
+\section{Setup}\label{setup}}
+
+Start by creating a package called ``lena.''
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{create\_package}\NormalTok{(}\StringTok{"lena"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Then, from the root of the package, create the \texttt{inst} directory and \texttt{assets} subdirectory then download and place the \texttt{lena.js} dependency within it.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dir.create}\NormalTok{(}\StringTok{"inst/assets"}\NormalTok{, }\DataTypeTok{recursive =} \OtherTok{TRUE}\NormalTok{)}
+
+\NormalTok{url <{-}}\StringTok{ }\KeywordTok{paste0}\NormalTok{(}
+  \StringTok{"https://raw.githubusercontent.com/davidsonfellipe/"}\NormalTok{,}
+  \StringTok{"lena.js/master/dist/lena.min.js"}
+\NormalTok{)}
+\KeywordTok{download.file}\NormalTok{(url, }\StringTok{"inst/assets/lena.min.js"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+We also need to create a JavaScript file that will include the custom JavaScript code that will eventually generate the custom output.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{file.create}\NormalTok{(}\StringTok{"inst/assets/custom.js"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+At this point one should have a package directory looking like the tree below.
+
+\begin{verbatim}
+.
+├── DESCRIPTION
+├── NAMESPACE
+├── R
+├── inst
+│   └── assets
+│       ├── custom.js
+│       └── lena.min.js
+└── man
+\end{verbatim}
+
+\hypertarget{output}{%
+\section{Output}\label{output}}
+
+We can then create the \texttt{lenaOutput} function. This function should return an HTML tag which bears an \texttt{id}, or a \texttt{data-input-id} attribute (more on that later) and a \texttt{class}. This is to be used by the user of the function in Shiny just like any other such outputs. For instance, \texttt{plotOutput} creates a \texttt{\textless{}div\textgreater{}} the \texttt{id} of which is actually the \texttt{id} used in the \texttt{plotOutput} function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# the id is used as id to the element}
+\NormalTok{shiny}\OperatorTok{::}\KeywordTok{plotOutput}\NormalTok{(}\DataTypeTok{id =} \StringTok{"myPlotId"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## <div id="myPlotId" class="shiny-plot-output" style="width: 100% ; height: 400px"></div>
+\end{verbatim}
+
+The \texttt{class} is used JavaScript-side to ``find'' the outputs in the DOM (document object model) and generate the output. The function \texttt{lenaOutput} could thus be as shown below, the \texttt{id} is passed along to the \texttt{\textless{}canvas\textgreater{}} which is created with a \texttt{lena} class that will be used in the output binding to find that element and generate the output within that very canvas.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export}
+\NormalTok{lenaOutput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id)\{}
+\NormalTok{  tags}\OperatorTok{$}\KeywordTok{canvas}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{class =} \StringTok{"lena"}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The dependencies should be added to the above, since this function must be placed in the UI for anything to work we can have the dependencies piggyback on the output element. This works using the htmltools package. The function \texttt{htmltools::htmlDependency} is used to create a dependency that is then attached with \texttt{htmltools::attachDependencies}. While the former creates an object that shiny can understand and translate into \texttt{\textless{}script\textgreater{}} or \texttt{\textless{}style\textgreater{}} tags, the former attaches them to the output object and ensures dependencies are not imported multiple times (e.g.: when \texttt{lenaOutput} is used more than once).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export}
+\NormalTok{lenaOutput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id)\{}
+\NormalTok{  el <{-}}\StringTok{ }\NormalTok{shiny}\OperatorTok{::}\NormalTok{tags}\OperatorTok{$}\KeywordTok{canvas}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{class =} \StringTok{"lena"}\NormalTok{)}
+
+\NormalTok{  path <{-}}\StringTok{ }\KeywordTok{system.file}\NormalTok{(}\StringTok{"assets"}\NormalTok{, }\DataTypeTok{package =} \StringTok{"lena"}\NormalTok{)}
+
+\NormalTok{  deps <{-}}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+\NormalTok{    htmltools}\OperatorTok{::}\KeywordTok{htmlDependency}\NormalTok{(}
+      \DataTypeTok{name =} \StringTok{"lena"}\NormalTok{,}
+      \DataTypeTok{version =} \StringTok{"0.2.0"}\NormalTok{,}
+      \DataTypeTok{src =} \KeywordTok{c}\NormalTok{(}\DataTypeTok{file =}\NormalTok{ path),}
+      \DataTypeTok{script =} \KeywordTok{c}\NormalTok{(}\StringTok{"lena.min.js"}\NormalTok{, }\StringTok{"custom.js"}\NormalTok{)}
+\NormalTok{    )}
+\NormalTok{  )}
+
+\NormalTok{  htmltools}\OperatorTok{::}\KeywordTok{attachDependencies}\NormalTok{(el, deps)}
+
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{render}{%
+\section{Render}\label{render}}
+
+Onto coding the server-side functions, we first define a function called ``lena'' which takes two arguments and return them as a list (which will eventually be used in JavaScript). First, the id of the image to apply the filter to and second the name of the filter to apply. Again, were we not creating a custom output we could use \texttt{session\$sendCustomMessage} to send that list of options JavaScript directly. Here we do not as it will be indirectly handled by the \texttt{render} function we are creating next.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export}
+\NormalTok{lena <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(img\_id, }\DataTypeTok{filter =} \StringTok{"red"}\NormalTok{)\{}
+  \KeywordTok{list}\NormalTok{(}\DataTypeTok{img\_id =}\NormalTok{ img\_id, }\DataTypeTok{filter =}\NormalTok{ filter)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The function \texttt{renderLena} should accept an expression, like other such \texttt{render*} function. For instance in the example below the \texttt{renderPlot} function does accept an expression which uses, amongst other functions, \texttt{plot}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{output}\OperatorTok{$}\NormalTok{myPlot <{-}}\StringTok{ }\KeywordTok{renderPlot}\NormalTok{(\{}
+  \CommentTok{\# this is an expression}
+\NormalTok{  cars }\OperatorTok{\%>\%}\StringTok{ }
+\StringTok{    }\KeywordTok{head}\NormalTok{() }\OperatorTok{\%>\%}\StringTok{ }
+\StringTok{    }\KeywordTok{plot}\NormalTok{()}
+\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+The function \texttt{renderLena} takes an expression and other arguments that are passed to \texttt{shiny::exprToFunction} this does pretty much what it says on the tin: it returns a function from an expression (unless that expression is a function, in which case it returns the expression). This function must be further wrapped in another as the render function must itself return a function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\textquotesingle{} @export}
+\NormalTok{renderLena <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(expr, }\DataTypeTok{env =} \KeywordTok{parent.frame}\NormalTok{(), }\DataTypeTok{quoted =} \OtherTok{FALSE}\NormalTok{) \{}
+  \CommentTok{\# Convert the expression + environment into a function}
+\NormalTok{  func <{-}}\StringTok{ }\NormalTok{shiny}\OperatorTok{::}\KeywordTok{exprToFunction}\NormalTok{(expr, env, quoted)}
+
+  \ControlFlowTok{function}\NormalTok{()\{}
+    \KeywordTok{func}\NormalTok{()}
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+This covers all R-related code, what's yet missing is the JavaScript binding.
+
+\hypertarget{javascript-binding}{%
+\section{JavaScript Binding}\label{javascript-binding}}
+
+Here we create an ``output binding,'' it tells Shiny how to find the component and how to interact with it. An output binding is initialised from \texttt{Shiny.OutputBinding}. Below we initialise a new binding.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// custom.js}
+\KeywordTok{var}\NormalTok{ lenaBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+Then, this must be ``extended'' by specifying a number of methods, a very necessary one being \texttt{find}. The first is used to look for the output HTML element in the document (\texttt{scope}), and return them as an array (\texttt{HTMLcollection}). Other methods all take an el argument; that value will always be an element that was returned from \texttt{find}. A very straightforward way to accomplish this is to use jQuery's find method to identify elements with the \texttt{lena} class used in \texttt{lenaOutput}. You are by no means forced to use a CSS class to identify the elements but there is no reason not to.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// custom.js}
+\KeywordTok{var}\NormalTok{ lenaBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(lenaBinding}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".lena"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+One might then want to use the \texttt{getId}, a method to return the \texttt{id} of the element, by default, as can be seen in the \href{https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js}{source code} (below), shiny looks for the id as the \texttt{data-input-id} attribute and if that is not found it looks for the element's \texttt{id}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// getId default}
+\KeywordTok{this}\NormalTok{.}\AttributeTok{getId} \OperatorTok{=} \KeywordTok{function}\NormalTok{(el) }\OperatorTok{\{}
+  \ControlFlowTok{return}\NormalTok{ el[}\StringTok{\textquotesingle{}data{-}input{-}id\textquotesingle{}}\NormalTok{] }\OperatorTok{||} \VariableTok{el}\NormalTok{.}\AttributeTok{id}\OperatorTok{;}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Since we use the element id the default will work and this can be skipped entirely. Next, one needs to implement the \texttt{renderValue} function which is the very function that generates the output based on data used in \texttt{lena} and sent to the front-end with \texttt{renderLena}. The \texttt{renderValue} accepts two arguments, first \texttt{el} the element where the output should be generated, this is effectively the output of \texttt{lenaOutput} which the binding found using \texttt{find} and \texttt{getId}. Second, \texttt{data}, this is the output of \texttt{lena} sent by \texttt{renderLena}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// custom.js}
+\KeywordTok{var}\NormalTok{ lenaBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(lenaBinding}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".lena"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ data) }\OperatorTok{\{}
+
+    \AttributeTok{$}\NormalTok{(document).}\AttributeTok{ready}\NormalTok{(}\KeywordTok{function}\NormalTok{()}\OperatorTok{\{}
+      \CommentTok{// Get the image}
+      \KeywordTok{var}\NormalTok{ originalImage }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{data}\NormalTok{.}\AttributeTok{img\_id}\NormalTok{)}\OperatorTok{;}
+
+      \CommentTok{// Filter to apply, in this case the red filter}
+      \KeywordTok{var}\NormalTok{ filter }\OperatorTok{=}\NormalTok{ LenaJS[}\VariableTok{data}\NormalTok{.}\AttributeTok{filter}\NormalTok{]}\OperatorTok{;}
+
+      \CommentTok{// Apply the filter}
+      \VariableTok{LenaJS}\NormalTok{.}\AttributeTok{filterImage}\NormalTok{(el}\OperatorTok{,}\NormalTok{ filter}\OperatorTok{,}\NormalTok{ originalImage)}\OperatorTok{;}
+    \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+  
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+Finally, the output binding is registered with shiny. Note that it uses a unique string identifier, the \href{https://shiny.rstudio.com/articles/building-outputs.html}{documentation} states:
+
+\begin{quote}
+At the moment it is unused but future features may depend on it.
+\end{quote}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// custom.js}
+\KeywordTok{var}\NormalTok{ lenaBinding }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{OutputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(lenaBinding}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".lena"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{renderValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ data) }\OperatorTok{\{}
+
+    \AttributeTok{$}\NormalTok{(document).}\AttributeTok{ready}\NormalTok{(}\KeywordTok{function}\NormalTok{()}\OperatorTok{\{}
+      \CommentTok{// Get the image}
+      \KeywordTok{var}\NormalTok{ originalImage }\OperatorTok{=} \VariableTok{document}\NormalTok{.}\AttributeTok{getElementById}\NormalTok{(}\VariableTok{data}\NormalTok{.}\AttributeTok{img\_id}\NormalTok{)}\OperatorTok{;}
+
+      \CommentTok{// Filter to apply, in this case the red filter}
+      \KeywordTok{var}\NormalTok{ filter }\OperatorTok{=}\NormalTok{ LenaJS[}\VariableTok{data}\NormalTok{.}\AttributeTok{filter}\NormalTok{]}\OperatorTok{;}
+
+      \CommentTok{// Apply the filter}
+      \VariableTok{LenaJS}\NormalTok{.}\AttributeTok{filterImage}\NormalTok{(el}\OperatorTok{,}\NormalTok{ filter}\OperatorTok{,}\NormalTok{ originalImage)}\OperatorTok{;}
+    \OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+  
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+
+\VariableTok{Shiny}\NormalTok{.}\VariableTok{outputBindings}\NormalTok{.}\AttributeTok{register}\NormalTok{(lenaBinding}\OperatorTok{,} \StringTok{"lenaPackage.lenaBinding"}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+Ensure that string uniquely identifies the binding to avoid future clash with other such bindings.
+
+\hypertarget{test}{%
+\section{Test}\label{test}}
+
+In order to test the package, an image needs to be downloaded in order to test it otherwise a Cross-Origin Resource Sharing (CORS) error will occur. Below we create a directory for the static files and download the R logo to test lena.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dir.create}\NormalTok{(}\StringTok{"www"}\NormalTok{)}
+\KeywordTok{download.file}\NormalTok{(}\StringTok{"https://www.r{-}project.org/Rlogo.png"}\NormalTok{, }\StringTok{"www/r{-}logo.png"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+After running \texttt{devtools::document} and \texttt{devtools::install} one is ready to test the package.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(lena)}
+\KeywordTok{library}\NormalTok{(shiny)}
+
+\CommentTok{\# serve static files}
+\NormalTok{shiny}\OperatorTok{::}\KeywordTok{addResourcePath}\NormalTok{(}\StringTok{"www"}\NormalTok{, }\StringTok{"www"}\NormalTok{)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+  \CommentTok{\# original logo}
+\NormalTok{  tags}\OperatorTok{$}\KeywordTok{img}\NormalTok{(}\DataTypeTok{src =} \StringTok{"www/r{-}logo.png"}\NormalTok{, }\DataTypeTok{id =} \StringTok{"r{-}logo"}\NormalTok{),}
+  \CommentTok{\# custom output}
+  \KeywordTok{lenaOutput}\NormalTok{(}\StringTok{"filtered"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output)\{}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{filtered <{-}}\StringTok{ }\KeywordTok{renderLena}\NormalTok{(\{}
+    \KeywordTok{lena}\NormalTok{(}\DataTypeTok{img\_id =} \StringTok{"r{-}logo"}\NormalTok{, }\DataTypeTok{filter =} \StringTok{"invert"}\NormalTok{)}
+\NormalTok{  \})}
+
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/lena-test.png}
+\caption{Lena test with R logo}
+\end{figure}
+
+As mentioned at the start of this chapter, this was really intended as a learning experience. There are great limitations to the package created, namely it cannot be used outside of shiny (when it should). As will be demonstrated in the following chapters, using htmlwidgets with lena would be far easier.
 
 \hypertarget{part-closing-remarks}{%
 \part{Closing Remarks}\label{part-closing-remarks}}
