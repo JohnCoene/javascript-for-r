@@ -330,7 +330,7 @@ Another great reason is that JavaScript can do things that R cannot, e.g.: run i
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(plotly)}
 
-\KeywordTok{plot\_ly}\NormalTok{(diamonds, }\DataTypeTok{x =} \OperatorTok{\textasciitilde{}}\NormalTok{cut, }\DataTypeTok{color =} \OperatorTok{\textasciitilde{}}\NormalTok{clarity)}
+\KeywordTok{plot\_ly}\NormalTok{(diamonds, }\DataTypeTok{x =} \OperatorTok{\textasciitilde{}}\NormalTok{cut, }\DataTypeTok{color =} \OperatorTok{\textasciitilde{}}\NormalTok{clarity, }\DataTypeTok{width =} \StringTok{"100\%"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1152,7 +1152,9 @@ This part of the book explores the integration of JavaScript with R using the ht
 
 As in previous parts of this book we mainly learn through examples, building multiple widgets of increasing complexity as we progress through the chapter. Before writing the first widget, we explore existing R packages that allow creating interactive data visualisations this give a first glimpse at we build in this part of the book. Then we explore JavaScript libraries that make great candidates for htmlwidgets and attempt to understand how they work to grasp what is expected from the developer in order to integrate them with R. Finally, we build up on the previous chapter to improve how htmlwidgets work with shiny.
 
-The htmlwidgets package originates from the rCharts \citep{R-rCharts} package created in 2012 by Ramnath Vaidyanathan. It brough together a plethora of data visualisation JavaScript libraries, datamaps, highcharts, morris.js, and many more. Though no longer maintained, two years later, in 2014 Ramnath, Joe Cheng (RStudio CTO), and J.J. Allaire (RStudio CEO) start working on htmlwidgets.
+The htmlwidgets package originates from the rCharts \citep{R-rCharts} package created in 2012 by Ramnath Vaidyanathan. It brough together a plethora of data visualisation JavaScript libraries, datamaps, highcharts, morris.js, and many more. Though no longer maintained rCharts ultimately paved the way towards a framework for interactive visualisations in R: two years later, in 2014 Ramnath and other prominent R users start working on htmlwidgets.
+
+The objective of this chapter is to explore existing widgets available on CRAN, discover how they work, whilst focusing on their prominent features as we will learn how to implement those in our very own widget in the coming chapters.
 
 \hypertarget{plotly-package}{%
 \section{Plotly package}\label{plotly-package}}
@@ -1160,6 +1162,28 @@ The htmlwidgets package originates from the rCharts \citep{R-rCharts} package cr
 The plotly \citep{R-plotly} R package is probably one of the first and the most popular widget thus far.
 
 Plotly.js is a substantial library that provides over 40 chart types, including 3D charts, statistical graphs, and maps, all of which are available from the R interface, there is in fact so much depth to plotly that there is an entire \href{https://plotly-r.com/}{book} on the topic.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(plotly)}
+
+\KeywordTok{plot\_ly}\NormalTok{(cars, }\DataTypeTok{x =} \OperatorTok{\textasciitilde{}}\NormalTok{speed, }\DataTypeTok{y =} \OperatorTok{\textasciitilde{}}\NormalTok{dist)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## No trace type specified:
+##   Based on info supplied, a 'scatter' trace seems appropriate.
+##   Read more about this trace type -> https://plot.ly/r/reference/#scatter
+\end{verbatim}
+
+\begin{verbatim}
+## No scatter mode specifed:
+##   Setting the mode to markers
+##   Read more about this attribute -> https://plot.ly/r/reference/#scatter-mode
+\end{verbatim}
+
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-22-1.png}
 
 \hypertarget{dt-package}{%
 \section{DT package}\label{dt-package}}
@@ -1321,7 +1345,7 @@ Imagine there is no such package as htmlwidgets to help create interactive visua
 
 As observed, an interactive visualisation using JavaScript will be contained within an HTML document, therefore it would probably have to be created first. Secondly, the visualisation that is yet to be created likely relies on external libraries, these would need to be imported in the document. The document should also include an HTML element (e.g.: \texttt{\textless{}div\textgreater{}}) to host said visualisation. Then data would have to be serialised in R and embedded into the document where it should be read by JavaScript code that uses it to create the visualisation. Finally all should be managed to work seamlessly across R markdown, shiny, and other environments.
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-22-1.png}
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-23-1.png}
 
 Thankfully the htmlwidgets package is there to handle most of this. Nonetheless, it is important to understand that these operations are undertaken (to some degree) by htmlwidgets.
 
@@ -3287,7 +3311,7 @@ Other than tabular data, crosstalk will require the widget to have the necessary
 
 As will be discovered later when we bring crosstalk support to gio, very little changes on the R side. As might be expected, crosstalk enables communication between widgets via JavaScript, hence much of what must be adapted by widgets developers happens in JavaScript too.
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-35-1.png}
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-36-1.png}
 
 Indeed the biderectional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. This, internally, works with \texttt{key}s that are assigned to every row of the data.frame. These keys can be explicitly set by the user and otherwise default to the row names of the data.frame, and if these are not available will create row numbers.
 
@@ -3301,7 +3325,7 @@ Indeed the biderectional communication between widgets works in the RStudio view
 
 In a sense, while crosstalk handles the lines of communication between widgets, developers of the respective widgets must handle what messages are sent to others and what to do with messages coming from other widgets. There are two types of such messages: filtering to actually narrow down the selection of data points displayed on a widget, and selection (what crosstalk refers to as ``linked brushing'') to highlight certain data points.
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-37-1.png}
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-38-1.png}
 
 This selection or filtering is communicated with the aforementioned keys. In JavaScript, a widget ``receives'' the keys of selected and filtered data points and must, when filtering or selection is observed, ``send'' said selected or filtered keys to other widgets.
 
@@ -3377,7 +3401,7 @@ Note that the name of the group was randomly generated since none were specified
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "SharedData2a56e55e"
+## [1] "SharedData40f11cf7"
 \end{verbatim}
 
 \begin{Shaded}
@@ -4357,7 +4381,7 @@ Then again, the goal is not to write a lot of convoluted JavaScript, on the cont
 
 Shiny applications have two components the user interface (UI) and the server function. These two components communicate via a websocket: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server this connection is managed by shiny using the httpuv \citep{R-httpuv} and websocket \citep{R-websocket} packages, while in clients connecting to the server this connection is managed with JavaScript.
 
-\begin{center}\includegraphics[width=1\linewidth]{bookdown_files/figure-latex/unnamed-chunk-45-1} \end{center}
+\begin{center}\includegraphics[width=1\linewidth]{bookdown_files/figure-latex/unnamed-chunk-46-1} \end{center}
 
 With that in mind we can put together a shiny applications which though simple exploits bi-directional communication. The application takes a text input, sends the value of the input to the R server which sends it back to the UI.
 
@@ -4411,7 +4435,7 @@ Drawing a diagram of the communication between the UI and the server reveals tha
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-46-1.png}
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-47-1.png}
 
 Communicating between the R server and the user interface requires JavaScript and thus makes us a reasonable chunk of this part of the book on web development with shiny.
 
@@ -7487,7 +7511,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Aug 23 2020 19:40:23 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Aug 23 2020 22:44:25 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -7497,7 +7521,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Aug 23 2020 19:40:23 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Aug 23 2020 22:44:25 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -8034,7 +8058,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 46.63
+## [1] -51.94
 \end{verbatim}
 
 \begin{Shaded}

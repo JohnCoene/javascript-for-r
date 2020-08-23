@@ -420,120 +420,120 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The gio package built thus far revolves around the <code>gio</code> function which expects a dataframe with three columns named <code>e</code>, <code>i</code>, and <code>v</code>, which is not great practice; there are great reasons why very few functions do that.</p>
 <p>First, it is unlikely that one comes across a dataset with such names in the real world thus users of the package will likely need to rename the columns of the dataset in order to use gio making the package rather unwieldy. Second, this makes understanding and approaching the gio package more complicated, it will not be evident by looking at the examples, and usage of gio.</p>
 <p>Instead <code>gio</code> should accept the dataframe as first argument and then the relevant columns to extract. This can be implemented in many ways ranging from arguments that accept the column names as strings to reproducing ggplot2’s <code>aes</code> function. Below we settle for a solution probably lying somewhere in between: using non-standard evaluation to provide arguments that accept the bare name of the columns.</p>
-<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="final-revisions.html#cb195-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, source, target, value, ..., </span>
-<span id="cb195-2"><a href="final-revisions.html#cb195-2"></a>  <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
-<span id="cb195-3"><a href="final-revisions.html#cb195-3"></a></span>
-<span id="cb195-4"><a href="final-revisions.html#cb195-4"></a>  <span class="co"># defaults to NULL</span></span>
-<span id="cb195-5"><a href="final-revisions.html#cb195-5"></a>  group &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb195-6"><a href="final-revisions.html#cb195-6"></a></span>
-<span id="cb195-7"><a href="final-revisions.html#cb195-7"></a>  <span class="cf">if</span> (crosstalk<span class="op">::</span><span class="kw">is.SharedData</span>(data)) {</span>
-<span id="cb195-8"><a href="final-revisions.html#cb195-8"></a>    group &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">groupName</span>()</span>
-<span id="cb195-9"><a href="final-revisions.html#cb195-9"></a>    data &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">origData</span>()</span>
-<span id="cb195-10"><a href="final-revisions.html#cb195-10"></a>  }</span>
-<span id="cb195-11"><a href="final-revisions.html#cb195-11"></a></span>
-<span id="cb195-12"><a href="final-revisions.html#cb195-12"></a>  data &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(</span>
-<span id="cb195-13"><a href="final-revisions.html#cb195-13"></a>    data,</span>
-<span id="cb195-14"><a href="final-revisions.html#cb195-14"></a>    <span class="dt">i =</span> {{ source }},</span>
-<span id="cb195-15"><a href="final-revisions.html#cb195-15"></a>    <span class="dt">e =</span> {{ target }},</span>
-<span id="cb195-16"><a href="final-revisions.html#cb195-16"></a>    <span class="dt">v =</span> {{ value }}</span>
-<span id="cb195-17"><a href="final-revisions.html#cb195-17"></a>  )</span>
-<span id="cb195-18"><a href="final-revisions.html#cb195-18"></a></span>
-<span id="cb195-19"><a href="final-revisions.html#cb195-19"></a>  <span class="co"># forward options using x</span></span>
-<span id="cb195-20"><a href="final-revisions.html#cb195-20"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb195-21"><a href="final-revisions.html#cb195-21"></a>    <span class="dt">configs =</span> <span class="kw">list</span>(...),</span>
-<span id="cb195-22"><a href="final-revisions.html#cb195-22"></a>    <span class="dt">data =</span> data,</span>
-<span id="cb195-23"><a href="final-revisions.html#cb195-23"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
-<span id="cb195-24"><a href="final-revisions.html#cb195-24"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(<span class="dt">group =</span> group)</span>
-<span id="cb195-25"><a href="final-revisions.html#cb195-25"></a>  )</span>
-<span id="cb195-26"><a href="final-revisions.html#cb195-26"></a></span>
-<span id="cb195-27"><a href="final-revisions.html#cb195-27"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_ARGS&#39;</span>) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">dataframe =</span> <span class="st">&quot;rows&quot;</span>)</span>
-<span id="cb195-28"><a href="final-revisions.html#cb195-28"></a></span>
-<span id="cb195-29"><a href="final-revisions.html#cb195-29"></a>  <span class="co"># create widget</span></span>
-<span id="cb195-30"><a href="final-revisions.html#cb195-30"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
-<span id="cb195-31"><a href="final-revisions.html#cb195-31"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
-<span id="cb195-32"><a href="final-revisions.html#cb195-32"></a>    x,</span>
-<span id="cb195-33"><a href="final-revisions.html#cb195-33"></a>    <span class="dt">width =</span> width,</span>
-<span id="cb195-34"><a href="final-revisions.html#cb195-34"></a>    <span class="dt">height =</span> height,</span>
-<span id="cb195-35"><a href="final-revisions.html#cb195-35"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
-<span id="cb195-36"><a href="final-revisions.html#cb195-36"></a>    <span class="dt">elementId =</span> elementId,</span>
-<span id="cb195-37"><a href="final-revisions.html#cb195-37"></a>    <span class="dt">sizingPolicy =</span> htmlwidgets<span class="op">::</span><span class="kw">sizingPolicy</span>(</span>
-<span id="cb195-38"><a href="final-revisions.html#cb195-38"></a>      <span class="dt">padding =</span> <span class="dv">0</span>,</span>
-<span id="cb195-39"><a href="final-revisions.html#cb195-39"></a>      <span class="dt">browser.fill =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb195-40"><a href="final-revisions.html#cb195-40"></a>      <span class="dt">defaultWidth =</span> <span class="st">&quot;100%&quot;</span></span>
-<span id="cb195-41"><a href="final-revisions.html#cb195-41"></a>    ),</span>
-<span id="cb195-42"><a href="final-revisions.html#cb195-42"></a>    <span class="dt">preRenderHook =</span> render_gio,</span>
-<span id="cb195-43"><a href="final-revisions.html#cb195-43"></a>    <span class="dt">dependencies =</span> crosstalk<span class="op">::</span><span class="kw">crosstalkLibs</span>()</span>
-<span id="cb195-44"><a href="final-revisions.html#cb195-44"></a>  )</span>
-<span id="cb195-45"><a href="final-revisions.html#cb195-45"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="final-revisions.html#cb198-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, source, target, value, ..., </span>
+<span id="cb198-2"><a href="final-revisions.html#cb198-2"></a>  <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
+<span id="cb198-3"><a href="final-revisions.html#cb198-3"></a></span>
+<span id="cb198-4"><a href="final-revisions.html#cb198-4"></a>  <span class="co"># defaults to NULL</span></span>
+<span id="cb198-5"><a href="final-revisions.html#cb198-5"></a>  group &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb198-6"><a href="final-revisions.html#cb198-6"></a></span>
+<span id="cb198-7"><a href="final-revisions.html#cb198-7"></a>  <span class="cf">if</span> (crosstalk<span class="op">::</span><span class="kw">is.SharedData</span>(data)) {</span>
+<span id="cb198-8"><a href="final-revisions.html#cb198-8"></a>    group &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">groupName</span>()</span>
+<span id="cb198-9"><a href="final-revisions.html#cb198-9"></a>    data &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">origData</span>()</span>
+<span id="cb198-10"><a href="final-revisions.html#cb198-10"></a>  }</span>
+<span id="cb198-11"><a href="final-revisions.html#cb198-11"></a></span>
+<span id="cb198-12"><a href="final-revisions.html#cb198-12"></a>  data &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(</span>
+<span id="cb198-13"><a href="final-revisions.html#cb198-13"></a>    data,</span>
+<span id="cb198-14"><a href="final-revisions.html#cb198-14"></a>    <span class="dt">i =</span> {{ source }},</span>
+<span id="cb198-15"><a href="final-revisions.html#cb198-15"></a>    <span class="dt">e =</span> {{ target }},</span>
+<span id="cb198-16"><a href="final-revisions.html#cb198-16"></a>    <span class="dt">v =</span> {{ value }}</span>
+<span id="cb198-17"><a href="final-revisions.html#cb198-17"></a>  )</span>
+<span id="cb198-18"><a href="final-revisions.html#cb198-18"></a></span>
+<span id="cb198-19"><a href="final-revisions.html#cb198-19"></a>  <span class="co"># forward options using x</span></span>
+<span id="cb198-20"><a href="final-revisions.html#cb198-20"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb198-21"><a href="final-revisions.html#cb198-21"></a>    <span class="dt">configs =</span> <span class="kw">list</span>(...),</span>
+<span id="cb198-22"><a href="final-revisions.html#cb198-22"></a>    <span class="dt">data =</span> data,</span>
+<span id="cb198-23"><a href="final-revisions.html#cb198-23"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
+<span id="cb198-24"><a href="final-revisions.html#cb198-24"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(<span class="dt">group =</span> group)</span>
+<span id="cb198-25"><a href="final-revisions.html#cb198-25"></a>  )</span>
+<span id="cb198-26"><a href="final-revisions.html#cb198-26"></a></span>
+<span id="cb198-27"><a href="final-revisions.html#cb198-27"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_ARGS&#39;</span>) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">dataframe =</span> <span class="st">&quot;rows&quot;</span>)</span>
+<span id="cb198-28"><a href="final-revisions.html#cb198-28"></a></span>
+<span id="cb198-29"><a href="final-revisions.html#cb198-29"></a>  <span class="co"># create widget</span></span>
+<span id="cb198-30"><a href="final-revisions.html#cb198-30"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
+<span id="cb198-31"><a href="final-revisions.html#cb198-31"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb198-32"><a href="final-revisions.html#cb198-32"></a>    x,</span>
+<span id="cb198-33"><a href="final-revisions.html#cb198-33"></a>    <span class="dt">width =</span> width,</span>
+<span id="cb198-34"><a href="final-revisions.html#cb198-34"></a>    <span class="dt">height =</span> height,</span>
+<span id="cb198-35"><a href="final-revisions.html#cb198-35"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb198-36"><a href="final-revisions.html#cb198-36"></a>    <span class="dt">elementId =</span> elementId,</span>
+<span id="cb198-37"><a href="final-revisions.html#cb198-37"></a>    <span class="dt">sizingPolicy =</span> htmlwidgets<span class="op">::</span><span class="kw">sizingPolicy</span>(</span>
+<span id="cb198-38"><a href="final-revisions.html#cb198-38"></a>      <span class="dt">padding =</span> <span class="dv">0</span>,</span>
+<span id="cb198-39"><a href="final-revisions.html#cb198-39"></a>      <span class="dt">browser.fill =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb198-40"><a href="final-revisions.html#cb198-40"></a>      <span class="dt">defaultWidth =</span> <span class="st">&quot;100%&quot;</span></span>
+<span id="cb198-41"><a href="final-revisions.html#cb198-41"></a>    ),</span>
+<span id="cb198-42"><a href="final-revisions.html#cb198-42"></a>    <span class="dt">preRenderHook =</span> render_gio,</span>
+<span id="cb198-43"><a href="final-revisions.html#cb198-43"></a>    <span class="dt">dependencies =</span> crosstalk<span class="op">::</span><span class="kw">crosstalkLibs</span>()</span>
+<span id="cb198-44"><a href="final-revisions.html#cb198-44"></a>  )</span>
+<span id="cb198-45"><a href="final-revisions.html#cb198-45"></a>}</span></code></pre></div>
 <p>The above changes allows documentation the input that <code>gio</code> accepts more clearly and also makes its usage more transparent: it is now clear to users what data is required to create a visualisation and they are free to use dataframes of their choice.</p>
-<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="final-revisions.html#cb196-1"></a><span class="co"># mock up data</span></span>
-<span id="cb196-2"><a href="final-revisions.html#cb196-2"></a>countries &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;US&quot;</span>, <span class="st">&quot;BE&quot;</span>, <span class="st">&quot;FR&quot;</span>, <span class="st">&quot;DE&quot;</span>)</span>
-<span id="cb196-3"><a href="final-revisions.html#cb196-3"></a>df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
-<span id="cb196-4"><a href="final-revisions.html#cb196-4"></a>  <span class="dt">from =</span> countries,</span>
-<span id="cb196-5"><a href="final-revisions.html#cb196-5"></a>  <span class="dt">to =</span> <span class="kw">rev</span>(countries),</span>
-<span id="cb196-6"><a href="final-revisions.html#cb196-6"></a>  <span class="dt">traded =</span> <span class="kw">runif</span>(<span class="dv">4</span>)</span>
-<span id="cb196-7"><a href="final-revisions.html#cb196-7"></a>)</span>
-<span id="cb196-8"><a href="final-revisions.html#cb196-8"></a></span>
-<span id="cb196-9"><a href="final-revisions.html#cb196-9"></a><span class="co"># use gio</span></span>
-<span id="cb196-10"><a href="final-revisions.html#cb196-10"></a><span class="kw">gio</span>(df, <span class="dt">source =</span> from, <span class="dt">target =</span> to, <span class="dt">value =</span> traded)</span></code></pre></div>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="final-revisions.html#cb199-1"></a><span class="co"># mock up data</span></span>
+<span id="cb199-2"><a href="final-revisions.html#cb199-2"></a>countries &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;US&quot;</span>, <span class="st">&quot;BE&quot;</span>, <span class="st">&quot;FR&quot;</span>, <span class="st">&quot;DE&quot;</span>)</span>
+<span id="cb199-3"><a href="final-revisions.html#cb199-3"></a>df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb199-4"><a href="final-revisions.html#cb199-4"></a>  <span class="dt">from =</span> countries,</span>
+<span id="cb199-5"><a href="final-revisions.html#cb199-5"></a>  <span class="dt">to =</span> <span class="kw">rev</span>(countries),</span>
+<span id="cb199-6"><a href="final-revisions.html#cb199-6"></a>  <span class="dt">traded =</span> <span class="kw">runif</span>(<span class="dv">4</span>)</span>
+<span id="cb199-7"><a href="final-revisions.html#cb199-7"></a>)</span>
+<span id="cb199-8"><a href="final-revisions.html#cb199-8"></a></span>
+<span id="cb199-9"><a href="final-revisions.html#cb199-9"></a><span class="co"># use gio</span></span>
+<span id="cb199-10"><a href="final-revisions.html#cb199-10"></a><span class="kw">gio</span>(df, <span class="dt">source =</span> from, <span class="dt">target =</span> to, <span class="dt">value =</span> traded)</span></code></pre></div>
 <p>This small change makes the package a great deal easier to use and understand.</p>
 </div>
 <div id="plethora-of-options" class="section level2" number="10.2">
 <h2><span class="header-section-number">10.2</span> Plethora of options</h2>
 <p>Some JavaScript libraries can be extensive and come with thousands of options that can make the port to R rather bulky, never hesitate to make us of the three dots construct (<code>...</code>) to make these accessible yet saving you from having to hard-code thousands of arguments.</p>
 <p>For instance gio.js accepts a JSON of options to further customise the globe. One could port all of these manually, or allow users to specify those configurations via the three-dot construct.</p>
-<div class="sourceCode" id="cb197"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb197-1"><a href="final-revisions.html#cb197-1"></a><span class="kw">var</span> configs <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb197-2"><a href="final-revisions.html#cb197-2"></a>  <span class="dt">control</span><span class="op">:</span> <span class="op">{</span></span>
-<span id="cb197-3"><a href="final-revisions.html#cb197-3"></a>    <span class="dt">stats</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
-<span id="cb197-4"><a href="final-revisions.html#cb197-4"></a>    <span class="dt">disableUnmentioned</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
-<span id="cb197-5"><a href="final-revisions.html#cb197-5"></a>    <span class="dt">lightenMentioned</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
-<span id="cb197-6"><a href="final-revisions.html#cb197-6"></a>    <span class="dt">inOnly</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
-<span id="cb197-7"><a href="final-revisions.html#cb197-7"></a>    <span class="dt">outOnly</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
-<span id="cb197-8"><a href="final-revisions.html#cb197-8"></a>    <span class="dt">initCountry</span><span class="op">:</span> <span class="st">&quot;CN&quot;</span><span class="op">,</span></span>
-<span id="cb197-9"><a href="final-revisions.html#cb197-9"></a>    <span class="dt">halo</span><span class="op">:</span> <span class="kw">true</span></span>
-<span id="cb197-10"><a href="final-revisions.html#cb197-10"></a>  <span class="op">},</span></span>
-<span id="cb197-11"><a href="final-revisions.html#cb197-11"></a>  <span class="dt">color</span><span class="op">:</span> <span class="op">{</span></span>
-<span id="cb197-12"><a href="final-revisions.html#cb197-12"></a>    <span class="dt">surface</span><span class="op">:</span> <span class="bn">0xFFFFFF</span><span class="op">,</span></span>
-<span id="cb197-13"><a href="final-revisions.html#cb197-13"></a>    <span class="dt">selected</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span></span>
-<span id="cb197-14"><a href="final-revisions.html#cb197-14"></a>    <span class="kw">in</span><span class="op">:</span> <span class="bn">0x154492</span><span class="op">,</span></span>
-<span id="cb197-15"><a href="final-revisions.html#cb197-15"></a>    <span class="dt">out</span><span class="op">:</span> <span class="bn">0xDD380C</span><span class="op">,</span></span>
-<span id="cb197-16"><a href="final-revisions.html#cb197-16"></a>    <span class="dt">halo</span><span class="op">:</span> <span class="bn">0xFFFFFF</span><span class="op">,</span></span>
-<span id="cb197-17"><a href="final-revisions.html#cb197-17"></a>    <span class="dt">background</span><span class="op">:</span> <span class="kw">null</span></span>
-<span id="cb197-18"><a href="final-revisions.html#cb197-18"></a>  <span class="op">},</span></span>
-<span id="cb197-19"><a href="final-revisions.html#cb197-19"></a>  <span class="dt">brightness</span><span class="op">:</span> <span class="op">{</span></span>
-<span id="cb197-20"><a href="final-revisions.html#cb197-20"></a>    <span class="dt">ocean</span><span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span></span>
-<span id="cb197-21"><a href="final-revisions.html#cb197-21"></a>    <span class="dt">mentioned</span><span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span></span>
-<span id="cb197-22"><a href="final-revisions.html#cb197-22"></a>    <span class="dt">related</span><span class="op">:</span> <span class="fl">0.5</span></span>
-<span id="cb197-23"><a href="final-revisions.html#cb197-23"></a>  <span class="op">}</span></span>
-<span id="cb197-24"><a href="final-revisions.html#cb197-24"></a><span class="op">}</span></span>
-<span id="cb197-25"><a href="final-revisions.html#cb197-25"></a></span>
-<span id="cb197-26"><a href="final-revisions.html#cb197-26"></a>controller <span class="op">=</span> <span class="kw">new</span> <span class="va">Gio</span>.<span class="at">controller</span>(el<span class="op">,</span> configs)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb200"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb200-1"><a href="final-revisions.html#cb200-1"></a><span class="kw">var</span> configs <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb200-2"><a href="final-revisions.html#cb200-2"></a>  <span class="dt">control</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb200-3"><a href="final-revisions.html#cb200-3"></a>    <span class="dt">stats</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb200-4"><a href="final-revisions.html#cb200-4"></a>    <span class="dt">disableUnmentioned</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb200-5"><a href="final-revisions.html#cb200-5"></a>    <span class="dt">lightenMentioned</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb200-6"><a href="final-revisions.html#cb200-6"></a>    <span class="dt">inOnly</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb200-7"><a href="final-revisions.html#cb200-7"></a>    <span class="dt">outOnly</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb200-8"><a href="final-revisions.html#cb200-8"></a>    <span class="dt">initCountry</span><span class="op">:</span> <span class="st">&quot;CN&quot;</span><span class="op">,</span></span>
+<span id="cb200-9"><a href="final-revisions.html#cb200-9"></a>    <span class="dt">halo</span><span class="op">:</span> <span class="kw">true</span></span>
+<span id="cb200-10"><a href="final-revisions.html#cb200-10"></a>  <span class="op">},</span></span>
+<span id="cb200-11"><a href="final-revisions.html#cb200-11"></a>  <span class="dt">color</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb200-12"><a href="final-revisions.html#cb200-12"></a>    <span class="dt">surface</span><span class="op">:</span> <span class="bn">0xFFFFFF</span><span class="op">,</span></span>
+<span id="cb200-13"><a href="final-revisions.html#cb200-13"></a>    <span class="dt">selected</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span></span>
+<span id="cb200-14"><a href="final-revisions.html#cb200-14"></a>    <span class="kw">in</span><span class="op">:</span> <span class="bn">0x154492</span><span class="op">,</span></span>
+<span id="cb200-15"><a href="final-revisions.html#cb200-15"></a>    <span class="dt">out</span><span class="op">:</span> <span class="bn">0xDD380C</span><span class="op">,</span></span>
+<span id="cb200-16"><a href="final-revisions.html#cb200-16"></a>    <span class="dt">halo</span><span class="op">:</span> <span class="bn">0xFFFFFF</span><span class="op">,</span></span>
+<span id="cb200-17"><a href="final-revisions.html#cb200-17"></a>    <span class="dt">background</span><span class="op">:</span> <span class="kw">null</span></span>
+<span id="cb200-18"><a href="final-revisions.html#cb200-18"></a>  <span class="op">},</span></span>
+<span id="cb200-19"><a href="final-revisions.html#cb200-19"></a>  <span class="dt">brightness</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb200-20"><a href="final-revisions.html#cb200-20"></a>    <span class="dt">ocean</span><span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span></span>
+<span id="cb200-21"><a href="final-revisions.html#cb200-21"></a>    <span class="dt">mentioned</span><span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span></span>
+<span id="cb200-22"><a href="final-revisions.html#cb200-22"></a>    <span class="dt">related</span><span class="op">:</span> <span class="fl">0.5</span></span>
+<span id="cb200-23"><a href="final-revisions.html#cb200-23"></a>  <span class="op">}</span></span>
+<span id="cb200-24"><a href="final-revisions.html#cb200-24"></a><span class="op">}</span></span>
+<span id="cb200-25"><a href="final-revisions.html#cb200-25"></a></span>
+<span id="cb200-26"><a href="final-revisions.html#cb200-26"></a>controller <span class="op">=</span> <span class="kw">new</span> <span class="va">Gio</span>.<span class="at">controller</span>(el<span class="op">,</span> configs)<span class="op">;</span></span></code></pre></div>
 <p>The three dots can be added to the <code>gio</code> function which internally captures them in a <code>list</code> named <code>configs</code> so it can be easily referenced in JavaScript.</p>
-<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="final-revisions.html#cb198-1"></a><span class="co"># add ...three dots</span></span>
-<span id="cb198-2"><a href="final-revisions.html#cb198-2"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, source, target, value, ..., </span>
-<span id="cb198-3"><a href="final-revisions.html#cb198-3"></a>  <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
-<span id="cb198-4"><a href="final-revisions.html#cb198-4"></a></span>
-<span id="cb198-5"><a href="final-revisions.html#cb198-5"></a>  <span class="co"># ... start of the function</span></span>
-<span id="cb198-6"><a href="final-revisions.html#cb198-6"></a></span>
-<span id="cb198-7"><a href="final-revisions.html#cb198-7"></a>  <span class="co"># forward options using x</span></span>
-<span id="cb198-8"><a href="final-revisions.html#cb198-8"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb198-9"><a href="final-revisions.html#cb198-9"></a>    <span class="dt">configs =</span> <span class="kw">list</span>(...), <span class="co"># pass to configs</span></span>
-<span id="cb198-10"><a href="final-revisions.html#cb198-10"></a>    <span class="dt">data =</span> data,</span>
-<span id="cb198-11"><a href="final-revisions.html#cb198-11"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
-<span id="cb198-12"><a href="final-revisions.html#cb198-12"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(<span class="dt">group =</span> group)</span>
-<span id="cb198-13"><a href="final-revisions.html#cb198-13"></a>  )</span>
-<span id="cb198-14"><a href="final-revisions.html#cb198-14"></a></span>
-<span id="cb198-15"><a href="final-revisions.html#cb198-15"></a>  <span class="co"># ... end of the function</span></span>
-<span id="cb198-16"><a href="final-revisions.html#cb198-16"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="final-revisions.html#cb201-1"></a><span class="co"># add ...three dots</span></span>
+<span id="cb201-2"><a href="final-revisions.html#cb201-2"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, source, target, value, ..., </span>
+<span id="cb201-3"><a href="final-revisions.html#cb201-3"></a>  <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
+<span id="cb201-4"><a href="final-revisions.html#cb201-4"></a></span>
+<span id="cb201-5"><a href="final-revisions.html#cb201-5"></a>  <span class="co"># ... start of the function</span></span>
+<span id="cb201-6"><a href="final-revisions.html#cb201-6"></a></span>
+<span id="cb201-7"><a href="final-revisions.html#cb201-7"></a>  <span class="co"># forward options using x</span></span>
+<span id="cb201-8"><a href="final-revisions.html#cb201-8"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb201-9"><a href="final-revisions.html#cb201-9"></a>    <span class="dt">configs =</span> <span class="kw">list</span>(...), <span class="co"># pass to configs</span></span>
+<span id="cb201-10"><a href="final-revisions.html#cb201-10"></a>    <span class="dt">data =</span> data,</span>
+<span id="cb201-11"><a href="final-revisions.html#cb201-11"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
+<span id="cb201-12"><a href="final-revisions.html#cb201-12"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(<span class="dt">group =</span> group)</span>
+<span id="cb201-13"><a href="final-revisions.html#cb201-13"></a>  )</span>
+<span id="cb201-14"><a href="final-revisions.html#cb201-14"></a></span>
+<span id="cb201-15"><a href="final-revisions.html#cb201-15"></a>  <span class="co"># ... end of the function</span></span>
+<span id="cb201-16"><a href="final-revisions.html#cb201-16"></a>}</span></code></pre></div>
 <p>In JavaScript, use the <code>configs</code> when initialising the visualisation.</p>
-<div class="sourceCode" id="cb199"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb199-1"><a href="final-revisions.html#cb199-1"></a><span class="co">// use x.configs</span></span>
-<span id="cb199-2"><a href="final-revisions.html#cb199-2"></a>controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(el<span class="op">,</span> <span class="va">x</span>.<span class="at">configs</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb202"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb202-1"><a href="final-revisions.html#cb202-1"></a><span class="co">// use x.configs</span></span>
+<span id="cb202-2"><a href="final-revisions.html#cb202-2"></a>controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(el<span class="op">,</span> <span class="va">x</span>.<span class="at">configs</span>)<span class="op">;</span></span></code></pre></div>
 <p>Below those configuration options are now used to set the initially selected country to the United States and change the colour of the selected country to red.</p>
-<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="final-revisions.html#cb200-1"></a><span class="kw">gio</span>(</span>
-<span id="cb200-2"><a href="final-revisions.html#cb200-2"></a>  df, from, to, traded, </span>
-<span id="cb200-3"><a href="final-revisions.html#cb200-3"></a>  <span class="dt">control =</span> <span class="kw">list</span>(<span class="dt">initCountry =</span> <span class="st">&#39;US&#39;</span>), </span>
-<span id="cb200-4"><a href="final-revisions.html#cb200-4"></a>  <span class="dt">color =</span> <span class="kw">list</span>(<span class="dt">selected =</span> <span class="st">&#39;#ff4d4d&#39;</span>)</span>
-<span id="cb200-5"><a href="final-revisions.html#cb200-5"></a>) </span></code></pre></div>
+<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb203-1"><a href="final-revisions.html#cb203-1"></a><span class="kw">gio</span>(</span>
+<span id="cb203-2"><a href="final-revisions.html#cb203-2"></a>  df, from, to, traded, </span>
+<span id="cb203-3"><a href="final-revisions.html#cb203-3"></a>  <span class="dt">control =</span> <span class="kw">list</span>(<span class="dt">initCountry =</span> <span class="st">&#39;US&#39;</span>), </span>
+<span id="cb203-4"><a href="final-revisions.html#cb203-4"></a>  <span class="dt">color =</span> <span class="kw">list</span>(<span class="dt">selected =</span> <span class="st">&#39;#ff4d4d&#39;</span>)</span>
+<span id="cb203-5"><a href="final-revisions.html#cb203-5"></a>) </span></code></pre></div>
 <p><img src="images/crosstalk-three-dots.png" /></p>
 </div>
 <div id="interface-design" class="section level2" number="10.3">
