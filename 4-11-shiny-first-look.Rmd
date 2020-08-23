@@ -1,16 +1,96 @@
 # (PART) Web Development with Shiny {-}
 
-# Discover
+# Introduction to shiny
 
 Shiny is the web framework of choice for the R programming language. Since JavaScript and Shiny both run in web browsers it follows that they can run alongside one another as one can include JavaScript in such applications. Yet, often disregarded is the ability for Shiny's R server to communicate to the front-end and vice versa. This collection of chapters aims to show precisely how this works. In this first part, we brush up on the essentials so we understand how to include JavaScript in shiny applications.
 
 Then again, the goal is not to write a lot of convoluted JavaScript, on the contrary, with little knowledge of the language the aim is to write as little as possible but demonstrate to the reader that it is often enough to greatly improve the user experience of shiny applications.
 
-## Static Files 
+## Websocket
+
+Shiny applications have two components the user interface (UI) and the server function. These two components communicate via a websocket: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server this connection is managed by shiny using the httpuv [@R-httpuv] and websocket [@R-websocket] packages, while in clients connecting to the server this connection is managed with JavaScript.  
+
+```{r, echo=FALSE, fig.align='center', out.width="100%", fig.dim=c(3, 6)}
+DiagrammeR::grViz("
+digraph{
+  node [shape=record fontsize=10];
+
+  w1 [label=Websocket];
+  w2 [label=Websocket];
+  w3 [label=Websocket];
+  w4 [label=Websocket];
+
+  b1 [label='Browser' color=gold];
+  b2 [label='Browser' color=gold];
+  b3 [label='Browser' color=gold];
+  b4 [label='Browser' color=gold];
+
+  s [label='R server' color=royalBlue];
+
+  s -> w1 -> b1 [dir=both color=dimGray arrowsize=.3];
+  s -> w2 -> b2 [dir=both color=dimGray arrowsize=.3];
+  s -> w3 -> b3 [dir=both color=dimGray arrowsize=.3];
+  s -> w4 -> b4 [dir=both color=dimGray arrowsize=.3];
+
+}
+")
+```
+
+With that in mind we can put together a shiny applications which though simple exploits bi-directional communication. The application takes a text input, sends the value of the input to the R server which sends it back to the UI.
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  textInput("nameInput", "Your name"),
+  textOutput("nameOutput")
+)
+
+server <- function(input, output) {
+  output$nameOutput <- renderText({
+    input$nameInput
+  })
+}
+
+shinyApp(ui, server)
+```
+
+Drawing a diagram of the communication between the UI and the server reveals that thought this is a simple application a lot is happening.
+
+```{r}
+DiagrammeR::grViz("
+digraph {
+  graph[rankdir=LR]
+  node[shape=record]
+
+  subgraph cluster_0 {
+    textInput
+    textOutput
+    label='User Interface'
+    color=gold
+  }
+
+  subgraph cluster_1 {
+    'input list'
+    renderOutput
+    label='R server'
+    color=royalBlue
+  }
+
+  textInput -> 'input list' [xlabel=websocket]
+  'input list' -> renderOutput
+  renderOutput -> textOutput [label=websocket]
+}
+")
+```
+
+Communicating between the R server and the user interface requires JavaScript and thus makes us a reasonable chunk of this part of the book on web development with shiny.
+
+## Static files
 
 In order to introduce JavaScript to shiny applications one must understand static files and how they work with the framework. Static files are files that are downloaded by the clients, in this case web browsers accessing shiny applications, as-is, these generally include images, CSS (`.css`), and JavaScript (`.js`).
 
-If you are familiar with R packags it enablesge development, static files are to shiny applications what the "inst" directory is to an R package, those files are installed as-is and do not require further processing as opposed to the "src" folder which contains files that need compiling for instance.
+If you are familiar with R packages it enables development, static files are to shiny applications what the "inst" directory is to an R package, those files are installed as-is and do not require further processing as opposed to the "src" folder which contains files that need compiling for instance.
 
 There are numerous functions to launch a shiny application locally; the two most used probably are `shinyApp` and `runApp`. The RStudio IDE comes with a convenient "Run" button when writing a shiny application, which when clicked actually uses the function `shiny::runApp` in the background, this function looks for said static files in the `www` directory and makes them available at the same path (`/www`). If you are building your applications outside of RStudio, you should either also use `shiny::runApp` or specify the directory which then allows using `shiny::shinyApp`. Note that this only applies locally, shiny server (community and pro) as well as [shinyapps.io](https://www.shinyapps.io/) use the same defaults as the RStudio IDE and `shiny::runApp`.
 
@@ -117,7 +197,7 @@ shinyApp(ui, server)
 
 From the browser, inspecting page (right click > inspect > console tab) one should see "Hello JS!" in the console which means the application correctly ran the code in the JavaScript file.
 
-## Example - Alerts 
+## Walkthrough - Alerts 
 
 Making shiny work with JavaScript can essentially be broken down into two operations: 1) passing data from the R server to the JavaScript client and 2) the other way around, from the client to the R server. This chapter covers both ways data travels between R and JavaScript in Shiny.
 
