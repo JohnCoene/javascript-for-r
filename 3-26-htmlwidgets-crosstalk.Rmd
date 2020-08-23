@@ -56,6 +56,7 @@ We will later explore and demonstrate why and where this is useful.
 Basic usage of crosstalk datasets in shiny is very straightforward since it accepts reactive expressions to create shared datasets. Note that it takes the expression itself (`reactive`) not the output of the expression (`expression()`).
 
 > If this feels foreign to you, think of how you pass a function name, not a function call, to `lapply`; that’s exactly analogous to what we’re doing here. 
+> 
 > --- Official Crosstalk documentation
 
 ```r
@@ -65,7 +66,10 @@ library(plotly)
 library(crosstalk)
 
 ui <- fluidPage(
-  selectInput("specie", "Specie", choices = c("setosa", "versicolor", "virginica")),
+  selectInput(
+    "specie", "Specie", 
+    choices = c("setosa", "versicolor", "virginica")
+  ),
   fluidRow(
     column(6, DTOutput("table")),
     column(6, plotlyOutput("plot"))
@@ -293,7 +297,8 @@ shared_arcs$key()
 The methods `origData` and `groupName` must be used in every widget, the original dataframe is still needed to produce the visualisation and the group will be needed JavaScript so we can tell crosstalk which group one is working with. The `key` method may not be useful with every widget if the visualisation library also comes with a key/id system so one can use it internally, we won't be using it with gio. Finally notice that we also add the JavaScript dependency with  `crosstalkLibs`.
 
 ```r
-gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
+gio <- function(data, width = NULL, height = NULL, 
+  elementId = NULL) {
 
   # defaults to NULL
   group <- NULL
@@ -396,8 +401,15 @@ sel_handle.on("change", function(e) {
 
 ```json
 {
-  oldValue: []
-  sender: n {_eventRelay: e, _emitter: t, _group: "SharedDatac7682f87", _var: r, _varOnChangeSub: "sub1", …}
+  oldValue: [],
+  sender: n {
+    _eventRelay: e, 
+    _emitter: t, 
+    _group: "SharedDatac7682f87", 
+    _var: r, 
+    _varOnChangeSub: "sub1", 
+    …
+  },
   value: ["AE"]
 }
 ```
@@ -505,7 +517,6 @@ arcs <- jsonlite::fromJSON(url)
 # key is importing country
 sd <- SharedData$new(arcs, key = arcs$i)
 
-# Use SharedData like a dataframe with Crosstalk-enabled widgets
 bscols(
   gio(sd),
   datatable(sd, width="100%", selection = "single")
@@ -536,9 +547,11 @@ nodes <- data.frame(
   country = iso2c,
   y = rnorm(length(iso2c))
 )
-nodes_sd <- SharedData$new(nodes, key = nodes$country, group = "gio")
+nodes_sd <- SharedData$new(
+  nodes, key = nodes$country, 
+  group = "gio"
+)
 
-# Use SharedData like a dataframe with Crosstalk-enabled widgets
 bscols(
   plot_ly(data = nodes_sd, type = "bar", x = ~country, y = ~y) %>% 
     config(displayModeBar = FALSE),

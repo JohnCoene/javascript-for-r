@@ -97,8 +97,12 @@ The `boxxyOutput` function, like all such functions (`plotOutput`, `uiOutput`, e
 shiny::plotOutput(id = "myPlotId")
 ```
 
-```{r, echo=FALSE}
-cat(as.character(shiny::plotOutput("myPlotId")))
+```r
+<div 
+  id="myPlotId" 
+  class="shiny-plot-output" 
+  style="width: 100% ; height: 400px">
+</div>
 ```
 
 The `class` is used JavaScript-side to "find" the outputs in the DOM (document object model) and generate the output. The function `boxxyOutput` could thus be as shown below, the `id` is passed along to the `<div>` which is created with a `boxxy` class that will be used in the output binding to find that element and generate the output within that very `<div>` using data that will be passed from the server.
@@ -217,7 +221,8 @@ output$myPlot <- renderPlot({
 The function `renderBoxxy` takes an expression and other arguments that are passed to `shiny::exprToFunction` this does pretty much what it says on the tin: it returns a function from an expression (unless that expression is a function, in which case it returns the expression). This function must be further wrapped in another as render functions must return functions.
 
 ```r
-renderBoxxy <- function(expr, env = parent.frame(), quoted = FALSE) {
+renderBoxxy <- function(expr, env = parent.frame(), 
+  quoted = FALSE) {
   # Convert the expression + environment into a function
   func <- shiny::exprToFunction(expr, env, quoted)
 
@@ -283,7 +288,8 @@ $.extend(boxxyBinding, {
   renderValue: function(el, data) {
 
     // insert the title
-    document.getElementById(el.id + '-boxxy-title').innerText = data.title
+    let title_id = el.id + '-boxxy-title';
+    document.getElementById(title_id).innerText = data.title
   }
 });
 ```
@@ -313,10 +319,12 @@ $.extend(boxxyBinding, {
   renderValue: function(el, data) {
 
     // insert the title
-    document.getElementById(el.id + '-boxxy-title').innerText = data.title;
+    let title_id = el.id + '-boxxy-title';
+    document.getElementById(title_id).innerText = data.title
 
     // counter start at 0
-    var counter = new CountUp(el.id + '-boxxy-value', 0, data.value);
+    let counter_id = el.id + '-boxxy-value';
+    var counter = new CountUp(counter_id, 0, data.value);
     counter.start();
   }
 });
@@ -336,10 +344,12 @@ $.extend(boxxyBinding, {
   renderValue: function(el, data) {
 
     // insert the title
-    document.getElementById(el.id + '-boxxy-title').innerText = data.title;
+    let title_id = el.id + '-boxxy-title';
+    document.getElementById(title_id).innerText = data.title
 
     // counter start at 0
-    var counter = new CountUp(el.id + '-boxxy-value', 0, data.value);
+    let counter_id = el.id + '-boxxy-value';
+    var counter = new CountUp(counter_id, 0, data.value);
     counter.start();
 
     // background color 
@@ -364,10 +374,12 @@ $.extend(boxxyBinding, {
   renderValue: function(el, data) {
 
     // insert the title
-    document.getElementById(el.id + '-boxxy-title').innerText = data.title;
+    let title_id = el.id + '-boxxy-title';
+    document.getElementById(title_id).innerText = data.title
 
     // counter start at 0
-    var counter = new CountUp(el.id + '-boxxy-value', 0, data.value);
+    let counter_id = el.id + '-boxxy-value';
+    var counter = new CountUp(counter_id, 0, data.value);
     counter.start();
 
     // background color 
@@ -414,7 +426,8 @@ boxxyOutput <- function(id){
   htmltools::attachDependencies(el, deps)
 }
 
-renderBoxxy <- function(expr, env = parent.frame(), quoted = FALSE) {
+renderBoxxy <- function(expr, env = parent.frame(), 
+  quoted = FALSE) {
   # Convert the expression + environment into a function
   func <- shiny::exprToFunction(expr, env, quoted)
 

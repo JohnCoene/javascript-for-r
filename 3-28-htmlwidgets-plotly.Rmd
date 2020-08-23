@@ -2,7 +2,7 @@
 
 In this chapter we build a widget for plotly.js, or a tiny part of it; it'll allow drawing a scatter and line plot and have some additional functionalities in shiny. The aim of this chapter is to demonstrate how easily one can transfer take aways from building the gio widget to build another.
 
-## Discover 
+## Discover Plotly
 
 Below is a basic example from the [plotly website](https://plotly.com/javascript/line-and-scatter/). We will aim to reproduce it using htmlwidgets before improving upon it.
 
@@ -52,7 +52,7 @@ plotly(data = cars) %>%
   plot_marker(x = "dist", y = "speed")
 ```
 
-## Basics 
+## Basics of plotly
 
 The story starts like all other widgets: create a package and scaffold the widget. We name the package plotlier so as to not override the local installation of the actual plotly package. We also add the magrittr pipe (`%>%`) while we're at it.
 
@@ -82,7 +82,8 @@ We start by editing the `plotly` function to accept a data frame which will be s
 
 ```r
 #' @export
-plotly <- function(data, width = NULL, height = NULL, elementId = NULL) {
+plotly <- function(data, width = NULL, height = NULL, 
+  elementId = NULL) {
 
   # forward options using x
   x = list(
@@ -233,7 +234,8 @@ We start, as done previously, by defining a "proxy," a function that returns an 
 
 ```r
 #' @export
-plotlyProxy <- function(id, session = shiny::getDefaultReactiveDomain()){
+plotlyProxy <- function(id, 
+  session = shiny::getDefaultReactiveDomain()){
   list(
     id = id,
     session = session
@@ -264,9 +266,11 @@ Finally, we add a message handler to handle the data sent to `add-traces` and us
 ```js
 if(HTMLWidgets.shinyMode){
 
-  Shiny.addCustomMessageHandler(type = 'add-traces', function(msg){
-    Plotly.addTraces(msg.id, msg.data);
-  })
+  Shiny.addCustomMessageHandler(
+    type = 'add-traces', function(msg){
+      Plotly.addTraces(msg.id, msg.data);
+    }
+  )
 
 }
 ```

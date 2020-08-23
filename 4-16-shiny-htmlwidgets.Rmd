@@ -122,11 +122,14 @@ One might also consider not sending back all the data. For instance, gio returns
 
 ```js
 function callback (selectedCountry, relatedCountries) {
-  Shiny.setInputValue(el.id + '_selected', selectedCountry.ISOCode);
+  Shiny.setInputValue(
+    el.id + '_selected', 
+    selectedCountry.ISOCode
+  );
 }
 ```
 
-## Input Handler 
+## Input handlers for widgets
 
 While input handlers were explored previously we found limited use for them as these were set to simple boolean values for which a preprocessor made little sense. It can be useful in this case as the inputs return more substantial data. Namely the input returning data on the related countries, it is converted from JSON to a list but could be reshaped to a data frame of arcs (looking like `gio`'s input data).
 
@@ -148,7 +151,10 @@ related_countries_handler <- function(x, session, inputname){
 }
 
 .onLoad <- function(libname, pkgname) {
-  shiny::registerInputHandler("gio.related.countries", related_countries_handler)
+  shiny::registerInputHandler(
+    "gio.related.countries", 
+    related_countries_handler
+  )
 }
 ```
 
@@ -260,7 +266,9 @@ Let's start by creating the R function used to send data to JavaScript. This is 
 
 ```r
 #' @export
-gio_send_data <- function(id, data, source, target, value, session = shiny::getDefaultReactiveDomain()){
+gio_send_data <- function(id, data, source, target, value, 
+  session = shiny::getDefaultReactiveDomain()){
+
   data <- dplyr::select(
     data,
     i = {{ source }},
@@ -285,7 +293,9 @@ Unfortunately this serialiser cannot be changed, therefore we have to reformat t
 
 ```r
 #' @export
-gio_send_data <- function(id, data, source, target, value, session = shiny::getDefaultReactiveDomain()){
+gio_send_data <- function(id, data, source, target, value, 
+  session = shiny::getDefaultReactiveDomain()){
+
   data <- dplyr::select(
     data,
     i = {{ source }},
@@ -344,8 +354,14 @@ HTMLWidgets.widget({
 
         function callback (selectedCountry, relatedCountries) {
           sel_handle.set([selectedCountry.ISOCode]);
-          Shiny.setInputValue(el.id + '_selected', selectedCountry);
-          Shiny.setInputValue(el.id + '_related:gio.related.countries', relatedCountries);
+          Shiny.setInputValue(
+            el.id + '_selected', 
+            selectedCountry
+          );
+          Shiny.setInputValue(
+            el.id + '_related:gio.related.countries', 
+            relatedCountries
+          );
         }
 
         // use stats
@@ -395,7 +411,8 @@ We can now turn the attention to actually applying the data sent from the R serv
 if (HTMLWidgets.shinyMode){
 
   // send-data message handler
-  Shiny.addCustomMessageHandler(type = 'send-data', function(message) {
+  Shiny.addCustomMessageHandler(
+    type = 'send-data', function(message) {
 
   });
 
@@ -411,7 +428,8 @@ What the currently empty `send-data` message handler should do is fetch the widg
 if (HTMLWidgets.shinyMode){
 
   // send-data message handler
-  Shiny.addCustomMessageHandler(type = 'send-data', function(message) {
+  Shiny.addCustomMessageHandler(
+    type = 'send-data', function(message) {
 
     // retrieve controller
     var controller = get_gio(message.id);
@@ -488,7 +506,9 @@ This can be remedied to by introducing what is often referred to as a "proxy." A
 
 ```r
 #' @export
-gio_proxy <- function(id, session = shiny::getDefaultReactiveDomain()){
+gio_proxy <- function(id, 
+  session = shiny::getDefaultReactiveDomain()){
+
   list(id = id, session = session)
 }
 ```
@@ -523,9 +543,11 @@ Now onto the JavaScript code to catch that message and actually clear the data f
 
 ```js
 // gio.js
-Shiny.addCustomMessageHandler(type = 'clear-data', function(message) {
-  var controller = get_gio(message.id);
-  controller.clearData();
+Shiny.addCustomMessageHandler(
+  type = 'clear-data', function(message) {
+
+    var controller = get_gio(message.id);
+    controller.clearData();
 });
 ```
 
@@ -587,19 +609,21 @@ gio_set_style <- function(proxy, style){
 Then adding the JavaScript handler.
 
 ```js
-Shiny.addCustomMessageHandler(type = 'set-style', function(message) {
-  var controller = get_gio(message.id);
-  controller.setStyle(message.style);
+Shiny.addCustomMessageHandler(
+  type = 'set-style', function(message) {
+    var controller = get_gio(message.id);
+    controller.setStyle(message.style);
 });
 ```
 
 At this stage one can try the function in a shiny application but it will not work because most such methods that change underlying aspects of a visualisation will not be reflected in real time. Gio.js, and many other libraries, will require one to explicitly ask for an update so the changes take effect. This has multiple advantages, one can stack multiple visual changes to execute them at the same time, and one can manage the load on the front-end. 
 
 ```js
-Shiny.addCustomMessageHandler(type = 'set-style', function(message) {
-  var controller = get_gio(message.id);
-  controller.setStyle(message.style);
-  controller.update(); // force update the visualisation
+Shiny.addCustomMessageHandler(
+  type = 'set-style', function(message) {
+    var controller = get_gio(message.id);
+    controller.setStyle(message.style);
+    controller.update(); // force update the visualisation
 });
 ```
 

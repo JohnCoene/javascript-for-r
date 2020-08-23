@@ -156,7 +156,9 @@ Let us start by writing the R code to send the data, thankfully very little is r
 ```r
 server <- function(input, output, session){
   # set the identifier to send-alert
-  session$sendCustomMessage(type = "send-alert", message = "Hi there!")
+  session$sendCustomMessage(
+    type = "send-alert", message = "Hi there!"
+  )
 }
 ```
 
@@ -164,8 +166,9 @@ This effectively sends the message to the JavaScript client but we are yet to us
 
 ```r
 tags$script(
-  "Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
-    alert(message);
+  "Shiny.addCustomMessageHandler(
+    type = 'send-alert', function(message) {
+      alert(message);
   });"
 )
 ```
@@ -179,8 +182,9 @@ library(shiny)
 
 ui <- fluidPage(
   tags$script(
-    "Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
-      alert(message);
+    "Shiny.addCustomMessageHandler(
+      type = 'send-alert', function(message) {
+        alert(message);
     });"
   ),
   h1("Hello"),
@@ -207,13 +211,14 @@ This can be done by defining a _simplified_ shiny input. While one can define a 
 
 ```r
 tags$script(
-  "Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
+  "Shiny.addCustomMessageHandler(
+    type = 'send-alert', function(message) {
     
-    // show alert
-    alert(message);
+      // show alert
+      alert(message);
 
-    // set to true when clicked OK
-    Shiny.setInputValue('delete_alert', true);
+      // set to true when clicked OK
+      Shiny.setInputValue('delete_alert', true);
   });"
 )
 ```
@@ -225,16 +230,19 @@ library(shiny)
 
 ui <- fluidPage(
   tags$script(
-    "Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
-      alert(message);
-      Shiny.setInputValue('delete_alert', true);
+    "Shiny.addCustomMessageHandler(
+      type = 'send-alert', function(message) {
+        alert(message);
+        Shiny.setInputValue('delete_alert', true);
     });"
   ),
   h1("Hello")
 )
 
 server <- function(input, output, session){
-  session$sendCustomMessage(type = "send-alert", message = "Deleting a record!")
+  session$sendCustomMessage(
+    type = "send-alert", message = "Deleting a record!"
+  )
 
   observeEvent(input$delete_alert, {
     # print TRUE when button is clicked
@@ -252,16 +260,19 @@ library(shiny)
 
 ui <- fluidPage(
   tags$script(
-    "Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
-      alert(message);
-      Shiny.setInputValue('delete_alert', true, {priority: 'event'});
+    "Shiny.addCustomMessageHandler(
+      type = 'send-alert', function(message) {
+        alert(message);
+        Shiny.setInputValue('delete_alert', true, {priority: 'event'});
     });"
   ),
   h1("Hello")
 )
 
 server <- function(input, output, session){
-  session$sendCustomMessage(type = "send-alert", message = "Deleting a record!")
+  session$sendCustomMessage(
+    type = "send-alert", message = "Deleting a record!"
+  )
 
   observeEvent(input$delete_alert, {
     # print TRUE when button is clicked
@@ -332,16 +343,22 @@ registerInputHandler("alert.processor", process_input)
 
 ui <- fluidPage(
   tags$script(
-    "Shiny.addCustomMessageHandler(type = 'send-alert', function(message) {
-      alert(message);
-      Shiny.setInputValue('delete_alert:alert.processor', true, {priority: 'event'});
+    "Shiny.addCustomMessageHandler(
+      type = 'send-alert', function(message) {
+        alert(message);
+        Shiny.setInputValue(
+          'delete_alert:alert.processor', true, 
+          {priority: 'event'}
+        );
     });"
   ),
   h1("Hello")
 )
 
 server <- function(input, output, session){
-  session$sendCustomMessage(type = "send-alert", message = "Deleting a record!")
+  session$sendCustomMessage(
+    type = "send-alert", message = "Deleting a record!"
+  )
 
   observeEvent(input$delete_alert, {
     print(input$delete_alert) 
