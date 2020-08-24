@@ -3123,8 +3123,8 @@ Using the above the data loaded would be accessible from the htmlwidgets JavaScr
 
 Note this means the data is read from the web browser and therefore the data must be accessible to the web browser, the \texttt{path\_to\_json} must thus be a served static file, e.g.: \texttt{www} directory in shiny.
 
-\hypertarget{crosstalk}{%
-\chapter{Linking Widgets}\label{crosstalk}}
+\hypertarget{linking-widgets}{%
+\chapter{Linking Widgets}\label{linking-widgets}}
 
 Widgets can be linked with one another using the crosstalk \citep{R-crosstalk} package, a fantastic add-on for htmlwidgets that implements cross-widget interactions, namely selection and filtering. This in effect allows the selection or filtering of data points in one widget to be mirrored in another. This is enabled by the creation of ``shared datasets'' that can be used across widgets.
 
@@ -3328,27 +3328,34 @@ In JavaScript, a widget ``receives'' the keys of selected and filtered data poin
 \hypertarget{crosstalk-with-gio}{%
 \section{Crosstalk with gio}\label{crosstalk-with-gio}}
 
-The application of crosstalk to the gio library is somewhat amiss. As mentioned or hinted at before, in order for crosstalk to be properly implemented a widget must be a able to select, deselect as well as filter and unfilter data points and this is not entirely the case of gio.
+The application of crosstalk to the gio library is somewhat amiss. As mentioned before, in order for crosstalk to be properly implemented a widget must be a able to select, deselect as well as filter and unfilter data points and this is not entirely the case of gio.
 
 \begin{rmdnote}
 The application of crosstalk to the gio package is instructive but
 limited and somewhat faulty.
 \end{rmdnote}
 
-First, gio's underlying data is somewhat uncommon: it is a network defined only by its edges (the arcs leaving and coming into countries). Second, those edges themselves cannot be selected, as we've observed previously one cannot truly change what edges are drawn on the globe, only change which country is selected and by proxy which edges are shown. Third, while gio supports changing which country is selected it does not allow having not countries selected.
+First, gio's underlying data is somewhat uncommon: it is a network defined only by its edges (the arcs leaving and coming into countries). Second, those edges themselves cannot be selected, as we've observed previously one cannot truly change what edges are drawn on the globe, only change which country is selected which by proxy defines the edges shown on the globe. Third, while gio supports changing which country is selected (by clicking on the globe) it does not allow unselecting a country; with gio.js a country is always selected.
 
 The way crosstalk can work with gio is by setting the keys of the shared dataset to the country ISO codes that gio uses. Since data gio accepts consists of edges this ISO code could correspond to either source or the target country.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{\# keys = target}
+\NormalTok{shared\_arcs \textless{}{-}}\StringTok{ }\NormalTok{SharedData}\OperatorTok{$}\KeywordTok{new}\NormalTok{(arcs, }\DataTypeTok{key =}\NormalTok{ arcs}\OperatorTok{$}\NormalTok{e)}
+\CommentTok{\# keys = source}
 \NormalTok{shared\_arcs \textless{}{-}}\StringTok{ }\NormalTok{SharedData}\OperatorTok{$}\KeywordTok{new}\NormalTok{(arcs, }\DataTypeTok{key =}\NormalTok{ arcs}\OperatorTok{$}\NormalTok{i)}
 \end{Highlighting}
 \end{Shaded}
 
+This constraint will have to be documented and communicated to the users of the package as otherwise gio's implementation of crosstalk will not work.
+
+The crosstalk integration with gio would be much clearer were gio able to highlight or filter specific edges, unfortunately it cannot. Were the constraint of having to specify the keys were removed the gio package would have to make an interpretation. For instance, the widget would receive a selection, say \texttt{1} indicating that the first edge was selected in another widget, gio, not being able to highlight the edge, would have decide whether to highlight either the country wherefrom the edge comes or the country where the edge goes to. Though this could be implemented it would be vastly more laborious and in fact provide a be more limited as the choice of country to highlight would no longer up to the user.
+
 \hypertarget{adapt-the-r-code}{%
 \section{Adapt the R code}\label{adapt-the-r-code}}
 
-In any event, let us start by making the required changes to the R code first. The only changes that need to be made are in the \texttt{gio} function as it is the only that accepts a data object.
+In any event, let us start by making the required changes to the R code first. The only changes that need to be made are in the \texttt{gio} function as it is the only that currently accepts a data object and thus may receive a shared dataset.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3360,7 +3367,7 @@ In any event, let us start by making the required changes to the R code first. T
 ## [1] "SharedData" "R6"
 \end{verbatim}
 
-The shared datasets are R6 classes and therefore cannot simply be treated as dataframes. The \texttt{gio} function needs to check whether the \texttt{data} object it received is a shared dataset with \texttt{is.SharedData} and if so use its methods to extract data from it, namely:
+Shared datasets are R6 classes and therefore cannot simply be treated as dataframes. The \texttt{gio} function needs to check whether the \texttt{data} object it received is a shared dataset with \texttt{is.SharedData} and if so use its methods to extract data from it, namely:
 
 \begin{itemize}
 \tightlist
@@ -3371,6 +3378,8 @@ The shared datasets are R6 classes and therefore cannot simply be treated as dat
 \item
   The keys that were assigned to every row of the dataset with \texttt{key}
 \end{itemize}
+
+The \texttt{origData} method is needed to extract the data from the shared dataset. This is of course necessary as the \texttt{gio} function still needs to obtain and serialise data to display on the globe.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3385,7 +3394,7 @@ The shared datasets are R6 classes and therefore cannot simply be treated as dat
 ## 2 CN RU   10000
 \end{verbatim}
 
-Note that the name of the group was randomly generated since none were specified when the shared dataset was created.
+The \texttt{gio} function would also has to extract the group to which the dataset belongs, this will be necessary JavaScript-side to tell crosstalk which group one is working with. Note that the it was randomly generated since none were specified when the shared dataset was created.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3395,7 +3404,7 @@ Note that the name of the group was randomly generated since none were specified
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "SharedData900c9c7e"
+## [1] "SharedData3e115672"
 \end{verbatim}
 
 \begin{Shaded}
@@ -3409,7 +3418,7 @@ Note that the name of the group was randomly generated since none were specified
 ## [1] "US" "RU"
 \end{verbatim}
 
-The methods \texttt{origData} and \texttt{groupName} must be used in every widget, the original dataframe is still needed to produce the visualisation and the group will be needed JavaScript so we can tell crosstalk which group one is working with. The \texttt{key} method may not be useful with every widget if the visualisation library also comes with a key/id system so one can use it internally, we won't be using it with gio. Finally notice that we also add the JavaScript dependency with \texttt{crosstalkLibs}.
+The methods \texttt{origData} and \texttt{groupName} must be used in every widget, the \texttt{key} method may not be useful with every widget, it can be immensely useful if the visualisation library also comes with a key/id system so one can use it internally, as explored previously gio.js does not and we thus will not be using it. The name of the group is passed to the \texttt{x} object so it is accessible JavaScript-side where it is needed, we also add the JavaScript dependency required to run crosstalk with \texttt{crosstalkLibs}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3455,12 +3464,10 @@ The methods \texttt{origData} and \texttt{groupName} must be used in every widge
 \end{Highlighting}
 \end{Shaded}
 
-The widget will now ship with the crosstalk dependencies and the group name will be serialised and accessible in JavaScript.
-
 \hypertarget{change-the-javascript-code}{%
 \section{Change the JavaScript code}\label{change-the-javascript-code}}
 
-What is left to do is to adapt the JavaScript code, as mentioned previously it must accept the keys selected in other widgets and share the selected key with other widgets.
+What is left to do is to adapt the JavaScript code, as a reminder it must accept the keys selected in other widgets and share the selected key with other widgets.
 
 First we create the selection handler in the \texttt{factory} function, this is done by instantiating a new class from \texttt{crosstalk.SelectionHandle}.
 
@@ -3470,7 +3477,7 @@ First we create the selection handler in the \texttt{factory} function, this is 
 \end{Highlighting}
 \end{Shaded}
 
-Once the selection handle created it can be used in the \texttt{renderValue} function to define set the group.
+Once the selection handle created it can be used in the \texttt{renderValue} function to set the group that was collected from R.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3481,7 +3488,30 @@ Once the selection handle created it can be used in the \texttt{renderValue} fun
 \hypertarget{send-selected-keys}{%
 \subsection{Send selected keys}\label{send-selected-keys}}
 
-In order to send the selected keys to crosstalk we shall need to use the one callback function that gio allows using. This callback function is fired every time a user selects a country on the globe and accepts two arguments, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). For this exercise only the selected country is of use. The callback function that one wants to have run every time a country is picked by the user can be passed to \texttt{controller.onCountryPicked}
+In order for gio to share share the selected country with other widgets it would first have to know which country is selected. This can be achieved with a callback function that gio supports.
+
+Most JavaScript visualisation libraries will support callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. What these callback functions will be and how they work will entirely depend on the library at hand.
+
+In gio.js this callback function is fired when a country is selected on the globe and accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country).
+
+The \href{https://giojs.org/html/docs/callbackPicked.html}{documentation of gio.js} gives the following example callback function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// define callback function}
+\KeywordTok{function} \FunctionTok{callback}\NormalTok{ (selectedCountry}\OperatorTok{,}\NormalTok{ relatedCountries) \{}
+  \BuiltInTok{console}\OperatorTok{.}\FunctionTok{log}\NormalTok{(selectedCountry)}\OperatorTok{;}
+  \BuiltInTok{console}\OperatorTok{.}\FunctionTok{log}\NormalTok{(relatedCountries)}\OperatorTok{;}
+\NormalTok{\}}
+
+\CommentTok{// use callback function}
+\NormalTok{controller}\OperatorTok{.}\FunctionTok{onCountryPicked}\NormalTok{(callback)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+This defines a function named \texttt{callback} which takes the two aforementioned objects and logs them in the JavaScript console. Then the function is passed to the \texttt{controller} which will run it every time a country is picked (selected). This callback function will be useful to send the \texttt{key}s to other widgets: when a user selects China send the \texttt{CN} key selection.
+
+The callback function that one wants to have run every time a country is picked by the user can be passed to \texttt{controller.onCountryPicked}.
 
 Let us first explore the what is within the object \texttt{selectedCountry} object by logging it to the console.
 
@@ -3505,7 +3535,7 @@ Let us first explore the what is within the object \texttt{selectedCountry} obje
 \end{Highlighting}
 \end{Shaded}
 
-As mentioned at the beginning of this section, the keys used with the datasets for gio.js should be ISO codes, therefore one can consider the \texttt{ISOCode} variable as selected \texttt{key}. The \texttt{set} method from the selection handle can be used to share the selected key with other widgets. Note that this method expects either a \texttt{null} value or an array a scalar value will throw an error, hence \texttt{selectedCountry.ISOCode} is wrapped in square brackets.
+As mentioned at the beginning of this section, the keys used with the datasets for gio.js should be country ISO codes, therefore one can consider the \texttt{ISOCode} variable as selected \texttt{key}. The \texttt{set} method from the selection handle can be used to share the selected key with other widgets. Note that this method expects either a \texttt{null} value or an array a scalar value will throw an error, hence \texttt{selectedCountry.ISOCode} is wrapped in square brackets.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6608,16 +6638,15 @@ To demonstrate how to integrate these functionalities in widgets we shall implem
 \hypertarget{javascript-to-r}{%
 \section{JavaScript to R}\label{javascript-to-r}}
 
-JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. The \protect\hyperlink{crosstalk}{crosstalk} chapter already explored gio.js' callback function: it is fired when a country is selected on the globe and accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). This is used to set the share selected key (country ISO code) with other widget already. This callback function could also send data back to the R server where they could be used for many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
+In a previous chapter on \protect\hyperlink{linking-widgets}{Linking Widgets} the topic of callback function was briefly explored. Gio.js provides a callback function that is fired every time a country is selected on globe, this is currently used to share said country with other widgets as part of the implementation with crosstalk. This callback function could also send data back to the R server where they could be used for many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
 
-The \href{https://giojs.org/html/docs/callbackPicked.html}{documentation of gio.js} gives the following example callback function. Note that we should already be making used of \texttt{selectedCountry} with crosstalk.
+The callback function in the gio package currently looks like this, it only makes use of some of the data for crosstalk.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{// define callback function}
 \KeywordTok{function} \FunctionTok{callback}\NormalTok{ (selectedCountry}\OperatorTok{,}\NormalTok{ relatedCountries) \{}
-  \BuiltInTok{console}\OperatorTok{.}\FunctionTok{log}\NormalTok{(selectedCountry)}\OperatorTok{;}
-  \BuiltInTok{console}\OperatorTok{.}\FunctionTok{log}\NormalTok{(relatedCountries)}\OperatorTok{;}
+\NormalTok{  sel\_handle}\OperatorTok{.}\FunctionTok{set}\NormalTok{([selectedCountry}\OperatorTok{.}\AttributeTok{ISOCode}\NormalTok{])}\OperatorTok{;}
 \NormalTok{\}}
 
 \CommentTok{// use callback function}
@@ -6625,7 +6654,7 @@ The \href{https://giojs.org/html/docs/callbackPicked.html}{documentation of gio.
 \end{Highlighting}
 \end{Shaded}
 
-This defines a function named \texttt{callback} which takes the two aforementioned objects and logs them in the JavaScript console. Then the function is passed to the \texttt{controller} which will run it every time a country is picked (selected). This can be incorporated into the widget where instead of logging the data in the console it could be used to define two different shiny inputs.
+We can make further use of this to define two different shiny inputs; one for the selected country and another for its related edges.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7505,7 +7534,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Mon Aug 24 2020 14:16:07 GMT+0200 (Central European Summer Time)"
+## [1] "Mon Aug 24 2020 16:01:15 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -7515,7 +7544,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Mon Aug 24 2020 14:16:07 GMT+0200 (Central European Summer Time)"
+## [1] "Mon Aug 24 2020 16:01:15 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -8052,7 +8081,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 47.74
+## [1] -43.98
 \end{verbatim}
 
 \begin{Shaded}

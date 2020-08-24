@@ -1,4 +1,4 @@
-# Linking Widgets {#crosstalk}
+# Linking Widgets {#linking-widgets}
 
 Widgets can be linked with one another using the crosstalk [@R-crosstalk] package, a fantastic add-on for htmlwidgets that implements cross-widget interactions, namely selection and filtering. This in effect allows the selection or filtering of data points in one widget to be mirrored in another. This is enabled by the creation of "shared datasets" that can be used across widgets.
 
@@ -265,40 +265,49 @@ shared_cars_head <- SharedData$new(head(mtcars), group = "cars")
 
 ## Crosstalk with gio
 
-The application of crosstalk to the gio library is somewhat amiss. As mentioned or hinted at before, in order for crosstalk to be properly implemented a widget must be a able to select, deselect as well as filter and unfilter data points and this is not entirely the case of gio. 
+The application of crosstalk to the gio library is somewhat amiss. As mentioned before, in order for crosstalk to be properly implemented a widget must be a able to select, deselect as well as filter and unfilter data points and this is not entirely the case of gio. 
 
 ```{block, type='rmdnote'}
 The application of crosstalk to the gio package is instructive but limited and somewhat faulty.
 ```
 
-First, gio's underlying data is somewhat uncommon: it is a network defined only by its edges (the arcs leaving and coming into countries). Second, those edges themselves cannot be selected, as we've observed previously one cannot truly change what edges are drawn on the globe, only change which country is selected and by proxy which edges are shown. Third, while gio supports changing which country is selected it does not allow having not countries selected.
+First, gio's underlying data is somewhat uncommon: it is a network defined only by its edges (the arcs leaving and coming into countries). Second, those edges themselves cannot be selected, as we've observed previously one cannot truly change what edges are drawn on the globe, only change which country is selected which by proxy defines the edges shown on the globe. Third, while gio supports changing which country is selected (by clicking on the globe) it does not allow unselecting a country; with gio.js a country is always selected.
 
 The way crosstalk can work with gio is by setting the keys of the shared dataset to the country ISO codes that gio uses. Since data gio accepts consists of edges this ISO code could correspond to either source or the target country.
 
 ```{r}
+# keys = target
+shared_arcs <- SharedData$new(arcs, key = arcs$e)
+# keys = source
 shared_arcs <- SharedData$new(arcs, key = arcs$i)
 ```
 
+This constraint will have to be documented and communicated to the users of the package as otherwise gio's implementation of crosstalk will not work.
+
+The crosstalk integration with gio would be much clearer were gio able to highlight or filter specific edges, unfortunately it cannot. Were the constraint of having to specify the keys were removed the gio package would have to make an interpretation. For instance, the widget would receive a selection, say `1` indicating that the first edge was selected in another widget, gio, not being able to highlight the edge, would have decide whether to highlight either the country wherefrom the edge comes or the country where the edge goes to. Though this could be implemented it would be vastly more laborious and in fact provide a be more limited as the choice of country to highlight would no longer up to the user.
+
 ## Adapt the R code
 
-In any event, let us start by making the required changes to the R code first. The only changes that need to be made are in the `gio` function as it is the only that accepts a data object.
+In any event, let us start by making the required changes to the R code first. The only changes that need to be made are in the `gio` function as it is the only that currently accepts a data object and thus may receive a shared dataset.
 
 ```{r}
 class(shared_arcs)
 ```
 
-The shared datasets are R6 classes and therefore cannot simply be treated as dataframes. The `gio` function needs to check whether the `data` object it received is a shared dataset with `is.SharedData` and if so use its methods to extract data from it, namely:
+Shared datasets are R6 classes and therefore cannot simply be treated as dataframes. The `gio` function needs to check whether the `data` object it received is a shared dataset with `is.SharedData` and if so use its methods to extract data from it, namely:
 
 - The original dataset with `origData`.
 - The group to which the dataset belongs with `groupName`.
 - The keys that were assigned to every row of the dataset with `key`
+
+The `origData` method is needed to extract the data from the shared dataset. This is of course necessary as the `gio` function still needs to obtain and serialise data to display on the globe.
 
 ```{r}
 # original data
 shared_arcs$origData()
 ```
 
-Note that the name of the group was randomly generated since none were specified when the shared dataset was created.
+The `gio` function would also has to extract the group to which the dataset belongs, this will be necessary JavaScript-side to tell crosstalk which group one is working with. Note that the it was randomly generated since none were specified when the shared dataset was created.
 
 ```{r}
 # groupName
@@ -308,7 +317,7 @@ shared_arcs$groupName()
 shared_arcs$key()
 ```
 
-The methods `origData` and `groupName` must be used in every widget, the original dataframe is still needed to produce the visualisation and the group will be needed JavaScript so we can tell crosstalk which group one is working with. The `key` method may not be useful with every widget if the visualisation library also comes with a key/id system so one can use it internally, we won't be using it with gio. Finally notice that we also add the JavaScript dependency with  `crosstalkLibs`.
+The methods `origData` and `groupName` must be used in every widget, the `key` method may not be useful with every widget, it can be immensely useful if the visualisation library also comes with a key/id system so one can use it internally, as explored previously gio.js does not and we thus will not be using it. The name of the group is passed to the `x` object so it is accessible JavaScript-side where it is needed, we also add the JavaScript dependency required to run crosstalk with `crosstalkLibs`.
 
 ```r
 gio <- function(data, width = NULL, height = NULL, 
@@ -352,11 +361,9 @@ gio <- function(data, width = NULL, height = NULL,
 }
 ```
 
-The widget will now ship with the crosstalk dependencies and the group name will be serialised and accessible in JavaScript.
-
 ## Change the JavaScript code
 
-What is left to do is to adapt the JavaScript code, as mentioned previously it must accept the keys selected in other widgets and share the selected key with other widgets.
+What is left to do is to adapt the JavaScript code, as a reminder it must accept the keys selected in other widgets and share the selected key with other widgets.
 
 First we create the selection handler in the `factory` function, this is done by instantiating a new class from `crosstalk.SelectionHandle`.
 
@@ -364,7 +371,7 @@ First we create the selection handler in the `factory` function, this is done by
 var sel_handle = new crosstalk.SelectionHandle();
 ```
 
-Once the selection handle created it can be used in the `renderValue` function to define set the group.
+Once the selection handle created it can be used in the `renderValue` function to set the group that was collected from R.
 
 ```js
 sel_handle.setGroup(x.crosstalk.group);
@@ -372,7 +379,28 @@ sel_handle.setGroup(x.crosstalk.group);
 
 ### Send selected keys
 
-In order to send the selected keys to crosstalk we shall need to use the one callback function that gio allows using. This callback function is fired every time a user selects a country on the globe and accepts two arguments, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). For this exercise only the selected country is of use. The callback function that one wants to have run every time a country is picked by the user can be passed to `controller.onCountryPicked`
+In order for gio to share share the selected country with other widgets it would first have to know which country is selected. This can be achieved with a callback function that gio supports.
+
+Most JavaScript visualisation libraries will support callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. What these callback functions will be and how they work will entirely depend on the library at hand. 
+
+In gio.js this callback function is fired when a country is selected on the globe and accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). 
+
+The [documentation of gio.js](https://giojs.org/html/docs/callbackPicked.html) gives the following example callback function.
+
+```js
+// define callback function
+function callback (selectedCountry, relatedCountries) {
+  console.log(selectedCountry);
+  console.log(relatedCountries);
+}
+
+// use callback function
+controller.onCountryPicked(callback);
+```
+
+This defines a function named `callback` which takes the two aforementioned objects and logs them in the JavaScript console. Then the function is passed to the `controller` which will run it every time a country is picked (selected). This callback function will be useful to send the `key`s to other widgets: when a user selects China send the `CN` key selection.
+
+The callback function that one wants to have run every time a country is picked by the user can be passed to `controller.onCountryPicked`.
 
 Let us first explore the what is within the object `selectedCountry` object by logging it to the console.
 
@@ -392,7 +420,7 @@ controller.onCountryPicked(callback);
 {name: "LIBYA", lat: 25, lon: 17, center: n, ISOCode: "LY"}
 ```
 
-As mentioned at the beginning of this section, the keys used with the datasets for gio.js should be ISO codes, therefore one can consider the `ISOCode` variable as selected `key`. The `set` method from the selection handle can be used to share the selected key with other widgets. Note that this method expects either a `null` value or an array a scalar value will throw an error, hence `selectedCountry.ISOCode` is wrapped in square brackets.
+As mentioned at the beginning of this section, the keys used with the datasets for gio.js should be country ISO codes, therefore one can consider the `ISOCode` variable as selected `key`. The `set` method from the selection handle can be used to share the selected key with other widgets. Note that this method expects either a `null` value or an array a scalar value will throw an error, hence `selectedCountry.ISOCode` is wrapped in square brackets.
 
 ```js
 function callback (selectedCountry) {

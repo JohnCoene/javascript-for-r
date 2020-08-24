@@ -6,22 +6,21 @@ To demonstrate how to integrate these functionalities in widgets we shall implem
 
 ## JavaScript to R 
 
-JavaScript visualisation libraries will often include callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. The [crosstalk](#crosstalk) chapter already explored gio.js' callback function: it is fired when a country is selected on the globe and accepts two objects, one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country). This is used to set the share selected key (country ISO code) with other widget already. This callback function could also send data back to the R server where they could be used for many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
+In a previous chapter on [Linking Widgets](#linking-widgets) the topic of callback function was briefly explored. Gio.js provides a callback function that is fired every time a country is selected on globe, this is currently used to share said country with other widgets as part of the implementation with crosstalk. This callback function could also send data back to the R server where they could be used for many things like fetching more data on the selected country from a database, or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
 
-The [documentation of gio.js](https://giojs.org/html/docs/callbackPicked.html) gives the following example callback function. Note that we should already be making used of `selectedCountry` with crosstalk.
+The callback function in the gio package currently looks like this, it only makes use of some of the data for crosstalk.
 
 ```js
 // define callback function
 function callback (selectedCountry, relatedCountries) {
-  console.log(selectedCountry);
-  console.log(relatedCountries);
+  sel_handle.set([selectedCountry.ISOCode]);
 }
 
 // use callback function
 controller.onCountryPicked(callback);
 ```
 
-This defines a function named `callback` which takes the two aforementioned objects and logs them in the JavaScript console. Then the function is passed to the `controller` which will run it every time a country is picked (selected). This can be incorporated into the widget where instead of logging the data in the console it could be used to define two different shiny inputs. 
+We can make further use of this to define two different shiny inputs; one for the selected country and another for its related edges. 
 
 ```js
 // gio.js
