@@ -1,8 +1,8 @@
 # Linking Widgets {#linking-widgets}
 
-Widgets can be linked with one another using the crosstalk [@R-crosstalk] package, a fantastic add-on for htmlwidgets that implements cross-widget interactions, namely selection and filtering. This in effect allows the selection or filtering of data points in one widget to be mirrored in another. This is enabled by the creation of "shared datasets" that can be used across widgets.
+Widgets can be linked with one another using the crosstalk [@R-crosstalk] package, a fantastic add-on for htmlwidgets that implements inter-widget interactions, namely selection and filtering. This in effect allows the selection or filtering of data points in one widget to be mirrored in another. This is enabled with the creation of "shared datasets" that can be used across widgets; outputs that share datasets share interactions.
 
-Crosstalk provides a straightforward interface to the users and instead requires effort from the developers for their widgets to support shared datasets.
+Crosstalk provides a straightforward interface to the users and instead requires effort from developers for their widgets to support shared datasets.
 
 ```{r, echo = FALSE}
 library(crosstalk)
@@ -25,7 +25,7 @@ arcs <- jsonlite::fromJSON(
 
 ## Crosstalk examples
 
-Both the plotly and DT packages support crosstalk, we can thus produce a scatter plot with the former and a table with the latter so that selection of data in one is reflected in the other.
+Both the plotly and DT packages support crosstalk, therefore using a shared dataset we can produce a scatter plot with the former and a table with the latter so that selection of data in one is reflected in the other.
 
 As alluded to earlier on this can be achieved by using a shared dataset which can be created with the `SharedData` R6 class from the crosstalk package, this dataset is then used as one would use a standard dataframe in plotly and DT. The `bscols` function is just a helper to create columns from html elements (using bootstrap). It's ideal for examples but one should not have to use it in Shiny---crosstalk will work without `bscols`.
 
@@ -44,7 +44,7 @@ bscols(
 
 ![Crosstalk Example](images/crosstalk.png)
 
-Basic usage of crosstalk datasets in shiny is very straightforward since it accepts reactive expressions to create shared datasets. Note that it takes the expression itself (`reactive`) not the output of the expression (`expression()`), the crosstalk documentation explains it best:
+Basic usage of crosstalk datasets in shiny is also straightforward since it accepts reactive expressions to create shared datasets. Note that it takes the expression itself (`reactive`) not the output of the expression (`expression()`), the crosstalk documentation explains it best:
 
 > If this feels foreign to you, think of how you pass a function name, not a function call, to `lapply`; that’s exactly analogous to what we’re doing here. 
 > 
@@ -163,9 +163,9 @@ shinyApp(ui, server)
 
 Crosstalk is will not work well with every widget and every dataset, in some cases it might not even be a good idea to support it at all.
 
-Crosstalk works best on rectangular data: dataframes or objects that resemble dataframes like `tibble` or `SpatialPolygonsDataFrame`. This is important as crosstalk will treat the data rowwise, where each row is an observation that is ultimately selected, or filtered. If the underlying data is not tabular (e.g.: trees) then one might eventually encounter mismatches between widgets.
+Crosstalk works best on rectangular data: dataframes or objects that resemble dataframes like `tibble` or `SpatialPolygonsDataFrame`. This is important as crosstalk will treat the data rowwise, where each row is an observation that is ultimately selected, or filtered. If the underlying data is not tabular (e.g.: trees) then one might eventually encounter mismatches between widgets as they go out of sync.
 
-Other than tabular data, crosstalk will require the widget to have the necessary functions or methods to dispatch the selection and filtering that crosstalk enables, that is, the widget must be able to filter as well as highlight and fade selected data points. 
+Other than tabular data, crosstalk will require the widget to have the necessary functions or methods to dispatch the selection and filtering that crosstalk enables, that is, the widget must be able to filter as well as highlight and fade selected data points as crosstalk itself does not provide this, neither the JavaScript nor the interface tools.
 
 ## How it works
 
@@ -202,7 +202,7 @@ digraph G {
 ", width = "100%", height = 250)
 ```
 
-Indeed the bi-directional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. This internally works with `key`s that are assigned to every row of the dataframe. These keys can be explicitly set by the user and otherwise default to the row names of the data.frame, and if these are not available the `SharedData` function will create row numbers.
+Indeed the bi-directional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. This internally works with `key`s that are assigned to every row of the dataframe which enable crosstalk to track which are selected or filtered. These keys can be explicitly set by the user and otherwise default to the row names of the data.frame, and if these are not available the `SharedData` function will create row numbers.
 
 ```{r}
 # assign keys
@@ -210,7 +210,7 @@ df <- data.frame(x = runif(26))
 sd <- SharedData$new(df, key = letters)
 ```
 
-In a sense, while crosstalk establishes lines of communication to transport `key`s between widgets, developers of the respective widgets must handle what `key`s are sent and what to do with incoming `key`s. There are two types of such messages: filtering to actually narrow down the selection of data points displayed on a widget, and selection (what crosstalk refers to as "linked brushing") to highlight certain data points.
+In a sense, while crosstalk establishes lines of communication to transport `key`s between widgets, developers of the respective widgets must handle what `key`s are sent and what to do with incoming `key`s. There are two such lines of communication, one for `key`s of rows that are meant to be filtered meant to narrow down the selection of data points displayed on a widget, and another for selection (what crosstalk refers to as "linked brushing") to highlight certain data points.
 
 ```{r, echo=FALSE}
 DiagrammeR::grViz("
@@ -256,24 +256,31 @@ digraph G {
 ", width = "100%", height=250)
 ```
 
-In JavaScript, a widget "receives" the keys of selected and filtered data points and must, when filtering or selection is observed, "send" said selected or filtered keys to other widgets. Internally crosstalk knows what to share across widgets with the aforementioned `group`, groups share `key`s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other. Therefore, the code below creates two shared datasets that are linked and share keys despite the fact that they are separate R objects.
+In JavaScript, a widget "receives" the keys of selected and filtered data points and must, when filtering or selection is observed, "send" said selected or filtered keys to other widgets. Internally crosstalk knows what to share across widgets with `group`s groups share `key`s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other. 
+
+```{block, type='rmdnote'}
+Crosstalk groups share keys.
+```
+
+Therefore, the code below creates two shared datasets that are linked as they fall in the same `group` despite the fact that they are separate R objects.
 
 ```r
+# row.name will be used as keys
+row.names(mtcars)[1:3]
+
 shared_cars <- SharedData$new(mtcars, group = "cars")
 shared_cars_head <- SharedData$new(head(mtcars), group = "cars")
 ```
 
+This effectively means that the key `Mazda RX4` "means" the same thing in `shared_cars` and `shared_cars_head`.
+
 ## Crosstalk with gio
 
-The application of crosstalk to the gio library is somewhat amiss. As mentioned before, in order for crosstalk to be properly implemented a widget must be a able to select, deselect as well as filter and unfilter data points and this is not entirely the case of gio. 
+The application of crosstalk to the gio library is somewhat amiss but it makes it rather more instructive. As mentioned before, in order for crosstalk to be properly implemented a widget must be a able to select, deselect as well as filter and unfilter data points and this is not entirely the case of gio. 
 
-```{block, type='rmdnote'}
-The application of crosstalk to the gio package is instructive but limited and somewhat faulty.
-```
+First, gio's underlying data is somewhat uncommon: it is a network defined only by its edges (the arcs leaving and coming into countries). Second, those edges themselves cannot be selected, as we've observed previously one cannot truly change what edges are drawn on the globe, only change the selected country which by proxy defines the edges shown on the globe. Third, while gio supports changing which country is selected (by clicking on the globe) it does not allow unselecting a country; with gio.js a country is always selected.
 
-First, gio's underlying data is somewhat uncommon: it is a network defined only by its edges (the arcs leaving and coming into countries). Second, those edges themselves cannot be selected, as we've observed previously one cannot truly change what edges are drawn on the globe, only change which country is selected which by proxy defines the edges shown on the globe. Third, while gio supports changing which country is selected (by clicking on the globe) it does not allow unselecting a country; with gio.js a country is always selected.
-
-The way crosstalk can work with gio is by setting the keys of the shared dataset to the country ISO codes that gio uses. Since data gio accepts consists of edges this ISO code could correspond to either source or the target country.
+The way crosstalk can work with gio is by setting the keys of the shared dataset to the country ISO codes that gio uses. Since data gio accepts consists of edges this ISO code could correspond to either the source or the target country.
 
 ```{r}
 # keys = target
@@ -282,9 +289,9 @@ shared_arcs <- SharedData$new(arcs, key = arcs$e)
 shared_arcs <- SharedData$new(arcs, key = arcs$i)
 ```
 
-This constraint will have to be documented and communicated to the users of the package as otherwise gio's implementation of crosstalk will not work.
+This constraint would have to be documented and communicated to the users of the package as otherwise gio's implementation of crosstalk will not work.
 
-The crosstalk integration with gio would be much clearer were gio able to highlight or filter specific edges, unfortunately it cannot. Were the constraint of having to specify the keys were removed the gio package would have to make an interpretation. For instance, the widget would receive a selection, say `1` indicating that the first edge was selected in another widget, gio, not being able to highlight the edge, would have decide whether to highlight either the country wherefrom the edge comes or the country where the edge goes to. Though this could be implemented it would be vastly more laborious and in fact provide a be more limited as the choice of country to highlight would no longer up to the user.
+Were the constraint of having to specify the keys removed the gio package would have to interpret the keys. For instance, the widget would receive a selection, say `3` indicating that the third edge was selected in another widget, gio, not being able to highlight the edge, would have decide whether to highlight either the country where the edge comes from or the country where the edge goes to. Though this could be implemented it would be vastly more laborious and in fact be more limited as the choice of country to highlight would no longer up to the user.
 
 ## Adapt the R code
 
@@ -300,14 +307,14 @@ Shared datasets are R6 classes and therefore cannot simply be treated as datafra
 - The group to which the dataset belongs with `groupName`.
 - The keys that were assigned to every row of the dataset with `key`
 
-The `origData` method is needed to extract the data from the shared dataset. This is of course necessary as the `gio` function still needs to obtain and serialise the data to display on the globe.
+The `origData` method is needed to extract the data from the shared dataset. This is of course necessary as the `gio` function still needs to obtain and serialise the arcs to display on the globe.
 
 ```{r}
 # original data
 shared_arcs$origData()
 ```
 
-The `gio` function would also has to extract the group to which the dataset belongs, this will be necessary JavaScript-side to tell crosstalk which group one is working with. Note that the it was randomly generated since none were specified when the shared dataset was created.
+The `gio` function also has to extract the group to which the dataset belongs, this will be necessary JavaScript-side to tell crosstalk which group one is working with. Note that it was randomly generated since none were specified when the shared dataset was created.
 
 ```{r}
 # groupName
@@ -360,6 +367,8 @@ gio <- function(data, width = NULL, height = NULL,
   )
 }
 ```
+
+While this is outside the scope of the book, it would be slightly more efficient to use a method instead of an if statement as above so that the crosstalk dependency is only loaded when a shared dataset is used, the function above would include the dependencies regardless making the output slight larger.
 
 ## Change the JavaScript code
 

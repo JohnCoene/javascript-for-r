@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-08-24" />
+<meta name="date" content="2020-08-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -599,21 +599,21 @@ Make sure you use unique class names so they are not accidentally overridden by 
 <h2><span class="header-section-number">15.6</span> JavaScript output binding</h2>
 <p>Here we create an “output binding,” it tells Shiny how to find the component and how to interact with it. An output binding is initialised from <code>Shiny.OutputBinding</code>. Below we initialise a new binding.</p>
 <div class="sourceCode" id="cb309"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb309-1"><a href="custom-outputs.html#cb309-1"></a><span class="co">// custom.js</span></span>
-<span id="cb309-2"><a href="custom-outputs.html#cb309-2"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">OutputBinding</span>()<span class="op">;</span></span></code></pre></div>
+<span id="cb309-2"><a href="custom-outputs.html#cb309-2"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span></code></pre></div>
 <p>Then, this must be “extended” by specifying a number of methods, a very necessary one being <code>find</code>. It is used to look for the output HTML element in the document (<code>scope</code>), and return them as an array (<code>HTMLcollection</code>). Other methods all take an <code>el</code> argument; that value will always be an element that was returned from <code>find</code>. A very straightforward way to accomplish this is to use jQuery’s find method to identify elements with the <code>boxxy</code> class used in <code>boxxyOutput</code>. You are by no means forced to use a CSS class to identify the elements but there is no reason not to.</p>
 <div class="sourceCode" id="cb310"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb310-1"><a href="custom-outputs.html#cb310-1"></a><span class="co">// custom.js</span></span>
-<span id="cb310-2"><a href="custom-outputs.html#cb310-2"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">OutputBinding</span>()<span class="op">;</span></span>
+<span id="cb310-2"><a href="custom-outputs.html#cb310-2"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
 <span id="cb310-3"><a href="custom-outputs.html#cb310-3"></a></span>
-<span id="cb310-4"><a href="custom-outputs.html#cb310-4"></a>$<span class="op">.</span><span class="fu">extend</span>(boxxyBinding<span class="op">,</span> {</span>
-<span id="cb310-5"><a href="custom-outputs.html#cb310-5"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
-<span id="cb310-6"><a href="custom-outputs.html#cb310-6"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
-<span id="cb310-7"><a href="custom-outputs.html#cb310-7"></a>  }</span>
-<span id="cb310-8"><a href="custom-outputs.html#cb310-8"></a>})<span class="op">;</span></span></code></pre></div>
+<span id="cb310-4"><a href="custom-outputs.html#cb310-4"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb310-5"><a href="custom-outputs.html#cb310-5"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
+<span id="cb310-6"><a href="custom-outputs.html#cb310-6"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
+<span id="cb310-7"><a href="custom-outputs.html#cb310-7"></a>  <span class="op">}</span></span>
+<span id="cb310-8"><a href="custom-outputs.html#cb310-8"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 <p>One might then want to use the <code>getId</code> method which returns the <code>id</code> of the element, by default, as can be seen in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js">source code</a> (below), the binding returns the id as the <code>data-input-id</code> attribute and if that is falsy it returns the element’s <code>id</code>.</p>
 <div class="sourceCode" id="cb311"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb311-1"><a href="custom-outputs.html#cb311-1"></a><span class="co">// getId default</span></span>
-<span id="cb311-2"><a href="custom-outputs.html#cb311-2"></a><span class="kw">this</span><span class="op">.</span><span class="at">getId</span> <span class="op">=</span> <span class="kw">function</span>(el) {</span>
-<span id="cb311-3"><a href="custom-outputs.html#cb311-3"></a>  <span class="cf">return</span> el[<span class="st">&#39;data-input-id&#39;</span>] <span class="op">||</span> el<span class="op">.</span><span class="at">id</span><span class="op">;</span></span>
-<span id="cb311-4"><a href="custom-outputs.html#cb311-4"></a>}</span></code></pre></div>
+<span id="cb311-2"><a href="custom-outputs.html#cb311-2"></a><span class="kw">this</span>.<span class="at">getId</span> <span class="op">=</span> <span class="kw">function</span>(el) <span class="op">{</span></span>
+<span id="cb311-3"><a href="custom-outputs.html#cb311-3"></a>  <span class="cf">return</span> el[<span class="st">&#39;data-input-id&#39;</span>] <span class="op">||</span> <span class="va">el</span>.<span class="at">id</span><span class="op">;</span></span>
+<span id="cb311-4"><a href="custom-outputs.html#cb311-4"></a><span class="op">}</span></span></code></pre></div>
 <p>Since boxxy uses the element id the default will work and this can be skipped entirely.</p>
 <p>Next, one needs to implement the <code>renderValue</code> function which is the very function that generates the output based on data used in <code>boxxy</code> and sent to the front-end with <code>renderBoxxy</code>. The <code>renderValue</code> method accepts two arguments, first <code>el</code> the element where the output should be generated, this is effectively the output of <code>boxxyOutput</code> which the binding found using <code>find</code>, the second argument is <code>data</code> which is the data passed to <code>boxxy</code> and serialised via <code>renderBoxxy</code>.</p>
 <div class="rmdnote">
@@ -628,19 +628,19 @@ The <code>renderValue</code> is in effect very similar if not identical to the J
 <li>In R <code>sprintf("%s-boxxy-title", id)</code></li>
 <li>In JavaScript <code>el.id + '-boxxy-title'</code></li>
 </ul>
-<div class="sourceCode" id="cb312"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb312-1"><a href="custom-outputs.html#cb312-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">OutputBinding</span>()<span class="op">;</span></span>
+<div class="sourceCode" id="cb312"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb312-1"><a href="custom-outputs.html#cb312-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
 <span id="cb312-2"><a href="custom-outputs.html#cb312-2"></a></span>
-<span id="cb312-3"><a href="custom-outputs.html#cb312-3"></a>$<span class="op">.</span><span class="fu">extend</span>(boxxyBinding<span class="op">,</span> {</span>
-<span id="cb312-4"><a href="custom-outputs.html#cb312-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
-<span id="cb312-5"><a href="custom-outputs.html#cb312-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
-<span id="cb312-6"><a href="custom-outputs.html#cb312-6"></a>  }<span class="op">,</span></span>
-<span id="cb312-7"><a href="custom-outputs.html#cb312-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) {</span>
+<span id="cb312-3"><a href="custom-outputs.html#cb312-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb312-4"><a href="custom-outputs.html#cb312-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
+<span id="cb312-5"><a href="custom-outputs.html#cb312-5"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
+<span id="cb312-6"><a href="custom-outputs.html#cb312-6"></a>  <span class="op">},</span></span>
+<span id="cb312-7"><a href="custom-outputs.html#cb312-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
 <span id="cb312-8"><a href="custom-outputs.html#cb312-8"></a></span>
 <span id="cb312-9"><a href="custom-outputs.html#cb312-9"></a>    <span class="co">// insert the title</span></span>
-<span id="cb312-10"><a href="custom-outputs.html#cb312-10"></a>    <span class="kw">let</span> title_id <span class="op">=</span> el<span class="op">.</span><span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span><span class="op">;</span></span>
-<span id="cb312-11"><a href="custom-outputs.html#cb312-11"></a>    <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(title_id)<span class="op">.</span><span class="at">innerText</span> <span class="op">=</span> data<span class="op">.</span><span class="at">title</span></span>
-<span id="cb312-12"><a href="custom-outputs.html#cb312-12"></a>  }</span>
-<span id="cb312-13"><a href="custom-outputs.html#cb312-13"></a>})<span class="op">;</span></span></code></pre></div>
+<span id="cb312-10"><a href="custom-outputs.html#cb312-10"></a>    <span class="kw">let</span> title_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span><span class="op">;</span></span>
+<span id="cb312-11"><a href="custom-outputs.html#cb312-11"></a>    <span class="va">document</span>.<span class="at">getElementById</span>(title_id).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">title</span></span>
+<span id="cb312-12"><a href="custom-outputs.html#cb312-12"></a>  <span class="op">}</span></span>
+<span id="cb312-13"><a href="custom-outputs.html#cb312-13"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 </div>
 <div id="boxxy-value" class="section level3" number="15.6.2">
 <h3><span class="header-section-number">15.6.2</span> Boxxy value</h3>
@@ -648,83 +648,83 @@ The <code>renderValue</code> is in effect very similar if not identical to the J
 <p>Initialise a new counter, specifying the id of the element where it should be created, then as second argument the starting value from which the counter should start and finally the value to count up to. Note that there is a fourth argument to pass a JSON of options which we do not use here.</p>
 <div class="sourceCode" id="cb313"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb313-1"><a href="custom-outputs.html#cb313-1"></a><span class="co">// place counter in elementId</span></span>
 <span id="cb313-2"><a href="custom-outputs.html#cb313-2"></a><span class="co">// start at 0 and count up to 123</span></span>
-<span id="cb313-3"><a href="custom-outputs.html#cb313-3"></a><span class="kw">const</span> counter <span class="op">=</span> <span class="kw">new</span> CountUp(<span class="st">&#39;elementId&#39;</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">123</span>)<span class="op">;</span></span>
-<span id="cb313-4"><a href="custom-outputs.html#cb313-4"></a>counter<span class="op">.</span><span class="fu">start</span>()<span class="op">;</span></span></code></pre></div>
+<span id="cb313-3"><a href="custom-outputs.html#cb313-3"></a><span class="kw">const</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(<span class="st">&#39;elementId&#39;</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">123</span>)<span class="op">;</span></span>
+<span id="cb313-4"><a href="custom-outputs.html#cb313-4"></a><span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span></code></pre></div>
 <p>The counter has to be generated in the <code>&lt;h1&gt;</code> placeholder bearing the <code>id-boxxy-value</code>, while the value to count up to is stored in <code>data.value</code> meaning the counter can be initialised with <code>new CountUp(el.id + '-boxxy-value', 0, data.value);</code>.</p>
-<div class="sourceCode" id="cb314"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb314-1"><a href="custom-outputs.html#cb314-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">OutputBinding</span>()<span class="op">;</span></span>
+<div class="sourceCode" id="cb314"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb314-1"><a href="custom-outputs.html#cb314-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
 <span id="cb314-2"><a href="custom-outputs.html#cb314-2"></a></span>
-<span id="cb314-3"><a href="custom-outputs.html#cb314-3"></a>$<span class="op">.</span><span class="fu">extend</span>(boxxyBinding<span class="op">,</span> {</span>
-<span id="cb314-4"><a href="custom-outputs.html#cb314-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
-<span id="cb314-5"><a href="custom-outputs.html#cb314-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
-<span id="cb314-6"><a href="custom-outputs.html#cb314-6"></a>  }<span class="op">,</span></span>
-<span id="cb314-7"><a href="custom-outputs.html#cb314-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) {</span>
+<span id="cb314-3"><a href="custom-outputs.html#cb314-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb314-4"><a href="custom-outputs.html#cb314-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
+<span id="cb314-5"><a href="custom-outputs.html#cb314-5"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
+<span id="cb314-6"><a href="custom-outputs.html#cb314-6"></a>  <span class="op">},</span></span>
+<span id="cb314-7"><a href="custom-outputs.html#cb314-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
 <span id="cb314-8"><a href="custom-outputs.html#cb314-8"></a></span>
 <span id="cb314-9"><a href="custom-outputs.html#cb314-9"></a>    <span class="co">// insert the title</span></span>
-<span id="cb314-10"><a href="custom-outputs.html#cb314-10"></a>    <span class="kw">let</span> title_id <span class="op">=</span> el<span class="op">.</span><span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span><span class="op">;</span></span>
-<span id="cb314-11"><a href="custom-outputs.html#cb314-11"></a>    <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(title_id)<span class="op">.</span><span class="at">innerText</span> <span class="op">=</span> data<span class="op">.</span><span class="at">title</span></span>
+<span id="cb314-10"><a href="custom-outputs.html#cb314-10"></a>    <span class="kw">let</span> title_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span><span class="op">;</span></span>
+<span id="cb314-11"><a href="custom-outputs.html#cb314-11"></a>    <span class="va">document</span>.<span class="at">getElementById</span>(title_id).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">title</span></span>
 <span id="cb314-12"><a href="custom-outputs.html#cb314-12"></a></span>
 <span id="cb314-13"><a href="custom-outputs.html#cb314-13"></a>    <span class="co">// counter start at 0</span></span>
-<span id="cb314-14"><a href="custom-outputs.html#cb314-14"></a>    <span class="kw">let</span> counter_id <span class="op">=</span> el<span class="op">.</span><span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">;</span></span>
-<span id="cb314-15"><a href="custom-outputs.html#cb314-15"></a>    <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> CountUp(counter_id<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> data<span class="op">.</span><span class="at">value</span>)<span class="op">;</span></span>
-<span id="cb314-16"><a href="custom-outputs.html#cb314-16"></a>    counter<span class="op">.</span><span class="fu">start</span>()<span class="op">;</span></span>
-<span id="cb314-17"><a href="custom-outputs.html#cb314-17"></a>  }</span>
-<span id="cb314-18"><a href="custom-outputs.html#cb314-18"></a>})<span class="op">;</span></span></code></pre></div>
+<span id="cb314-14"><a href="custom-outputs.html#cb314-14"></a>    <span class="kw">let</span> counter_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">;</span></span>
+<span id="cb314-15"><a href="custom-outputs.html#cb314-15"></a>    <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(counter_id<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="va">data</span>.<span class="at">value</span>)<span class="op">;</span></span>
+<span id="cb314-16"><a href="custom-outputs.html#cb314-16"></a>    <span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span>
+<span id="cb314-17"><a href="custom-outputs.html#cb314-17"></a>  <span class="op">}</span></span>
+<span id="cb314-18"><a href="custom-outputs.html#cb314-18"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 </div>
 </div>
 <div id="background-color" class="section level2" number="15.7">
 <h2><span class="header-section-number">15.7</span> Background color</h2>
 <p>Then we can set the background color that was passed to <code>boxxy</code> (<code>data.color</code>).</p>
-<div class="sourceCode" id="cb315"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb315-1"><a href="custom-outputs.html#cb315-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">OutputBinding</span>()<span class="op">;</span></span>
+<div class="sourceCode" id="cb315"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb315-1"><a href="custom-outputs.html#cb315-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
 <span id="cb315-2"><a href="custom-outputs.html#cb315-2"></a></span>
-<span id="cb315-3"><a href="custom-outputs.html#cb315-3"></a>$<span class="op">.</span><span class="fu">extend</span>(boxxyBinding<span class="op">,</span> {</span>
-<span id="cb315-4"><a href="custom-outputs.html#cb315-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
-<span id="cb315-5"><a href="custom-outputs.html#cb315-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
-<span id="cb315-6"><a href="custom-outputs.html#cb315-6"></a>  }<span class="op">,</span></span>
-<span id="cb315-7"><a href="custom-outputs.html#cb315-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) {</span>
+<span id="cb315-3"><a href="custom-outputs.html#cb315-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb315-4"><a href="custom-outputs.html#cb315-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
+<span id="cb315-5"><a href="custom-outputs.html#cb315-5"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
+<span id="cb315-6"><a href="custom-outputs.html#cb315-6"></a>  <span class="op">},</span></span>
+<span id="cb315-7"><a href="custom-outputs.html#cb315-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
 <span id="cb315-8"><a href="custom-outputs.html#cb315-8"></a></span>
 <span id="cb315-9"><a href="custom-outputs.html#cb315-9"></a>    <span class="co">// insert the title</span></span>
-<span id="cb315-10"><a href="custom-outputs.html#cb315-10"></a>    <span class="kw">let</span> title_id <span class="op">=</span> el<span class="op">.</span><span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span><span class="op">;</span></span>
-<span id="cb315-11"><a href="custom-outputs.html#cb315-11"></a>    <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(title_id)<span class="op">.</span><span class="at">innerText</span> <span class="op">=</span> data<span class="op">.</span><span class="at">title</span></span>
+<span id="cb315-10"><a href="custom-outputs.html#cb315-10"></a>    <span class="kw">let</span> title_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span><span class="op">;</span></span>
+<span id="cb315-11"><a href="custom-outputs.html#cb315-11"></a>    <span class="va">document</span>.<span class="at">getElementById</span>(title_id).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">title</span></span>
 <span id="cb315-12"><a href="custom-outputs.html#cb315-12"></a></span>
 <span id="cb315-13"><a href="custom-outputs.html#cb315-13"></a>    <span class="co">// counter start at 0</span></span>
-<span id="cb315-14"><a href="custom-outputs.html#cb315-14"></a>    <span class="kw">let</span> counter_id <span class="op">=</span> el<span class="op">.</span><span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">;</span></span>
-<span id="cb315-15"><a href="custom-outputs.html#cb315-15"></a>    <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> CountUp(counter_id<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> data<span class="op">.</span><span class="at">value</span>)<span class="op">;</span></span>
-<span id="cb315-16"><a href="custom-outputs.html#cb315-16"></a>    counter<span class="op">.</span><span class="fu">start</span>()<span class="op">;</span></span>
+<span id="cb315-14"><a href="custom-outputs.html#cb315-14"></a>    <span class="kw">let</span> counter_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">;</span></span>
+<span id="cb315-15"><a href="custom-outputs.html#cb315-15"></a>    <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(counter_id<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="va">data</span>.<span class="at">value</span>)<span class="op">;</span></span>
+<span id="cb315-16"><a href="custom-outputs.html#cb315-16"></a>    <span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span>
 <span id="cb315-17"><a href="custom-outputs.html#cb315-17"></a></span>
 <span id="cb315-18"><a href="custom-outputs.html#cb315-18"></a>    <span class="co">// background color </span></span>
-<span id="cb315-19"><a href="custom-outputs.html#cb315-19"></a>    el<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">backgroundColor</span> <span class="op">=</span> data<span class="op">.</span><span class="at">color</span><span class="op">;</span></span>
-<span id="cb315-20"><a href="custom-outputs.html#cb315-20"></a>  }</span>
-<span id="cb315-21"><a href="custom-outputs.html#cb315-21"></a>})<span class="op">;</span></span></code></pre></div>
+<span id="cb315-19"><a href="custom-outputs.html#cb315-19"></a>    <span class="va">el</span>.<span class="va">style</span>.<span class="at">backgroundColor</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">color</span><span class="op">;</span></span>
+<span id="cb315-20"><a href="custom-outputs.html#cb315-20"></a>  <span class="op">}</span></span>
+<span id="cb315-21"><a href="custom-outputs.html#cb315-21"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 <div id="register-the-output-binding" class="section level3" number="15.7.1">
 <h3><span class="header-section-number">15.7.1</span> Register the output binding</h3>
 <p>Finally, the output binding must be registered with shiny. Note that it uses a unique string identifier, the <a href="https://shiny.rstudio.com/articles/building-outputs.html">documentation</a> states:</p>
 <blockquote>
 <p>At the moment it is unused but future features may depend on it.</p>
 </blockquote>
-<div class="sourceCode" id="cb316"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb316-1"><a href="custom-outputs.html#cb316-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">OutputBinding</span>()<span class="op">;</span></span>
+<div class="sourceCode" id="cb316"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb316-1"><a href="custom-outputs.html#cb316-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
 <span id="cb316-2"><a href="custom-outputs.html#cb316-2"></a></span>
-<span id="cb316-3"><a href="custom-outputs.html#cb316-3"></a>$<span class="op">.</span><span class="fu">extend</span>(boxxyBinding<span class="op">,</span> {</span>
-<span id="cb316-4"><a href="custom-outputs.html#cb316-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
-<span id="cb316-5"><a href="custom-outputs.html#cb316-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
-<span id="cb316-6"><a href="custom-outputs.html#cb316-6"></a>  }<span class="op">,</span></span>
-<span id="cb316-7"><a href="custom-outputs.html#cb316-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) {</span>
+<span id="cb316-3"><a href="custom-outputs.html#cb316-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb316-4"><a href="custom-outputs.html#cb316-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
+<span id="cb316-5"><a href="custom-outputs.html#cb316-5"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
+<span id="cb316-6"><a href="custom-outputs.html#cb316-6"></a>  <span class="op">},</span></span>
+<span id="cb316-7"><a href="custom-outputs.html#cb316-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
 <span id="cb316-8"><a href="custom-outputs.html#cb316-8"></a></span>
 <span id="cb316-9"><a href="custom-outputs.html#cb316-9"></a>    <span class="co">// insert the title</span></span>
-<span id="cb316-10"><a href="custom-outputs.html#cb316-10"></a>    <span class="kw">let</span> title_id <span class="op">=</span> el<span class="op">.</span><span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span><span class="op">;</span></span>
-<span id="cb316-11"><a href="custom-outputs.html#cb316-11"></a>    <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(title_id)<span class="op">.</span><span class="at">innerText</span> <span class="op">=</span> data<span class="op">.</span><span class="at">title</span></span>
+<span id="cb316-10"><a href="custom-outputs.html#cb316-10"></a>    <span class="kw">let</span> title_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span><span class="op">;</span></span>
+<span id="cb316-11"><a href="custom-outputs.html#cb316-11"></a>    <span class="va">document</span>.<span class="at">getElementById</span>(title_id).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">title</span></span>
 <span id="cb316-12"><a href="custom-outputs.html#cb316-12"></a></span>
 <span id="cb316-13"><a href="custom-outputs.html#cb316-13"></a>    <span class="co">// counter start at 0</span></span>
-<span id="cb316-14"><a href="custom-outputs.html#cb316-14"></a>    <span class="kw">let</span> counter_id <span class="op">=</span> el<span class="op">.</span><span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">;</span></span>
-<span id="cb316-15"><a href="custom-outputs.html#cb316-15"></a>    <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> CountUp(counter_id<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> data<span class="op">.</span><span class="at">value</span>)<span class="op">;</span></span>
-<span id="cb316-16"><a href="custom-outputs.html#cb316-16"></a>    counter<span class="op">.</span><span class="fu">start</span>()<span class="op">;</span></span>
+<span id="cb316-14"><a href="custom-outputs.html#cb316-14"></a>    <span class="kw">let</span> counter_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">;</span></span>
+<span id="cb316-15"><a href="custom-outputs.html#cb316-15"></a>    <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(counter_id<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="va">data</span>.<span class="at">value</span>)<span class="op">;</span></span>
+<span id="cb316-16"><a href="custom-outputs.html#cb316-16"></a>    <span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span>
 <span id="cb316-17"><a href="custom-outputs.html#cb316-17"></a></span>
 <span id="cb316-18"><a href="custom-outputs.html#cb316-18"></a>    <span class="co">// background color </span></span>
-<span id="cb316-19"><a href="custom-outputs.html#cb316-19"></a>    el<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">backgroundColor</span> <span class="op">=</span> data<span class="op">.</span><span class="at">color</span><span class="op">;</span></span>
-<span id="cb316-20"><a href="custom-outputs.html#cb316-20"></a>  }</span>
-<span id="cb316-21"><a href="custom-outputs.html#cb316-21"></a>})<span class="op">;</span></span>
+<span id="cb316-19"><a href="custom-outputs.html#cb316-19"></a>    <span class="va">el</span>.<span class="va">style</span>.<span class="at">backgroundColor</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">color</span><span class="op">;</span></span>
+<span id="cb316-20"><a href="custom-outputs.html#cb316-20"></a>  <span class="op">}</span></span>
+<span id="cb316-21"><a href="custom-outputs.html#cb316-21"></a><span class="op">}</span>)<span class="op">;</span></span>
 <span id="cb316-22"><a href="custom-outputs.html#cb316-22"></a></span>
 <span id="cb316-23"><a href="custom-outputs.html#cb316-23"></a><span class="co">// register</span></span>
-<span id="cb316-24"><a href="custom-outputs.html#cb316-24"></a>Shiny<span class="op">.</span><span class="at">outputBindings</span><span class="op">.</span><span class="fu">register</span>(boxxyBinding<span class="op">,</span> <span class="st">&quot;john.boxxy&quot;</span>)<span class="op">;</span></span></code></pre></div>
+<span id="cb316-24"><a href="custom-outputs.html#cb316-24"></a><span class="va">Shiny</span>.<span class="va">outputBindings</span>.<span class="at">register</span>(boxxyBinding<span class="op">,</span> <span class="st">&quot;john.boxxy&quot;</span>)<span class="op">;</span></span></code></pre></div>
 <p>Ensure that string uniquely identifies the binding to avoid future clash with other such bindings.</p>
 </div>
 </div>
