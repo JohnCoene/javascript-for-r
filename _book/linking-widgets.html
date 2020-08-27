@@ -421,16 +421,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">9.1</span> Crosstalk examples</h2>
 <p>Both the plotly and DT packages support crosstalk, therefore using a shared dataset we can produce a scatter plot with the former and a table with the latter so that selection of data in one is reflected in the other.</p>
 <p>As alluded to earlier on this can be achieved by using a shared dataset which can be created with the <code>SharedData</code> R6 class from the crosstalk package, this dataset is then used as one would use a standard dataframe in plotly and DT. The <code>bscols</code> function is just a helper to create columns from html elements (using bootstrap). It’s ideal for examples but one should not have to use it in Shiny—crosstalk will work without <code>bscols</code>.</p>
-<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="linking-widgets.html#cb172-1"></a><span class="kw">library</span>(DT)</span>
-<span id="cb172-2"><a href="linking-widgets.html#cb172-2"></a><span class="kw">library</span>(plotly)</span>
-<span id="cb172-3"><a href="linking-widgets.html#cb172-3"></a><span class="kw">library</span>(crosstalk)</span>
-<span id="cb172-4"><a href="linking-widgets.html#cb172-4"></a></span>
-<span id="cb172-5"><a href="linking-widgets.html#cb172-5"></a>shared &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(cars)</span>
-<span id="cb172-6"><a href="linking-widgets.html#cb172-6"></a></span>
-<span id="cb172-7"><a href="linking-widgets.html#cb172-7"></a><span class="kw">bscols</span>(</span>
-<span id="cb172-8"><a href="linking-widgets.html#cb172-8"></a>  <span class="kw">plot_ly</span>(shared, <span class="dt">x =</span> <span class="op">~</span>speed, <span class="dt">y=</span><span class="op">~</span>dist),</span>
-<span id="cb172-9"><a href="linking-widgets.html#cb172-9"></a>  <span class="kw">datatable</span>(shared, <span class="dt">width =</span> <span class="st">&quot;100%&quot;</span>)</span>
-<span id="cb172-10"><a href="linking-widgets.html#cb172-10"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="linking-widgets.html#cb173-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb173-2"><a href="linking-widgets.html#cb173-2"></a><span class="kw">library</span>(plotly)</span>
+<span id="cb173-3"><a href="linking-widgets.html#cb173-3"></a><span class="kw">library</span>(crosstalk)</span>
+<span id="cb173-4"><a href="linking-widgets.html#cb173-4"></a></span>
+<span id="cb173-5"><a href="linking-widgets.html#cb173-5"></a>shared &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(cars)</span>
+<span id="cb173-6"><a href="linking-widgets.html#cb173-6"></a></span>
+<span id="cb173-7"><a href="linking-widgets.html#cb173-7"></a><span class="kw">bscols</span>(</span>
+<span id="cb173-8"><a href="linking-widgets.html#cb173-8"></a>  <span class="kw">plot_ly</span>(shared, <span class="dt">x =</span> <span class="op">~</span>speed, <span class="dt">y=</span><span class="op">~</span>dist),</span>
+<span id="cb173-9"><a href="linking-widgets.html#cb173-9"></a>  <span class="kw">datatable</span>(shared, <span class="dt">width =</span> <span class="st">&quot;100%&quot;</span>)</span>
+<span id="cb173-10"><a href="linking-widgets.html#cb173-10"></a>)</span></code></pre></div>
 <div class="figure">
 <img src="images/crosstalk.png" alt="" />
 <p class="caption">Crosstalk Example</p>
@@ -440,87 +440,52 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>If this feels foreign to you, think of how you pass a function name, not a function call, to <code>lapply</code>; that’s exactly analogous to what we’re doing here.</p>
 <p>— Official Crosstalk documentation</p>
 </blockquote>
-<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="linking-widgets.html#cb173-1"></a><span class="kw">library</span>(DT)</span>
-<span id="cb173-2"><a href="linking-widgets.html#cb173-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb173-3"><a href="linking-widgets.html#cb173-3"></a><span class="kw">library</span>(plotly)</span>
-<span id="cb173-4"><a href="linking-widgets.html#cb173-4"></a><span class="kw">library</span>(crosstalk)</span>
-<span id="cb173-5"><a href="linking-widgets.html#cb173-5"></a></span>
-<span id="cb173-6"><a href="linking-widgets.html#cb173-6"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb173-7"><a href="linking-widgets.html#cb173-7"></a>  <span class="kw">selectInput</span>(</span>
-<span id="cb173-8"><a href="linking-widgets.html#cb173-8"></a>    <span class="st">&quot;specie&quot;</span>, <span class="st">&quot;Specie&quot;</span>, </span>
-<span id="cb173-9"><a href="linking-widgets.html#cb173-9"></a>    <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;setosa&quot;</span>, <span class="st">&quot;versicolor&quot;</span>, <span class="st">&quot;virginica&quot;</span>)</span>
-<span id="cb173-10"><a href="linking-widgets.html#cb173-10"></a>  ),</span>
-<span id="cb173-11"><a href="linking-widgets.html#cb173-11"></a>  <span class="kw">fluidRow</span>(</span>
-<span id="cb173-12"><a href="linking-widgets.html#cb173-12"></a>    <span class="kw">column</span>(<span class="dv">6</span>, <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>)),</span>
-<span id="cb173-13"><a href="linking-widgets.html#cb173-13"></a>    <span class="kw">column</span>(<span class="dv">6</span>, <span class="kw">plotlyOutput</span>(<span class="st">&quot;plot&quot;</span>))</span>
-<span id="cb173-14"><a href="linking-widgets.html#cb173-14"></a>  )</span>
-<span id="cb173-15"><a href="linking-widgets.html#cb173-15"></a>)</span>
-<span id="cb173-16"><a href="linking-widgets.html#cb173-16"></a></span>
-<span id="cb173-17"><a href="linking-widgets.html#cb173-17"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
-<span id="cb173-18"><a href="linking-widgets.html#cb173-18"></a>  reactive_data &lt;-<span class="st"> </span><span class="kw">reactive</span>({</span>
-<span id="cb173-19"><a href="linking-widgets.html#cb173-19"></a>    iris[iris<span class="op">$</span>Species <span class="op">==</span><span class="st"> </span>input<span class="op">$</span>specie, ]</span>
-<span id="cb173-20"><a href="linking-widgets.html#cb173-20"></a>  })</span>
-<span id="cb173-21"><a href="linking-widgets.html#cb173-21"></a></span>
-<span id="cb173-22"><a href="linking-widgets.html#cb173-22"></a>  sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(reactive_data)</span>
-<span id="cb173-23"><a href="linking-widgets.html#cb173-23"></a></span>
-<span id="cb173-24"><a href="linking-widgets.html#cb173-24"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
-<span id="cb173-25"><a href="linking-widgets.html#cb173-25"></a>    <span class="kw">datatable</span>(sd)</span>
-<span id="cb173-26"><a href="linking-widgets.html#cb173-26"></a>  }, <span class="dt">server =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb173-27"><a href="linking-widgets.html#cb173-27"></a></span>
-<span id="cb173-28"><a href="linking-widgets.html#cb173-28"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlotly</span>({</span>
-<span id="cb173-29"><a href="linking-widgets.html#cb173-29"></a>    <span class="kw">plot_ly</span>(sd, <span class="dt">x =</span> <span class="op">~</span>Sepal.Length, <span class="dt">y =</span> <span class="op">~</span>Sepal.Width)</span>
-<span id="cb173-30"><a href="linking-widgets.html#cb173-30"></a>  })</span>
-<span id="cb173-31"><a href="linking-widgets.html#cb173-31"></a>}</span>
-<span id="cb173-32"><a href="linking-widgets.html#cb173-32"></a></span>
-<span id="cb173-33"><a href="linking-widgets.html#cb173-33"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="linking-widgets.html#cb174-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb174-2"><a href="linking-widgets.html#cb174-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb174-3"><a href="linking-widgets.html#cb174-3"></a><span class="kw">library</span>(plotly)</span>
+<span id="cb174-4"><a href="linking-widgets.html#cb174-4"></a><span class="kw">library</span>(crosstalk)</span>
+<span id="cb174-5"><a href="linking-widgets.html#cb174-5"></a></span>
+<span id="cb174-6"><a href="linking-widgets.html#cb174-6"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb174-7"><a href="linking-widgets.html#cb174-7"></a>  <span class="kw">selectInput</span>(</span>
+<span id="cb174-8"><a href="linking-widgets.html#cb174-8"></a>    <span class="st">&quot;specie&quot;</span>, <span class="st">&quot;Specie&quot;</span>, </span>
+<span id="cb174-9"><a href="linking-widgets.html#cb174-9"></a>    <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;setosa&quot;</span>, <span class="st">&quot;versicolor&quot;</span>, <span class="st">&quot;virginica&quot;</span>)</span>
+<span id="cb174-10"><a href="linking-widgets.html#cb174-10"></a>  ),</span>
+<span id="cb174-11"><a href="linking-widgets.html#cb174-11"></a>  <span class="kw">fluidRow</span>(</span>
+<span id="cb174-12"><a href="linking-widgets.html#cb174-12"></a>    <span class="kw">column</span>(<span class="dv">6</span>, <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>)),</span>
+<span id="cb174-13"><a href="linking-widgets.html#cb174-13"></a>    <span class="kw">column</span>(<span class="dv">6</span>, <span class="kw">plotlyOutput</span>(<span class="st">&quot;plot&quot;</span>))</span>
+<span id="cb174-14"><a href="linking-widgets.html#cb174-14"></a>  )</span>
+<span id="cb174-15"><a href="linking-widgets.html#cb174-15"></a>)</span>
+<span id="cb174-16"><a href="linking-widgets.html#cb174-16"></a></span>
+<span id="cb174-17"><a href="linking-widgets.html#cb174-17"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
+<span id="cb174-18"><a href="linking-widgets.html#cb174-18"></a>  reactive_data &lt;-<span class="st"> </span><span class="kw">reactive</span>({</span>
+<span id="cb174-19"><a href="linking-widgets.html#cb174-19"></a>    iris[iris<span class="op">$</span>Species <span class="op">==</span><span class="st"> </span>input<span class="op">$</span>specie, ]</span>
+<span id="cb174-20"><a href="linking-widgets.html#cb174-20"></a>  })</span>
+<span id="cb174-21"><a href="linking-widgets.html#cb174-21"></a></span>
+<span id="cb174-22"><a href="linking-widgets.html#cb174-22"></a>  sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(reactive_data)</span>
+<span id="cb174-23"><a href="linking-widgets.html#cb174-23"></a></span>
+<span id="cb174-24"><a href="linking-widgets.html#cb174-24"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
+<span id="cb174-25"><a href="linking-widgets.html#cb174-25"></a>    <span class="kw">datatable</span>(sd)</span>
+<span id="cb174-26"><a href="linking-widgets.html#cb174-26"></a>  }, <span class="dt">server =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb174-27"><a href="linking-widgets.html#cb174-27"></a></span>
+<span id="cb174-28"><a href="linking-widgets.html#cb174-28"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlotly</span>({</span>
+<span id="cb174-29"><a href="linking-widgets.html#cb174-29"></a>    <span class="kw">plot_ly</span>(sd, <span class="dt">x =</span> <span class="op">~</span>Sepal.Length, <span class="dt">y =</span> <span class="op">~</span>Sepal.Width)</span>
+<span id="cb174-30"><a href="linking-widgets.html#cb174-30"></a>  })</span>
+<span id="cb174-31"><a href="linking-widgets.html#cb174-31"></a>}</span>
+<span id="cb174-32"><a href="linking-widgets.html#cb174-32"></a></span>
+<span id="cb174-33"><a href="linking-widgets.html#cb174-33"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div class="rmdnote">
 <p>
 Create the shared dataset in the server function or some things that follow might not work as expected.
 </p>
 </div>
 <p>One can also use the <code>data</code> method on the crosstalk object in reactive expressions, which allows accessing the Javascript selection where crosstalk is not directly supported, like below in a custom UI block. Note that the argument <code>withSelection</code> is set to <code>TRUE</code> in order to retrieve the selection state of the rows.</p>
-<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="linking-widgets.html#cb174-1"></a><span class="kw">library</span>(DT)</span>
-<span id="cb174-2"><a href="linking-widgets.html#cb174-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb174-3"><a href="linking-widgets.html#cb174-3"></a><span class="kw">library</span>(crosstalk)</span>
-<span id="cb174-4"><a href="linking-widgets.html#cb174-4"></a></span>
-<span id="cb174-5"><a href="linking-widgets.html#cb174-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb174-6"><a href="linking-widgets.html#cb174-6"></a>  <span class="kw">fluidRow</span>(</span>
-<span id="cb174-7"><a href="linking-widgets.html#cb174-7"></a>    <span class="kw">column</span>(<span class="dv">4</span>, <span class="kw">uiOutput</span>(<span class="st">&quot;text&quot;</span>)),</span>
-<span id="cb174-8"><a href="linking-widgets.html#cb174-8"></a>    <span class="kw">column</span>(<span class="dv">8</span>, <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>))</span>
-<span id="cb174-9"><a href="linking-widgets.html#cb174-9"></a>  )</span>
-<span id="cb174-10"><a href="linking-widgets.html#cb174-10"></a>)</span>
-<span id="cb174-11"><a href="linking-widgets.html#cb174-11"></a></span>
-<span id="cb174-12"><a href="linking-widgets.html#cb174-12"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
-<span id="cb174-13"><a href="linking-widgets.html#cb174-13"></a>  sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(cars)</span>
-<span id="cb174-14"><a href="linking-widgets.html#cb174-14"></a></span>
-<span id="cb174-15"><a href="linking-widgets.html#cb174-15"></a>  output<span class="op">$</span>text &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
-<span id="cb174-16"><a href="linking-widgets.html#cb174-16"></a>    <span class="co"># get selected rows</span></span>
-<span id="cb174-17"><a href="linking-widgets.html#cb174-17"></a>    n_selected &lt;-<span class="st"> </span>sd<span class="op">$</span><span class="kw">data</span>(<span class="dt">withSelection =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb174-18"><a href="linking-widgets.html#cb174-18"></a><span class="st">      </span>dplyr<span class="op">::</span><span class="kw">filter</span>(selected_ <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb174-19"><a href="linking-widgets.html#cb174-19"></a><span class="st">      </span><span class="kw">nrow</span>()</span>
-<span id="cb174-20"><a href="linking-widgets.html#cb174-20"></a></span>
-<span id="cb174-21"><a href="linking-widgets.html#cb174-21"></a>    <span class="kw">h3</span>(n_selected, <span class="st">&quot;selected items&quot;</span>)</span>
-<span id="cb174-22"><a href="linking-widgets.html#cb174-22"></a>    </span>
-<span id="cb174-23"><a href="linking-widgets.html#cb174-23"></a>  })</span>
-<span id="cb174-24"><a href="linking-widgets.html#cb174-24"></a></span>
-<span id="cb174-25"><a href="linking-widgets.html#cb174-25"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
-<span id="cb174-26"><a href="linking-widgets.html#cb174-26"></a>    <span class="kw">datatable</span>(sd)</span>
-<span id="cb174-27"><a href="linking-widgets.html#cb174-27"></a>  }, <span class="dt">server =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb174-28"><a href="linking-widgets.html#cb174-28"></a>}</span>
-<span id="cb174-29"><a href="linking-widgets.html#cb174-29"></a></span>
-<span id="cb174-30"><a href="linking-widgets.html#cb174-30"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<div class="figure">
-<img src="images/crosstalk-shiny.png" alt="" />
-<p class="caption">Shiny with crosstalk</p>
-</div>
-<p>Using crosstalk with shiny one can also change the selection server-side with the <code>selection</code> method, passing it the keys to select.</p>
 <div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="linking-widgets.html#cb175-1"></a><span class="kw">library</span>(DT)</span>
 <span id="cb175-2"><a href="linking-widgets.html#cb175-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb175-3"><a href="linking-widgets.html#cb175-3"></a><span class="kw">library</span>(crosstalk)</span>
 <span id="cb175-4"><a href="linking-widgets.html#cb175-4"></a></span>
 <span id="cb175-5"><a href="linking-widgets.html#cb175-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
 <span id="cb175-6"><a href="linking-widgets.html#cb175-6"></a>  <span class="kw">fluidRow</span>(</span>
-<span id="cb175-7"><a href="linking-widgets.html#cb175-7"></a>    <span class="kw">column</span>(<span class="dv">4</span>, <span class="kw">actionButton</span>(<span class="st">&quot;random&quot;</span>, <span class="st">&quot;Select a random row&quot;</span>)),</span>
+<span id="cb175-7"><a href="linking-widgets.html#cb175-7"></a>    <span class="kw">column</span>(<span class="dv">4</span>, <span class="kw">uiOutput</span>(<span class="st">&quot;text&quot;</span>)),</span>
 <span id="cb175-8"><a href="linking-widgets.html#cb175-8"></a>    <span class="kw">column</span>(<span class="dv">8</span>, <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>))</span>
 <span id="cb175-9"><a href="linking-widgets.html#cb175-9"></a>  )</span>
 <span id="cb175-10"><a href="linking-widgets.html#cb175-10"></a>)</span>
@@ -528,19 +493,54 @@ Create the shared dataset in the server function or some things that follow migh
 <span id="cb175-12"><a href="linking-widgets.html#cb175-12"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
 <span id="cb175-13"><a href="linking-widgets.html#cb175-13"></a>  sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(cars)</span>
 <span id="cb175-14"><a href="linking-widgets.html#cb175-14"></a></span>
-<span id="cb175-15"><a href="linking-widgets.html#cb175-15"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
-<span id="cb175-16"><a href="linking-widgets.html#cb175-16"></a>    <span class="kw">datatable</span>(sd)</span>
-<span id="cb175-17"><a href="linking-widgets.html#cb175-17"></a>  }, <span class="dt">server =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb175-18"><a href="linking-widgets.html#cb175-18"></a></span>
-<span id="cb175-19"><a href="linking-widgets.html#cb175-19"></a>  selected &lt;-<span class="st"> </span><span class="kw">c</span>()</span>
-<span id="cb175-20"><a href="linking-widgets.html#cb175-20"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>random, {</span>
-<span id="cb175-21"><a href="linking-widgets.html#cb175-21"></a>    smp &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">50</span>)[<span class="op">!</span><span class="dv">1</span><span class="op">:</span><span class="dv">50</span> <span class="op">%in%</span><span class="st"> </span>selected]</span>
-<span id="cb175-22"><a href="linking-widgets.html#cb175-22"></a>    selected &lt;&lt;-<span class="st"> </span><span class="kw">append</span>(selected, <span class="kw">sample</span>(smp, <span class="dv">1</span>))</span>
-<span id="cb175-23"><a href="linking-widgets.html#cb175-23"></a>    sd<span class="op">$</span><span class="kw">selection</span>(selected)</span>
-<span id="cb175-24"><a href="linking-widgets.html#cb175-24"></a>  })</span>
-<span id="cb175-25"><a href="linking-widgets.html#cb175-25"></a>}</span>
-<span id="cb175-26"><a href="linking-widgets.html#cb175-26"></a></span>
-<span id="cb175-27"><a href="linking-widgets.html#cb175-27"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<span id="cb175-15"><a href="linking-widgets.html#cb175-15"></a>  output<span class="op">$</span>text &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
+<span id="cb175-16"><a href="linking-widgets.html#cb175-16"></a>    <span class="co"># get selected rows</span></span>
+<span id="cb175-17"><a href="linking-widgets.html#cb175-17"></a>    n_selected &lt;-<span class="st"> </span>sd<span class="op">$</span><span class="kw">data</span>(<span class="dt">withSelection =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb175-18"><a href="linking-widgets.html#cb175-18"></a><span class="st">      </span>dplyr<span class="op">::</span><span class="kw">filter</span>(selected_ <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb175-19"><a href="linking-widgets.html#cb175-19"></a><span class="st">      </span><span class="kw">nrow</span>()</span>
+<span id="cb175-20"><a href="linking-widgets.html#cb175-20"></a></span>
+<span id="cb175-21"><a href="linking-widgets.html#cb175-21"></a>    <span class="kw">h3</span>(n_selected, <span class="st">&quot;selected items&quot;</span>)</span>
+<span id="cb175-22"><a href="linking-widgets.html#cb175-22"></a>    </span>
+<span id="cb175-23"><a href="linking-widgets.html#cb175-23"></a>  })</span>
+<span id="cb175-24"><a href="linking-widgets.html#cb175-24"></a></span>
+<span id="cb175-25"><a href="linking-widgets.html#cb175-25"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
+<span id="cb175-26"><a href="linking-widgets.html#cb175-26"></a>    <span class="kw">datatable</span>(sd)</span>
+<span id="cb175-27"><a href="linking-widgets.html#cb175-27"></a>  }, <span class="dt">server =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb175-28"><a href="linking-widgets.html#cb175-28"></a>}</span>
+<span id="cb175-29"><a href="linking-widgets.html#cb175-29"></a></span>
+<span id="cb175-30"><a href="linking-widgets.html#cb175-30"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="figure">
+<img src="images/crosstalk-shiny.png" alt="" />
+<p class="caption">Shiny with crosstalk</p>
+</div>
+<p>Using crosstalk with shiny one can also change the selection server-side with the <code>selection</code> method, passing it the keys to select.</p>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="linking-widgets.html#cb176-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb176-2"><a href="linking-widgets.html#cb176-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb176-3"><a href="linking-widgets.html#cb176-3"></a><span class="kw">library</span>(crosstalk)</span>
+<span id="cb176-4"><a href="linking-widgets.html#cb176-4"></a></span>
+<span id="cb176-5"><a href="linking-widgets.html#cb176-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb176-6"><a href="linking-widgets.html#cb176-6"></a>  <span class="kw">fluidRow</span>(</span>
+<span id="cb176-7"><a href="linking-widgets.html#cb176-7"></a>    <span class="kw">column</span>(<span class="dv">4</span>, <span class="kw">actionButton</span>(<span class="st">&quot;random&quot;</span>, <span class="st">&quot;Select a random row&quot;</span>)),</span>
+<span id="cb176-8"><a href="linking-widgets.html#cb176-8"></a>    <span class="kw">column</span>(<span class="dv">8</span>, <span class="kw">DTOutput</span>(<span class="st">&quot;table&quot;</span>))</span>
+<span id="cb176-9"><a href="linking-widgets.html#cb176-9"></a>  )</span>
+<span id="cb176-10"><a href="linking-widgets.html#cb176-10"></a>)</span>
+<span id="cb176-11"><a href="linking-widgets.html#cb176-11"></a></span>
+<span id="cb176-12"><a href="linking-widgets.html#cb176-12"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
+<span id="cb176-13"><a href="linking-widgets.html#cb176-13"></a>  sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(cars)</span>
+<span id="cb176-14"><a href="linking-widgets.html#cb176-14"></a></span>
+<span id="cb176-15"><a href="linking-widgets.html#cb176-15"></a>  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>({</span>
+<span id="cb176-16"><a href="linking-widgets.html#cb176-16"></a>    <span class="kw">datatable</span>(sd)</span>
+<span id="cb176-17"><a href="linking-widgets.html#cb176-17"></a>  }, <span class="dt">server =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb176-18"><a href="linking-widgets.html#cb176-18"></a></span>
+<span id="cb176-19"><a href="linking-widgets.html#cb176-19"></a>  selected &lt;-<span class="st"> </span><span class="kw">c</span>()</span>
+<span id="cb176-20"><a href="linking-widgets.html#cb176-20"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>random, {</span>
+<span id="cb176-21"><a href="linking-widgets.html#cb176-21"></a>    smp &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">50</span>)[<span class="op">!</span><span class="dv">1</span><span class="op">:</span><span class="dv">50</span> <span class="op">%in%</span><span class="st"> </span>selected]</span>
+<span id="cb176-22"><a href="linking-widgets.html#cb176-22"></a>    selected &lt;&lt;-<span class="st"> </span><span class="kw">append</span>(selected, <span class="kw">sample</span>(smp, <span class="dv">1</span>))</span>
+<span id="cb176-23"><a href="linking-widgets.html#cb176-23"></a>    sd<span class="op">$</span><span class="kw">selection</span>(selected)</span>
+<span id="cb176-24"><a href="linking-widgets.html#cb176-24"></a>  })</span>
+<span id="cb176-25"><a href="linking-widgets.html#cb176-25"></a>}</span>
+<span id="cb176-26"><a href="linking-widgets.html#cb176-26"></a></span>
+<span id="cb176-27"><a href="linking-widgets.html#cb176-27"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="crosstalk-requirements" class="section level2" number="9.2">
 <h2><span class="header-section-number">9.2</span> Crosstalk requirements</h2>
@@ -551,15 +551,15 @@ Create the shared dataset in the server function or some things that follow migh
 <div id="how-it-works" class="section level2" number="9.3">
 <h2><span class="header-section-number">9.3</span> How it works</h2>
 <p>As will be discovered later when support for crosstalk is brought to gio, very little changes on the R side. As might be expected, crosstalk enables communication between widgets via JavaScript, hence much of what must be adapted by widgets developers happens in JavaScript too.</p>
-<div id="htmlwidget-dd53586073b8b854ea8f" style="width:100%;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-dd53586073b8b854ea8f">{"x":{"diagram":"\ndigraph G {\n\n  graph [compound=true rankdir = LR]\n  node [shape=record fontsize=10];\n\n  # r stuff\n  subgraph cluster_1 { \n    \"Widget 1\" \"Widget 2\";\n    label = \"JavaScript\";\n    color=gold;\n  }\n\n  # js\n  subgraph cluster_0 {\n    node [width = 0.9]\n    Dataframe \"Shared Dataset\"; \n    label=\"R\";\n    color=royalBlue;\n  }\n\n  \"Dataframe\" -> \"Shared Dataset\";\n  \"Widget 1\" -> \"Widget 2\" [dir=both color=dimGray];\n\n  # connect subgraphs\n  \"Shared Dataset\" -> \"Widget 1\" [lhead=cluster_1 ltail=cluster_0];\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-4f653620134364bc19a1" style="width:100%;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4f653620134364bc19a1">{"x":{"diagram":"\ndigraph G {\n\n  graph [compound=true rankdir = LR]\n  node [shape=record fontsize=10];\n\n  # r stuff\n  subgraph cluster_1 { \n    \"Widget 1\" \"Widget 2\";\n    label = \"JavaScript\";\n    color=gold;\n  }\n\n  # js\n  subgraph cluster_0 {\n    node [width = 0.9]\n    Dataframe \"Shared Dataset\"; \n    label=\"R\";\n    color=royalBlue;\n  }\n\n  \"Dataframe\" -> \"Shared Dataset\";\n  \"Widget 1\" -> \"Widget 2\" [dir=both color=dimGray];\n\n  # connect subgraphs\n  \"Shared Dataset\" -> \"Widget 1\" [lhead=cluster_1 ltail=cluster_0];\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Indeed the bi-directional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. This internally works with <code>key</code>s that are assigned to every row of the dataframe which enable crosstalk to track which are selected or filtered. These keys can be explicitly set by the user and otherwise default to the row names of the data.frame, and if these are not available the <code>SharedData</code> function will create row numbers.</p>
-<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="linking-widgets.html#cb176-1"></a><span class="co"># assign keys</span></span>
-<span id="cb176-2"><a href="linking-widgets.html#cb176-2"></a>df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(<span class="dv">26</span>))</span>
-<span id="cb176-3"><a href="linking-widgets.html#cb176-3"></a>sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(df, <span class="dt">key =</span> letters)</span></code></pre></div>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="linking-widgets.html#cb177-1"></a><span class="co"># assign keys</span></span>
+<span id="cb177-2"><a href="linking-widgets.html#cb177-2"></a>df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(<span class="dv">26</span>))</span>
+<span id="cb177-3"><a href="linking-widgets.html#cb177-3"></a>sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(df, <span class="dt">key =</span> letters)</span></code></pre></div>
 <p>In a sense, while crosstalk establishes lines of communication to transport <code>key</code>s between widgets, developers of the respective widgets must handle what <code>key</code>s are sent and what to do with incoming <code>key</code>s. There are two such lines of communication, one for <code>key</code>s of rows that are meant to be filtered meant to narrow down the selection of data points displayed on a widget, and another for selection (what crosstalk refers to as “linked brushing”) to highlight certain data points.</p>
-<div id="htmlwidget-0bb802a078693b1ac9c9" style="width:100%;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-0bb802a078693b1ac9c9">{"x":{"diagram":"\ndigraph G {\n\n  subgraph cluster_g1 {\n    node [shape=record fontsize=7]\n    d1 [label=\"Dataset\"]\n    d3 [label=\"Dataset\"]\n    k1 [label=\"Keys\"]\n    label=\"Group 1\"\n    fontsize=9\n    color=royalBlue\n  }\n\n  subgraph cluster_g2 {\n    node [shape=record fontsize=7]\n    d2 [label=\"Dataset\"] \n    k2 [label=\"Keys\"]\n    label=\"Group 2\"\n    fontsize=9\n    color=royalBlue\n  }\n\n  node [shape=record fontsize=7 color=gold]\n  w1 [label=\"widget 1\"]\n  w2 [label=\"widget 2\"]\n  w3 [label=\"widget 3\"]\n  w4 [label=\"widget 4\"]\n  w5 [label=\"widget 5\"]\n\n  w1 -> k1 [dir=both arrowsize=.5]\n  w2 -> k1 [dir=both arrowsize=.5]\n  w3 -> k2 [dir=both arrowsize=.5]\n  w4 -> k2 [dir=both arrowsize=.5]\n  w5 -> k2 [dir=both arrowsize=.5]\n\n  d2 -> k2 [arrowsize=.5]\n  d1 -> k1 [arrowsize=.5]\n  d3 -> k1 [arrowsize=.5]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-b3ab625594eb66850d7b" style="width:100%;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b3ab625594eb66850d7b">{"x":{"diagram":"\ndigraph G {\n\n  subgraph cluster_g1 {\n    node [shape=record fontsize=7]\n    d1 [label=\"Dataset\"]\n    d3 [label=\"Dataset\"]\n    k1 [label=\"Keys\"]\n    label=\"Group 1\"\n    fontsize=9\n    color=royalBlue\n  }\n\n  subgraph cluster_g2 {\n    node [shape=record fontsize=7]\n    d2 [label=\"Dataset\"] \n    k2 [label=\"Keys\"]\n    label=\"Group 2\"\n    fontsize=9\n    color=royalBlue\n  }\n\n  node [shape=record fontsize=7 color=gold]\n  w1 [label=\"widget 1\"]\n  w2 [label=\"widget 2\"]\n  w3 [label=\"widget 3\"]\n  w4 [label=\"widget 4\"]\n  w5 [label=\"widget 5\"]\n\n  w1 -> k1 [dir=both arrowsize=.5]\n  w2 -> k1 [dir=both arrowsize=.5]\n  w3 -> k2 [dir=both arrowsize=.5]\n  w4 -> k2 [dir=both arrowsize=.5]\n  w5 -> k2 [dir=both arrowsize=.5]\n\n  d2 -> k2 [arrowsize=.5]\n  d1 -> k1 [arrowsize=.5]\n  d3 -> k1 [arrowsize=.5]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>In JavaScript, a widget “receives” the keys of selected and filtered data points and must, when filtering or selection is observed, “send” said selected or filtered keys to other widgets. Internally crosstalk knows what to share across widgets with <code>group</code>s groups share <code>key</code>s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other.</p>
 <div class="rmdnote">
 <p>
@@ -567,25 +567,25 @@ Crosstalk groups share keys.
 </p>
 </div>
 <p>Therefore, the code below creates two shared datasets that are linked and share keys as they fall in the same <code>group</code> despite the fact that they are separate R objects.</p>
-<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="linking-widgets.html#cb177-1"></a>shared_cars &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(mtcars, <span class="dt">group =</span> <span class="st">&quot;cars&quot;</span>)</span>
-<span id="cb177-2"><a href="linking-widgets.html#cb177-2"></a>shared_cars_head &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(<span class="kw">head</span>(mtcars), <span class="dt">group =</span> <span class="st">&quot;cars&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="linking-widgets.html#cb178-1"></a>shared_cars &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(mtcars, <span class="dt">group =</span> <span class="st">&quot;cars&quot;</span>)</span>
+<span id="cb178-2"><a href="linking-widgets.html#cb178-2"></a>shared_cars_head &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(<span class="kw">head</span>(mtcars), <span class="dt">group =</span> <span class="st">&quot;cars&quot;</span>)</span></code></pre></div>
 </div>
 <div id="crosstalk-with-gio" class="section level2" number="9.4">
 <h2><span class="header-section-number">9.4</span> Crosstalk with gio</h2>
 <p>The application of crosstalk to the gio library is somewhat amiss but it makes it rather more instructive. As mentioned before, in order for crosstalk to be properly implemented a widget must be a able to select, deselect as well as filter and unfilter data points and this is not entirely the case of gio.</p>
 <p>First, gio’s underlying data is somewhat uncommon: it is a network defined only by its edges (the arcs leaving and coming into countries). Second, those edges themselves cannot be selected, as we’ve observed previously what edges are drawn on the globe cannot directly be defined, the selected country can be changed which only by proxy changes the edges shown on the globe. Third, while gio supports changing which country is selected (by clicking on the globe) it does not allow unselecting a country; with gio.js a country is always selected.</p>
 <p>The way crosstalk can work with gio is by setting the keys of the shared dataset to the country ISO codes that gio uses. Since data gio accepts consists of edges this ISO code could correspond to either the source or the target country.</p>
-<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="linking-widgets.html#cb178-1"></a><span class="co"># keys = target</span></span>
-<span id="cb178-2"><a href="linking-widgets.html#cb178-2"></a>shared_arcs &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(arcs, <span class="dt">key =</span> arcs<span class="op">$</span>e)</span>
-<span id="cb178-3"><a href="linking-widgets.html#cb178-3"></a><span class="co"># keys = source</span></span>
-<span id="cb178-4"><a href="linking-widgets.html#cb178-4"></a>shared_arcs &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(arcs, <span class="dt">key =</span> arcs<span class="op">$</span>i)</span></code></pre></div>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="linking-widgets.html#cb179-1"></a><span class="co"># keys = target</span></span>
+<span id="cb179-2"><a href="linking-widgets.html#cb179-2"></a>shared_arcs &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(arcs, <span class="dt">key =</span> arcs<span class="op">$</span>e)</span>
+<span id="cb179-3"><a href="linking-widgets.html#cb179-3"></a><span class="co"># keys = source</span></span>
+<span id="cb179-4"><a href="linking-widgets.html#cb179-4"></a>shared_arcs &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(arcs, <span class="dt">key =</span> arcs<span class="op">$</span>i)</span></code></pre></div>
 <p>This constraint would have to be documented and communicated to the users of the package as otherwise gio’s implementation of crosstalk will not work.</p>
 <p>Were the constraint of having to specify the keys removed the gio package would have to interpret the keys. For instance, the widget would receive a selection, say <code>3</code> indicating that the third edge was selected in another widget, gio, not being able to highlight the edge, would have decide whether to highlight either the country where the edge comes from or the country where the edge goes to. Though this could be implemented it would be vastly more laborious and in fact be more limited as the choice of country to highlight would no longer up to the user.</p>
 </div>
 <div id="adapt-the-r-code" class="section level2" number="9.5">
 <h2><span class="header-section-number">9.5</span> Adapt the R code</h2>
 <p>In any event, let us start by making the required changes to the R code first. The only changes that need to be made are in the <code>gio</code> function as it is the only that currently accepts a dataframe and thus may receive a shared dataset.</p>
-<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="linking-widgets.html#cb179-1"></a><span class="kw">class</span>(shared_arcs)</span></code></pre></div>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="linking-widgets.html#cb180-1"></a><span class="kw">class</span>(shared_arcs)</span></code></pre></div>
 <pre><code>## [1] &quot;SharedData&quot; &quot;R6&quot;</code></pre>
 <p>Shared datasets are R6 classes and therefore cannot simply be treated as dataframes. The <code>gio</code> function needs to check whether the <code>data</code> object it received is a shared dataset with <code>is.SharedData</code> and if so use its methods to extract data from it, namely:</p>
 <ul>
@@ -594,226 +594,200 @@ Crosstalk groups share keys.
 <li>The keys that were assigned to every row of the dataset with <code>key</code></li>
 </ul>
 <p>The <code>origData</code> method is needed to extract original dataframe from the shared dataset. This is of course necessary as the <code>gio</code> function still needs to obtain and serialise the arcs to display on the globe.</p>
-<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="linking-widgets.html#cb181-1"></a><span class="co"># original data</span></span>
-<span id="cb181-2"><a href="linking-widgets.html#cb181-2"></a>shared_arcs<span class="op">$</span><span class="kw">origData</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="linking-widgets.html#cb182-1"></a><span class="co"># original data</span></span>
+<span id="cb182-2"><a href="linking-widgets.html#cb182-2"></a>shared_arcs<span class="op">$</span><span class="kw">origData</span>()</span></code></pre></div>
 <pre><code>##    e  i       v
 ## 1 CN US 3300000
 ## 2 CN RU   10000</code></pre>
 <p>The <code>gio</code> function also has to extract the group to which the dataset belongs, this will be necessary JavaScript-side to tell crosstalk which group one is working with. Note that it was randomly generated since none were specified when the shared dataset was created.</p>
-<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="linking-widgets.html#cb183-1"></a><span class="co"># groupName</span></span>
-<span id="cb183-2"><a href="linking-widgets.html#cb183-2"></a>shared_arcs<span class="op">$</span><span class="kw">groupName</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;SharedDatadd535860&quot;</code></pre>
-<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="linking-widgets.html#cb185-1"></a><span class="co"># keys</span></span>
-<span id="cb185-2"><a href="linking-widgets.html#cb185-2"></a>shared_arcs<span class="op">$</span><span class="kw">key</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="linking-widgets.html#cb184-1"></a><span class="co"># groupName</span></span>
+<span id="cb184-2"><a href="linking-widgets.html#cb184-2"></a>shared_arcs<span class="op">$</span><span class="kw">groupName</span>()</span></code></pre></div>
+<pre><code>## [1] &quot;SharedDatab1f742a6&quot;</code></pre>
+<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="linking-widgets.html#cb186-1"></a><span class="co"># keys</span></span>
+<span id="cb186-2"><a href="linking-widgets.html#cb186-2"></a>shared_arcs<span class="op">$</span><span class="kw">key</span>()</span></code></pre></div>
 <pre><code>## [1] &quot;US&quot; &quot;RU&quot;</code></pre>
 <p>The methods <code>origData</code> and <code>groupName</code> must be used in every widget, the <code>key</code> method may not be of use to every widget, it can be immensely useful if the visualisation library also comes with a key/id system so one can use it internally, gio.js does not and we thus will not be using it. The name of the group is passed to the <code>x</code> object so it is accessible JavaScript-side where it is needed, we also add the JavaScript dependency required to run crosstalk with <code>crosstalkLibs</code>.</p>
-<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="linking-widgets.html#cb187-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, </span>
-<span id="cb187-2"><a href="linking-widgets.html#cb187-2"></a>  <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
-<span id="cb187-3"><a href="linking-widgets.html#cb187-3"></a></span>
-<span id="cb187-4"><a href="linking-widgets.html#cb187-4"></a>  <span class="co"># defaults to NULL</span></span>
-<span id="cb187-5"><a href="linking-widgets.html#cb187-5"></a>  group &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb187-6"><a href="linking-widgets.html#cb187-6"></a>  deps &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb187-7"><a href="linking-widgets.html#cb187-7"></a></span>
-<span id="cb187-8"><a href="linking-widgets.html#cb187-8"></a>  <span class="co"># uses crosstalk</span></span>
-<span id="cb187-9"><a href="linking-widgets.html#cb187-9"></a>  <span class="cf">if</span> (crosstalk<span class="op">::</span><span class="kw">is.SharedData</span>(data)) {</span>
-<span id="cb187-10"><a href="linking-widgets.html#cb187-10"></a>    group &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">groupName</span>()</span>
-<span id="cb187-11"><a href="linking-widgets.html#cb187-11"></a>    data &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">origData</span>()</span>
-<span id="cb187-12"><a href="linking-widgets.html#cb187-12"></a>    deps &lt;-<span class="st"> </span>crosstalk<span class="op">::</span><span class="kw">crosstalkLibs</span>()</span>
-<span id="cb187-13"><a href="linking-widgets.html#cb187-13"></a>  }</span>
-<span id="cb187-14"><a href="linking-widgets.html#cb187-14"></a></span>
-<span id="cb187-15"><a href="linking-widgets.html#cb187-15"></a>  <span class="co"># forward options using x</span></span>
-<span id="cb187-16"><a href="linking-widgets.html#cb187-16"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb187-17"><a href="linking-widgets.html#cb187-17"></a>    <span class="dt">data =</span> data,</span>
-<span id="cb187-18"><a href="linking-widgets.html#cb187-18"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
-<span id="cb187-19"><a href="linking-widgets.html#cb187-19"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(<span class="dt">group =</span> group) <span class="co"># pass group</span></span>
-<span id="cb187-20"><a href="linking-widgets.html#cb187-20"></a>  )</span>
-<span id="cb187-21"><a href="linking-widgets.html#cb187-21"></a></span>
-<span id="cb187-22"><a href="linking-widgets.html#cb187-22"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_ARGS&#39;</span>) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">dataframe =</span> <span class="st">&quot;rows&quot;</span>)</span>
-<span id="cb187-23"><a href="linking-widgets.html#cb187-23"></a></span>
-<span id="cb187-24"><a href="linking-widgets.html#cb187-24"></a>  <span class="co"># create widget</span></span>
-<span id="cb187-25"><a href="linking-widgets.html#cb187-25"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
-<span id="cb187-26"><a href="linking-widgets.html#cb187-26"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
-<span id="cb187-27"><a href="linking-widgets.html#cb187-27"></a>    x,</span>
-<span id="cb187-28"><a href="linking-widgets.html#cb187-28"></a>    <span class="dt">width =</span> width,</span>
-<span id="cb187-29"><a href="linking-widgets.html#cb187-29"></a>    <span class="dt">height =</span> height,</span>
-<span id="cb187-30"><a href="linking-widgets.html#cb187-30"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
-<span id="cb187-31"><a href="linking-widgets.html#cb187-31"></a>    <span class="dt">elementId =</span> elementId,</span>
-<span id="cb187-32"><a href="linking-widgets.html#cb187-32"></a>    <span class="dt">sizingPolicy =</span> htmlwidgets<span class="op">::</span><span class="kw">sizingPolicy</span>(</span>
-<span id="cb187-33"><a href="linking-widgets.html#cb187-33"></a>      <span class="dt">padding =</span> <span class="dv">0</span>,</span>
-<span id="cb187-34"><a href="linking-widgets.html#cb187-34"></a>      <span class="dt">browser.fill =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb187-35"><a href="linking-widgets.html#cb187-35"></a>      <span class="dt">defaultWidth =</span> <span class="st">&quot;100%&quot;</span></span>
-<span id="cb187-36"><a href="linking-widgets.html#cb187-36"></a>    ),</span>
-<span id="cb187-37"><a href="linking-widgets.html#cb187-37"></a>    <span class="dt">preRenderHook =</span> render_gio,</span>
-<span id="cb187-38"><a href="linking-widgets.html#cb187-38"></a>    <span class="co"># add crosstalk dependency</span></span>
-<span id="cb187-39"><a href="linking-widgets.html#cb187-39"></a>    <span class="dt">dependencies =</span> deps</span>
-<span id="cb187-40"><a href="linking-widgets.html#cb187-40"></a>  )</span>
-<span id="cb187-41"><a href="linking-widgets.html#cb187-41"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="linking-widgets.html#cb188-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, </span>
+<span id="cb188-2"><a href="linking-widgets.html#cb188-2"></a>  <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
+<span id="cb188-3"><a href="linking-widgets.html#cb188-3"></a></span>
+<span id="cb188-4"><a href="linking-widgets.html#cb188-4"></a>  <span class="co"># defaults to NULL</span></span>
+<span id="cb188-5"><a href="linking-widgets.html#cb188-5"></a>  group &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb188-6"><a href="linking-widgets.html#cb188-6"></a>  deps &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb188-7"><a href="linking-widgets.html#cb188-7"></a></span>
+<span id="cb188-8"><a href="linking-widgets.html#cb188-8"></a>  <span class="co"># uses crosstalk</span></span>
+<span id="cb188-9"><a href="linking-widgets.html#cb188-9"></a>  <span class="cf">if</span> (crosstalk<span class="op">::</span><span class="kw">is.SharedData</span>(data)) {</span>
+<span id="cb188-10"><a href="linking-widgets.html#cb188-10"></a>    group &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">groupName</span>()</span>
+<span id="cb188-11"><a href="linking-widgets.html#cb188-11"></a>    data &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">origData</span>()</span>
+<span id="cb188-12"><a href="linking-widgets.html#cb188-12"></a>    deps &lt;-<span class="st"> </span>crosstalk<span class="op">::</span><span class="kw">crosstalkLibs</span>()</span>
+<span id="cb188-13"><a href="linking-widgets.html#cb188-13"></a>  }</span>
+<span id="cb188-14"><a href="linking-widgets.html#cb188-14"></a></span>
+<span id="cb188-15"><a href="linking-widgets.html#cb188-15"></a>  <span class="co"># forward options using x</span></span>
+<span id="cb188-16"><a href="linking-widgets.html#cb188-16"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb188-17"><a href="linking-widgets.html#cb188-17"></a>    <span class="dt">data =</span> data,</span>
+<span id="cb188-18"><a href="linking-widgets.html#cb188-18"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
+<span id="cb188-19"><a href="linking-widgets.html#cb188-19"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(<span class="dt">group =</span> group) <span class="co"># pass group</span></span>
+<span id="cb188-20"><a href="linking-widgets.html#cb188-20"></a>  )</span>
+<span id="cb188-21"><a href="linking-widgets.html#cb188-21"></a></span>
+<span id="cb188-22"><a href="linking-widgets.html#cb188-22"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_ARGS&#39;</span>) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">dataframe =</span> <span class="st">&quot;rows&quot;</span>)</span>
+<span id="cb188-23"><a href="linking-widgets.html#cb188-23"></a></span>
+<span id="cb188-24"><a href="linking-widgets.html#cb188-24"></a>  <span class="co"># create widget</span></span>
+<span id="cb188-25"><a href="linking-widgets.html#cb188-25"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
+<span id="cb188-26"><a href="linking-widgets.html#cb188-26"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb188-27"><a href="linking-widgets.html#cb188-27"></a>    x,</span>
+<span id="cb188-28"><a href="linking-widgets.html#cb188-28"></a>    <span class="dt">width =</span> width,</span>
+<span id="cb188-29"><a href="linking-widgets.html#cb188-29"></a>    <span class="dt">height =</span> height,</span>
+<span id="cb188-30"><a href="linking-widgets.html#cb188-30"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb188-31"><a href="linking-widgets.html#cb188-31"></a>    <span class="dt">elementId =</span> elementId,</span>
+<span id="cb188-32"><a href="linking-widgets.html#cb188-32"></a>    <span class="dt">sizingPolicy =</span> htmlwidgets<span class="op">::</span><span class="kw">sizingPolicy</span>(</span>
+<span id="cb188-33"><a href="linking-widgets.html#cb188-33"></a>      <span class="dt">padding =</span> <span class="dv">0</span>,</span>
+<span id="cb188-34"><a href="linking-widgets.html#cb188-34"></a>      <span class="dt">browser.fill =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb188-35"><a href="linking-widgets.html#cb188-35"></a>      <span class="dt">defaultWidth =</span> <span class="st">&quot;100%&quot;</span></span>
+<span id="cb188-36"><a href="linking-widgets.html#cb188-36"></a>    ),</span>
+<span id="cb188-37"><a href="linking-widgets.html#cb188-37"></a>    <span class="dt">preRenderHook =</span> render_gio,</span>
+<span id="cb188-38"><a href="linking-widgets.html#cb188-38"></a>    <span class="co"># add crosstalk dependency</span></span>
+<span id="cb188-39"><a href="linking-widgets.html#cb188-39"></a>    <span class="dt">dependencies =</span> deps</span>
+<span id="cb188-40"><a href="linking-widgets.html#cb188-40"></a>  )</span>
+<span id="cb188-41"><a href="linking-widgets.html#cb188-41"></a>}</span></code></pre></div>
 </div>
 <div id="change-the-javascript-code" class="section level2" number="9.6">
 <h2><span class="header-section-number">9.6</span> Change the JavaScript code</h2>
 <p>What is left to do is to adapt the JavaScript code, as a reminder it must accept the keys selected in other widgets and share the selected key with other widgets.</p>
 <p>First we create the selection handler in the <code>factory</code> function, this is done by instantiating a new class from <code>crosstalk.SelectionHandle</code>.</p>
-<div class="sourceCode" id="cb188"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb188-1"><a href="linking-widgets.html#cb188-1"></a><span class="kw">var</span> sel_handle <span class="op">=</span> <span class="kw">new</span> crosstalk<span class="op">.</span><span class="fu">SelectionHandle</span>()<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb189"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb189-1"><a href="linking-widgets.html#cb189-1"></a><span class="kw">var</span> sel_handle <span class="op">=</span> <span class="kw">new</span> crosstalk<span class="op">.</span><span class="fu">SelectionHandle</span>()<span class="op">;</span></span></code></pre></div>
 <p>Once the selection handle created it can be used in the <code>renderValue</code> function to set the group that was collected from R.</p>
-<div class="sourceCode" id="cb189"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb189-1"><a href="linking-widgets.html#cb189-1"></a>sel_handle<span class="op">.</span><span class="fu">setGroup</span>(x<span class="op">.</span><span class="at">crosstalk</span><span class="op">.</span><span class="at">group</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb190"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb190-1"><a href="linking-widgets.html#cb190-1"></a>sel_handle<span class="op">.</span><span class="fu">setGroup</span>(x<span class="op">.</span><span class="at">crosstalk</span><span class="op">.</span><span class="at">group</span>)<span class="op">;</span></span></code></pre></div>
 <div id="send-selected-keys" class="section level3" number="9.6.1">
 <h3><span class="header-section-number">9.6.1</span> Send selected keys</h3>
 <p>In order for gio to share the selected country with other widgets it would first have to know which country is selected. This can be achieved with a callback function that gio supports.</p>
 <p>Most JavaScript visualisation libraries will support callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. What these callback functions will be and how they work will entirely depend on the library at hand.</p>
 <p>In gio.js this callback function is fired when a country is selected on the globe, it accepts two objects; one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country).</p>
 <p>The <a href="https://giojs.org/html/docs/callbackPicked.html">documentation of gio.js</a> gives the following example callback function.</p>
-<div class="sourceCode" id="cb190"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb190-1"><a href="linking-widgets.html#cb190-1"></a><span class="co">// define callback function</span></span>
-<span id="cb190-2"><a href="linking-widgets.html#cb190-2"></a><span class="kw">function</span> <span class="fu">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) {</span>
-<span id="cb190-3"><a href="linking-widgets.html#cb190-3"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(selectedCountry)<span class="op">;</span></span>
-<span id="cb190-4"><a href="linking-widgets.html#cb190-4"></a>  <span class="co">// console.log(relatedCountries);</span></span>
-<span id="cb190-5"><a href="linking-widgets.html#cb190-5"></a>}</span>
-<span id="cb190-6"><a href="linking-widgets.html#cb190-6"></a></span>
-<span id="cb190-7"><a href="linking-widgets.html#cb190-7"></a><span class="co">// use callback function</span></span>
-<span id="cb190-8"><a href="linking-widgets.html#cb190-8"></a>controller<span class="op">.</span><span class="fu">onCountryPicked</span>(callback)<span class="op">;</span></span></code></pre></div>
-<div class="sourceCode" id="cb191"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb191-1"><a href="linking-widgets.html#cb191-1"></a><span class="fu">{</span><span class="er">name</span><span class="fu">:</span> <span class="st">&quot;LIBYA&quot;</span><span class="fu">,</span> <span class="er">lat</span><span class="fu">:</span> <span class="dv">25</span><span class="fu">,</span> <span class="er">lon</span><span class="fu">:</span> <span class="dv">17</span><span class="fu">,</span> <span class="er">center</span><span class="fu">:</span> <span class="er">n</span><span class="fu">,</span> <span class="er">ISOCode</span><span class="fu">:</span> <span class="st">&quot;LY&quot;</span><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb191"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb191-1"><a href="linking-widgets.html#cb191-1"></a><span class="co">// define callback function</span></span>
+<span id="cb191-2"><a href="linking-widgets.html#cb191-2"></a><span class="kw">function</span> <span class="fu">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) {</span>
+<span id="cb191-3"><a href="linking-widgets.html#cb191-3"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(selectedCountry)<span class="op">;</span></span>
+<span id="cb191-4"><a href="linking-widgets.html#cb191-4"></a>  <span class="co">// console.log(relatedCountries);</span></span>
+<span id="cb191-5"><a href="linking-widgets.html#cb191-5"></a>}</span>
+<span id="cb191-6"><a href="linking-widgets.html#cb191-6"></a></span>
+<span id="cb191-7"><a href="linking-widgets.html#cb191-7"></a><span class="co">// use callback function</span></span>
+<span id="cb191-8"><a href="linking-widgets.html#cb191-8"></a>controller<span class="op">.</span><span class="fu">onCountryPicked</span>(callback)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb192"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb192-1"><a href="linking-widgets.html#cb192-1"></a><span class="fu">{</span><span class="er">name</span><span class="fu">:</span> <span class="st">&quot;LIBYA&quot;</span><span class="fu">,</span> <span class="er">lat</span><span class="fu">:</span> <span class="dv">25</span><span class="fu">,</span> <span class="er">lon</span><span class="fu">:</span> <span class="dv">17</span><span class="fu">,</span> <span class="er">center</span><span class="fu">:</span> <span class="er">n</span><span class="fu">,</span> <span class="er">ISOCode</span><span class="fu">:</span> <span class="st">&quot;LY&quot;</span><span class="fu">}</span></span></code></pre></div>
 <p>This defines a function named <code>callback</code> which takes the two aforementioned objects and logs them in the JavaScript console. Then the function is passed to the <code>controller</code> via the <code>onCountryPicked</code> method which will run it every time a country is selected by the user.</p>
 <p>This callback function will be useful to send the <code>key</code>s to other widgets: when a user selects China send the <code>CN</code> key selection via crosstalk.</p>
 <p>As mentioned at the beginning of this section, the keys used with the datasets for gio.js should be country ISO codes, therefore one can consider the variable <code>selectedCountry.ISOCode</code> as selected <code>key</code>. The <code>set</code> method from the selection handle can be used to share the selected key with other widgets. Note that this method expects either a <code>null</code> value or an array, a scalar value will throw an error, hence <code>selectedCountry.ISOCode</code> is wrapped in square brackets.</p>
-<div class="sourceCode" id="cb192"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb192-1"><a href="linking-widgets.html#cb192-1"></a><span class="kw">function</span> <span class="fu">callback</span> (selectedCountry) {</span>
-<span id="cb192-2"><a href="linking-widgets.html#cb192-2"></a>  sel_handle<span class="op">.</span><span class="fu">set</span>([selectedCountry<span class="op">.</span><span class="at">ISOCode</span>])<span class="op">;</span></span>
-<span id="cb192-3"><a href="linking-widgets.html#cb192-3"></a>}</span>
-<span id="cb192-4"><a href="linking-widgets.html#cb192-4"></a></span>
-<span id="cb192-5"><a href="linking-widgets.html#cb192-5"></a>controller<span class="op">.</span><span class="fu">onCountryPicked</span>(callback)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb193"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb193-1"><a href="linking-widgets.html#cb193-1"></a><span class="kw">function</span> <span class="fu">callback</span> (selectedCountry) {</span>
+<span id="cb193-2"><a href="linking-widgets.html#cb193-2"></a>  sel_handle<span class="op">.</span><span class="fu">set</span>([selectedCountry<span class="op">.</span><span class="at">ISOCode</span>])<span class="op">;</span></span>
+<span id="cb193-3"><a href="linking-widgets.html#cb193-3"></a>}</span>
+<span id="cb193-4"><a href="linking-widgets.html#cb193-4"></a></span>
+<span id="cb193-5"><a href="linking-widgets.html#cb193-5"></a>controller<span class="op">.</span><span class="fu">onCountryPicked</span>(callback)<span class="op">;</span></span></code></pre></div>
 </div>
 <div id="set-selected-keys" class="section level3" number="9.6.2">
 <h3><span class="header-section-number">9.6.2</span> Set selected keys</h3>
 <p>We have implemented the necessary to share the selected country with other widgets but are yet to implemented the opposite; when users select a country in another widget the selected country in gio should change too. Gio does provide a method called <code>switchCountry</code> to programmatically change the selected country.</p>
 <p>This can be achieved by listening to the <code>change</code> event on the selection handle previously created, below it is used to log the object <code>e</code> in order to inspect its properties.</p>
-<div class="sourceCode" id="cb193"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb193-1"><a href="linking-widgets.html#cb193-1"></a><span class="co">// placed in factory function</span></span>
-<span id="cb193-2"><a href="linking-widgets.html#cb193-2"></a>sel_handle<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) {</span>
-<span id="cb193-3"><a href="linking-widgets.html#cb193-3"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(e)<span class="op">;</span></span>
-<span id="cb193-4"><a href="linking-widgets.html#cb193-4"></a>})<span class="op">;</span></span></code></pre></div>
-<div class="sourceCode" id="cb194"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb194-1"><a href="linking-widgets.html#cb194-1"></a><span class="fu">{</span></span>
-<span id="cb194-2"><a href="linking-widgets.html#cb194-2"></a>  <span class="er">oldValue</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span></span>
-<span id="cb194-3"><a href="linking-widgets.html#cb194-3"></a>  <span class="er">sender</span><span class="fu">:</span> <span class="er">n</span> <span class="fu">{</span></span>
-<span id="cb194-4"><a href="linking-widgets.html#cb194-4"></a>    <span class="er">_eventRelay</span><span class="fu">:</span> <span class="er">e</span><span class="fu">,</span> </span>
-<span id="cb194-5"><a href="linking-widgets.html#cb194-5"></a>    <span class="er">_emitter</span><span class="fu">:</span> <span class="er">t</span><span class="fu">,</span> </span>
-<span id="cb194-6"><a href="linking-widgets.html#cb194-6"></a>    <span class="er">_group</span><span class="fu">:</span> <span class="st">&quot;SharedDatac7682f87&quot;</span><span class="fu">,</span> </span>
-<span id="cb194-7"><a href="linking-widgets.html#cb194-7"></a>    <span class="er">_var</span><span class="fu">:</span> <span class="er">r</span><span class="fu">,</span> </span>
-<span id="cb194-8"><a href="linking-widgets.html#cb194-8"></a>    <span class="er">_varOnChangeSub</span><span class="fu">:</span> <span class="st">&quot;sub1&quot;</span><span class="fu">,</span> </span>
-<span id="cb194-9"><a href="linking-widgets.html#cb194-9"></a>    <span class="er">…</span></span>
-<span id="cb194-10"><a href="linking-widgets.html#cb194-10"></a>  <span class="fu">},</span></span>
-<span id="cb194-11"><a href="linking-widgets.html#cb194-11"></a>  <span class="er">value</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;AE&quot;</span><span class="ot">]</span></span>
-<span id="cb194-12"><a href="linking-widgets.html#cb194-12"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb194"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb194-1"><a href="linking-widgets.html#cb194-1"></a><span class="co">// placed in factory function</span></span>
+<span id="cb194-2"><a href="linking-widgets.html#cb194-2"></a>sel_handle<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) {</span>
+<span id="cb194-3"><a href="linking-widgets.html#cb194-3"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(e)<span class="op">;</span></span>
+<span id="cb194-4"><a href="linking-widgets.html#cb194-4"></a>})<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb195"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb195-1"><a href="linking-widgets.html#cb195-1"></a><span class="fu">{</span></span>
+<span id="cb195-2"><a href="linking-widgets.html#cb195-2"></a>  <span class="er">oldValue</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span></span>
+<span id="cb195-3"><a href="linking-widgets.html#cb195-3"></a>  <span class="er">sender</span><span class="fu">:</span> <span class="er">n</span> <span class="fu">{</span></span>
+<span id="cb195-4"><a href="linking-widgets.html#cb195-4"></a>    <span class="er">_eventRelay</span><span class="fu">:</span> <span class="er">e</span><span class="fu">,</span> </span>
+<span id="cb195-5"><a href="linking-widgets.html#cb195-5"></a>    <span class="er">_emitter</span><span class="fu">:</span> <span class="er">t</span><span class="fu">,</span> </span>
+<span id="cb195-6"><a href="linking-widgets.html#cb195-6"></a>    <span class="er">_group</span><span class="fu">:</span> <span class="st">&quot;SharedDatac7682f87&quot;</span><span class="fu">,</span> </span>
+<span id="cb195-7"><a href="linking-widgets.html#cb195-7"></a>    <span class="er">_var</span><span class="fu">:</span> <span class="er">r</span><span class="fu">,</span> </span>
+<span id="cb195-8"><a href="linking-widgets.html#cb195-8"></a>    <span class="er">_varOnChangeSub</span><span class="fu">:</span> <span class="st">&quot;sub1&quot;</span><span class="fu">,</span> </span>
+<span id="cb195-9"><a href="linking-widgets.html#cb195-9"></a>    <span class="er">…</span></span>
+<span id="cb195-10"><a href="linking-widgets.html#cb195-10"></a>  <span class="fu">},</span></span>
+<span id="cb195-11"><a href="linking-widgets.html#cb195-11"></a>  <span class="er">value</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;AE&quot;</span><span class="ot">]</span></span>
+<span id="cb195-12"><a href="linking-widgets.html#cb195-12"></a><span class="fu">}</span></span></code></pre></div>
 <ol style="list-style-type: decimal">
 <li><code>oldValue</code> - the value that was previously selected (if any), this may be useful if the widget wants to calculate differences between the currently and previously selected value.</li>
 <li><code>sender</code> - the selection handle instance that made the change. This is useful to compare against the selection handle of the widget and know whether the change in selection was initiated by this widget or another. It is often used to clear the selection or filtering before applying a new one when the change comes from another widget.</li>
 <li><code>value</code> - the array of selected keys.</li>
 </ol>
 <p>Therefore event listener could make use of gio.js’ <code>switchCountry</code>. Note that 1) the selection cannot be cleared with gio.js, a country is always selected, and 2) one can only select one country a time, hence only accepting the first element of the selected keys with <code>e.value[0]</code>.</p>
-<div class="sourceCode" id="cb195"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb195-1"><a href="linking-widgets.html#cb195-1"></a><span class="co">// placed in factory function</span></span>
-<span id="cb195-2"><a href="linking-widgets.html#cb195-2"></a>sel_handle<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) {</span>
-<span id="cb195-3"><a href="linking-widgets.html#cb195-3"></a></span>
-<span id="cb195-4"><a href="linking-widgets.html#cb195-4"></a>  <span class="co">// selection comes from another widget</span></span>
-<span id="cb195-5"><a href="linking-widgets.html#cb195-5"></a>  <span class="cf">if</span> (e<span class="op">.</span><span class="at">sender</span> <span class="op">!==</span> sel_handle) {</span>
-<span id="cb195-6"><a href="linking-widgets.html#cb195-6"></a>    <span class="co">// clear the selection</span></span>
-<span id="cb195-7"><a href="linking-widgets.html#cb195-7"></a>    <span class="co">// not possible with gio.js</span></span>
-<span id="cb195-8"><a href="linking-widgets.html#cb195-8"></a>  }</span>
-<span id="cb195-9"><a href="linking-widgets.html#cb195-9"></a>  controller<span class="op">.</span><span class="fu">switchCountry</span>(e<span class="op">.</span><span class="at">value</span>[<span class="dv">0</span>])<span class="op">;</span></span>
-<span id="cb195-10"><a href="linking-widgets.html#cb195-10"></a>})<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb196"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb196-1"><a href="linking-widgets.html#cb196-1"></a><span class="co">// placed in factory function</span></span>
+<span id="cb196-2"><a href="linking-widgets.html#cb196-2"></a>sel_handle<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) {</span>
+<span id="cb196-3"><a href="linking-widgets.html#cb196-3"></a></span>
+<span id="cb196-4"><a href="linking-widgets.html#cb196-4"></a>  <span class="co">// selection comes from another widget</span></span>
+<span id="cb196-5"><a href="linking-widgets.html#cb196-5"></a>  <span class="cf">if</span> (e<span class="op">.</span><span class="at">sender</span> <span class="op">!==</span> sel_handle) {</span>
+<span id="cb196-6"><a href="linking-widgets.html#cb196-6"></a>    <span class="co">// clear the selection</span></span>
+<span id="cb196-7"><a href="linking-widgets.html#cb196-7"></a>    <span class="co">// not possible with gio.js</span></span>
+<span id="cb196-8"><a href="linking-widgets.html#cb196-8"></a>  }</span>
+<span id="cb196-9"><a href="linking-widgets.html#cb196-9"></a>  controller<span class="op">.</span><span class="fu">switchCountry</span>(e<span class="op">.</span><span class="at">value</span>[<span class="dv">0</span>])<span class="op">;</span></span>
+<span id="cb196-10"><a href="linking-widgets.html#cb196-10"></a>})<span class="op">;</span></span></code></pre></div>
 </div>
 <div id="recap-javascript-code" class="section level3" number="9.6.3">
 <h3><span class="header-section-number">9.6.3</span> Recap JavaScript code</h3>
 <p>To recapitulate, this is what the JavaScript code should not look like.</p>
-<div class="sourceCode" id="cb196"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb196-1"><a href="linking-widgets.html#cb196-1"></a>HTMLWidgets<span class="op">.</span><span class="fu">widget</span>({</span>
-<span id="cb196-2"><a href="linking-widgets.html#cb196-2"></a></span>
-<span id="cb196-3"><a href="linking-widgets.html#cb196-3"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;gio&#39;</span><span class="op">,</span></span>
-<span id="cb196-4"><a href="linking-widgets.html#cb196-4"></a></span>
-<span id="cb196-5"><a href="linking-widgets.html#cb196-5"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
-<span id="cb196-6"><a href="linking-widgets.html#cb196-6"></a></span>
-<span id="cb196-7"><a href="linking-widgets.html#cb196-7"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) {</span>
-<span id="cb196-8"><a href="linking-widgets.html#cb196-8"></a></span>
-<span id="cb196-9"><a href="linking-widgets.html#cb196-9"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
-<span id="cb196-10"><a href="linking-widgets.html#cb196-10"></a>    <span class="kw">var</span> controller<span class="op">;</span></span>
-<span id="cb196-11"><a href="linking-widgets.html#cb196-11"></a></span>
-<span id="cb196-12"><a href="linking-widgets.html#cb196-12"></a>    <span class="co">// create selection handle</span></span>
-<span id="cb196-13"><a href="linking-widgets.html#cb196-13"></a>    <span class="kw">var</span> sel_handle <span class="op">=</span> <span class="kw">new</span> crosstalk<span class="op">.</span><span class="fu">SelectionHandle</span>()<span class="op">;</span></span>
-<span id="cb196-14"><a href="linking-widgets.html#cb196-14"></a></span>
-<span id="cb196-15"><a href="linking-widgets.html#cb196-15"></a>    <span class="co">// listen to change</span></span>
-<span id="cb196-16"><a href="linking-widgets.html#cb196-16"></a>    sel_handle<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) {</span>
-<span id="cb196-17"><a href="linking-widgets.html#cb196-17"></a>      <span class="cf">if</span> (e<span class="op">.</span><span class="at">sender</span> <span class="op">!==</span> sel_handle) {</span>
-<span id="cb196-18"><a href="linking-widgets.html#cb196-18"></a>        <span class="co">// clear selection</span></span>
-<span id="cb196-19"><a href="linking-widgets.html#cb196-19"></a>      }</span>
-<span id="cb196-20"><a href="linking-widgets.html#cb196-20"></a>      controller<span class="op">.</span><span class="fu">switchCountry</span>(e<span class="op">.</span><span class="at">value</span>[<span class="dv">0</span>])<span class="op">;</span></span>
-<span id="cb196-21"><a href="linking-widgets.html#cb196-21"></a>    })<span class="op">;</span></span>
-<span id="cb196-22"><a href="linking-widgets.html#cb196-22"></a></span>
-<span id="cb196-23"><a href="linking-widgets.html#cb196-23"></a></span>
-<span id="cb196-24"><a href="linking-widgets.html#cb196-24"></a>    <span class="cf">return</span> {</span>
-<span id="cb196-25"><a href="linking-widgets.html#cb196-25"></a></span>
-<span id="cb196-26"><a href="linking-widgets.html#cb196-26"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) {</span>
-<span id="cb196-27"><a href="linking-widgets.html#cb196-27"></a></span>
-<span id="cb196-28"><a href="linking-widgets.html#cb196-28"></a>        controller <span class="op">=</span> <span class="kw">new</span> GIO<span class="op">.</span><span class="fu">Controller</span>(el)<span class="op">;</span></span>
-<span id="cb196-29"><a href="linking-widgets.html#cb196-29"></a></span>
-<span id="cb196-30"><a href="linking-widgets.html#cb196-30"></a>        <span class="co">// group</span></span>
-<span id="cb196-31"><a href="linking-widgets.html#cb196-31"></a>        sel_handle<span class="op">.</span><span class="fu">setGroup</span>(x<span class="op">.</span><span class="at">crosstalk</span><span class="op">.</span><span class="at">group</span>)<span class="op">;</span></span>
-<span id="cb196-32"><a href="linking-widgets.html#cb196-32"></a>        </span>
-<span id="cb196-33"><a href="linking-widgets.html#cb196-33"></a>        <span class="co">// add data</span></span>
-<span id="cb196-34"><a href="linking-widgets.html#cb196-34"></a>        controller<span class="op">.</span><span class="fu">addData</span>(x<span class="op">.</span><span class="at">data</span>)<span class="op">;</span></span>
-<span id="cb196-35"><a href="linking-widgets.html#cb196-35"></a></span>
-<span id="cb196-36"><a href="linking-widgets.html#cb196-36"></a>        controller<span class="op">.</span><span class="fu">setStyle</span>(x<span class="op">.</span><span class="at">style</span>)<span class="op">;</span></span>
-<span id="cb196-37"><a href="linking-widgets.html#cb196-37"></a></span>
-<span id="cb196-38"><a href="linking-widgets.html#cb196-38"></a>        <span class="co">// callback</span></span>
-<span id="cb196-39"><a href="linking-widgets.html#cb196-39"></a>        <span class="kw">function</span> callback (selectedCountry<span class="op">,</span> relatedCountries) {</span>
-<span id="cb196-40"><a href="linking-widgets.html#cb196-40"></a>          sel_handle<span class="op">.</span><span class="fu">set</span>([selectedCountry<span class="op">.</span><span class="at">ISOCode</span>])<span class="op">;</span> <span class="co">// send keys</span></span>
-<span id="cb196-41"><a href="linking-widgets.html#cb196-41"></a>        }</span>
-<span id="cb196-42"><a href="linking-widgets.html#cb196-42"></a></span>
-<span id="cb196-43"><a href="linking-widgets.html#cb196-43"></a>        controller<span class="op">.</span><span class="fu">onCountryPicked</span>(callback)<span class="op">;</span></span>
-<span id="cb196-44"><a href="linking-widgets.html#cb196-44"></a></span>
-<span id="cb196-45"><a href="linking-widgets.html#cb196-45"></a>        <span class="co">// use stats</span></span>
-<span id="cb196-46"><a href="linking-widgets.html#cb196-46"></a>        <span class="cf">if</span>(x<span class="op">.</span><span class="at">stats</span>)</span>
-<span id="cb196-47"><a href="linking-widgets.html#cb196-47"></a>          controller<span class="op">.</span><span class="fu">enableStats</span>()<span class="op">;</span></span>
-<span id="cb196-48"><a href="linking-widgets.html#cb196-48"></a></span>
-<span id="cb196-49"><a href="linking-widgets.html#cb196-49"></a>        <span class="co">// render</span></span>
-<span id="cb196-50"><a href="linking-widgets.html#cb196-50"></a>        controller<span class="op">.</span><span class="fu">init</span>()<span class="op">;</span></span>
-<span id="cb196-51"><a href="linking-widgets.html#cb196-51"></a></span>
-<span id="cb196-52"><a href="linking-widgets.html#cb196-52"></a>      }<span class="op">,</span></span>
-<span id="cb196-53"><a href="linking-widgets.html#cb196-53"></a></span>
-<span id="cb196-54"><a href="linking-widgets.html#cb196-54"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) {</span>
-<span id="cb196-55"><a href="linking-widgets.html#cb196-55"></a>        controller<span class="op">.</span><span class="fu">resizeUpdate</span>()<span class="op">;</span></span>
-<span id="cb196-56"><a href="linking-widgets.html#cb196-56"></a>      }<span class="op">,</span></span>
-<span id="cb196-57"><a href="linking-widgets.html#cb196-57"></a></span>
-<span id="cb196-58"><a href="linking-widgets.html#cb196-58"></a>    }<span class="op">;</span></span>
-<span id="cb196-59"><a href="linking-widgets.html#cb196-59"></a>  }</span>
-<span id="cb196-60"><a href="linking-widgets.html#cb196-60"></a>})<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb197"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb197-1"><a href="linking-widgets.html#cb197-1"></a>HTMLWidgets<span class="op">.</span><span class="fu">widget</span>({</span>
+<span id="cb197-2"><a href="linking-widgets.html#cb197-2"></a></span>
+<span id="cb197-3"><a href="linking-widgets.html#cb197-3"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;gio&#39;</span><span class="op">,</span></span>
+<span id="cb197-4"><a href="linking-widgets.html#cb197-4"></a></span>
+<span id="cb197-5"><a href="linking-widgets.html#cb197-5"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
+<span id="cb197-6"><a href="linking-widgets.html#cb197-6"></a></span>
+<span id="cb197-7"><a href="linking-widgets.html#cb197-7"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) {</span>
+<span id="cb197-8"><a href="linking-widgets.html#cb197-8"></a></span>
+<span id="cb197-9"><a href="linking-widgets.html#cb197-9"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
+<span id="cb197-10"><a href="linking-widgets.html#cb197-10"></a>    <span class="kw">var</span> controller<span class="op">;</span></span>
+<span id="cb197-11"><a href="linking-widgets.html#cb197-11"></a></span>
+<span id="cb197-12"><a href="linking-widgets.html#cb197-12"></a>    <span class="co">// create selection handle</span></span>
+<span id="cb197-13"><a href="linking-widgets.html#cb197-13"></a>    <span class="kw">var</span> sel_handle <span class="op">=</span> <span class="kw">new</span> crosstalk<span class="op">.</span><span class="fu">SelectionHandle</span>()<span class="op">;</span></span>
+<span id="cb197-14"><a href="linking-widgets.html#cb197-14"></a></span>
+<span id="cb197-15"><a href="linking-widgets.html#cb197-15"></a>    <span class="co">// listen to change</span></span>
+<span id="cb197-16"><a href="linking-widgets.html#cb197-16"></a>    sel_handle<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) {</span>
+<span id="cb197-17"><a href="linking-widgets.html#cb197-17"></a>      <span class="cf">if</span> (e<span class="op">.</span><span class="at">sender</span> <span class="op">!==</span> sel_handle) {</span>
+<span id="cb197-18"><a href="linking-widgets.html#cb197-18"></a>        <span class="co">// clear selection</span></span>
+<span id="cb197-19"><a href="linking-widgets.html#cb197-19"></a>      }</span>
+<span id="cb197-20"><a href="linking-widgets.html#cb197-20"></a>      controller<span class="op">.</span><span class="fu">switchCountry</span>(e<span class="op">.</span><span class="at">value</span>[<span class="dv">0</span>])<span class="op">;</span></span>
+<span id="cb197-21"><a href="linking-widgets.html#cb197-21"></a>    })<span class="op">;</span></span>
+<span id="cb197-22"><a href="linking-widgets.html#cb197-22"></a></span>
+<span id="cb197-23"><a href="linking-widgets.html#cb197-23"></a></span>
+<span id="cb197-24"><a href="linking-widgets.html#cb197-24"></a>    <span class="cf">return</span> {</span>
+<span id="cb197-25"><a href="linking-widgets.html#cb197-25"></a></span>
+<span id="cb197-26"><a href="linking-widgets.html#cb197-26"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) {</span>
+<span id="cb197-27"><a href="linking-widgets.html#cb197-27"></a></span>
+<span id="cb197-28"><a href="linking-widgets.html#cb197-28"></a>        controller <span class="op">=</span> <span class="kw">new</span> GIO<span class="op">.</span><span class="fu">Controller</span>(el)<span class="op">;</span></span>
+<span id="cb197-29"><a href="linking-widgets.html#cb197-29"></a></span>
+<span id="cb197-30"><a href="linking-widgets.html#cb197-30"></a>        <span class="co">// group</span></span>
+<span id="cb197-31"><a href="linking-widgets.html#cb197-31"></a>        sel_handle<span class="op">.</span><span class="fu">setGroup</span>(x<span class="op">.</span><span class="at">crosstalk</span><span class="op">.</span><span class="at">group</span>)<span class="op">;</span></span>
+<span id="cb197-32"><a href="linking-widgets.html#cb197-32"></a>        </span>
+<span id="cb197-33"><a href="linking-widgets.html#cb197-33"></a>        <span class="co">// add data</span></span>
+<span id="cb197-34"><a href="linking-widgets.html#cb197-34"></a>        controller<span class="op">.</span><span class="fu">addData</span>(x<span class="op">.</span><span class="at">data</span>)<span class="op">;</span></span>
+<span id="cb197-35"><a href="linking-widgets.html#cb197-35"></a></span>
+<span id="cb197-36"><a href="linking-widgets.html#cb197-36"></a>        controller<span class="op">.</span><span class="fu">setStyle</span>(x<span class="op">.</span><span class="at">style</span>)<span class="op">;</span></span>
+<span id="cb197-37"><a href="linking-widgets.html#cb197-37"></a></span>
+<span id="cb197-38"><a href="linking-widgets.html#cb197-38"></a>        <span class="co">// callback</span></span>
+<span id="cb197-39"><a href="linking-widgets.html#cb197-39"></a>        <span class="kw">function</span> callback (selectedCountry<span class="op">,</span> relatedCountries) {</span>
+<span id="cb197-40"><a href="linking-widgets.html#cb197-40"></a>          sel_handle<span class="op">.</span><span class="fu">set</span>([selectedCountry<span class="op">.</span><span class="at">ISOCode</span>])<span class="op">;</span> <span class="co">// send keys</span></span>
+<span id="cb197-41"><a href="linking-widgets.html#cb197-41"></a>        }</span>
+<span id="cb197-42"><a href="linking-widgets.html#cb197-42"></a></span>
+<span id="cb197-43"><a href="linking-widgets.html#cb197-43"></a>        controller<span class="op">.</span><span class="fu">onCountryPicked</span>(callback)<span class="op">;</span></span>
+<span id="cb197-44"><a href="linking-widgets.html#cb197-44"></a></span>
+<span id="cb197-45"><a href="linking-widgets.html#cb197-45"></a>        <span class="co">// use stats</span></span>
+<span id="cb197-46"><a href="linking-widgets.html#cb197-46"></a>        <span class="cf">if</span>(x<span class="op">.</span><span class="at">stats</span>)</span>
+<span id="cb197-47"><a href="linking-widgets.html#cb197-47"></a>          controller<span class="op">.</span><span class="fu">enableStats</span>()<span class="op">;</span></span>
+<span id="cb197-48"><a href="linking-widgets.html#cb197-48"></a></span>
+<span id="cb197-49"><a href="linking-widgets.html#cb197-49"></a>        <span class="co">// render</span></span>
+<span id="cb197-50"><a href="linking-widgets.html#cb197-50"></a>        controller<span class="op">.</span><span class="fu">init</span>()<span class="op">;</span></span>
+<span id="cb197-51"><a href="linking-widgets.html#cb197-51"></a></span>
+<span id="cb197-52"><a href="linking-widgets.html#cb197-52"></a>      }<span class="op">,</span></span>
+<span id="cb197-53"><a href="linking-widgets.html#cb197-53"></a></span>
+<span id="cb197-54"><a href="linking-widgets.html#cb197-54"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) {</span>
+<span id="cb197-55"><a href="linking-widgets.html#cb197-55"></a>        controller<span class="op">.</span><span class="fu">resizeUpdate</span>()<span class="op">;</span></span>
+<span id="cb197-56"><a href="linking-widgets.html#cb197-56"></a>      }<span class="op">,</span></span>
+<span id="cb197-57"><a href="linking-widgets.html#cb197-57"></a></span>
+<span id="cb197-58"><a href="linking-widgets.html#cb197-58"></a>    }<span class="op">;</span></span>
+<span id="cb197-59"><a href="linking-widgets.html#cb197-59"></a>  }</span>
+<span id="cb197-60"><a href="linking-widgets.html#cb197-60"></a>})<span class="op">;</span></span></code></pre></div>
 </div>
 </div>
 <div id="using-crosstalk-with-gio" class="section level2" number="9.7">
 <h2><span class="header-section-number">9.7</span> Using crosstalk with gio</h2>
 <p>Finally, now that gio supports shared dataset we can create a few examples to demonstrate how it can be used.</p>
 <p>The simplest way is probably to convert the edges to a shared dataset specifying either the source (<code>i</code>) or target (<code>e</code>) country codes as keys. However this is unlikely to be used this way out in the real world. In the example below selecting an edge highlights a node which is somewhat confusing.</p>
-<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="linking-widgets.html#cb197-1"></a><span class="kw">library</span>(DT)</span>
-<span id="cb197-2"><a href="linking-widgets.html#cb197-2"></a><span class="kw">library</span>(gio)</span>
-<span id="cb197-3"><a href="linking-widgets.html#cb197-3"></a><span class="kw">library</span>(crosstalk)</span>
-<span id="cb197-4"><a href="linking-widgets.html#cb197-4"></a></span>
-<span id="cb197-5"><a href="linking-widgets.html#cb197-5"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb197-6"><a href="linking-widgets.html#cb197-6"></a>  <span class="st">&quot;https://raw.githubusercontent.com/JohnCoene/&quot;</span>,</span>
-<span id="cb197-7"><a href="linking-widgets.html#cb197-7"></a>  <span class="st">&quot;javascript-for-r/master/data/countries.json&quot;</span></span>
-<span id="cb197-8"><a href="linking-widgets.html#cb197-8"></a>)</span>
-<span id="cb197-9"><a href="linking-widgets.html#cb197-9"></a>arcs &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">fromJSON</span>(url)</span>
-<span id="cb197-10"><a href="linking-widgets.html#cb197-10"></a></span>
-<span id="cb197-11"><a href="linking-widgets.html#cb197-11"></a><span class="co"># Wrap data frame in SharedData</span></span>
-<span id="cb197-12"><a href="linking-widgets.html#cb197-12"></a><span class="co"># key is importing country</span></span>
-<span id="cb197-13"><a href="linking-widgets.html#cb197-13"></a>sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(arcs, <span class="dt">key =</span> arcs<span class="op">$</span>i)</span>
-<span id="cb197-14"><a href="linking-widgets.html#cb197-14"></a></span>
-<span id="cb197-15"><a href="linking-widgets.html#cb197-15"></a><span class="kw">bscols</span>(</span>
-<span id="cb197-16"><a href="linking-widgets.html#cb197-16"></a>  <span class="kw">gio</span>(sd),</span>
-<span id="cb197-17"><a href="linking-widgets.html#cb197-17"></a>  <span class="kw">datatable</span>(sd, <span class="dt">width=</span><span class="st">&quot;100%&quot;</span>, <span class="dt">selection =</span> <span class="st">&quot;single&quot;</span>)</span>
-<span id="cb197-18"><a href="linking-widgets.html#cb197-18"></a>)</span></code></pre></div>
-<div class="figure">
-<img src="images/crosstalk-gio-1.png" alt="" />
-<p class="caption">Gio with DT using crosstalk</p>
-</div>
-<p>Thankfully we can use the <code>group</code> argument in order to create edges and nodes that share keys and produce a more sensible link between widgets.</p>
-<div id="htmlwidget-ac00f211b3ba2eac049b" style="width:100%;height:480px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ac00f211b3ba2eac049b">{"x":{"diagram":"\ndigraph {\n\n  graph[rankdir = TB]\n\n  subgraph cluster_0 {\n    label=\"sharedGroup\"\n    node [shape=record fontsize=10];\n    edges_sd nodes_sd\n    keys [color=royalBlue]\n    color=dimGray\n  }\n\n  node [shape=record fontsize=10 color=gold];\n  gio plotly\n\n  edges_sd -> keys [arrowsize=.5];\n  nodes_sd -> keys [arrowsize=.5];\n\n  gio -> keys [dir=both arrowsize=.5];\n  plotly -> keys [dir=both arrowsize=.5 constraint=false];\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
-<p>Below we create two shared datasets with the same group name, one for the edges and another for the nodes and use one for the gio visualisation and the other for the plotly graph.</p>
-<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="linking-widgets.html#cb198-1"></a><span class="kw">library</span>(gio)</span>
-<span id="cb198-2"><a href="linking-widgets.html#cb198-2"></a><span class="kw">library</span>(plotly)</span>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="linking-widgets.html#cb198-1"></a><span class="kw">library</span>(DT)</span>
+<span id="cb198-2"><a href="linking-widgets.html#cb198-2"></a><span class="kw">library</span>(gio)</span>
 <span id="cb198-3"><a href="linking-widgets.html#cb198-3"></a><span class="kw">library</span>(crosstalk)</span>
 <span id="cb198-4"><a href="linking-widgets.html#cb198-4"></a></span>
 <span id="cb198-5"><a href="linking-widgets.html#cb198-5"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
@@ -823,24 +797,50 @@ Crosstalk groups share keys.
 <span id="cb198-9"><a href="linking-widgets.html#cb198-9"></a>arcs &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">fromJSON</span>(url)</span>
 <span id="cb198-10"><a href="linking-widgets.html#cb198-10"></a></span>
 <span id="cb198-11"><a href="linking-widgets.html#cb198-11"></a><span class="co"># Wrap data frame in SharedData</span></span>
-<span id="cb198-12"><a href="linking-widgets.html#cb198-12"></a>edges_sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(arcs, <span class="dt">key =</span> arcs<span class="op">$</span>i, <span class="dt">group =</span> <span class="st">&quot;sharedGroup&quot;</span>)</span>
-<span id="cb198-13"><a href="linking-widgets.html#cb198-13"></a></span>
-<span id="cb198-14"><a href="linking-widgets.html#cb198-14"></a><span class="co"># create nodes</span></span>
-<span id="cb198-15"><a href="linking-widgets.html#cb198-15"></a>iso2c &lt;-<span class="st"> </span><span class="kw">unique</span>(arcs<span class="op">$</span>i)</span>
-<span id="cb198-16"><a href="linking-widgets.html#cb198-16"></a>nodes &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
-<span id="cb198-17"><a href="linking-widgets.html#cb198-17"></a>  <span class="dt">country =</span> iso2c,</span>
-<span id="cb198-18"><a href="linking-widgets.html#cb198-18"></a>  <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="kw">length</span>(iso2c))</span>
-<span id="cb198-19"><a href="linking-widgets.html#cb198-19"></a>)</span>
-<span id="cb198-20"><a href="linking-widgets.html#cb198-20"></a>nodes_sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(</span>
-<span id="cb198-21"><a href="linking-widgets.html#cb198-21"></a>  nodes, <span class="dt">key =</span> nodes<span class="op">$</span>country, </span>
-<span id="cb198-22"><a href="linking-widgets.html#cb198-22"></a>  <span class="dt">group =</span> <span class="st">&quot;sharedGroup&quot;</span></span>
-<span id="cb198-23"><a href="linking-widgets.html#cb198-23"></a>)</span>
-<span id="cb198-24"><a href="linking-widgets.html#cb198-24"></a></span>
-<span id="cb198-25"><a href="linking-widgets.html#cb198-25"></a><span class="kw">bscols</span>(</span>
-<span id="cb198-26"><a href="linking-widgets.html#cb198-26"></a>  <span class="kw">plot_ly</span>(<span class="dt">data =</span> nodes_sd, <span class="dt">type =</span> <span class="st">&quot;bar&quot;</span>, <span class="dt">x =</span> <span class="op">~</span>country, <span class="dt">y =</span> <span class="op">~</span>y) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb198-27"><a href="linking-widgets.html#cb198-27"></a><span class="st">    </span><span class="kw">config</span>(<span class="dt">displayModeBar =</span> <span class="ot">FALSE</span>),</span>
-<span id="cb198-28"><a href="linking-widgets.html#cb198-28"></a>  <span class="kw">gio</span>(edges_sd)</span>
-<span id="cb198-29"><a href="linking-widgets.html#cb198-29"></a>)</span></code></pre></div>
+<span id="cb198-12"><a href="linking-widgets.html#cb198-12"></a><span class="co"># key is importing country</span></span>
+<span id="cb198-13"><a href="linking-widgets.html#cb198-13"></a>sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(arcs, <span class="dt">key =</span> arcs<span class="op">$</span>i)</span>
+<span id="cb198-14"><a href="linking-widgets.html#cb198-14"></a></span>
+<span id="cb198-15"><a href="linking-widgets.html#cb198-15"></a><span class="kw">bscols</span>(</span>
+<span id="cb198-16"><a href="linking-widgets.html#cb198-16"></a>  <span class="kw">gio</span>(sd),</span>
+<span id="cb198-17"><a href="linking-widgets.html#cb198-17"></a>  <span class="kw">datatable</span>(sd, <span class="dt">width=</span><span class="st">&quot;100%&quot;</span>, <span class="dt">selection =</span> <span class="st">&quot;single&quot;</span>)</span>
+<span id="cb198-18"><a href="linking-widgets.html#cb198-18"></a>)</span></code></pre></div>
+<div class="figure">
+<img src="images/crosstalk-gio-1.png" alt="" />
+<p class="caption">Gio with DT using crosstalk</p>
+</div>
+<p>Thankfully we can use the <code>group</code> argument in order to create edges and nodes that share keys and produce a more sensible link between widgets.</p>
+<div id="htmlwidget-52ed94ffffebbdb274e5" style="width:100%;height:480px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-52ed94ffffebbdb274e5">{"x":{"diagram":"\ndigraph {\n\n  graph[rankdir = TB]\n\n  subgraph cluster_0 {\n    label=\"sharedGroup\"\n    node [shape=record fontsize=10];\n    edges_sd nodes_sd\n    keys [color=royalBlue]\n    color=dimGray\n  }\n\n  node [shape=record fontsize=10 color=gold];\n  gio plotly\n\n  edges_sd -> keys [arrowsize=.5];\n  nodes_sd -> keys [arrowsize=.5];\n\n  gio -> keys [dir=both arrowsize=.5];\n  plotly -> keys [dir=both arrowsize=.5 constraint=false];\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p>Below we create two shared datasets with the same group name, one for the edges and another for the nodes and use one for the gio visualisation and the other for the plotly graph.</p>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="linking-widgets.html#cb199-1"></a><span class="kw">library</span>(gio)</span>
+<span id="cb199-2"><a href="linking-widgets.html#cb199-2"></a><span class="kw">library</span>(plotly)</span>
+<span id="cb199-3"><a href="linking-widgets.html#cb199-3"></a><span class="kw">library</span>(crosstalk)</span>
+<span id="cb199-4"><a href="linking-widgets.html#cb199-4"></a></span>
+<span id="cb199-5"><a href="linking-widgets.html#cb199-5"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb199-6"><a href="linking-widgets.html#cb199-6"></a>  <span class="st">&quot;https://raw.githubusercontent.com/JohnCoene/&quot;</span>,</span>
+<span id="cb199-7"><a href="linking-widgets.html#cb199-7"></a>  <span class="st">&quot;javascript-for-r/master/data/countries.json&quot;</span></span>
+<span id="cb199-8"><a href="linking-widgets.html#cb199-8"></a>)</span>
+<span id="cb199-9"><a href="linking-widgets.html#cb199-9"></a>arcs &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">fromJSON</span>(url)</span>
+<span id="cb199-10"><a href="linking-widgets.html#cb199-10"></a></span>
+<span id="cb199-11"><a href="linking-widgets.html#cb199-11"></a><span class="co"># Wrap data frame in SharedData</span></span>
+<span id="cb199-12"><a href="linking-widgets.html#cb199-12"></a>edges_sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(arcs, <span class="dt">key =</span> arcs<span class="op">$</span>i, <span class="dt">group =</span> <span class="st">&quot;sharedGroup&quot;</span>)</span>
+<span id="cb199-13"><a href="linking-widgets.html#cb199-13"></a></span>
+<span id="cb199-14"><a href="linking-widgets.html#cb199-14"></a><span class="co"># create nodes</span></span>
+<span id="cb199-15"><a href="linking-widgets.html#cb199-15"></a>iso2c &lt;-<span class="st"> </span><span class="kw">unique</span>(arcs<span class="op">$</span>i)</span>
+<span id="cb199-16"><a href="linking-widgets.html#cb199-16"></a>nodes &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb199-17"><a href="linking-widgets.html#cb199-17"></a>  <span class="dt">country =</span> iso2c,</span>
+<span id="cb199-18"><a href="linking-widgets.html#cb199-18"></a>  <span class="dt">y =</span> <span class="kw">rnorm</span>(<span class="kw">length</span>(iso2c))</span>
+<span id="cb199-19"><a href="linking-widgets.html#cb199-19"></a>)</span>
+<span id="cb199-20"><a href="linking-widgets.html#cb199-20"></a>nodes_sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb199-21"><a href="linking-widgets.html#cb199-21"></a>  nodes, <span class="dt">key =</span> nodes<span class="op">$</span>country, </span>
+<span id="cb199-22"><a href="linking-widgets.html#cb199-22"></a>  <span class="dt">group =</span> <span class="st">&quot;sharedGroup&quot;</span></span>
+<span id="cb199-23"><a href="linking-widgets.html#cb199-23"></a>)</span>
+<span id="cb199-24"><a href="linking-widgets.html#cb199-24"></a></span>
+<span id="cb199-25"><a href="linking-widgets.html#cb199-25"></a><span class="kw">bscols</span>(</span>
+<span id="cb199-26"><a href="linking-widgets.html#cb199-26"></a>  <span class="kw">plot_ly</span>(<span class="dt">data =</span> nodes_sd, <span class="dt">type =</span> <span class="st">&quot;bar&quot;</span>, <span class="dt">x =</span> <span class="op">~</span>country, <span class="dt">y =</span> <span class="op">~</span>y) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb199-27"><a href="linking-widgets.html#cb199-27"></a><span class="st">    </span><span class="kw">config</span>(<span class="dt">displayModeBar =</span> <span class="ot">FALSE</span>),</span>
+<span id="cb199-28"><a href="linking-widgets.html#cb199-28"></a>  <span class="kw">gio</span>(edges_sd)</span>
+<span id="cb199-29"><a href="linking-widgets.html#cb199-29"></a>)</span></code></pre></div>
 <div class="figure">
 <img src="images/crosstalk-gio-2.png" alt="" />
 <p class="caption">Gio plotly using crosstalk and groups</p>

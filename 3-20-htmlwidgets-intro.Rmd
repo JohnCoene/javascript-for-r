@@ -19,7 +19,31 @@ Plotly.js is a substantial library that provides over 40 chart types, including 
 ```{r}
 library(plotly)
 
-plot_ly(cars, x = ~speed, y = ~dist)
+plot_ly(cars, x = ~speed, y = ~dist) %>% 
+  add_markers()
+```
+
+Plotly also has the ability to translate static ggplot2 [@R-ggplot2] charts to interactive plotly charts with the `ggplotly` function.
+
+```{r}
+p <- ggplot(diamonds, aes(x = log(carat), y = log(price))) + 
+  geom_hex(bins = 100)
+ggplotly(p)
+```
+
+All plotly charts are initialised with the `plot_ly` function and work nicely with the magrittr [@R-magrittr] pipe `%>%`. This implies that (almost) every function expects a plotly object (the output of `plot_ly`) and returns a modified version of that object. The pipe makes code easier to read and more concise.
+
+```{r}
+p <- plot_ly(cars, x = ~speed, y = ~dist) 
+p <- add_markers(p)
+```
+
+Plotly implements geoms in a similar fashion as ggplot2, functions that start in `add_` add a layer to the plot (e.g.: `add_lines`, `add_bars`).
+
+```{r}
+plot_ly(mtcars, x = ~disp) %>% 
+  add_markers(y = ~mpg, text = rownames(mtcars)) %>% 
+  add_lines(y = ~fitted(loess(mpg ~ disp)))
 ```
 
 ## DT package

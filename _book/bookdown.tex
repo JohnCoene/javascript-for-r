@@ -1176,23 +1176,45 @@ Plotly.js is a substantial library that provides over 40 chart types, including 
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(plotly)}
 
-\KeywordTok{plot\_ly}\NormalTok{(cars, }\DataTypeTok{x =} \OperatorTok{\textasciitilde{}}\NormalTok{speed, }\DataTypeTok{y =} \OperatorTok{\textasciitilde{}}\NormalTok{dist)}
+\KeywordTok{plot\_ly}\NormalTok{(cars, }\DataTypeTok{x =} \OperatorTok{\textasciitilde{}}\NormalTok{speed, }\DataTypeTok{y =} \OperatorTok{\textasciitilde{}}\NormalTok{dist) }\OperatorTok{\%\textgreater{}\%}\StringTok{ }
+\StringTok{  }\KeywordTok{add\_markers}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## No trace type specified:
-##   Based on info supplied, a 'scatter' trace seems appropriate.
-##   Read more about this trace type -> https://plot.ly/r/reference/#scatter
-\end{verbatim}
-
-\begin{verbatim}
-## No scatter mode specifed:
-##   Setting the mode to markers
-##   Read more about this attribute -> https://plot.ly/r/reference/#scatter-mode
-\end{verbatim}
-
 \includegraphics{bookdown_files/figure-latex/unnamed-chunk-21-1.png}
+
+Plotly also has the ability to translate static ggplot2 \citep{R-ggplot2} charts to interactive plotly charts with the \texttt{ggplotly} function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p \textless{}{-}}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(diamonds, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{log}\NormalTok{(carat), }\DataTypeTok{y =} \KeywordTok{log}\NormalTok{(price))) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom\_hex}\NormalTok{(}\DataTypeTok{bins =} \DecValTok{100}\NormalTok{)}
+\KeywordTok{ggplotly}\NormalTok{(p)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-22-1.png}
+
+All plotly charts are initialised with the \texttt{plot\_ly} function and work nicely with the magrittr \citep{R-magrittr} pipe \texttt{\%\textgreater{}\%}. This implies that (almost) every function expects a plotly object (the output of \texttt{plot\_ly}) and returns a modified version of that object. The pipe makes code easier to read and more concise.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p \textless{}{-}}\StringTok{ }\KeywordTok{plot\_ly}\NormalTok{(cars, }\DataTypeTok{x =} \OperatorTok{\textasciitilde{}}\NormalTok{speed, }\DataTypeTok{y =} \OperatorTok{\textasciitilde{}}\NormalTok{dist) }
+\NormalTok{p \textless{}{-}}\StringTok{ }\KeywordTok{add\_markers}\NormalTok{(p)}
+\end{Highlighting}
+\end{Shaded}
+
+Plotly implements geoms in a similar fashion as ggplot2, functions that start in \texttt{add\_} add a layer to the plot (e.g.: \texttt{add\_lines}, \texttt{add\_bars}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot\_ly}\NormalTok{(mtcars, }\DataTypeTok{x =} \OperatorTok{\textasciitilde{}}\NormalTok{disp) }\OperatorTok{\%\textgreater{}\%}\StringTok{ }
+\StringTok{  }\KeywordTok{add\_markers}\NormalTok{(}\DataTypeTok{y =} \OperatorTok{\textasciitilde{}}\NormalTok{mpg, }\DataTypeTok{text =} \KeywordTok{rownames}\NormalTok{(mtcars)) }\OperatorTok{\%\textgreater{}\%}\StringTok{ }
+\StringTok{  }\KeywordTok{add\_lines}\NormalTok{(}\DataTypeTok{y =} \OperatorTok{\textasciitilde{}}\KeywordTok{fitted}\NormalTok{(}\KeywordTok{loess}\NormalTok{(mpg }\OperatorTok{\textasciitilde{}}\StringTok{ }\NormalTok{disp)))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-24-1.png}
 
 \hypertarget{dt-package}{%
 \section{DT package}\label{dt-package}}
@@ -1354,7 +1376,7 @@ Imagine there is no such package as htmlwidgets to help create interactive visua
 
 As observed, an interactive visualisation using JavaScript will be contained within an HTML document, therefore it would probably have to be created first. Secondly, the visualisation that is yet to be created likely relies on external libraries, these would need to be imported in the document. The document should also include an HTML element (e.g.: \texttt{\textless{}div\textgreater{}}) to host said visualisation. Then data would have to be serialised in R and embedded into the document where it should be read by JavaScript code that uses it to create the visualisation. Finally all should be managed to work seamlessly across R markdown, shiny, and other environments.
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-22-1.png}
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-25-1.png}
 
 Thankfully the htmlwidgets package is there to handle most of this. Nonetheless, it is important to understand that these operations are undertaken (to some degree) by htmlwidgets.
 
@@ -3309,7 +3331,7 @@ Other than tabular data, crosstalk will require the widget to have the necessary
 
 As will be discovered later when support for crosstalk is brought to gio, very little changes on the R side. As might be expected, crosstalk enables communication between widgets via JavaScript, hence much of what must be adapted by widgets developers happens in JavaScript too.
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-35-1.png}
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-38-1.png}
 
 Indeed the bi-directional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. This internally works with \texttt{key}s that are assigned to every row of the dataframe which enable crosstalk to track which are selected or filtered. These keys can be explicitly set by the user and otherwise default to the row names of the data.frame, and if these are not available the \texttt{SharedData} function will create row numbers.
 
@@ -3323,7 +3345,7 @@ Indeed the bi-directional communication between widgets works in the RStudio vie
 
 In a sense, while crosstalk establishes lines of communication to transport \texttt{key}s between widgets, developers of the respective widgets must handle what \texttt{key}s are sent and what to do with incoming \texttt{key}s. There are two such lines of communication, one for \texttt{key}s of rows that are meant to be filtered meant to narrow down the selection of data points displayed on a widget, and another for selection (what crosstalk refers to as ``linked brushing'') to highlight certain data points.
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-37-1.png}
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-40-1.png}
 
 In JavaScript, a widget ``receives'' the keys of selected and filtered data points and must, when filtering or selection is observed, ``send'' said selected or filtered keys to other widgets. Internally crosstalk knows what to share across widgets with \texttt{group}s groups share \texttt{key}s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other.
 
@@ -3414,7 +3436,7 @@ The \texttt{gio} function also has to extract the group to which the dataset bel
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "SharedDatab91c1fb3"
+## [1] "SharedData21ad3860"
 \end{verbatim}
 
 \begin{Shaded}
@@ -3712,7 +3734,7 @@ The simplest way is probably to convert the edges to a shared dataset specifying
 
 Thankfully we can use the \texttt{group} argument in order to create edges and nodes that share keys and produce a more sensible link between widgets.
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-43-1.png}
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-46-1.png}
 
 Below we create two shared datasets with the same group name, one for the edges and another for the nodes and use one for the gio visualisation and the other for the plotly graph.
 
@@ -4412,7 +4434,7 @@ Then again, the goal is not to write a lot of convoluted JavaScript, on the cont
 
 Shiny applications have two components the user interface (UI) and the server function. These two components communicate via a websocket: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server this connection is managed by shiny using the httpuv \citep{R-httpuv} and websocket \citep{R-websocket} packages, while in clients connecting to the server this connection is managed with JavaScript.
 
-\begin{center}\includegraphics[width=1\linewidth]{bookdown_files/figure-latex/unnamed-chunk-46-1} \end{center}
+\begin{center}\includegraphics[width=1\linewidth]{bookdown_files/figure-latex/unnamed-chunk-49-1} \end{center}
 
 With that in mind we can put together a shiny applications which though simple exploits bi-directional communication. The application takes a text input, sends the value of the input to the R server which sends it back to the UI.
 
@@ -4437,7 +4459,7 @@ With that in mind we can put together a shiny applications which though simple e
 
 Drawing a diagram of the communication between the UI and the server reveals that thought this is a simple application a lot is happening.
 
-\begin{center}\includegraphics[width=1\linewidth]{bookdown_files/figure-latex/unnamed-chunk-47-1} \end{center}
+\begin{center}\includegraphics[width=1\linewidth]{bookdown_files/figure-latex/unnamed-chunk-50-1} \end{center}
 
 Communicating between the R server and the user interface requires JavaScript and thus makes us a reasonable chunk of this part of the book on web development with shiny.
 
@@ -7512,7 +7534,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Thu Aug 27 2020 15:05:56 GMT+0200 (Central European Summer Time)"
+## [1] "Thu Aug 27 2020 17:32:01 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -7522,7 +7544,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Thu Aug 27 2020 15:05:56 GMT+0200 (Central European Summer Time)"
+## [1] "Thu Aug 27 2020 17:32:01 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -8059,7 +8081,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] -7.517
+## [1] 69.25
 \end{verbatim}
 
 \begin{Shaded}
