@@ -479,3 +479,158 @@ shiny::actionButton(inputId = "theId", label = "the label")
 ```
 
 This of course only scratches the surface of JavaScript thus this provides ample understanding of the language to keep up with the next chapters. Also, a somewhat interesting fact that will prove useful later in the book: the RStudio IDE is actually a browser, therefore, in the IDE, one can right-click and "inspect element" to view the rendered source code.
+
+## Shiny
+
+It is assumed that the reader has basic knowledge of the shiny framework and already used it to build applications. However, there are some more obscure functionalities that one may not know but that become essential when introducing JavaScript to applications. Chiefly, how to introduce external dependencies; JavaScript or otherwise.
+
+There are two ways to make dependencies: using the htmltools [@R-htmltools] package to create a dependency object that shiny can understand or manually serving and importing the files with shiny.
+
+### Htmltools
+
+The htmltools package powers much of the shiny UI, most of the tags that comprise the UI are indeed imported by shiny from htmltools. For instance `shiny::actionButton` is just a light wrapper around htmltools `tags`.
+
+```r
+shiny::actionButton
+```
+
+```r
+function (inputId, label, icon = NULL, width = NULL, ...) 
+{
+    value <- restoreInput(id = inputId, default = NULL)
+    tags$button(id = inputId, style = if (!is.null(width)) 
+        paste0("width: ", validateCssUnit(width), ";"), type = "button", 
+        class = "btn btn-default action-button", `data-val` = value, 
+        list(validateIcon(icon), label), ...)
+}
+```
+
+As the name indicates htmltools goes beyond the generation of HTML tags and provides broader tools to generate HTML, this includes working the dependencies. dependencies may appear simple at first, after all were one working with an HTML document in order to import HTML or CSS one could simply use HTML tags.
+
+```html
+ <!–– index.html ––>
+<html>
+  <head>
+    <script src="path/to/script.js"></script>
+    <link rel="stylesheet" href="path/to/styles.css">
+  </head>
+  <body></body>
+</html>
+```
+
+However, it can quickly get out of hand when working with modules and packages. Imagine having to manage the generation of dependencies such as the above when multiple functions rely on a dependency but being a dependency it should only be imported once? The unified framework htmltools provides helps immensely in dealing with this sort of issues.
+
+The htmltools package provides utilities to import dependencies and ensure these are only rendered once, as they should be. The way this works is by creating a dependency object that packages like Shiny and R markdown can understand and translate into HTML dependencies.
+
+### Static files
+
+In order to introduce JavaScript to shiny applications one must understand static files and how they work with the framework. Static files are files that are downloaded by the clients, in this case web browsers accessing shiny applications, as-is, these generally include images, CSS (`.css`), and JavaScript (`.js`).
+
+If you are familiar with R packages it enables development, static files are to shiny applications what the "inst" directory is to an R package, those files are installed as-is and do not require further processing as opposed to the "src" folder which contains files that need compiling for instance.
+
+There are numerous functions to launch a shiny application locally; the two most used probably are `shinyApp` and `runApp`. The RStudio IDE comes with a convenient "Run" button when writing a shiny application, which when clicked actually uses the function `shiny::runApp` in the background, this function looks for said static files in the `www` directory and makes them available at the same path (`/www`). If you are building your applications outside of RStudio, you should either also use `shiny::runApp` or specify the directory which then allows using `shiny::shinyApp`. Note that this only applies locally, shiny server (community and pro) as well as [shinyapps.io](https://www.shinyapps.io/) use the same defaults as the RStudio IDE and `shiny::runApp`.
+
+In order to ensure the code in this book can run regardless of the reader's machine or editor, the asset directory is always specified explicitly. This is probably advised to steer clear of the potential headaches as, unlike the default, it'll work regardless of the environment. If you are using [golem](https://thinkr-open.github.io/golem/) [@R-golem] to develop your application then you should not worry about this as it specifies the directory internally.
+
+Below we build a basic shiny application, however, before we define the ui and server we use the `shiny::addResourcePath` function to specify the location of the directory of static files that will be served by the server and thus accessible by the client. This function takes two arguments, first the `prefix`, which is the path (URL) at which the assets will be available, second the path to the directory of static assets.
+
+We thus create the "assets" directory and a JavaScript file called `script.js` within it.
+
+```r
+# run from root of app (where app.R is located)
+dir.create("assets")
+writeLines("console.log('Hello JS!');", con = "assets/script.js")
+```
+
+We can now use the `shiny::addResourcePath` to point to this directory. Generally the same name for the directory of static assets and prefix is used so as to avoid confusion, below we name them differently in order for the reader to clearly distinguish which is which.
+
+```r
+# app.R
+library(shiny)
+
+# serve the files
+addResourcePath(
+  # will be accessible at /files
+  prefix = "files", 
+  # path to the assets directory
+  directoryPath = "assets"
+)
+
+ui <- fluidPage(
+  h1("R and JavaScript")
+)
+
+server <- function(input, output){}
+
+shinyApp(ui, server)
+```
+
+If you then run the application and open it at the `/files/script.js` path (e.g.: `127.0.0.1:3000/files/script.js`) you should see the content of the JavaScript file (`console.log('Hello JS!')`), commenting the `addResourcePath` line will have a "Not Found" error displayed on the page instead.
+
+```{block, class='rmdnote'}
+All files in your asset directory will be served online and accessible to anyone: do not place sensitive files in it.
+```
+
+Though one may create multiple such directory and correspondingly use `addResourcePath` to specify multiple paths and prefixes, one will routinely specify a single one, named "assets" or "static," which contains multiple subdirectories, one for each type of static file to obtain a directory that looks something like the tree below. This is, however, an unwritten convention which is by no means forced upon the developer: do as you wish.
+
+```
+assets/
+├── js/
+│    └── script.js
+├── css/
+│    └── style.css
+└── img/
+     └── pic.png
+```
+
+At this stage we have made the JavaScript file we created accessible by the clients but we still have to source this file in the `ui` as currently this file is, though served, not used by the application. Were one creating a static HTML page one would use the `script` to `src` the file in the `head` of the page.
+
+```html
+<html>
+  <head>
+    <!–– source the JavaScript file ––>
+    <script src="path/to/script.js"></script>
+  </head>
+  <body>
+    <p id="content">Trying JavaScript!</p>
+  </body>
+</html>
+```
+
+In shiny we write the ui in R and not in HTML (though this is also supported). Given the resemblance between the names of HTML tags and shiny UI functions it's pretty straightforward, the html page above would look something like the shiny `ui` below. 
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  tags$head(
+    tags$script(src = "path/to/script.js")
+  ),
+  p(id = "content", "Trying JavaScript!")
+)
+```
+
+Note that we use the `tags` object which comes from the shiny package and includes HTML tags that are not exported as standalone functions. For instance, you can create a `<div>` in shiny with the `div` function but `tags$div` will also work. This can now be applied to the shiny application, the `path/to/script.js` should be changed to `files/script.js` where `files` is the prefix we defined in `addResourcePath`.
+
+```r
+# app.R
+library(shiny)
+
+# serve the files
+addResourcePath(prefix = "files", directoryPath = "assets")
+
+ui <- fluidPage(
+  tags$head(
+    tags$script(src = "files/script.js")
+  ),
+  h1("R and JavaScript")
+)
+
+server <- function(input, output){}
+
+shinyApp(ui, server)
+```
+
+From the browser, inspecting page (right click > inspect > console tab) one should see "Hello JS!" in the console which means the application correctly ran the code in the JavaScript file.
+
+### Pros and Cons
