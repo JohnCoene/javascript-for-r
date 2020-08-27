@@ -520,7 +520,53 @@ As the name indicates htmltools goes beyond the generation of HTML tags and prov
 
 However, it can quickly get out of hand when working with modules and packages. Imagine having to manage the generation of dependencies such as the above when multiple functions rely on a dependency but being a dependency it should only be imported once? The unified framework htmltools provides helps immensely in dealing with this sort of issues.
 
-The htmltools package provides utilities to import dependencies and ensure these are only rendered once, as they should be. The way this works is by creating a dependency object that packages like Shiny and R markdown can understand and translate into HTML dependencies.
+The htmltools package provides utilities to import dependencies and ensure these are only rendered once, as they should be. The way this works is by creating a dependency object that packages like Shiny and R markdown can understand and translate into HTML dependencies. This is handled with the `htmlDependency` function which returns an object of class `html_dependency`.
+
+```r
+dependency <- htmltools::htmlDependency(
+  name = "myDependency",
+  version = "1.0.0",
+  src = "path/to/directory",
+  script = c(file = "script.js"),
+  stylesheet = c(file = "styles.css")
+)
+```
+
+There are a few noteworthy things about the above. First, the `src` argument points to a directory, not the file one wants to import. Second, the `script` and `stylesheet` arguments are named vectors that point to files within the `src` directory. One can use the name `file` to point to a local file (as done above) or use `href` to point to a remote file hosted on a CDN.
+
+Shiny, R markdown, and other packages where htmltools is relevant will then be able to translate an `html_dependency` object into actual HTML dependencies. The above would for instance generate the following HTML.
+
+```html
+<script src="path/to/directory/script.js"></script>
+<link rel="stylesheet" href="path/to/directory/styles.css">
+```
+
+Importantly, the `htmltools::htmlDependency` also takes a `package` argument which makes it such that the `src` path becomes relative to the package directory (the `inst` folder). Hence the snippet below imports a file located at `myPackage/inst/assets/script.js`; the ultimate full path will of course depend on the users' machine.
+
+```r
+dependency <- htmltools::htmlDependency(
+  name = "myDependency",
+  version = "1.0.0",
+  src = "assets",
+  script = c(file = "script.js"),
+  package = "myPackage" # user package
+)
+```
+
+But does one use it in R markdown or shiny? Well simply placing it in the Shiny UI or an evaluated R markdown chunk will the the job.
+
+```r
+# place it in the shiny UI
+ui <- fluidPage(
+  htmltools::htmlDependency(
+    name = "myDependency",
+    version = "1.0.0",
+    src = "assets",
+    script = c(file = "script.js"),
+    package = "myPackage" # user package
+  )
+)
+```
 
 ### Static files
 
