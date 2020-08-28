@@ -50,8 +50,7 @@ renderBoxxy <- function(expr, env = parent.frame(), quoted = FALSE) {
         name = "countup",
         version = "1.8.2",
         src = c(file = path),
-        script = c("countup.js"), # only countup
-        stylesheet = "styles.css"
+        script = c("countup.js") # only countup
       )
 
       val$deps <- lapply(
