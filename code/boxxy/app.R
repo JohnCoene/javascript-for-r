@@ -1,7 +1,7 @@
 library(shiny)
 
-boxxy <- function(title, value, color = "#ef476f"){
-  list(title = title, value = value, color = color)
+boxxy <- function(title, value, color = "#ef476f", animate = TRUE){
+  list(title = title, value = value, color = color, animate = animate)
 }
 
 boxxyOutput <- function(id){
@@ -18,7 +18,7 @@ boxxyOutput <- function(id){
       name = "boxxy",
       version = "1.0.0",
       src = c(file = path),
-      script = c("countup.js", "binding.js"),
+      script = c("binding.js"), # only binding
       stylesheet = "styles.css"
     )
   )
@@ -31,7 +31,26 @@ renderBoxxy <- function(expr, env = parent.frame(), quoted = FALSE) {
   func <- shiny::exprToFunction(expr, env, quoted)
 
   function(){
-    func()
+    val <- func()
+
+    if(val$animate){
+      path <- normalizePath("assets")
+
+      deps <- htmltools::htmlDependency(
+        name = "countup",
+        version = "1.8.2",
+        src = c(file = path),
+        script = c("countup.js"), # only countup
+        stylesheet = "styles.css"
+      )
+
+      val$deps <- lapply(
+        htmltools::resolveDependencies(list(deps)),
+        shiny::createWebDependency
+      )
+    }
+
+    return(val)
   }
 }
 
@@ -55,7 +74,7 @@ ui <- fluidPage(
 
 server <- function(input, output){
   output$countries <- renderBoxxy({
-    boxxy("Countries", 95, color = "#ef476f")
+    boxxy("Countries", 95, color = "#ef476f", animate = FALSE)
   })
 
   output$employees <- renderBoxxy({

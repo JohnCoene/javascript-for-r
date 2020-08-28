@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-08-27" />
+<meta name="date" content="2020-08-28" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -159,7 +159,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#premise"><i class="fa fa-check"></i>Premise</a></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#book-structure"><i class="fa fa-check"></i>Book Structure</a></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgement"><i class="fa fa-check"></i>Acknowledgement</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i>Disclaimer</a></li>
 </ul></li>
 <li class="part"><span><b>I Basics &amp; Roadmap</b></span></li>
 <li class="chapter" data-level="1" data-path="overview.html"><a href="overview.html"><i class="fa fa-check"></i><b>1</b> Overview</a>
@@ -204,7 +203,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li class="chapter" data-level="2.4.1" data-path="prerequisites.html"><a href="prerequisites.html#htmltools"><i class="fa fa-check"></i><b>2.4.1</b> Htmltools</a></li>
 <li class="chapter" data-level="2.4.2" data-path="prerequisites.html"><a href="prerequisites.html#static-files"><i class="fa fa-check"></i><b>2.4.2</b> Static files</a></li>
-<li class="chapter" data-level="2.4.3" data-path="prerequisites.html"><a href="prerequisites.html#pros-and-cons"><i class="fa fa-check"></i><b>2.4.3</b> Pros and Cons</a></li>
+<li class="chapter" data-level="2.4.3" data-path="prerequisites.html"><a href="prerequisites.html#dependencies-pros-and-cons"><i class="fa fa-check"></i><b>2.4.3</b> Dependencies Pros and Cons</a></li>
 </ul></li>
 </ul></li>
 <li class="part"><span><b>II Data Visualisation</b></span></li>
@@ -339,6 +338,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="15.7.1" data-path="custom-outputs.html"><a href="custom-outputs.html#register-the-output-binding"><i class="fa fa-check"></i><b>15.7.1</b> Register the output binding</a></li>
 </ul></li>
 <li class="chapter" data-level="15.8" data-path="custom-outputs.html"><a href="custom-outputs.html#boxxy-usage"><i class="fa fa-check"></i><b>15.8</b> Boxxy usage</a></li>
+<li class="chapter" data-level="15.9" data-path="custom-outputs.html"><a href="custom-outputs.html#injecting-dependencies"><i class="fa fa-check"></i><b>15.9</b> Injecting Dependencies</a></li>
 </ul></li>
 <li class="chapter" data-level="16" data-path="cookies.html"><a href="cookies.html"><i class="fa fa-check"></i><b>16</b> Cookies</a>
 <ul>
@@ -556,15 +556,15 @@ Create the shared dataset in the server function or some things that follow migh
 <div id="how-it-works" class="section level2" number="9.3">
 <h2><span class="header-section-number">9.3</span> How it works</h2>
 <p>As will be discovered later when support for crosstalk is brought to gio, very little changes on the R side. As might be expected, crosstalk enables communication between widgets via JavaScript, hence much of what must be adapted by widgets developers happens in JavaScript too.</p>
-<div id="htmlwidget-00ed78a342d238cfbc1d" style="width:100%;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-00ed78a342d238cfbc1d">{"x":{"diagram":"\ndigraph G {\n\n  graph [compound=true rankdir = LR]\n  node [shape=record fontsize=10];\n\n  # r stuff\n  subgraph cluster_1 { \n    \"Widget 1\" \"Widget 2\";\n    label = \"JavaScript\";\n    color=gold;\n  }\n\n  # js\n  subgraph cluster_0 {\n    node [width = 0.9]\n    Dataframe \"Shared Dataset\"; \n    label=\"R\";\n    color=royalBlue;\n  }\n\n  \"Dataframe\" -> \"Shared Dataset\";\n  \"Widget 1\" -> \"Widget 2\" [dir=both color=dimGray];\n\n  # connect subgraphs\n  \"Shared Dataset\" -> \"Widget 1\" [lhead=cluster_1 ltail=cluster_0];\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-2aa21e0ea6eff60d8637" style="width:100%;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2aa21e0ea6eff60d8637">{"x":{"diagram":"\ndigraph G {\n\n  graph [compound=true rankdir = LR]\n  node [shape=record fontsize=10];\n\n  # r stuff\n  subgraph cluster_1 { \n    \"Widget 1\" \"Widget 2\";\n    label = \"JavaScript\";\n    color=gold;\n  }\n\n  # js\n  subgraph cluster_0 {\n    node [width = 0.9]\n    Dataframe \"Shared Dataset\"; \n    label=\"R\";\n    color=royalBlue;\n  }\n\n  \"Dataframe\" -> \"Shared Dataset\";\n  \"Widget 1\" -> \"Widget 2\" [dir=both color=dimGray];\n\n  # connect subgraphs\n  \"Shared Dataset\" -> \"Widget 1\" [lhead=cluster_1 ltail=cluster_0];\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Indeed the bi-directional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. This internally works with <code>key</code>s that are assigned to every row of the dataframe which enable crosstalk to track which are selected or filtered. These keys can be explicitly set by the user and otherwise default to the row names of the data.frame, and if these are not available the <code>SharedData</code> function will create row numbers.</p>
 <div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb190-1"><a href="linking-widgets.html#cb190-1"></a><span class="co"># assign keys</span></span>
 <span id="cb190-2"><a href="linking-widgets.html#cb190-2"></a>df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">runif</span>(<span class="dv">26</span>))</span>
 <span id="cb190-3"><a href="linking-widgets.html#cb190-3"></a>sd &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(df, <span class="dt">key =</span> letters)</span></code></pre></div>
 <p>In a sense, while crosstalk establishes lines of communication to transport <code>key</code>s between widgets, developers of the respective widgets must handle what <code>key</code>s are sent and what to do with incoming <code>key</code>s. There are two such lines of communication, one for <code>key</code>s of rows that are meant to be filtered meant to narrow down the selection of data points displayed on a widget, and another for selection (what crosstalk refers to as “linked brushing”) to highlight certain data points.</p>
-<div id="htmlwidget-f65adf0f62bc841a9a4c" style="width:100%;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-f65adf0f62bc841a9a4c">{"x":{"diagram":"\ndigraph G {\n\n  subgraph cluster_g1 {\n    node [shape=record fontsize=7]\n    d1 [label=\"Dataset\"]\n    d3 [label=\"Dataset\"]\n    k1 [label=\"Keys\"]\n    label=\"Group 1\"\n    fontsize=9\n    color=royalBlue\n  }\n\n  subgraph cluster_g2 {\n    node [shape=record fontsize=7]\n    d2 [label=\"Dataset\"] \n    k2 [label=\"Keys\"]\n    label=\"Group 2\"\n    fontsize=9\n    color=royalBlue\n  }\n\n  node [shape=record fontsize=7 color=gold]\n  w1 [label=\"widget 1\"]\n  w2 [label=\"widget 2\"]\n  w3 [label=\"widget 3\"]\n  w4 [label=\"widget 4\"]\n  w5 [label=\"widget 5\"]\n\n  w1 -> k1 [dir=both arrowsize=.5]\n  w2 -> k1 [dir=both arrowsize=.5]\n  w3 -> k2 [dir=both arrowsize=.5]\n  w4 -> k2 [dir=both arrowsize=.5]\n  w5 -> k2 [dir=both arrowsize=.5]\n\n  d2 -> k2 [arrowsize=.5]\n  d1 -> k1 [arrowsize=.5]\n  d3 -> k1 [arrowsize=.5]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-70b5599fcec37e469dc2" style="width:100%;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-70b5599fcec37e469dc2">{"x":{"diagram":"\ndigraph G {\n\n  subgraph cluster_g1 {\n    node [shape=record fontsize=7]\n    d1 [label=\"Dataset\"]\n    d3 [label=\"Dataset\"]\n    k1 [label=\"Keys\"]\n    label=\"Group 1\"\n    fontsize=9\n    color=royalBlue\n  }\n\n  subgraph cluster_g2 {\n    node [shape=record fontsize=7]\n    d2 [label=\"Dataset\"] \n    k2 [label=\"Keys\"]\n    label=\"Group 2\"\n    fontsize=9\n    color=royalBlue\n  }\n\n  node [shape=record fontsize=7 color=gold]\n  w1 [label=\"widget 1\"]\n  w2 [label=\"widget 2\"]\n  w3 [label=\"widget 3\"]\n  w4 [label=\"widget 4\"]\n  w5 [label=\"widget 5\"]\n\n  w1 -> k1 [dir=both arrowsize=.5]\n  w2 -> k1 [dir=both arrowsize=.5]\n  w3 -> k2 [dir=both arrowsize=.5]\n  w4 -> k2 [dir=both arrowsize=.5]\n  w5 -> k2 [dir=both arrowsize=.5]\n\n  d2 -> k2 [arrowsize=.5]\n  d1 -> k1 [arrowsize=.5]\n  d3 -> k1 [arrowsize=.5]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>In JavaScript, a widget “receives” the keys of selected and filtered data points and must, when filtering or selection is observed, “send” said selected or filtered keys to other widgets. Internally crosstalk knows what to share across widgets with <code>group</code>s groups share <code>key</code>s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other.</p>
 <div class="rmdnote">
 <p>
@@ -607,7 +607,7 @@ Crosstalk groups share keys.
 <p>The <code>gio</code> function also has to extract the group to which the dataset belongs, this will be necessary JavaScript-side to tell crosstalk which group one is working with. Note that it was randomly generated since none were specified when the shared dataset was created.</p>
 <div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="linking-widgets.html#cb197-1"></a><span class="co"># groupName</span></span>
 <span id="cb197-2"><a href="linking-widgets.html#cb197-2"></a>shared_arcs<span class="op">$</span><span class="kw">groupName</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;SharedDataf8dabab9&quot;</code></pre>
+<pre><code>## [1] &quot;SharedDatac2b51aaa&quot;</code></pre>
 <div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="linking-widgets.html#cb199-1"></a><span class="co"># keys</span></span>
 <span id="cb199-2"><a href="linking-widgets.html#cb199-2"></a>shared_arcs<span class="op">$</span><span class="kw">key</span>()</span></code></pre></div>
 <pre><code>## [1] &quot;US&quot; &quot;RU&quot;</code></pre>
@@ -658,9 +658,9 @@ Crosstalk groups share keys.
 <h2><span class="header-section-number">9.6</span> Change the JavaScript code</h2>
 <p>What is left to do is to adapt the JavaScript code, as a reminder it must accept the keys selected in other widgets and share the selected key with other widgets.</p>
 <p>First we create the selection handler in the <code>factory</code> function, this is done by instantiating a new class from <code>crosstalk.SelectionHandle</code>.</p>
-<div class="sourceCode" id="cb202"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb202-1"><a href="linking-widgets.html#cb202-1"></a><span class="kw">var</span> sel_handle <span class="op">=</span> <span class="kw">new</span> <span class="va">crosstalk</span>.<span class="at">SelectionHandle</span>()<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb202"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb202-1"><a href="linking-widgets.html#cb202-1"></a><span class="kw">var</span> sel_handle <span class="op">=</span> <span class="kw">new</span> crosstalk<span class="op">.</span><span class="fu">SelectionHandle</span>()<span class="op">;</span></span></code></pre></div>
 <p>Once the selection handle created it can be used in the <code>renderValue</code> function to set the group that was collected from R.</p>
-<div class="sourceCode" id="cb203"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb203-1"><a href="linking-widgets.html#cb203-1"></a><span class="va">sel_handle</span>.<span class="at">setGroup</span>(<span class="va">x</span>.<span class="va">crosstalk</span>.<span class="at">group</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb203"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb203-1"><a href="linking-widgets.html#cb203-1"></a>sel_handle<span class="op">.</span><span class="fu">setGroup</span>(x<span class="op">.</span><span class="at">crosstalk</span><span class="op">.</span><span class="at">group</span>)<span class="op">;</span></span></code></pre></div>
 <div id="send-selected-keys" class="section level3" number="9.6.1">
 <h3><span class="header-section-number">9.6.1</span> Send selected keys</h3>
 <p>In order for gio to share the selected country with other widgets it would first have to know which country is selected. This can be achieved with a callback function that gio supports.</p>
@@ -668,31 +668,31 @@ Crosstalk groups share keys.
 <p>In gio.js this callback function is fired when a country is selected on the globe, it accepts two objects; one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country).</p>
 <p>The <a href="https://giojs.org/html/docs/callbackPicked.html">documentation of gio.js</a> gives the following example callback function.</p>
 <div class="sourceCode" id="cb204"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb204-1"><a href="linking-widgets.html#cb204-1"></a><span class="co">// define callback function</span></span>
-<span id="cb204-2"><a href="linking-widgets.html#cb204-2"></a><span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
-<span id="cb204-3"><a href="linking-widgets.html#cb204-3"></a>  <span class="va">console</span>.<span class="at">log</span>(selectedCountry)<span class="op">;</span></span>
+<span id="cb204-2"><a href="linking-widgets.html#cb204-2"></a><span class="kw">function</span> <span class="fu">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) {</span>
+<span id="cb204-3"><a href="linking-widgets.html#cb204-3"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(selectedCountry)<span class="op">;</span></span>
 <span id="cb204-4"><a href="linking-widgets.html#cb204-4"></a>  <span class="co">// console.log(relatedCountries);</span></span>
-<span id="cb204-5"><a href="linking-widgets.html#cb204-5"></a><span class="op">}</span></span>
+<span id="cb204-5"><a href="linking-widgets.html#cb204-5"></a>}</span>
 <span id="cb204-6"><a href="linking-widgets.html#cb204-6"></a></span>
 <span id="cb204-7"><a href="linking-widgets.html#cb204-7"></a><span class="co">// use callback function</span></span>
-<span id="cb204-8"><a href="linking-widgets.html#cb204-8"></a><span class="va">controller</span>.<span class="at">onCountryPicked</span>(callback)<span class="op">;</span></span></code></pre></div>
+<span id="cb204-8"><a href="linking-widgets.html#cb204-8"></a>controller<span class="op">.</span><span class="fu">onCountryPicked</span>(callback)<span class="op">;</span></span></code></pre></div>
 <div class="sourceCode" id="cb205"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb205-1"><a href="linking-widgets.html#cb205-1"></a><span class="fu">{</span><span class="er">name</span><span class="fu">:</span> <span class="st">&quot;LIBYA&quot;</span><span class="fu">,</span> <span class="er">lat</span><span class="fu">:</span> <span class="dv">25</span><span class="fu">,</span> <span class="er">lon</span><span class="fu">:</span> <span class="dv">17</span><span class="fu">,</span> <span class="er">center</span><span class="fu">:</span> <span class="er">n</span><span class="fu">,</span> <span class="er">ISOCode</span><span class="fu">:</span> <span class="st">&quot;LY&quot;</span><span class="fu">}</span></span></code></pre></div>
 <p>This defines a function named <code>callback</code> which takes the two aforementioned objects and logs them in the JavaScript console. Then the function is passed to the <code>controller</code> via the <code>onCountryPicked</code> method which will run it every time a country is selected by the user.</p>
 <p>This callback function will be useful to send the <code>key</code>s to other widgets: when a user selects China send the <code>CN</code> key selection via crosstalk.</p>
 <p>As mentioned at the beginning of this section, the keys used with the datasets for gio.js should be country ISO codes, therefore one can consider the variable <code>selectedCountry.ISOCode</code> as selected <code>key</code>. The <code>set</code> method from the selection handle can be used to share the selected key with other widgets. Note that this method expects either a <code>null</code> value or an array, a scalar value will throw an error, hence <code>selectedCountry.ISOCode</code> is wrapped in square brackets.</p>
-<div class="sourceCode" id="cb206"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb206-1"><a href="linking-widgets.html#cb206-1"></a><span class="kw">function</span> <span class="at">callback</span> (selectedCountry) <span class="op">{</span></span>
-<span id="cb206-2"><a href="linking-widgets.html#cb206-2"></a>  <span class="va">sel_handle</span>.<span class="at">set</span>([<span class="va">selectedCountry</span>.<span class="at">ISOCode</span>])<span class="op">;</span></span>
-<span id="cb206-3"><a href="linking-widgets.html#cb206-3"></a><span class="op">}</span></span>
+<div class="sourceCode" id="cb206"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb206-1"><a href="linking-widgets.html#cb206-1"></a><span class="kw">function</span> <span class="fu">callback</span> (selectedCountry) {</span>
+<span id="cb206-2"><a href="linking-widgets.html#cb206-2"></a>  sel_handle<span class="op">.</span><span class="fu">set</span>([selectedCountry<span class="op">.</span><span class="at">ISOCode</span>])<span class="op">;</span></span>
+<span id="cb206-3"><a href="linking-widgets.html#cb206-3"></a>}</span>
 <span id="cb206-4"><a href="linking-widgets.html#cb206-4"></a></span>
-<span id="cb206-5"><a href="linking-widgets.html#cb206-5"></a><span class="va">controller</span>.<span class="at">onCountryPicked</span>(callback)<span class="op">;</span></span></code></pre></div>
+<span id="cb206-5"><a href="linking-widgets.html#cb206-5"></a>controller<span class="op">.</span><span class="fu">onCountryPicked</span>(callback)<span class="op">;</span></span></code></pre></div>
 </div>
 <div id="set-selected-keys" class="section level3" number="9.6.2">
 <h3><span class="header-section-number">9.6.2</span> Set selected keys</h3>
 <p>We have implemented the necessary to share the selected country with other widgets but are yet to implemented the opposite; when users select a country in another widget the selected country in gio should change too. Gio does provide a method called <code>switchCountry</code> to programmatically change the selected country.</p>
 <p>This can be achieved by listening to the <code>change</code> event on the selection handle previously created, below it is used to log the object <code>e</code> in order to inspect its properties.</p>
 <div class="sourceCode" id="cb207"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb207-1"><a href="linking-widgets.html#cb207-1"></a><span class="co">// placed in factory function</span></span>
-<span id="cb207-2"><a href="linking-widgets.html#cb207-2"></a><span class="va">sel_handle</span>.<span class="at">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) <span class="op">{</span></span>
-<span id="cb207-3"><a href="linking-widgets.html#cb207-3"></a>  <span class="va">console</span>.<span class="at">log</span>(e)<span class="op">;</span></span>
-<span id="cb207-4"><a href="linking-widgets.html#cb207-4"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<span id="cb207-2"><a href="linking-widgets.html#cb207-2"></a>sel_handle<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) {</span>
+<span id="cb207-3"><a href="linking-widgets.html#cb207-3"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(e)<span class="op">;</span></span>
+<span id="cb207-4"><a href="linking-widgets.html#cb207-4"></a>})<span class="op">;</span></span></code></pre></div>
 <div class="sourceCode" id="cb208"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb208-1"><a href="linking-widgets.html#cb208-1"></a><span class="fu">{</span></span>
 <span id="cb208-2"><a href="linking-widgets.html#cb208-2"></a>  <span class="er">oldValue</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span></span>
 <span id="cb208-3"><a href="linking-widgets.html#cb208-3"></a>  <span class="er">sender</span><span class="fu">:</span> <span class="er">n</span> <span class="fu">{</span></span>
@@ -712,79 +712,79 @@ Crosstalk groups share keys.
 </ol>
 <p>Therefore event listener could make use of gio.js’ <code>switchCountry</code>. Note that 1) the selection cannot be cleared with gio.js, a country is always selected, and 2) one can only select one country a time, hence only accepting the first element of the selected keys with <code>e.value[0]</code>.</p>
 <div class="sourceCode" id="cb209"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb209-1"><a href="linking-widgets.html#cb209-1"></a><span class="co">// placed in factory function</span></span>
-<span id="cb209-2"><a href="linking-widgets.html#cb209-2"></a><span class="va">sel_handle</span>.<span class="at">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) <span class="op">{</span></span>
+<span id="cb209-2"><a href="linking-widgets.html#cb209-2"></a>sel_handle<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) {</span>
 <span id="cb209-3"><a href="linking-widgets.html#cb209-3"></a></span>
 <span id="cb209-4"><a href="linking-widgets.html#cb209-4"></a>  <span class="co">// selection comes from another widget</span></span>
-<span id="cb209-5"><a href="linking-widgets.html#cb209-5"></a>  <span class="cf">if</span> (<span class="va">e</span>.<span class="at">sender</span> <span class="op">!==</span> sel_handle) <span class="op">{</span></span>
+<span id="cb209-5"><a href="linking-widgets.html#cb209-5"></a>  <span class="cf">if</span> (e<span class="op">.</span><span class="at">sender</span> <span class="op">!==</span> sel_handle) {</span>
 <span id="cb209-6"><a href="linking-widgets.html#cb209-6"></a>    <span class="co">// clear the selection</span></span>
 <span id="cb209-7"><a href="linking-widgets.html#cb209-7"></a>    <span class="co">// not possible with gio.js</span></span>
-<span id="cb209-8"><a href="linking-widgets.html#cb209-8"></a>  <span class="op">}</span></span>
-<span id="cb209-9"><a href="linking-widgets.html#cb209-9"></a>  <span class="va">controller</span>.<span class="at">switchCountry</span>(<span class="va">e</span>.<span class="at">value</span>[<span class="dv">0</span>])<span class="op">;</span></span>
-<span id="cb209-10"><a href="linking-widgets.html#cb209-10"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<span id="cb209-8"><a href="linking-widgets.html#cb209-8"></a>  }</span>
+<span id="cb209-9"><a href="linking-widgets.html#cb209-9"></a>  controller<span class="op">.</span><span class="fu">switchCountry</span>(e<span class="op">.</span><span class="at">value</span>[<span class="dv">0</span>])<span class="op">;</span></span>
+<span id="cb209-10"><a href="linking-widgets.html#cb209-10"></a>})<span class="op">;</span></span></code></pre></div>
 </div>
 <div id="recap-javascript-code" class="section level3" number="9.6.3">
 <h3><span class="header-section-number">9.6.3</span> Recap JavaScript code</h3>
 <p>To recapitulate, this is what the JavaScript code should not look like.</p>
-<div class="sourceCode" id="cb210"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb210-1"><a href="linking-widgets.html#cb210-1"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
+<div class="sourceCode" id="cb210"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb210-1"><a href="linking-widgets.html#cb210-1"></a>HTMLWidgets<span class="op">.</span><span class="fu">widget</span>({</span>
 <span id="cb210-2"><a href="linking-widgets.html#cb210-2"></a></span>
 <span id="cb210-3"><a href="linking-widgets.html#cb210-3"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;gio&#39;</span><span class="op">,</span></span>
 <span id="cb210-4"><a href="linking-widgets.html#cb210-4"></a></span>
 <span id="cb210-5"><a href="linking-widgets.html#cb210-5"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
 <span id="cb210-6"><a href="linking-widgets.html#cb210-6"></a></span>
-<span id="cb210-7"><a href="linking-widgets.html#cb210-7"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb210-7"><a href="linking-widgets.html#cb210-7"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) {</span>
 <span id="cb210-8"><a href="linking-widgets.html#cb210-8"></a></span>
 <span id="cb210-9"><a href="linking-widgets.html#cb210-9"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
 <span id="cb210-10"><a href="linking-widgets.html#cb210-10"></a>    <span class="kw">var</span> controller<span class="op">;</span></span>
 <span id="cb210-11"><a href="linking-widgets.html#cb210-11"></a></span>
 <span id="cb210-12"><a href="linking-widgets.html#cb210-12"></a>    <span class="co">// create selection handle</span></span>
-<span id="cb210-13"><a href="linking-widgets.html#cb210-13"></a>    <span class="kw">var</span> sel_handle <span class="op">=</span> <span class="kw">new</span> <span class="va">crosstalk</span>.<span class="at">SelectionHandle</span>()<span class="op">;</span></span>
+<span id="cb210-13"><a href="linking-widgets.html#cb210-13"></a>    <span class="kw">var</span> sel_handle <span class="op">=</span> <span class="kw">new</span> crosstalk<span class="op">.</span><span class="fu">SelectionHandle</span>()<span class="op">;</span></span>
 <span id="cb210-14"><a href="linking-widgets.html#cb210-14"></a></span>
 <span id="cb210-15"><a href="linking-widgets.html#cb210-15"></a>    <span class="co">// listen to change</span></span>
-<span id="cb210-16"><a href="linking-widgets.html#cb210-16"></a>    <span class="va">sel_handle</span>.<span class="at">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) <span class="op">{</span></span>
-<span id="cb210-17"><a href="linking-widgets.html#cb210-17"></a>      <span class="cf">if</span> (<span class="va">e</span>.<span class="at">sender</span> <span class="op">!==</span> sel_handle) <span class="op">{</span></span>
+<span id="cb210-16"><a href="linking-widgets.html#cb210-16"></a>    sel_handle<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) {</span>
+<span id="cb210-17"><a href="linking-widgets.html#cb210-17"></a>      <span class="cf">if</span> (e<span class="op">.</span><span class="at">sender</span> <span class="op">!==</span> sel_handle) {</span>
 <span id="cb210-18"><a href="linking-widgets.html#cb210-18"></a>        <span class="co">// clear selection</span></span>
-<span id="cb210-19"><a href="linking-widgets.html#cb210-19"></a>      <span class="op">}</span></span>
-<span id="cb210-20"><a href="linking-widgets.html#cb210-20"></a>      <span class="va">controller</span>.<span class="at">switchCountry</span>(<span class="va">e</span>.<span class="at">value</span>[<span class="dv">0</span>])<span class="op">;</span></span>
-<span id="cb210-21"><a href="linking-widgets.html#cb210-21"></a>    <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb210-19"><a href="linking-widgets.html#cb210-19"></a>      }</span>
+<span id="cb210-20"><a href="linking-widgets.html#cb210-20"></a>      controller<span class="op">.</span><span class="fu">switchCountry</span>(e<span class="op">.</span><span class="at">value</span>[<span class="dv">0</span>])<span class="op">;</span></span>
+<span id="cb210-21"><a href="linking-widgets.html#cb210-21"></a>    })<span class="op">;</span></span>
 <span id="cb210-22"><a href="linking-widgets.html#cb210-22"></a></span>
 <span id="cb210-23"><a href="linking-widgets.html#cb210-23"></a></span>
-<span id="cb210-24"><a href="linking-widgets.html#cb210-24"></a>    <span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb210-24"><a href="linking-widgets.html#cb210-24"></a>    <span class="cf">return</span> {</span>
 <span id="cb210-25"><a href="linking-widgets.html#cb210-25"></a></span>
-<span id="cb210-26"><a href="linking-widgets.html#cb210-26"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb210-26"><a href="linking-widgets.html#cb210-26"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) {</span>
 <span id="cb210-27"><a href="linking-widgets.html#cb210-27"></a></span>
-<span id="cb210-28"><a href="linking-widgets.html#cb210-28"></a>        controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(el)<span class="op">;</span></span>
+<span id="cb210-28"><a href="linking-widgets.html#cb210-28"></a>        controller <span class="op">=</span> <span class="kw">new</span> GIO<span class="op">.</span><span class="fu">Controller</span>(el)<span class="op">;</span></span>
 <span id="cb210-29"><a href="linking-widgets.html#cb210-29"></a></span>
 <span id="cb210-30"><a href="linking-widgets.html#cb210-30"></a>        <span class="co">// group</span></span>
-<span id="cb210-31"><a href="linking-widgets.html#cb210-31"></a>        <span class="va">sel_handle</span>.<span class="at">setGroup</span>(<span class="va">x</span>.<span class="va">crosstalk</span>.<span class="at">group</span>)<span class="op">;</span></span>
+<span id="cb210-31"><a href="linking-widgets.html#cb210-31"></a>        sel_handle<span class="op">.</span><span class="fu">setGroup</span>(x<span class="op">.</span><span class="at">crosstalk</span><span class="op">.</span><span class="at">group</span>)<span class="op">;</span></span>
 <span id="cb210-32"><a href="linking-widgets.html#cb210-32"></a>        </span>
 <span id="cb210-33"><a href="linking-widgets.html#cb210-33"></a>        <span class="co">// add data</span></span>
-<span id="cb210-34"><a href="linking-widgets.html#cb210-34"></a>        <span class="va">controller</span>.<span class="at">addData</span>(<span class="va">x</span>.<span class="at">data</span>)<span class="op">;</span></span>
+<span id="cb210-34"><a href="linking-widgets.html#cb210-34"></a>        controller<span class="op">.</span><span class="fu">addData</span>(x<span class="op">.</span><span class="at">data</span>)<span class="op">;</span></span>
 <span id="cb210-35"><a href="linking-widgets.html#cb210-35"></a></span>
-<span id="cb210-36"><a href="linking-widgets.html#cb210-36"></a>        <span class="va">controller</span>.<span class="at">setStyle</span>(<span class="va">x</span>.<span class="at">style</span>)<span class="op">;</span></span>
+<span id="cb210-36"><a href="linking-widgets.html#cb210-36"></a>        controller<span class="op">.</span><span class="fu">setStyle</span>(x<span class="op">.</span><span class="at">style</span>)<span class="op">;</span></span>
 <span id="cb210-37"><a href="linking-widgets.html#cb210-37"></a></span>
 <span id="cb210-38"><a href="linking-widgets.html#cb210-38"></a>        <span class="co">// callback</span></span>
-<span id="cb210-39"><a href="linking-widgets.html#cb210-39"></a>        <span class="kw">function</span> <span class="at">callback</span> (selectedCountry<span class="op">,</span> relatedCountries) <span class="op">{</span></span>
-<span id="cb210-40"><a href="linking-widgets.html#cb210-40"></a>          <span class="va">sel_handle</span>.<span class="at">set</span>([<span class="va">selectedCountry</span>.<span class="at">ISOCode</span>])<span class="op">;</span> <span class="co">// send keys</span></span>
-<span id="cb210-41"><a href="linking-widgets.html#cb210-41"></a>        <span class="op">}</span></span>
+<span id="cb210-39"><a href="linking-widgets.html#cb210-39"></a>        <span class="kw">function</span> callback (selectedCountry<span class="op">,</span> relatedCountries) {</span>
+<span id="cb210-40"><a href="linking-widgets.html#cb210-40"></a>          sel_handle<span class="op">.</span><span class="fu">set</span>([selectedCountry<span class="op">.</span><span class="at">ISOCode</span>])<span class="op">;</span> <span class="co">// send keys</span></span>
+<span id="cb210-41"><a href="linking-widgets.html#cb210-41"></a>        }</span>
 <span id="cb210-42"><a href="linking-widgets.html#cb210-42"></a></span>
-<span id="cb210-43"><a href="linking-widgets.html#cb210-43"></a>        <span class="va">controller</span>.<span class="at">onCountryPicked</span>(callback)<span class="op">;</span></span>
+<span id="cb210-43"><a href="linking-widgets.html#cb210-43"></a>        controller<span class="op">.</span><span class="fu">onCountryPicked</span>(callback)<span class="op">;</span></span>
 <span id="cb210-44"><a href="linking-widgets.html#cb210-44"></a></span>
 <span id="cb210-45"><a href="linking-widgets.html#cb210-45"></a>        <span class="co">// use stats</span></span>
-<span id="cb210-46"><a href="linking-widgets.html#cb210-46"></a>        <span class="cf">if</span>(<span class="va">x</span>.<span class="at">stats</span>)</span>
-<span id="cb210-47"><a href="linking-widgets.html#cb210-47"></a>          <span class="va">controller</span>.<span class="at">enableStats</span>()<span class="op">;</span></span>
+<span id="cb210-46"><a href="linking-widgets.html#cb210-46"></a>        <span class="cf">if</span>(x<span class="op">.</span><span class="at">stats</span>)</span>
+<span id="cb210-47"><a href="linking-widgets.html#cb210-47"></a>          controller<span class="op">.</span><span class="fu">enableStats</span>()<span class="op">;</span></span>
 <span id="cb210-48"><a href="linking-widgets.html#cb210-48"></a></span>
 <span id="cb210-49"><a href="linking-widgets.html#cb210-49"></a>        <span class="co">// render</span></span>
-<span id="cb210-50"><a href="linking-widgets.html#cb210-50"></a>        <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></span>
+<span id="cb210-50"><a href="linking-widgets.html#cb210-50"></a>        controller<span class="op">.</span><span class="fu">init</span>()<span class="op">;</span></span>
 <span id="cb210-51"><a href="linking-widgets.html#cb210-51"></a></span>
-<span id="cb210-52"><a href="linking-widgets.html#cb210-52"></a>      <span class="op">},</span></span>
+<span id="cb210-52"><a href="linking-widgets.html#cb210-52"></a>      }<span class="op">,</span></span>
 <span id="cb210-53"><a href="linking-widgets.html#cb210-53"></a></span>
-<span id="cb210-54"><a href="linking-widgets.html#cb210-54"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
-<span id="cb210-55"><a href="linking-widgets.html#cb210-55"></a>        <span class="va">controller</span>.<span class="at">resizeUpdate</span>()<span class="op">;</span></span>
-<span id="cb210-56"><a href="linking-widgets.html#cb210-56"></a>      <span class="op">},</span></span>
+<span id="cb210-54"><a href="linking-widgets.html#cb210-54"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) {</span>
+<span id="cb210-55"><a href="linking-widgets.html#cb210-55"></a>        controller<span class="op">.</span><span class="fu">resizeUpdate</span>()<span class="op">;</span></span>
+<span id="cb210-56"><a href="linking-widgets.html#cb210-56"></a>      }<span class="op">,</span></span>
 <span id="cb210-57"><a href="linking-widgets.html#cb210-57"></a></span>
-<span id="cb210-58"><a href="linking-widgets.html#cb210-58"></a>    <span class="op">};</span></span>
-<span id="cb210-59"><a href="linking-widgets.html#cb210-59"></a>  <span class="op">}</span></span>
-<span id="cb210-60"><a href="linking-widgets.html#cb210-60"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<span id="cb210-58"><a href="linking-widgets.html#cb210-58"></a>    }<span class="op">;</span></span>
+<span id="cb210-59"><a href="linking-widgets.html#cb210-59"></a>  }</span>
+<span id="cb210-60"><a href="linking-widgets.html#cb210-60"></a>})<span class="op">;</span></span></code></pre></div>
 </div>
 </div>
 <div id="using-crosstalk-with-gio" class="section level2" number="9.7">
@@ -814,8 +814,8 @@ Crosstalk groups share keys.
 <p class="caption">Gio with DT using crosstalk</p>
 </div>
 <p>Thankfully we can use the <code>group</code> argument in order to create edges and nodes that share keys and produce a more sensible link between widgets.</p>
-<div id="htmlwidget-aa066848f1f414997cfa" style="width:100%;height:480px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-aa066848f1f414997cfa">{"x":{"diagram":"\ndigraph {\n\n  graph[rankdir = TB]\n\n  subgraph cluster_0 {\n    label=\"sharedGroup\"\n    node [shape=record fontsize=10];\n    edges_sd nodes_sd\n    keys [color=royalBlue]\n    color=dimGray\n  }\n\n  node [shape=record fontsize=10 color=gold];\n  gio plotly\n\n  edges_sd -> keys [arrowsize=.5];\n  nodes_sd -> keys [arrowsize=.5];\n\n  gio -> keys [dir=both arrowsize=.5];\n  plotly -> keys [dir=both arrowsize=.5 constraint=false];\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-87aa53259fe3e7a3049d" style="width:100%;height:480px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-87aa53259fe3e7a3049d">{"x":{"diagram":"\ndigraph {\n\n  graph[rankdir = TB]\n\n  subgraph cluster_0 {\n    label=\"sharedGroup\"\n    node [shape=record fontsize=10];\n    edges_sd nodes_sd\n    keys [color=royalBlue]\n    color=dimGray\n  }\n\n  node [shape=record fontsize=10 color=gold];\n  gio plotly\n\n  edges_sd -> keys [arrowsize=.5];\n  nodes_sd -> keys [arrowsize=.5];\n\n  gio -> keys [dir=both arrowsize=.5];\n  plotly -> keys [dir=both arrowsize=.5 constraint=false];\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Below we create two shared datasets with the same group name, one for the edges and another for the nodes and use one for the gio visualisation and the other for the plotly graph.</p>
 <div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="linking-widgets.html#cb212-1"></a><span class="kw">library</span>(gio)</span>
 <span id="cb212-2"><a href="linking-widgets.html#cb212-2"></a><span class="kw">library</span>(plotly)</span>

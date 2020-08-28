@@ -476,3 +476,214 @@ shinyApp(ui, server)
 ```
 
 ![Shiny application with boxxy](images/custom-output-boxxy.png)
+
+## Injecting Dependencies
+
+We could consider making the animation of the value rendered with `boxxy` optional, some users may not want to use it. You might already imagine how a new argument and a few if statements could very easily do the job, but how would one handle the dependency? Surely if users do not want to make use of the animation the CountUp.js dependency should also be excluded so as to keep the output as light as possible.
+
+The dependency is currently attached in the `boxxyOutput` function which does not take any argument, it could but it would make for rather messy and confusing interface as whatever additional argument that indicates whether the numbers should be animated would have be specified twice, once in the `boxxyOutput` function so it does not import the dependency as well as in the `boxxy` function in order to serialise that parameter so the JavaScript binding does not run the animation function.
+
+```r
+# pseudo code
+# do not do this
+library(shiny)
+
+ui <- fluidPage(
+  boxxyOutput(
+    "countries", 
+    # do not import dependency
+    animate = FALSE
+  )
+)
+
+server <- function(input, output){
+  output$countries <- renderBoxxy({
+    # do not animate the numbers
+    boxxy("Countries", 95, animate = FALSE)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+Thankfully there is a better way, combining htmltools and shiny to insert the dependency dynamically from JavaScript.
+
+The `boxxy` function needs to take an additional argument `animate` which is passed to the output list. This will be used in the `render` function (and JavaScript binding) to dynamically render the dependency.
+
+```r
+boxxy <- function(title, value, color = "black", aniamte = TRUE){
+  list(title = title, value = value, color = color, animate = animate)
+}
+```
+
+The `boxxyOutput` function can be slightly simplified, it currently attaches the `countup.js` dependency which needs to be removed.
+
+```r
+boxxyOutput <- function(id){
+  el <- shiny::tags$div(
+    id = id, class = "boxxy",
+    h1(id = sprintf("%s-boxxy-value", id), class = "boxxy-value"),
+    p(id = sprintf("%s-boxxy-title", id), class = "boxxy-title")
+  )
+
+  path <- normalizePath("assets")
+
+  # only attach binding.js
+  deps <- list(
+    htmltools::htmlDependency(
+      name = "boxxy",
+      version = "1.0.0",
+      src = c(file = path),
+      script = c("binding.js"),
+      stylesheet = "styles.css"
+    )
+  )
+
+  htmltools::attachDependencies(el, deps)
+}
+```
+
+The `renderBoxxy` function sees quite some modifications, while before it was technically only returning a function that itself returned the output of `boxxy` (`func() == boxxy()`). Here we want to capture the output of `boxxy` to check whether the `animate` element is `TRUE` and if so add the dependency.
+
+```r
+renderBoxxy <- function(expr, env = parent.frame(), 
+  quoted = FALSE) {
+  # Convert the expression + environment into a function
+  func <- shiny::exprToFunction(expr, env, quoted)
+
+  function(){
+    val <- func()
+
+    if(val$animate){
+      # add dependency
+    }
+
+    return(val)
+  }
+}
+```
+
+Within the `if` statement the dependency can be created with the htmltools as done for the binding. Ensure the names of the dependencies are unique as shiny internally uses it to differentiate between them, if they bear the same name shiny assumes they are the same and will only render one of them.
+
+```{block, type='rmdnote'}
+Make sure dependencies bear different names or shiny thinks it's the same and only renders one of them. 
+```
+
+The dependency generated with htmltools is then passed to the `shiny::createWebDependency` function which internally uses `shiny::addResourcePath` to serve the dependency. This is necessary here as, at this stage, the countup dependency is not actually rendered, below we merely add it to the list of options that serialised to JSON. Indeed this will actually be injected JavaScript-side, therefore the front-end needs to be able to access this file, hence it is served.
+
+```r
+renderBoxxy <- function(expr, env = parent.frame(), quoted = FALSE) {
+  # Convert the expression + environment into a function
+  func <- shiny::exprToFunction(expr, env, quoted)
+
+  function(){
+    # evaluate to output list
+    val <- func()
+
+    # add dependency
+    if(val$animate){
+      path <- normalizePath("assets")
+
+      deps <- htmltools::htmlDependency(
+        name = "countup", # change name
+        version = "1.0.0",
+        src = c(file = path),
+        script = c("countup.js"), # only countup
+        stylesheet = "styles.css"
+      )
+
+      # serve dependency 
+      val$deps <- list(shiny::createWebDependency(deps))
+    }
+
+    return(val)
+  }
+}
+```
+
+Thus far the dependency is dynamically included in the R object that is serialised to JSON but it is not yet actually imported in the document, this happens in the JavaScript binding.
+
+The first thing we ought to do is mirror the if statement that was created in the `renderBoxxy` function, if the numbers should be animated the function can use countup, if not it must insert the text with `insertText` just like it does for the `title`.
+
+```js
+var boxxyBinding = new Shiny.OutputBinding();
+
+$.extend(boxxyBinding, {
+  find: function(scope) {
+    return $(scope).find(".boxxy");
+  },
+  renderValue: function(el, data) {
+
+    el.style.backgroundColor = data.color;
+
+    if(data.animate){
+      var counter = new CountUp(el.id + '-boxxy-value', 0, data.value);
+      counter.start();
+    } else {
+      document.getElementById(el.id + '-boxxy-value').innerText = data.value;
+    }
+
+    document.getElementById(el.id + '-boxxy-title').innerText = data.title;
+  }
+});
+
+Shiny.outputBindings.register(boxxyBinding, "john.boxxy");
+```
+
+Finally, we can render the dependency, the JavaScript method aptly named `renderDependencies` will do just that from the list of dependency created in `renderBoxxy`.
+
+```js
+var boxxyBinding = new Shiny.OutputBinding();
+
+$.extend(boxxyBinding, {
+  find: function(scope) {
+    return $(scope).find(".boxxy");
+  },
+  renderValue: function(el, data) {
+
+    el.style.backgroundColor = data.color;
+
+    if(data.animate){
+      Shiny.renderDependencies(data.deps); // render dependency
+      var counter = new CountUp(el.id + '-boxxy-value', 0, data.value);
+      counter.start();
+    } else {
+      document.getElementById(el.id + '-boxxy-value').innerText = data.value;
+    }
+
+    document.getElementById(el.id + '-boxxy-title').innerText = data.title;
+  }
+});
+
+Shiny.outputBindings.register(boxxyBinding, "john.boxxy");
+```
+
+With those changes made not only is the animation of numbers optional but if users decide to turn off the animation in all `boxxy` functions the `countup.js` file will not be included at all.
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  h2("Custom outputs"),
+  fluidRow(
+    column(
+      3, boxxyOutput("countries")
+    ),
+    column(
+      3, boxxyOutput("employees")
+    )
+  )
+)
+
+server <- function(input, output){
+  output$countries <- renderBoxxy({
+    boxxy("Countries", 176, animate = FALSE)
+  })
+
+  output$employees <- renderBoxxy({
+    boxxy("Thing", 67, animate = FALSE)
+  })
+}
+
+shinyApp(ui, server)
+```

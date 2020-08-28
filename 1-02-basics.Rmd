@@ -482,7 +482,7 @@ This of course only scratches the surface of JavaScript thus this provides ample
 
 ## Shiny
 
-It is assumed that the reader has basic knowledge of the shiny framework and already used it to build applications. However, there are some more obscure functionalities that one may not know but that become essential when introducing JavaScript to applications. Chiefly, how to introduce external dependencies; JavaScript or otherwise.
+It is assumed that the reader has basic knowledge of the shiny framework and already used it to build applications. However, there are some more obscure functionalities that one may not know but that become essential when introducing JavaScript to applications. Chiefly, how to import external dependencies; JavaScript or otherwise.
 
 There are two ways to make dependencies: using the htmltools [@R-htmltools] package to create a dependency object that shiny can understand or manually serving and importing the files with shiny.
 
@@ -498,14 +498,17 @@ shiny::actionButton
 function (inputId, label, icon = NULL, width = NULL, ...) 
 {
     value <- restoreInput(id = inputId, default = NULL)
-    tags$button(id = inputId, style = if (!is.null(width)) 
-        paste0("width: ", validateCssUnit(width), ";"), type = "button", 
-        class = "btn btn-default action-button", `data-val` = value, 
-        list(validateIcon(icon), label), ...)
+    tags$button(
+      id = inputId, style = if (!is.null(width)) 
+      paste0("width: ", validateCssUnit(width), ";"),
+      type = "button", class = "btn btn-default action-button", 
+      `data-val` = value, list(validateIcon(icon), label), 
+      ...
+    )
 }
 ```
 
-As the name indicates htmltools goes beyond the generation of HTML tags and provides broader tools to generate HTML, this includes working the dependencies. dependencies may appear simple at first, after all were one working with an HTML document in order to import HTML or CSS one could simply use HTML tags.
+As the name indicates htmltools goes beyond the generation of HTML tags and provides broader tools to work with HTML from R, this includes working the dependencies. dependencies may appear simple at first, after all were one working with an HTML document in order to import HTML or CSS one could simply use HTML tags.
 
 ```html
  <!–– index.html ––>
@@ -541,7 +544,7 @@ Shiny, R markdown, and other packages where htmltools is relevant will then be a
 <link rel="stylesheet" href="path/to/directory/styles.css">
 ```
 
-Importantly, the `htmltools::htmlDependency` also takes a `package` argument which makes it such that the `src` path becomes relative to the package directory (the `inst` folder). Hence the snippet below imports a file located at `myPackage/inst/assets/script.js`; the ultimate full path will of course depend on the users' machine.
+Importantly, the `htmltools::htmlDependency` also takes a `package` argument which makes it such that the `src` path becomes relative to the package directory (the `inst` folder). Hence the snippet below imports a file located at `myPackage/inst/assets/script.js`; the ultimate full path will of course depend on where the package is installed on the users' machine.
 
 ```r
 dependency <- htmltools::htmlDependency(
@@ -570,13 +573,13 @@ ui <- fluidPage(
 
 ### Static files
 
-In order to introduce JavaScript to shiny applications one must understand static files and how they work with the framework. Static files are files that are downloaded by the clients, in this case web browsers accessing shiny applications, as-is, these generally include images, CSS (`.css`), and JavaScript (`.js`).
+Static files are files that are downloaded by the clients, in this case web browsers accessing shiny applications, as-is, these generally include images, CSS (`.css`), and JavaScript (`.js`).
 
-If you are familiar with R packages it enables development, static files are to shiny applications what the "inst" directory is to an R package, those files are installed as-is and do not require further processing as opposed to the "src" folder which contains files that need compiling for instance.
+If you are familiar with R packages, static files are to shiny applications what the `inst` directory is to an R package, those files are installed as-is and do not require further processing as opposed to the `src` folder which contains files that need compiling for instance.
 
 There are numerous functions to launch a shiny application locally; the two most used probably are `shinyApp` and `runApp`. The RStudio IDE comes with a convenient "Run" button when writing a shiny application, which when clicked actually uses the function `shiny::runApp` in the background, this function looks for said static files in the `www` directory and makes them available at the same path (`/www`). If you are building your applications outside of RStudio, you should either also use `shiny::runApp` or specify the directory which then allows using `shiny::shinyApp`. Note that this only applies locally, shiny server (community and pro) as well as [shinyapps.io](https://www.shinyapps.io/) use the same defaults as the RStudio IDE and `shiny::runApp`.
 
-In order to ensure the code in this book can run regardless of the reader's machine or editor, the asset directory is always specified explicitly. This is probably advised to steer clear of the potential headaches as, unlike the default, it'll work regardless of the environment. If you are using [golem](https://thinkr-open.github.io/golem/) [@R-golem] to develop your application then you should not worry about this as it specifies the directory internally.
+In order to ensure the code in this book can run regardless of the reader's machine or editor, the asset directory (when used) is always specified explicitly. This is probably advised to steer clear of the potential headaches as, unlike the default, it'll work regardless of the environment. If you are using golem [@R-golem] to develop your application then you should not worry about this as it specifies the directory internally.
 
 Below we build a basic shiny application, however, before we define the ui and server we use the `shiny::addResourcePath` function to specify the location of the directory of static files that will be served by the server and thus accessible by the client. This function takes two arguments, first the `prefix`, which is the path (URL) at which the assets will be available, second the path to the directory of static assets.
 
@@ -649,12 +652,16 @@ In shiny we write the ui in R and not in HTML (though this is also supported). G
 library(shiny)
 
 ui <- fluidPage(
-  tags$head(
-    tags$script(src = "path/to/script.js")
+  singleton(
+    tags$head(
+      tags$script(src = "path/to/script.js")
+    )
   ),
   p(id = "content", "Trying JavaScript!")
 )
 ```
+
+The dependency is used in the `singleton` function (from htmltools) ensure that its content is _only imported in the document once._ 
 
 Note that we use the `tags` object which comes from the shiny package and includes HTML tags that are not exported as standalone functions. For instance, you can create a `<div>` in shiny with the `div` function but `tags$div` will also work. This can now be applied to the shiny application, the `path/to/script.js` should be changed to `files/script.js` where `files` is the prefix we defined in `addResourcePath`.
 
@@ -677,6 +684,11 @@ server <- function(input, output){}
 shinyApp(ui, server)
 ```
 
-From the browser, inspecting page (right click > inspect > console tab) one should see "Hello JS!" in the console which means the application correctly ran the code in the JavaScript file.
+From the browser, inspecting page (right click > inspect > console tab) one should see `Hello JS!` in the console which means the application correctly ran the code in the JavaScript file.
 
-### Pros and Cons
+### Dependencies Pros and Cons
+
+For multiple reasons, the best way to include dependencies is probably the former using htmltools. First, it will work with both shiny and rmarkdown [@R-rmarkdown] reducing the cognitive load on the developer; learn to use this method and you import dependencies for many different output types. Moreover it comes with neat features that will be explored later in the book, e.g.: dynamic dependencies for interactive visualisations or shiny.
+
+Using `shiny::addResourcePath` has one advantage, its use is not limited to making CSS and JavaScript files available in Shiny, it can be used to serve other file types such as JSON or images that may also be needed in the application.
+

@@ -8,9 +8,15 @@ $.extend(boxxyBinding, {
 
     el.style.backgroundColor = data.color;
 
-    var counter = new CountUp(el.id + '-boxxy-value', 0, data.value);
-    counter.start();
-    document.getElementById(el.id + '-boxxy-title').innerText = data.title
+    if(data.animate){
+      Shiny.renderDependencies(data.deps);
+      var counter = new CountUp(el.id + '-boxxy-value', 0, data.value);
+      counter.start();
+    } else {
+      document.getElementById(el.id + '-boxxy-value').innerText = data.value;
+    }
+
+    document.getElementById(el.id + '-boxxy-title').innerText = data.title;
   }
 });
 
