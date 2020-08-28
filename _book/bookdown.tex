@@ -3577,7 +3577,7 @@ Indeed the bi-directional communication between widgets works in the RStudio vie
 \end{Highlighting}
 \end{Shaded}
 
-In a sense, while crosstalk establishes lines of communication to transport \texttt{key}s between widgets, developers of the respective widgets must handle what \texttt{key}s are sent and what to do with incoming \texttt{key}s. There are two such lines of communication, one for \texttt{key}s of rows that are meant to be filtered meant to narrow down the selection of data points displayed on a widget, and another for selection (what crosstalk refers to as ``linked brushing'') to highlight certain data points.
+In a sense, while crosstalk establishes lines of communication to transport \texttt{key}s between widgets, developers of the respective widgets must handle what \texttt{key}s are sent and what to do with incoming \texttt{key}s. There are two such lines of communication, one for \texttt{key}s of rows to be filtered meant to narrow down the selection of data points displayed on a widget, and another for selection (what crosstalk refers to as ``linked brushing'') to highlight certain data points.
 
 \includegraphics{bookdown_files/figure-latex/unnamed-chunk-41-1.png}
 
@@ -3670,7 +3670,7 @@ The \texttt{gio} function also has to extract the group to which the dataset bel
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "SharedData81c926cf"
+## [1] "SharedDataa3837651"
 \end{verbatim}
 
 \begin{Shaded}
@@ -6002,7 +6002,7 @@ This is something where, again, R is leveraged in order to make it easier on the
 \hypertarget{custom-outputs}{%
 \chapter{Custom Outputs}\label{custom-outputs}}
 
-In this chapter we create a custom shiny output, in practical terms this creates custom \texttt{render*} and \texttt{*Output} functions to use in Shiny. This will be demonstrated by creating something akin to the \texttt{valueBox} available in the shinydashboard \citep{R-shinydashboard} package. While similar to what shinydashboard provides this box will 1) be fully customisable and 2) available in any shiny application.
+In this chapter we create a custom shiny output, in practical terms this creates custom \texttt{render*} and \texttt{*Output} functions to use in Shiny. This will be demonstrated by creating something akin to the \texttt{valueBox} available in the shinydashboard \citep{R-shinydashboard} package. While similar to what shinydashboard provides this box will 1) be fully customisable and 2) available in any shiny application 3) have additional functionalities.
 
 The \texttt{valueBox} equivalent we shall build in this chapter is named ``boxxy,'' and allows creating simple but colourful value boxes with animated numbers (by counting up to it) using \href{https://github.com/inorganik/countUp.js}{countUp.js}.
 
@@ -6031,7 +6031,7 @@ The \texttt{valueBox} equivalent we shall build in this chapter is named ``boxxy
 \end{figure}
 
 \hypertarget{custom-outputs-inner-workings}{%
-\section{Custom outputs inner-workings}\label{custom-outputs-inner-workings}}
+\section{Custom Outputs Inner-workings}\label{custom-outputs-inner-workings}}
 
 At the core, this consists in creating three functions; \texttt{boxxy}, \texttt{renderBoxxy} and \texttt{boxxyOutput} (analogous to \texttt{plot}, \texttt{renderPlot}, \texttt{plotOutput}) which are linked by an ``output binding'' in JavaScript.
 
@@ -6431,7 +6431,7 @@ Then we can set the background color that was passed to \texttt{boxxy} (\texttt{
 \end{Shaded}
 
 \hypertarget{register-the-output-binding}{%
-\subsection{Register the output binding}\label{register-the-output-binding}}
+\section{Register the Output Binding}\label{register-the-output-binding}}
 
 Finally, the output binding must be registered with shiny. Note that it uses a unique string identifier, the \href{https://shiny.rstudio.com/articles/building-outputs.html}{documentation} states:
 
@@ -6789,6 +6789,43 @@ With those changes made not only is the animation of numbers optional but if use
 \KeywordTok{shinyApp}\NormalTok{(ui, server)}
 \end{Highlighting}
 \end{Shaded}
+
+\hypertarget{preprocessing-custom-outputs}{%
+\section{Preprocessing Custom Outputs}\label{preprocessing-custom-outputs}}
+
+One aspect that this example did not explore truly explore thus far is the idea that the function \texttt{boxxy} should preprocess the input more in order to be truly justify. Currently \texttt{boxxy} only wraps the arguments in a \texttt{list}, therefore the code below works too.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# works too}
+\NormalTok{output}\OperatorTok{$}\NormalTok{theId \textless{}{-}}\StringTok{ }\KeywordTok{renderBoxxy}\NormalTok{(\{}
+  \KeywordTok{list}\NormalTok{(}\DataTypeTok{title =} \StringTok{"The Title"}\NormalTok{, }\DataTypeTok{value =} \DecValTok{123}\NormalTok{, }\DataTypeTok{color =} \StringTok{"blue"}\NormalTok{, }\DataTypeTok{animate =} \OtherTok{TRUE}\NormalTok{)}
+\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+One the things \texttt{boxxy} could do is preprocess the input, below the function takes the sum of \texttt{value} to one pass a vector of any length and changes the default \texttt{color} argument to \texttt{NULL} so it is made dynamic based on the total \texttt{value}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{boxxy \textless{}{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(title, value, }\DataTypeTok{color =} \OtherTok{NULL}\NormalTok{, }\DataTypeTok{animate =} \OtherTok{TRUE}\NormalTok{)\{}
+
+  \CommentTok{\# sum the vector}
+\NormalTok{  value \textless{}{-}}\StringTok{ }\KeywordTok{sum}\NormalTok{(value)}
+
+  \CommentTok{\# dynamic color}
+  \ControlFlowTok{if}\NormalTok{(}\KeywordTok{is.null}\NormalTok{(color))}
+    \ControlFlowTok{if}\NormalTok{(value }\OperatorTok{\textgreater{}}\StringTok{ }\DecValTok{100}\NormalTok{)}
+\NormalTok{      color \textless{}{-}}\StringTok{ "\#ef476f"}
+    \ControlFlowTok{else}
+\NormalTok{      color \textless{}{-}}\StringTok{ "\#06d6a0"}
+
+  \KeywordTok{list}\NormalTok{(}\DataTypeTok{title =}\NormalTok{ title, }\DataTypeTok{value =}\NormalTok{ value, }\DataTypeTok{color =}\NormalTok{ color, }\DataTypeTok{animate =}\NormalTok{ animate)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+This means boxxy could be used like so: \texttt{boxxy("Total",\ c(1,6,9))}.
 
 \hypertarget{cookies}{%
 \chapter{Cookies}\label{cookies}}
@@ -7877,7 +7914,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Fri Aug 28 2020 14:52:22 GMT+0200 (Central European Summer Time)"
+## [1] "Fri Aug 28 2020 16:39:15 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -7887,7 +7924,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Fri Aug 28 2020 14:52:22 GMT+0200 (Central European Summer Time)"
+## [1] "Fri Aug 28 2020 16:39:15 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -8424,7 +8461,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] -82.71
+## [1] 12.31
 \end{verbatim}
 
 \begin{Shaded}

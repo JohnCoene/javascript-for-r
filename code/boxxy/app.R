@@ -1,6 +1,16 @@
 library(shiny)
 
-boxxy <- function(title, value, color = "#ef476f", animate = TRUE){
+boxxy <- function(title, value, color = NULL, animate = TRUE){
+
+  value <- sum(value)
+
+  # dynamic color
+  if(is.null(color))
+    if(value > 100)
+      color <- "#ef476f"
+    else
+      color <- "#06d6a0"
+
   list(title = title, value = value, color = color, animate = animate)
 }
 

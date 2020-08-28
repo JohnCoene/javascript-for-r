@@ -1,6 +1,6 @@
 # Custom Outputs
 
-In this chapter we create a custom shiny output, in practical terms this creates custom `render*` and `*Output` functions to use in Shiny. This will be demonstrated by creating something akin to the `valueBox` available in the shinydashboard [@R-shinydashboard] package. While similar to what shinydashboard provides this box will 1) be fully customisable and 2) available in any shiny application. 
+In this chapter we create a custom shiny output, in practical terms this creates custom `render*` and `*Output` functions to use in Shiny. This will be demonstrated by creating something akin to the `valueBox` available in the shinydashboard [@R-shinydashboard] package. While similar to what shinydashboard provides this box will 1) be fully customisable and 2) available in any shiny application 3) have additional functionalities. 
 
 The `valueBox` equivalent we shall build in this chapter is named "boxxy," and allows creating simple but colourful value boxes with animated numbers (by counting up to it) using [countUp.js](https://github.com/inorganik/countUp.js).
 
@@ -22,7 +22,7 @@ shinyApp(ui, server)
 
 ![Custom output example](images/boxxy-example.png)
 
-## Custom outputs inner-workings 
+## Custom Outputs Inner-workings 
 
 At the core, this consists in creating three functions; `boxxy`, `renderBoxxy` and `boxxyOutput` (analogous to `plot`, `renderPlot`, `plotOutput`) which are linked by an "output binding" in JavaScript. 
 
@@ -358,7 +358,7 @@ $.extend(boxxyBinding, {
 });
 ```
 
-### Register the output binding
+## Register the Output Binding
 
 Finally, the output binding must be registered with shiny. Note that it uses a unique string identifier, the [documentation](https://shiny.rstudio.com/articles/building-outputs.html) states:
 
@@ -687,3 +687,35 @@ server <- function(input, output){
 
 shinyApp(ui, server)
 ```
+
+## Preprocessing Custom Outputs
+
+One aspect that this example did not explore truly explore thus far is the idea that the function `boxxy` should preprocess the input more in order to be truly justify. Currently `boxxy` only wraps the arguments in a `list`, therefore the code below works too. 
+
+```r
+# works too
+output$theId <- renderBoxxy({
+  list(title = "The Title", value = 123, color = "blue", animate = TRUE)
+})
+```
+
+One the things `boxxy` could do is preprocess the input, below the function takes the sum of `value` to one pass a vector of any length and changes the default `color` argument to `NULL` so it is made dynamic based on the total `value`.
+
+```r
+boxxy <- function(title, value, color = NULL, animate = TRUE){
+
+  # sum the vector
+  value <- sum(value)
+
+  # dynamic color
+  if(is.null(color))
+    if(value > 100)
+      color <- "#ef476f"
+    else
+      color <- "#06d6a0"
+
+  list(title = title, value = value, color = color, animate = animate)
+}
+```
+
+This means boxxy could be used like so: `boxxy("Total", c(1,6,9))`.
