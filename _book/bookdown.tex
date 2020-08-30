@@ -201,7 +201,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2020-08-30}
+\date{2020-08-31}
 
 \begin{document}
 \maketitle
@@ -3670,7 +3670,7 @@ The \texttt{gio} function also has to extract the group to which the dataset bel
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "SharedData6a08148f"
+## [1] "SharedData9d3c3fb9"
 \end{verbatim}
 
 \begin{Shaded}
@@ -6833,12 +6833,6 @@ Shiny comes with a variety of inputs ranging from buttons to text fields, these 
 
 To explain and demonstrate how to build such a custom input we shall build a switch input which is essentially a fancy-looking checkbox that can be toggled on and off.
 
-\begin{figure}
-\centering
-\includegraphics{images/bootstrap-input-group-addon.png}
-\caption{Bootstrap 3 input group addons}
-\end{figure}
-
 Custom shiny inputs very much resemble shiny outputs though they consist of a single R function (e.g.: \texttt{selectInput}) which generates the HTML and attaches necessary dependencies. For instance running the \texttt{shiny::textInput} function will print the HTML it generates in the R console.
 
 \begin{Shaded}
@@ -6889,6 +6883,19 @@ This should give the following directory structure.
 \section{Switch Input Style}\label{switch-input-style}}
 
 We will use \href{https://www.w3schools.com/howto/howto_css_switch.asp}{w3schools}' switch input template.
+
+The HTML of the input looks like so.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{<label}\OtherTok{ class=}\StringTok{"switch"}\KeywordTok{>}
+  \KeywordTok{<input}\OtherTok{ type=}\StringTok{"checkbox"}\KeywordTok{>}
+  \KeywordTok{<span}\OtherTok{ class=}\StringTok{"slider"}\KeywordTok{></span>}
+\KeywordTok{</label>}
+\end{Highlighting}
+\end{Shaded}
+
+While the CSS which stylises the checkbox input into a switch is the following.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6945,7 +6952,7 @@ We will use \href{https://www.w3schools.com/howto/howto_css_switch.asp}{w3school
 \end{Highlighting}
 \end{Shaded}
 
-This CSS changes a standard checkbox to look like a switch.
+The above CSS should be placed in the previously created \texttt{assets/styles.css} file.
 
 \begin{figure}
 \centering
@@ -6956,18 +6963,34 @@ This CSS changes a standard checkbox to look like a switch.
 \hypertarget{generate-input-html}{%
 \section{Generate Input HTML}\label{generate-input-html}}
 
-Let us start with the R function to be used in the shiny UI.
+Let us start with the R function to be used in the shiny UI. The \texttt{\textless{}input\textgreater{}} it generates bear a \texttt{switch-input} class which will be used to identify all switch inputs from JavaScript, this was also done in the custom output. The function also takes an \texttt{id}, this is also common across all inputs and outputs: a unique identifier is required in order to retrieve the input JavaScript-side.
+
+The input also takes a customary label and a \texttt{checked} argument to define the initial state of the switch.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{switchInput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id) \{}
+\CommentTok{\# app.R}
+\NormalTok{switchInput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id, label, }\DataTypeTok{checked =} \OtherTok{TRUE}\NormalTok{) \{}
 
-  \CommentTok{\# HTML}
-\NormalTok{  tags}\OperatorTok{$}\KeywordTok{label}\NormalTok{(}
-    \DataTypeTok{class =} \StringTok{"switch"}\NormalTok{,}
-\NormalTok{    tags}\OperatorTok{$}\KeywordTok{input}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{type =} \StringTok{"checkbox"}\NormalTok{, }\DataTypeTok{class =} \StringTok{"switch{-}input"}\NormalTok{, }\DataTypeTok{checked=}\StringTok{"true"}\NormalTok{),}
-\NormalTok{    tags}\OperatorTok{$}\KeywordTok{span}\NormalTok{(}\DataTypeTok{class =} \StringTok{"slider"}\NormalTok{)}
+\NormalTok{  input <{-}}\StringTok{ }\NormalTok{tags}\OperatorTok{$}\KeywordTok{input}\NormalTok{(}
+    \DataTypeTok{id =}\NormalTok{ id, }
+    \DataTypeTok{type =} \StringTok{"checkbox"}\NormalTok{, }
+    \DataTypeTok{class =} \StringTok{"switchInput"}
 \NormalTok{  )}
+
+  \ControlFlowTok{if}\NormalTok{(checked)}
+\NormalTok{    input <{-}}\StringTok{ }\NormalTok{htmltools}\OperatorTok{::}\KeywordTok{tagAppendAttributes}\NormalTok{(input, }\DataTypeTok{checked =} \OtherTok{NA}\NormalTok{)}
+
+\NormalTok{  form <{-}}\StringTok{ }\KeywordTok{tagList}\NormalTok{(}
+    \KeywordTok{p}\NormalTok{(label),}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{label}\NormalTok{(}
+      \DataTypeTok{class =} \StringTok{"switch"}\NormalTok{,}
+\NormalTok{      input,}
+\NormalTok{      tags}\OperatorTok{$}\KeywordTok{span}\NormalTok{(}\DataTypeTok{class =} \StringTok{"slider"}\NormalTok{)}
+\NormalTok{    )}
+\NormalTok{  )}
+
+  \KeywordTok{return}\NormalTok{(form)}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
@@ -6976,20 +6999,31 @@ As for the custom outputs, the dependencies (CSS and JavaScript binding) can pig
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{switchInput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id) \{}
+\CommentTok{\# app.R}
+\NormalTok{switchInput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id, label, }\DataTypeTok{checked =} \OtherTok{TRUE}\NormalTok{) \{}
 
-  \CommentTok{\# HTML}
-\NormalTok{  form <{-}}\StringTok{ }\NormalTok{tags}\OperatorTok{$}\KeywordTok{label}\NormalTok{(}
-    \DataTypeTok{class =} \StringTok{"switch"}\NormalTok{,}
-\NormalTok{    tags}\OperatorTok{$}\KeywordTok{input}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{type =} \StringTok{"checkbox"}\NormalTok{, }\DataTypeTok{class =} \StringTok{"switch{-}input"}\NormalTok{, }\DataTypeTok{checked=}\StringTok{"true"}\NormalTok{),}
-\NormalTok{    tags}\OperatorTok{$}\KeywordTok{span}\NormalTok{(}\DataTypeTok{class =} \StringTok{"slider"}\NormalTok{)}
+\NormalTok{  input <{-}}\StringTok{ }\NormalTok{tags}\OperatorTok{$}\KeywordTok{input}\NormalTok{(}
+    \DataTypeTok{id =}\NormalTok{ id, }
+    \DataTypeTok{type =} \StringTok{"checkbox"}\NormalTok{, }
+    \DataTypeTok{class =} \StringTok{"switchInput"}
 \NormalTok{  )}
 
-  \CommentTok{\# dependencies}
+  \ControlFlowTok{if}\NormalTok{(checked)}
+\NormalTok{    input <{-}}\StringTok{ }\NormalTok{htmltools}\OperatorTok{::}\KeywordTok{tagAppendAttributes}\NormalTok{(input, }\DataTypeTok{checked =} \OtherTok{NA}\NormalTok{)}
+
+\NormalTok{  form <{-}}\StringTok{ }\KeywordTok{tagList}\NormalTok{(}
+    \KeywordTok{p}\NormalTok{(label),}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{label}\NormalTok{(}
+      \DataTypeTok{class =} \StringTok{"switch"}\NormalTok{,}
+\NormalTok{      input,}
+\NormalTok{      tags}\OperatorTok{$}\KeywordTok{span}\NormalTok{(}\DataTypeTok{class =} \StringTok{"slider"}\NormalTok{)}
+\NormalTok{    )}
+\NormalTok{  )}
+
 \NormalTok{  path <{-}}\StringTok{ }\KeywordTok{normalizePath}\NormalTok{(}\StringTok{"./assets"}\NormalTok{)}
 
 \NormalTok{  deps <{-}}\StringTok{ }\NormalTok{htmltools}\OperatorTok{::}\KeywordTok{htmlDependency}\NormalTok{(}
-    \DataTypeTok{name =} \StringTok{"textInputPlus"}\NormalTok{,}
+    \DataTypeTok{name =} \StringTok{"switchInput"}\NormalTok{,}
     \DataTypeTok{version =} \StringTok{"1.0.0"}\NormalTok{,}
     \DataTypeTok{src =} \KeywordTok{c}\NormalTok{(}\DataTypeTok{file =}\NormalTok{ path),}
     \DataTypeTok{script =} \StringTok{"binding.js"}\NormalTok{,}
@@ -7003,6 +7037,379 @@ As for the custom outputs, the dependencies (CSS and JavaScript binding) can pig
 
 \hypertarget{javascript-input-binding}{%
 \section{JavaScript Input Binding}\label{javascript-input-binding}}
+
+The JavaScript input binding is instantiated from \texttt{Shiny.InputBinding}, this is similar to output bindings which are instantiated from \texttt{Shiny.OutputBinding}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{var}\NormalTok{ switchInput }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{InputBinding}\NormalTok{()}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+Then again we ``extend'' the binding, this consists of adding several methods.
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{find} returns all the relevant inputs.
+\item
+  \texttt{getId} returns the unique identifier of the input.
+\item
+  \texttt{getValue} returns the value of the input to be sent to the server.
+\item
+  \texttt{setValue} used to set the value of the input.
+\item
+  \texttt{receiveMessage} used to receive messages from the server and, with \texttt{setValue}, change the input value.
+\item
+  \texttt{subscribe} tells shiny when and how to send the updated input value to the server.
+\item
+  \texttt{unsubscribe} removes event handlers, stops shiny from sending updated values to the server.
+\end{itemize}
+
+\hypertarget{find-inputs}{%
+\subsection{Find Inputs}\label{find-inputs}}
+
+The \texttt{find} method looks for all the relevant HTML elements in the document (\texttt{scope}), and returns them as an array. Many other method we are about to implement will accept \texttt{el} as an argument, this will ultimately be one of the elements returned by \texttt{find}.
+
+Generally the \texttt{find} method is used in conjunction with a \texttt{class}, hence the \texttt{\textless{}input\textgreater{}} generated by \texttt{switchInput} bears a class of the same name \texttt{switchInput}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{var}\NormalTok{ switchInput }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{InputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(switchInput}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".switchInput"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{get-input-id}{%
+\subsection{Get Input Id}\label{get-input-id}}
+
+The \texttt{getId} is exactly it seems to be, it returns the \texttt{id} of the element. It looks for that id as \texttt{data-input-id} attribute and if that is not found returns the \texttt{id}; this can be observed in the \href{https://github.com/rstudio/shiny/blob/master/srcjs/input_binding.js\#L9}{source code}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{this}\NormalTok{.}\AttributeTok{getId} \OperatorTok{=} \KeywordTok{function}\NormalTok{(el) }\OperatorTok{\{}
+  \ControlFlowTok{return}\NormalTok{ el[}\StringTok{\textquotesingle{}data{-}input{-}id\textquotesingle{}}\NormalTok{] }\OperatorTok{||} \VariableTok{el}\NormalTok{.}\AttributeTok{id}\OperatorTok{;}
+\OperatorTok{\};}
+\end{Highlighting}
+\end{Shaded}
+
+Since the default works we have no need to use it for the switch input.
+
+\hypertarget{get-input-value}{%
+\subsection{Get Input Value}\label{get-input-value}}
+
+This retrieves the value of the input, this is often the attribute of the same name (\texttt{value="something"}) which can be obtain with the jQuery \texttt{.val} method. The switch is an input of type \texttt{checkbox} and therefore uses the \texttt{checked} prop.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{var}\NormalTok{ switchInput }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{InputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(switchInput}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".switchInput"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{getValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(el).}\AttributeTok{prop}\NormalTok{(}\StringTok{"checked"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+
+\VariableTok{Shiny}\NormalTok{.}\VariableTok{inputBindings}\NormalTok{.}\AttributeTok{register}\NormalTok{(switchInput}\OperatorTok{,} \StringTok{\textquotesingle{}john.switch\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{set-input-value}{%
+\subsection{Set Input Value}\label{set-input-value}}
+
+The \texttt{setValue} method sets the value of the input, hence it also accepts the \texttt{value} object: the actual value to which the input should be set. Then again, most inputs will likely use the \texttt{value} attribute which can be set in jQuery with \texttt{\$(el).val(newValue)} the checkbox uses the \texttt{checked} prop which is slightly different.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{var}\NormalTok{ switchInput }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{InputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(switchInput}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".switchInput"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{getValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(el).}\AttributeTok{prop}\NormalTok{(}\StringTok{"checked"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{setValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ value) }\OperatorTok{\{}
+    \AttributeTok{$}\NormalTok{(el).}\AttributeTok{prop}\NormalTok{(}\StringTok{"checked"}\OperatorTok{,}\NormalTok{ value).}\AttributeTok{change}\NormalTok{()}\OperatorTok{;}
+  \OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Note the use of the \texttt{change} method which ensures the event is fired, otherwise the input is checked or unchecked the event that tells JavaScript this has happened is not fired and this will cause issues later on.
+
+\hypertarget{receive-input-messages}{%
+\subsection{Receive Input Messages}\label{receive-input-messages}}
+
+The \texttt{setValue} method previously defined is only really useful when combined with \texttt{receiveMessage}, the latter handles messages sent to the input, these are generally sent from the server via functions the likes of \texttt{updateSelectInput}. Therefore it uses the \texttt{setValue} method to define the value of the input. Note that \texttt{value} is therefore a serialised JSON input coming from the R server and can be of any complexity you desire. Below we use it such that expect a simple boolean: the checkbox (switch) can be either on (\texttt{true}) or off (\texttt{false}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{var}\NormalTok{ switchInput }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{InputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(switchInput}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".switchInput"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{getValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(el).}\AttributeTok{prop}\NormalTok{(}\StringTok{"checked"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{setValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ value) }\OperatorTok{\{}
+    \AttributeTok{$}\NormalTok{(el).}\AttributeTok{prop}\NormalTok{(}\StringTok{"checked"}\OperatorTok{,}\NormalTok{ value).}\AttributeTok{change}\NormalTok{()}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{receiveMessage}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ value)}\OperatorTok{\{}
+    \KeywordTok{this}\NormalTok{.}\AttributeTok{setValue}\NormalTok{(el}\OperatorTok{,}\NormalTok{ value)}\OperatorTok{;}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+
+\VariableTok{Shiny}\NormalTok{.}\VariableTok{inputBindings}\NormalTok{.}\AttributeTok{register}\NormalTok{(switchInput}\OperatorTok{,} \StringTok{\textquotesingle{}john.switch\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{subscribe-unsubscribe-inputs}{%
+\subsection{Subscribe \& Unsubscribe Inputs}\label{subscribe-unsubscribe-inputs}}
+
+Finally, a crucial method is \texttt{subscribe}, this is ran when the input is registered (more on that later) and is used to determine when shiny sends new values of the input back to the server. This method also accepts a \texttt{callback} which is the very function that tells shiny to update the value. This callback function accepts a single boolean value which in the \href{https://github.com/rstudio/shiny/blob/master/srcjs/input_binding.js\#L18}{source code} states is used to enable debouncing or throttling. This is covered in the next section on rate policy.
+
+This method often consists of an event listener that observes changes on the input to send its to the server. In layman terms, when the switch input changes (on to off or vice versa) run the \texttt{callback} function which sends the data to the server.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{var}\NormalTok{ switchInput }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{InputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(switchInput}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".switchInput"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{getValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(el).}\AttributeTok{prop}\NormalTok{(}\StringTok{"checked"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{setValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ value) }\OperatorTok{\{}
+    \AttributeTok{$}\NormalTok{(el).}\AttributeTok{prop}\NormalTok{(}\StringTok{"checked"}\OperatorTok{,}\NormalTok{ value).}\AttributeTok{change}\NormalTok{()}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{receiveMessage}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ value)}\OperatorTok{\{}
+    \KeywordTok{this}\NormalTok{.}\AttributeTok{setValue}\NormalTok{(el}\OperatorTok{,}\NormalTok{ value)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{subscribe}\OperatorTok{:} \KeywordTok{function}\NormalTok{ (el}\OperatorTok{,}\NormalTok{ callback) }\OperatorTok{\{}
+    \AttributeTok{$}\NormalTok{(el).}\AttributeTok{on}\NormalTok{(}\StringTok{"change.switchInput"}\OperatorTok{,} \KeywordTok{function}\NormalTok{()}\OperatorTok{\{}
+      \AttributeTok{callback}\NormalTok{(}\KeywordTok{true}\NormalTok{)}\OperatorTok{;}
+    \OperatorTok{\}}\NormalTok{)}
+  \OperatorTok{\},}
+  \DataTypeTok{unsubscribe}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el) }\OperatorTok{\{}
+    \AttributeTok{$}\NormalTok{(el).}\AttributeTok{off}\NormalTok{(}\StringTok{".switchInput"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+Note that in the \texttt{subscribe} method we listen for \texttt{change}s on the input, hence the \texttt{setValue} also uses jQuery's \texttt{change} method; it ensures this event is fired and that shiny will subsequently pick it up.
+
+\begin{rmdnote}
+Make sure the \texttt{setValue} method triggers the event observed in
+\texttt{subscribe}
+\end{rmdnote}
+
+\hypertarget{input-rate-policy}{%
+\subsection{Input Rate Policy}\label{input-rate-policy}}
+
+The rate policy determines how frequently the front-end should send new input values back to the server. The \texttt{getRatePolicy} method should return an object that describes that, it is a JSON array with two variable \texttt{policy} and \texttt{delay}.
+
+\textbf{direct}
+
+The \texttt{direct} policy tells shiny to sends any new value directly, however often this occurs. Therefore, this policy does not make use of \texttt{delay}.
+
+\textbf{debounce}
+
+The \texttt{debounce} policy tells shiny to ignore all new values until no new values have been received for \texttt{delay} milliseconds.
+
+\textbf{throttle}
+
+The \texttt{throttle} policy means that no more than one value will be sent per \texttt{delay} milliseconds.
+
+The rate of a switch input is not expected to be high it's good practice to throttle it to ensure the server does not receive too many requests. This will admittedly be more relevant to inputs that see a higher rate of change like text fields which unless debounced send every key stroke to the server.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{var}\NormalTok{ switchInput }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{InputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(switchInput}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".switchInput"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{getValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(el).}\AttributeTok{prop}\NormalTok{(}\StringTok{"checked"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{setValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ value) }\OperatorTok{\{}
+    \AttributeTok{$}\NormalTok{(el).}\AttributeTok{prop}\NormalTok{(}\StringTok{"checked"}\OperatorTok{,}\NormalTok{ value).}\AttributeTok{change}\NormalTok{()}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{receiveMessage}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ value)}\OperatorTok{\{}
+    \KeywordTok{this}\NormalTok{.}\AttributeTok{setValue}\NormalTok{(el}\OperatorTok{,}\NormalTok{ value)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{subscribe}\OperatorTok{:} \KeywordTok{function}\NormalTok{ (el}\OperatorTok{,}\NormalTok{ callback) }\OperatorTok{\{}
+    \AttributeTok{$}\NormalTok{(el).}\AttributeTok{on}\NormalTok{(}\StringTok{"change.switchInput"}\OperatorTok{,} \KeywordTok{function}\NormalTok{()}\OperatorTok{\{}
+      \AttributeTok{callback}\NormalTok{(}\KeywordTok{true}\NormalTok{)}\OperatorTok{;}
+    \OperatorTok{\}}\NormalTok{)}
+  \OperatorTok{\},}
+  \DataTypeTok{unsubscribe}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el) }\OperatorTok{\{}
+    \AttributeTok{$}\NormalTok{(el).}\AttributeTok{off}\NormalTok{(}\StringTok{".switchInput"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{getRatePolicy}\OperatorTok{:} \KeywordTok{function}\NormalTok{()}\OperatorTok{\{}
+    \ControlFlowTok{return} \OperatorTok{\{}
+      \DataTypeTok{policy}\OperatorTok{:} \StringTok{\textquotesingle{}throttle\textquotesingle{}}\OperatorTok{,}
+      \DataTypeTok{delay}\OperatorTok{:} \DecValTok{1000}
+    \OperatorTok{\}}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{registering-the-input}{%
+\subsection{Registering the Input}\label{registering-the-input}}
+
+Finally, like the custom output, the input can be registered with shiny, it too takes a unique identifier as second argument.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{var}\NormalTok{ switchInput }\OperatorTok{=} \KeywordTok{new} \VariableTok{Shiny}\NormalTok{.}\AttributeTok{InputBinding}\NormalTok{()}\OperatorTok{;}
+
+\VariableTok{$}\NormalTok{.}\AttributeTok{extend}\NormalTok{(switchInput}\OperatorTok{,} \OperatorTok{\{}
+  \DataTypeTok{find}\OperatorTok{:} \KeywordTok{function}\NormalTok{(scope) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(scope).}\AttributeTok{find}\NormalTok{(}\StringTok{".switchInput"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{getValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el) }\OperatorTok{\{}
+    \ControlFlowTok{return} \AttributeTok{$}\NormalTok{(el).}\AttributeTok{prop}\NormalTok{(}\StringTok{"checked"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{setValue}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ value) }\OperatorTok{\{}
+    \AttributeTok{$}\NormalTok{(el).}\AttributeTok{prop}\NormalTok{(}\StringTok{"checked"}\OperatorTok{,}\NormalTok{ value).}\AttributeTok{change}\NormalTok{()}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{receiveMessage}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el}\OperatorTok{,}\NormalTok{ value)}\OperatorTok{\{}
+    \KeywordTok{this}\NormalTok{.}\AttributeTok{setValue}\NormalTok{(el}\OperatorTok{,}\NormalTok{ value)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{subscribe}\OperatorTok{:} \KeywordTok{function}\NormalTok{ (el}\OperatorTok{,}\NormalTok{ callback) }\OperatorTok{\{}
+    \AttributeTok{$}\NormalTok{(el).}\AttributeTok{on}\NormalTok{(}\StringTok{"change.switchInput"}\OperatorTok{,} \KeywordTok{function}\NormalTok{()}\OperatorTok{\{}
+      \AttributeTok{callback}\NormalTok{(}\KeywordTok{true}\NormalTok{)}\OperatorTok{;}
+    \OperatorTok{\}}\NormalTok{)}
+  \OperatorTok{\},}
+  \DataTypeTok{unsubscribe}\OperatorTok{:} \KeywordTok{function}\NormalTok{(el) }\OperatorTok{\{}
+    \AttributeTok{$}\NormalTok{(el).}\AttributeTok{off}\NormalTok{(}\StringTok{".switchInput"}\NormalTok{)}\OperatorTok{;}
+  \OperatorTok{\},}
+  \DataTypeTok{getRatePolicy}\OperatorTok{:} \KeywordTok{function}\NormalTok{()}\OperatorTok{\{}
+    \ControlFlowTok{return} \OperatorTok{\{}
+      \DataTypeTok{policy}\OperatorTok{:} \StringTok{\textquotesingle{}throttle\textquotesingle{}}\OperatorTok{,}
+      \DataTypeTok{delay}\OperatorTok{:} \DecValTok{1000}
+    \OperatorTok{\}}
+  \OperatorTok{\}}
+\OperatorTok{\}}\NormalTok{)}\OperatorTok{;}
+
+\VariableTok{Shiny}\NormalTok{.}\VariableTok{inputBindings}\NormalTok{.}\AttributeTok{register}\NormalTok{(switchInput}\OperatorTok{,} \StringTok{\textquotesingle{}john.switch\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+This wraps up a custom input, it can now be used in a shiny application
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(shiny)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+  \KeywordTok{switchInput}\NormalTok{(}\StringTok{"switch"}\NormalTok{, }\StringTok{"Show plot"}\NormalTok{, }\OtherTok{FALSE}\NormalTok{),}
+  \KeywordTok{plotOutput}\NormalTok{(}\StringTok{"plot"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output, session)\{}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{plot <{-}}\StringTok{ }\KeywordTok{renderPlot}\NormalTok{(\{}
+    \KeywordTok{print}\NormalTok{(input}\OperatorTok{$}\ControlFlowTok{switch}\NormalTok{)}
+
+    \ControlFlowTok{if}\NormalTok{(}\OperatorTok{!}\NormalTok{input}\OperatorTok{$}\ControlFlowTok{switch}\NormalTok{)}
+      \KeywordTok{return}\NormalTok{()}
+
+    \KeywordTok{plot}\NormalTok{(cars)}
+\NormalTok{  \})}
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{images/switch-example.png}
+\caption{Switch input example}
+\end{figure}
+
+\hypertarget{update-input}{%
+\section{Update Input}\label{update-input}}
+
+The JavaScript function was provided with the required methods to receive updates from the server but the R function that sends those updates is yet to be written. It looks very much like previous messages send from the server.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{update\_switch\_input <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id, value, }
+  \DataTypeTok{session =}\NormalTok{ shiny}\OperatorTok{::}\KeywordTok{getDefaultReactiveDomain}\NormalTok{())\{}
+\NormalTok{  session}\OperatorTok{$}\KeywordTok{sendInputMessage}\NormalTok{(id, value)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+This pattern was used previously albeit using \texttt{sendCustomMessage}, using \texttt{sendInputMessage} the message can be sent straight to the \texttt{receiveMessage} handler of the input using 1) the \texttt{id} of the input and 2) the data one wants to send.
+
+We can adapt the application to make use of this button.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(shiny)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+  \KeywordTok{actionButton}\NormalTok{(}\StringTok{"chg"}\NormalTok{, }\StringTok{"Switch ON"}\NormalTok{),}
+  \KeywordTok{switchInput}\NormalTok{(}\StringTok{"switch"}\NormalTok{, }\StringTok{"Switch input"}\NormalTok{, }\OtherTok{FALSE}\NormalTok{),}
+  \KeywordTok{plotOutput}\NormalTok{(}\StringTok{"plot"}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output, session)\{}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{plot <{-}}\StringTok{ }\KeywordTok{renderPlot}\NormalTok{(\{}
+    \KeywordTok{print}\NormalTok{(input}\OperatorTok{$}\ControlFlowTok{switch}\NormalTok{)}
+    
+    \ControlFlowTok{if}\NormalTok{(}\OperatorTok{!}\NormalTok{input}\OperatorTok{$}\ControlFlowTok{switch}\NormalTok{)}
+      \KeywordTok{return}\NormalTok{()}
+
+    \KeywordTok{plot}\NormalTok{(cars)}
+\NormalTok{  \})}
+
+  \KeywordTok{observeEvent}\NormalTok{(input}\OperatorTok{$}\NormalTok{chg, \{}
+    \KeywordTok{update\_switch\_input}\NormalTok{(}\StringTok{"switch"}\NormalTok{, }\OtherTok{TRUE}\NormalTok{, session)}
+\NormalTok{  \})}
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+The diagram below attempts to summarize the various elements that were put together and used in the last application.
+
+It all starts from the \texttt{switchInput} function which generates the HTML defining the switch input and its initial state. In the \texttt{subscribe} method, an event listener checks for changes on this HTML element (\texttt{\$(el).on(\textquotesingle{}change\textquotesingle{},\ ...)}), every time it changes (check/unchecked) it fires the shiny \texttt{callback} which sends the value of the input obtained from \texttt{getValue} through the websocket. When the value of the input is changed from the server this value travels through the websocket to the front-end where \texttt{receiveMessage} uses \texttt{setValue} to programmatically change the check box which incidentally triggers the change event and back we go.
+
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-59-1.png}
+
+\hypertarget{exercise}{%
+\section{Exercise}\label{exercise}}
+
+\begin{itemize}
+\tightlist
+\item
+  Add a \texttt{toggle\_switch\_input} that toggles between states so it turns it off when it's on and vice versa
+\item
+  Bring support for \href{https://getbootstrap.com/docs/3.3/components/\#input-groups-basic}{Bootstrap 3 text input addon}
+\end{itemize}
 
 \hypertarget{cookies}{%
 \chapter{Cookies}\label{cookies}}
@@ -8091,7 +8498,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Aug 30 2020 17:33:26 GMT+0200 (Central European Summer Time)"
+## [1] "Mon Aug 31 2020 00:57:45 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -8101,7 +8508,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Aug 30 2020 17:33:26 GMT+0200 (Central European Summer Time)"
+## [1] "Mon Aug 31 2020 00:57:45 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -8638,7 +9045,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 67.82
+## [1] 7.426
 \end{verbatim}
 
 \begin{Shaded}

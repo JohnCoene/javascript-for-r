@@ -12,7 +12,7 @@ $.extend(switchInput, {
     return $(el).prop("checked");
   },
   setValue: function(el, value) {
-    return $(el).prop("checked", value);
+    $(el).prop("checked", value).change();
   },
   receiveMessage: function(el, value){
     this.setValue(el, value);
@@ -20,7 +20,7 @@ $.extend(switchInput, {
   subscribe: function (el, callback) {
     $(el).on("change.switchInput", function(){
       callback(true);
-    })
+    });
   },
   unsubscribe: function(el) {
     $(el).off(".switchInput");

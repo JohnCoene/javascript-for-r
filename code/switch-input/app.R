@@ -38,17 +38,24 @@ update_switch_input <- function(id, value, session = shiny::getDefaultReactiveDo
 }
 
 ui <- fluidPage(
-  actionButton("chg", "change input to TRUE"),
-  switchInput("switchIt", "Switch input", FALSE)
+  actionButton("chg", "Switch ON"),
+  switchInput("switch", "Switch input", FALSE),
+  plotOutput("plot")
 )
 
 server <- function(input, output, session){
-  observeEvent(input$switchIt, {
-    print(input$switchIt)
+
+  output$plot <- renderPlot({
+    print(input$switch)
+    
+    if(!input$switch)
+      return()
+
+    plot(cars)
   })
 
   observeEvent(input$chg, {
-    update_switch_input("switchIt", TRUE, session)
+    update_switch_input("switch", TRUE, session)
   })
 }
 

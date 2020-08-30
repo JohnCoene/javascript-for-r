@@ -4,8 +4,6 @@ Shiny comes with a variety of inputs ranging from buttons to text fields, these 
 
 To explain and demonstrate how to build such a custom input we shall build a switch input which is essentially a fancy-looking checkbox that can be toggled on and off.
 
-![Bootstrap 3 input group addons](images/bootstrap-input-group-addon.png)
-
 Custom shiny inputs very much resemble shiny outputs though they consist of a single R function (e.g.: `selectInput`) which generates the HTML and attaches necessary dependencies. For instance running the `shiny::textInput` function will print the HTML it generates in the R console.
 
 ```r
@@ -267,9 +265,11 @@ $.extend(switchInput, {
     return $(el).prop("checked");
   },
   setValue: function(el, value) {
-    return $(el).prop("checked", value);
+    $(el).prop("checked", value).change();
   }
 ```
+
+Note the use of the `change` method which ensures the event is fired, otherwise the input is checked or unchecked the event that tells JavaScript this has happened is not fired and this will cause issues later on.
 
 ### Receive Input Messages
 
@@ -286,7 +286,7 @@ $.extend(switchInput, {
     return $(el).prop("checked");
   },
   setValue: function(el, value) {
-    return $(el).prop("checked", value);
+    $(el).prop("checked", value).change();
   },
   receiveMessage: function(el, value){
     this.setValue(el, value);
@@ -313,7 +313,7 @@ $.extend(switchInput, {
     return $(el).prop("checked");
   },
   setValue: function(el, value) {
-    return $(el).prop("checked", value);
+    $(el).prop("checked", value).change();
   },
   receiveMessage: function(el, value){
     this.setValue(el, value);
@@ -329,6 +329,12 @@ $.extend(switchInput, {
 });
 ```
 
+Note that in the `subscribe` method we listen for `change`s on the input, hence the `setValue` also uses jQuery's `change` method; it ensures this event is fired and that shiny will subsequently pick it up. 
+
+```{block, type='rmdnote'}
+Make sure the `setValue` method triggers the event observed in `subscribe`
+```
+
 ### Input Rate Policy
 
 The rate policy determines how frequently the front-end should send new input values back to the server. The `getRatePolicy` method should return an object that describes that, it is a JSON array with two variable `policy` and `delay`.
@@ -339,11 +345,13 @@ The `direct` policy tells shiny to sends any new value directly, however often t
 
 __debounce__
 
-The `debounce` policy tells shiny to ignore all events until no events have been received for `delay` milliseconds.
+The `debounce` policy tells shiny to ignore all new values until no new values have been received for `delay` milliseconds.
 
 __throttle__
 
-The `throttle` policy means that no more than one event will be sent per `delay` milliseconds.
+The `throttle` policy means that no more than one value will be sent per `delay` milliseconds.
+
+The rate of a switch input is not expected to be high it's good practice to throttle it to ensure the server does not receive too many requests. This will admittedly be more relevant to inputs that see a higher rate of change like text fields which unless debounced send every key stroke to the server.
 
 ```js
 var switchInput = new Shiny.InputBinding();
@@ -356,7 +364,44 @@ $.extend(switchInput, {
     return $(el).prop("checked");
   },
   setValue: function(el, value) {
-    return $(el).prop("checked", value);
+    $(el).prop("checked", value).change();
+  },
+  receiveMessage: function(el, value){
+    this.setValue(el, value);
+  },
+  subscribe: function (el, callback) {
+    $(el).on("change.switchInput", function(){
+      callback(true);
+    })
+  },
+  unsubscribe: function(el) {
+    $(el).off(".switchInput");
+  },
+  getRatePolicy: function(){
+    return {
+      policy: 'throttle',
+      delay: 1000
+    }
+  }
+});
+```
+
+### Registering the Input
+
+Finally, like the custom output, the input can be registered with shiny, it too takes a unique identifier as second argument.
+
+```js
+var switchInput = new Shiny.InputBinding();
+
+$.extend(switchInput, {
+  find: function(scope) {
+    return $(scope).find(".switchInput");
+  },
+  getValue: function(el) {
+    return $(el).prop("checked");
+  },
+  setValue: function(el, value) {
+    $(el).prop("checked", value).change();
   },
   receiveMessage: function(el, value){
     this.setValue(el, value);
@@ -380,15 +425,90 @@ $.extend(switchInput, {
 Shiny.inputBindings.register(switchInput, 'john.switch');
 ```
 
+This wraps up a custom input, it can now be used in a shiny application
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  switchInput("switch", "Show plot", FALSE),
+  plotOutput("plot")
+)
+
+server <- function(input, output, session){
+
+  output$plot <- renderPlot({
+    print(input$switch)
+
+    if(!input$switch)
+      return()
+
+    plot(cars)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+![Switch input example](images/switch-example.png)
+
+## Update Input
+
+The JavaScript function was provided with the required methods to receive updates from the server but the R function that sends those updates is yet to be written. It looks very much like previous messages send from the server.
+
+```r
+update_switch_input <- function(id, value, 
+  session = shiny::getDefaultReactiveDomain()){
+  session$sendInputMessage(id, value)
+}
+```
+
+This pattern was used previously albeit using `sendCustomMessage`, using `sendInputMessage` the message can be sent straight to the `receiveMessage` handler of the input using 1) the `id` of the input and 2) the data one wants to send.
+
+We can adapt the application to make use of this button.
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  actionButton("chg", "Switch ON"),
+  switchInput("switch", "Switch input", FALSE),
+  plotOutput("plot")
+)
+
+server <- function(input, output, session){
+
+  output$plot <- renderPlot({
+    print(input$switch)
+    
+    if(!input$switch)
+      return()
+
+    plot(cars)
+  })
+
+  observeEvent(input$chg, {
+    update_switch_input("switch", TRUE, session)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+The diagram below attempts to summarize the various elements that were put together and used in the last application.
+
+It all starts from the `switchInput` function which generates the HTML defining the switch input and its initial state. In the `subscribe` method, an event listener checks for changes on this HTML element (`$(el).on('change', ...)`), every time it changes (check/unchecked) it fires the shiny `callback` which sends the value of the input obtained from `getValue` through the websocket. When the value of the input is changed from the server this value travels through the websocket to the front-end where `receiveMessage` uses `setValue` to programmatically change the check box which incidentally triggers the change event and back we go.
+
 ```{r, echo=FALSE}
 DiagrammeR::grViz("
 digraph {
   graph [rankdir = LR]
-  node [shape=record fontsize=10];
+  node [shape=record fontsize=12];
 
   subgraph cluster_r {
     node [color=royalBlue];
-    'updateInput'
+    'update_switch_input'
+    'switchInput'
     'Input list'
 
     label = 'R server'
@@ -405,13 +525,19 @@ digraph {
     label = 'Front-end'
   }
 
-  edge [fontsize=8]
-  'updateInput' -> 'receiveMessage' [label='websocket']
+  edge [fontsize=10]
+  'update_switch_input' -> 'receiveMessage' [xlabel='websocket']
   'receiveMessage' -> 'setValue' [label='value']
+  'switchInput' -> 'HTML input' [label='websocket']
   'setValue' -> 'HTML input' [label='value']
-  'HTML input' -> 'subscribe' [label='event observer']
+  'HTML input' -> 'subscribe' [label='event listener']
   'subscribe' -> 'getValue' [label='callback']
   'getValue' -> 'Input list' [label='websocket']
 }
 ")
 ```
+
+## Exercise
+
+- Add a `toggle_switch_input` that toggles between states so it turns it off when it's on and vice versa
+- Bring support for [Bootstrap 3 text input addon](https://getbootstrap.com/docs/3.3/components/#input-groups-basic)
