@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 6 A Realistic Widget | JavaScript for R</title>
+  <title>Chapter 16 Custom Inputs | JavaScript for R</title>
   <meta name="description" content="Invite JavaScript into your Data Science workflow." />
   <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 6 A Realistic Widget | JavaScript for R" />
+  <meta property="og:title" content="Chapter 16 Custom Inputs | JavaScript for R" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="JohnCoene/javascript-for-r" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 6 A Realistic Widget | JavaScript for R" />
+  <meta name="twitter:title" content="Chapter 16 Custom Inputs | JavaScript for R" />
   
   <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="your-first-widget.html"/>
-<link rel="next" href="the-full-monty.html"/>
+<link rel="prev" href="custom-outputs.html"/>
+<link rel="next" href="cookies.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -424,181 +424,135 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="a-realistic-widget" class="section level1" number="6">
-<h1><span class="header-section-number">Chapter 6</span> A Realistic Widget</h1>
-<p>In this section we build a package called <code>typed</code>, which wraps the JavaScript library of the same name, <a href="https://github.com/mattboldt/typed.js/">typed.js</a> that mimics text being typed. This builds upon many things we explored in the playground package.</p>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="a-realistic-widget.html#cb102-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;typed&quot;</span>)</span>
-<span id="cb102-2"><a href="a-realistic-widget.html#cb102-2"></a>htmlwidgets<span class="op">::</span><span class="kw">scaffoldWidget</span>(<span class="st">&quot;typed&quot;</span>)</span></code></pre></div>
-<p>As done with candidate libraries, let’s take a look at documentation of <a href="https://github.com/mattboldt/typed.js/">typed.js</a> to see how typed.js works.</p>
-<div class="sourceCode" id="cb103"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb103-1"><a href="a-realistic-widget.html#cb103-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
-<span id="cb103-2"><a href="a-realistic-widget.html#cb103-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb103-3"><a href="a-realistic-widget.html#cb103-3"></a></span>
-<span id="cb103-4"><a href="a-realistic-widget.html#cb103-4"></a><span class="kw">&lt;head&gt;</span></span>
-<span id="cb103-5"><a href="a-realistic-widget.html#cb103-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
-<span id="cb103-6"><a href="a-realistic-widget.html#cb103-6"></a>  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;typed.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb103-7"><a href="a-realistic-widget.html#cb103-7"></a><span class="kw">&lt;/head&gt;</span></span>
-<span id="cb103-8"><a href="a-realistic-widget.html#cb103-8"></a></span>
-<span id="cb103-9"><a href="a-realistic-widget.html#cb103-9"></a><span class="kw">&lt;body&gt;</span></span>
-<span id="cb103-10"><a href="a-realistic-widget.html#cb103-10"></a>  <span class="co">&lt;!-- div to hold visualisation --&gt;</span></span>
-<span id="cb103-11"><a href="a-realistic-widget.html#cb103-11"></a>  <span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;element&quot;</span><span class="kw">&gt;&lt;/div&gt;</span></span>
-<span id="cb103-12"><a href="a-realistic-widget.html#cb103-12"></a></span>
-<span id="cb103-13"><a href="a-realistic-widget.html#cb103-13"></a>  <span class="co">&lt;!-- Script to create visualisation --&gt;</span></span>
-<span id="cb103-14"><a href="a-realistic-widget.html#cb103-14"></a>  <span class="kw">&lt;script&gt;</span></span>
-<span id="cb103-15"><a href="a-realistic-widget.html#cb103-15"></a>    <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;.element&#39;</span><span class="op">,</span> <span class="op">{</span></span>
-<span id="cb103-16"><a href="a-realistic-widget.html#cb103-16"></a>      <span class="dt">strings</span><span class="op">:</span> [<span class="st">&#39;First sentence.&#39;</span><span class="op">,</span> <span class="st">&#39;And a second sentence.&#39;</span>]</span>
-<span id="cb103-17"><a href="a-realistic-widget.html#cb103-17"></a>    <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb103-18"><a href="a-realistic-widget.html#cb103-18"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb103-19"><a href="a-realistic-widget.html#cb103-19"></a><span class="kw">&lt;/body&gt;</span></span>
-<span id="cb103-20"><a href="a-realistic-widget.html#cb103-20"></a></span>
-<span id="cb103-21"><a href="a-realistic-widget.html#cb103-21"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
-<p>The code above is not very different from what was observed in other libraries: the library is imported, there is a <code>&lt;div&gt;</code> where the output will be generated, and a script which also takes a selector and a JSON of options.</p>
-<div id="dependency" class="section level2" number="6.1">
-<h2><span class="header-section-number">6.1</span> Dependency</h2>
-<p>Once the package created and the widget scaffold laid down we need to add the JavaScript dependency without which nothing can move forward. The <a href="https://github.com/mattboldt/typed.js">documentation in the README of typed.js</a> states that it can be imported like so.</p>
-<div class="sourceCode" id="cb104"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb104-1"><a href="a-realistic-widget.html#cb104-1"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;https://cdn.jsdelivr.net/npm/typed.js@2.0.11&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span></code></pre></div>
-<p>First, we will download the dependency, which consists of a single JavaScript file, instead of using the CDN as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Below we place the dependency in a “typed” directory within the “htmlwidgets” folder.</p>
-<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="a-realistic-widget.html#cb105-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;./inst/htmlwidgets/typed&quot;</span>)</span>
-<span id="cb105-2"><a href="a-realistic-widget.html#cb105-2"></a>cdn &lt;-<span class="st"> &quot;https://cdn.jsdelivr.net/npm/typed.js@2.0.11&quot;</span></span>
-<span id="cb105-3"><a href="a-realistic-widget.html#cb105-3"></a><span class="kw">download.file</span>(cdn, <span class="st">&quot;./inst/htmlwidgets/typed/typed.min.js&quot;</span>)</span></code></pre></div>
-<p>This produces a directory that looks like this:</p>
+<div id="custom-inputs" class="section level1" number="16">
+<h1><span class="header-section-number">Chapter 16</span> Custom Inputs</h1>
+<p>Shiny comes with a variety of inputs ranging from buttons to text fields, these inputs send data from the client to the R server. Custom inputs are in fact no different than from shiny’s out-of-the-box inputs, they work very much the same way.</p>
+<p>To explain and demonstrate how to build such a custom input we shall build a switch input which is essentially a fancy-looking checkbox that can be toggled on and off.</p>
+<div class="figure">
+<img src="images/bootstrap-input-group-addon.png" alt="" />
+<p class="caption">Bootstrap 3 input group addons</p>
+</div>
+<p>Custom shiny inputs very much resemble shiny outputs though they consist of a single R function (e.g.: <code>selectInput</code>) which generates the HTML and attaches necessary dependencies. For instance running the <code>shiny::textInput</code> function will print the HTML it generates in the R console.</p>
+<div class="sourceCode" id="cb335"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb335-1"><a href="custom-inputs.html#cb335-1"></a>shiny<span class="op">::</span><span class="kw">textInput</span>(<span class="st">&quot;theId&quot;</span>, <span class="st">&quot;The label&quot;</span>)   </span></code></pre></div>
+<div class="sourceCode" id="cb336"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb336-1"><a href="custom-inputs.html#cb336-1"></a><span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;form-group shiny-input-container&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb336-2"><a href="custom-inputs.html#cb336-2"></a>  <span class="kw">&lt;label</span><span class="ot"> class=</span><span class="st">&quot;control-label&quot;</span><span class="ot"> for=</span><span class="st">&quot;theId&quot;</span><span class="kw">&gt;</span>The label<span class="kw">&lt;/label&gt;</span></span>
+<span id="cb336-3"><a href="custom-inputs.html#cb336-3"></a>  <span class="kw">&lt;input</span><span class="ot"> id=</span><span class="st">&quot;theId&quot;</span><span class="ot"> type=</span><span class="st">&quot;text&quot;</span><span class="ot"> class=</span><span class="st">&quot;form-control&quot;</span><span class="ot"> value=</span><span class="st">&quot;&quot;</span><span class="kw">/&gt;</span></span>
+<span id="cb336-4"><a href="custom-inputs.html#cb336-4"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
+<p>The R function is paired with an input binding akin to the output binding used in the previous chapter.</p>
+<div id="setup" class="section level2" number="16.1">
+<h2><span class="header-section-number">16.1</span> Setup</h2>
+<p>Let’s set up the necessary files and project structure.</p>
+<div class="sourceCode" id="cb337"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb337-1"><a href="custom-inputs.html#cb337-1"></a><span class="co"># create directory for application</span></span>
+<span id="cb337-2"><a href="custom-inputs.html#cb337-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;switch/assets&quot;</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb337-3"><a href="custom-inputs.html#cb337-3"></a></span>
+<span id="cb337-4"><a href="custom-inputs.html#cb337-4"></a><span class="co"># create R, JS, and CSS files</span></span>
+<span id="cb337-5"><a href="custom-inputs.html#cb337-5"></a><span class="kw">file.create</span>(<span class="st">&quot;app.R&quot;</span>)</span>
+<span id="cb337-6"><a href="custom-inputs.html#cb337-6"></a><span class="kw">file.create</span>(<span class="st">&quot;switch/assets/binding.js&quot;</span>)</span>
+<span id="cb337-7"><a href="custom-inputs.html#cb337-7"></a><span class="kw">file.create</span>(<span class="st">&quot;switch/assets/styles.css&quot;</span>)</span></code></pre></div>
+<p>This should give the following directory structure.</p>
 <pre><code>.
-├── DESCRIPTION
-├── NAMESPACE
-├── R
-│   └── typed.R
-└── inst
-    └── htmlwidgets
-        ├── typed
-        │   └── typed.min.js
-        ├── typed.js
-        └── typed.yaml</code></pre>
-<p>In htmlwidgets packages dependencies are specified in the <code>.yml</code> file located at <code>inst/htmlwidgets</code> which at first contains a commented template.</p>
-<div class="sourceCode" id="cb107"><pre class="sourceCode yml"><code class="sourceCode yaml"><span id="cb107-1"><a href="a-realistic-widget.html#cb107-1"></a><span class="co"># (uncomment to add a dependency)</span></span>
-<span id="cb107-2"><a href="a-realistic-widget.html#cb107-2"></a><span class="co"># dependencies:</span></span>
-<span id="cb107-3"><a href="a-realistic-widget.html#cb107-3"></a><span class="co">#  - name:</span></span>
-<span id="cb107-4"><a href="a-realistic-widget.html#cb107-4"></a><span class="co">#    version:</span></span>
-<span id="cb107-5"><a href="a-realistic-widget.html#cb107-5"></a><span class="co">#    src:</span></span>
-<span id="cb107-6"><a href="a-realistic-widget.html#cb107-6"></a><span class="co">#    script:</span></span>
-<span id="cb107-7"><a href="a-realistic-widget.html#cb107-7"></a><span class="co">#    stylesheet:</span></span></code></pre></div>
-<p>Let’s uncomment those lines as instructed at the top of the file and fill it in.</p>
-<div class="sourceCode" id="cb108"><pre class="sourceCode yml"><code class="sourceCode yaml"><span id="cb108-1"><a href="a-realistic-widget.html#cb108-1"></a><span class="fu">dependencies</span><span class="kw">:</span></span>
-<span id="cb108-2"><a href="a-realistic-widget.html#cb108-2"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> typed.js</span></span>
-<span id="cb108-3"><a href="a-realistic-widget.html#cb108-3"></a><span class="at">    </span><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="fl">2.0.11</span></span>
-<span id="cb108-4"><a href="a-realistic-widget.html#cb108-4"></a><span class="at">    </span><span class="fu">src</span><span class="kw">:</span><span class="at"> htmlwidgets/typed</span></span>
-<span id="cb108-5"><a href="a-realistic-widget.html#cb108-5"></a><span class="at">    </span><span class="fu">script</span><span class="kw">:</span><span class="at"> typed.min.js</span></span></code></pre></div>
-<p>We remove the <code>stylesheet</code> entry as this package does not require any CSS files. The <code>src</code> specifies the path to the directory containing the scripts and stylesheets. This is akin to using the <code>system.file</code> function to return the full path to a file or directory within the package.</p>
-<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="a-realistic-widget.html#cb109-1"></a>devtools<span class="op">::</span><span class="kw">load_all</span>()</span>
-<span id="cb109-2"><a href="a-realistic-widget.html#cb109-2"></a><span class="kw">system.file</span>(<span class="st">&quot;htmlwidgets/typed&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;typed&quot;</span>)                                         </span>
-<span id="cb109-3"><a href="a-realistic-widget.html#cb109-3"></a><span class="co">#&gt; &quot;/home/me/packages/typed/inst/htmlwidgets/typed&quot;</span></span></code></pre></div>
-<p>We should verify that this is correct by using the one R function the package features and check the source code of the output to verify that the typed.js is indeed imported. We thus run <code>typed("test")</code>, open the output in the browser (<img src="images/open-in-browser.png" />) and look at the source code of the page (right click and select “View page source”). At the top of the page one should see <code>typed.min.js</code> imported, click the link to ensure it correctly points to the dependency.</p>
-<div class="sourceCode" id="cb110"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb110-1"><a href="a-realistic-widget.html#cb110-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
-<span id="cb110-2"><a href="a-realistic-widget.html#cb110-2"></a><span class="kw">&lt;html&gt;</span></span>
-<span id="cb110-3"><a href="a-realistic-widget.html#cb110-3"></a><span class="kw">&lt;head&gt;</span></span>
-<span id="cb110-4"><a href="a-realistic-widget.html#cb110-4"></a><span class="kw">&lt;meta</span><span class="ot"> charset=</span><span class="st">&quot;utf-8&quot;</span><span class="kw">/&gt;</span></span>
-<span id="cb110-5"><a href="a-realistic-widget.html#cb110-5"></a><span class="kw">&lt;style&gt;</span>body{<span class="kw">background-color</span>:<span class="cn">white</span><span class="op">;</span>}<span class="kw">&lt;/style&gt;</span></span>
-<span id="cb110-6"><a href="a-realistic-widget.html#cb110-6"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;lib/htmlwidgets-1.5.1/htmlwidgets.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb110-7"><a href="a-realistic-widget.html#cb110-7"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;lib/typed.js-2.0.11/typed.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb110-8"><a href="a-realistic-widget.html#cb110-8"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;lib/typed-binding-0.0.0.9000/typed.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb110-9"><a href="a-realistic-widget.html#cb110-9"></a>...</span></code></pre></div>
+├── app.R
+└── assets
+    ├── binding.js
+    └── styles.css</code></pre>
 </div>
-<div id="javascript" class="section level2" number="6.2">
-<h2><span class="header-section-number">6.2</span> JavaScript</h2>
-<p>On its <a href="https://mattboldt.com/demos/typed-js/">official website</a>, typed.js gives the following example. The JavaScript function <code>Typed</code> takes two arguments, first the selector, the element to hold the output, second a JSON of options to specify what is being typed and a myriad of other things.</p>
-<div class="sourceCode" id="cb111"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb111-1"><a href="a-realistic-widget.html#cb111-1"></a><span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;.element&#39;</span><span class="op">,</span> <span class="op">{</span></span>
-<span id="cb111-2"><a href="a-realistic-widget.html#cb111-2"></a>  <span class="dt">strings</span><span class="op">:</span> [<span class="st">&quot;First sentence.&quot;</span><span class="op">,</span> <span class="st">&quot;Second sentence.&quot;</span>]<span class="op">,</span></span>
-<span id="cb111-3"><a href="a-realistic-widget.html#cb111-3"></a>  <span class="dt">typeSpeed</span><span class="op">:</span> <span class="dv">30</span></span>
-<span id="cb111-4"><a href="a-realistic-widget.html#cb111-4"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
-<p>Let’s place it in the package by replacing the content of the <code>renderValue</code> in <code>typed.js</code> with the above.</p>
-<div class="sourceCode" id="cb112"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb112-1"><a href="a-realistic-widget.html#cb112-1"></a>...</span>
-<span id="cb112-2"><a href="a-realistic-widget.html#cb112-2"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb112-3"><a href="a-realistic-widget.html#cb112-3"></a></span>
-<span id="cb112-4"><a href="a-realistic-widget.html#cb112-4"></a>  <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;.element&#39;</span><span class="op">,</span> <span class="op">{</span></span>
-<span id="cb112-5"><a href="a-realistic-widget.html#cb112-5"></a>    <span class="dt">strings</span><span class="op">:</span> [<span class="st">&quot;First sentence.&quot;</span><span class="op">,</span> <span class="st">&quot;Second sentence.&quot;</span>]<span class="op">,</span></span>
-<span id="cb112-6"><a href="a-realistic-widget.html#cb112-6"></a>    <span class="dt">typeSpeed</span><span class="op">:</span> <span class="dv">30</span></span>
-<span id="cb112-7"><a href="a-realistic-widget.html#cb112-7"></a>  <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb112-8"><a href="a-realistic-widget.html#cb112-8"></a></span>
-<span id="cb112-9"><a href="a-realistic-widget.html#cb112-9"></a><span class="op">}</span></span>
-<span id="cb112-10"><a href="a-realistic-widget.html#cb112-10"></a>...</span></code></pre></div>
-<p>One could be tempted to run <code>devtools::load_all</code> but this will not work, namely because the function uses a selector that is will not return any object; it needs to be applied to the div created by the widget not <code>.element</code>. As hinted at in the playground, the selector of the element created is accessible from the <code>el</code> object. As a matter of fact, we did log in the browser console the id of the created div taken from <code>el.id</code>. Therefore concatenating the pound sign and the element id produces the select to said element. (<code>.class</code>, <code>#id</code>)</p>
-<div class="sourceCode" id="cb113"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb113-1"><a href="a-realistic-widget.html#cb113-1"></a><span class="co">// typed.js</span></span>
-<span id="cb113-2"><a href="a-realistic-widget.html#cb113-2"></a>...</span>
-<span id="cb113-3"><a href="a-realistic-widget.html#cb113-3"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb113-4"><a href="a-realistic-widget.html#cb113-4"></a></span>
-<span id="cb113-5"><a href="a-realistic-widget.html#cb113-5"></a>  <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;#&#39;</span> <span class="op">+</span> <span class="va">el</span>.<span class="at">id</span><span class="op">,</span> <span class="op">{</span></span>
-<span id="cb113-6"><a href="a-realistic-widget.html#cb113-6"></a>    <span class="dt">strings</span><span class="op">:</span> [<span class="st">&quot;First sentence.&quot;</span><span class="op">,</span> <span class="st">&quot;Second sentence.&quot;</span>]<span class="op">,</span></span>
-<span id="cb113-7"><a href="a-realistic-widget.html#cb113-7"></a>    <span class="dt">typeSpeed</span><span class="op">:</span> <span class="dv">30</span></span>
-<span id="cb113-8"><a href="a-realistic-widget.html#cb113-8"></a>  <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb113-9"><a href="a-realistic-widget.html#cb113-9"></a></span>
-<span id="cb113-10"><a href="a-realistic-widget.html#cb113-10"></a><span class="op">}</span></span>
-<span id="cb113-11"><a href="a-realistic-widget.html#cb113-11"></a>...</span></code></pre></div>
-<p>This should now work, run <code>devtools::load_all</code> followed by <code>typed("whatever")</code> and the JavaScript animated text will appear! It’s not of any use just yet as the options, including the text being typed is predefined: the package is currently not making any use the of the inputs passed from R. This can be changed by using <code>x.message</code> passed from R instead of the default strings.</p>
-<div class="sourceCode" id="cb114"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb114-1"><a href="a-realistic-widget.html#cb114-1"></a><span class="co">// typed.js</span></span>
-<span id="cb114-2"><a href="a-realistic-widget.html#cb114-2"></a>...</span>
-<span id="cb114-3"><a href="a-realistic-widget.html#cb114-3"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb114-4"><a href="a-realistic-widget.html#cb114-4"></a></span>
-<span id="cb114-5"><a href="a-realistic-widget.html#cb114-5"></a>  <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;#&#39;</span> <span class="op">+</span> <span class="va">el</span>.<span class="at">id</span><span class="op">,</span> <span class="op">{</span></span>
-<span id="cb114-6"><a href="a-realistic-widget.html#cb114-6"></a>    <span class="dt">strings</span><span class="op">:</span> <span class="va">x</span>.<span class="at">message</span><span class="op">,</span></span>
-<span id="cb114-7"><a href="a-realistic-widget.html#cb114-7"></a>    <span class="dt">typeSpeed</span><span class="op">:</span> <span class="dv">30</span></span>
-<span id="cb114-8"><a href="a-realistic-widget.html#cb114-8"></a>  <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb114-9"><a href="a-realistic-widget.html#cb114-9"></a></span>
-<span id="cb114-10"><a href="a-realistic-widget.html#cb114-10"></a><span class="op">}</span></span>
-<span id="cb114-11"><a href="a-realistic-widget.html#cb114-11"></a>...</span></code></pre></div>
-<p>This, however, will cause issues as the <code>strings</code> options expects and array (vector) and not a single string.</p>
-<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="a-realistic-widget.html#cb115-1"></a><span class="kw">typed</span>(<span class="st">&quot;does not work&quot;</span>) <span class="co"># length =  1</span></span>
-<span id="cb115-2"><a href="a-realistic-widget.html#cb115-2"></a><span class="kw">typed</span>(<span class="kw">c</span>(<span class="st">&quot;This&quot;</span>, <span class="st">&quot;will&quot;</span>, <span class="st">&quot;work&quot;</span>)) <span class="co"># length &gt; 1</span></span></code></pre></div>
-<p>One solution is to force the input into a list.</p>
-<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="a-realistic-widget.html#cb116-1"></a><span class="co"># typed.R</span></span>
-<span id="cb116-2"><a href="a-realistic-widget.html#cb116-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb116-3"><a href="a-realistic-widget.html#cb116-3"></a>  <span class="dt">message =</span> <span class="kw">as.list</span>(message)</span>
-<span id="cb116-4"><a href="a-realistic-widget.html#cb116-4"></a>)</span></code></pre></div>
-<p>At this juncture the package works but there is a salient issue with the way it handles options. Why build a list in R to reconstruct it in JavaScript manually. Since the options are serialised in R to JSON and that typed.js expects a JSON of options it is actually cleaner and more convenient to construct an R list that mirrors the JSON array so one can use it as-is in JavaScript.</p>
-<p>In fact, renaming the <code>message</code> to <code>strings</code> effectively does this.</p>
-<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="a-realistic-widget.html#cb117-1"></a><span class="co"># typed.R</span></span>
-<span id="cb117-2"><a href="a-realistic-widget.html#cb117-2"></a>x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb117-3"><a href="a-realistic-widget.html#cb117-3"></a>  <span class="dt">strings =</span> <span class="kw">as.list</span>(message)</span>
-<span id="cb117-4"><a href="a-realistic-widget.html#cb117-4"></a>)</span></code></pre></div>
-<p>This allows greatly simplifying the code JavaScript side, making it much easier to add other options down the line, maintain, debug, and read.</p>
-<div class="sourceCode" id="cb118"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb118-1"><a href="a-realistic-widget.html#cb118-1"></a><span class="co">// typed.js</span></span>
-<span id="cb118-2"><a href="a-realistic-widget.html#cb118-2"></a>...</span>
-<span id="cb118-3"><a href="a-realistic-widget.html#cb118-3"></a>renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb118-4"><a href="a-realistic-widget.html#cb118-4"></a></span>
-<span id="cb118-5"><a href="a-realistic-widget.html#cb118-5"></a>  <span class="kw">var</span> typed <span class="op">=</span> <span class="kw">new</span> <span class="at">Typed</span>(<span class="st">&#39;#&#39;</span> <span class="op">+</span> <span class="va">el</span>.<span class="at">id</span><span class="op">,</span> x)<span class="op">;</span></span>
-<span id="cb118-6"><a href="a-realistic-widget.html#cb118-6"></a></span>
-<span id="cb118-7"><a href="a-realistic-widget.html#cb118-7"></a><span class="op">}</span></span>
-<span id="cb118-8"><a href="a-realistic-widget.html#cb118-8"></a>...</span></code></pre></div>
-<p>One can now add more options from the R code without having to alter any of the JavaScript. Let us demonstrate with the <code>loop</code> option.</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="a-realistic-widget.html#cb119-1"></a>typed &lt;-<span class="st"> </span><span class="cf">function</span>(message, <span class="dt">loop =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb119-2"><a href="a-realistic-widget.html#cb119-2"></a>  <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
-<span id="cb119-3"><a href="a-realistic-widget.html#cb119-3"></a></span>
-<span id="cb119-4"><a href="a-realistic-widget.html#cb119-4"></a>  <span class="co"># forward options using x</span></span>
-<span id="cb119-5"><a href="a-realistic-widget.html#cb119-5"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb119-6"><a href="a-realistic-widget.html#cb119-6"></a>    <span class="dt">loop =</span> loop,</span>
-<span id="cb119-7"><a href="a-realistic-widget.html#cb119-7"></a>    <span class="dt">strings =</span> <span class="kw">as.list</span>(message)</span>
-<span id="cb119-8"><a href="a-realistic-widget.html#cb119-8"></a>  )</span>
-<span id="cb119-9"><a href="a-realistic-widget.html#cb119-9"></a></span>
-<span id="cb119-10"><a href="a-realistic-widget.html#cb119-10"></a>  <span class="co"># create widget</span></span>
-<span id="cb119-11"><a href="a-realistic-widget.html#cb119-11"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
-<span id="cb119-12"><a href="a-realistic-widget.html#cb119-12"></a>    <span class="dt">name =</span> <span class="st">&#39;typed&#39;</span>,</span>
-<span id="cb119-13"><a href="a-realistic-widget.html#cb119-13"></a>    x,</span>
-<span id="cb119-14"><a href="a-realistic-widget.html#cb119-14"></a>    <span class="dt">width =</span> width,</span>
-<span id="cb119-15"><a href="a-realistic-widget.html#cb119-15"></a>    <span class="dt">height =</span> height,</span>
-<span id="cb119-16"><a href="a-realistic-widget.html#cb119-16"></a>    <span class="dt">package =</span> <span class="st">&#39;typed&#39;</span>,</span>
-<span id="cb119-17"><a href="a-realistic-widget.html#cb119-17"></a>    <span class="dt">elementId =</span> elementId</span>
-<span id="cb119-18"><a href="a-realistic-widget.html#cb119-18"></a>  )</span>
-<span id="cb119-19"><a href="a-realistic-widget.html#cb119-19"></a>}</span></code></pre></div>
+<div id="switch-input-style" class="section level2" number="16.2">
+<h2><span class="header-section-number">16.2</span> Switch Input Style</h2>
+<p>We will use <a href="https://www.w3schools.com/howto/howto_css_switch.asp">w3schools</a>’ switch input template.</p>
+<div class="sourceCode" id="cb339"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb339-1"><a href="custom-inputs.html#cb339-1"></a><span class="fu">.switch</span> {</span>
+<span id="cb339-2"><a href="custom-inputs.html#cb339-2"></a>  <span class="kw">position</span>: <span class="dv">relative</span><span class="op">;</span></span>
+<span id="cb339-3"><a href="custom-inputs.html#cb339-3"></a>  <span class="kw">display</span>: <span class="dv">inline-block</span><span class="op">;</span></span>
+<span id="cb339-4"><a href="custom-inputs.html#cb339-4"></a>  <span class="kw">width</span>: <span class="dv">60</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb339-5"><a href="custom-inputs.html#cb339-5"></a>  <span class="kw">height</span>: <span class="dv">34</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb339-6"><a href="custom-inputs.html#cb339-6"></a>}</span>
+<span id="cb339-7"><a href="custom-inputs.html#cb339-7"></a></span>
+<span id="cb339-8"><a href="custom-inputs.html#cb339-8"></a><span class="fu">.switch</span> input { </span>
+<span id="cb339-9"><a href="custom-inputs.html#cb339-9"></a>  <span class="kw">opacity</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb339-10"><a href="custom-inputs.html#cb339-10"></a>  <span class="kw">width</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb339-11"><a href="custom-inputs.html#cb339-11"></a>  <span class="kw">height</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb339-12"><a href="custom-inputs.html#cb339-12"></a>}</span>
+<span id="cb339-13"><a href="custom-inputs.html#cb339-13"></a></span>
+<span id="cb339-14"><a href="custom-inputs.html#cb339-14"></a><span class="fu">.slider</span> {</span>
+<span id="cb339-15"><a href="custom-inputs.html#cb339-15"></a>  <span class="kw">position</span>: <span class="dv">absolute</span><span class="op">;</span></span>
+<span id="cb339-16"><a href="custom-inputs.html#cb339-16"></a>  <span class="kw">cursor</span>: <span class="dv">pointer</span><span class="op">;</span></span>
+<span id="cb339-17"><a href="custom-inputs.html#cb339-17"></a>  <span class="kw">top</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb339-18"><a href="custom-inputs.html#cb339-18"></a>  <span class="kw">left</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb339-19"><a href="custom-inputs.html#cb339-19"></a>  <span class="kw">right</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb339-20"><a href="custom-inputs.html#cb339-20"></a>  <span class="kw">bottom</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb339-21"><a href="custom-inputs.html#cb339-21"></a>  <span class="kw">background-color</span>: <span class="cn">#ccc</span><span class="op">;</span></span>
+<span id="cb339-22"><a href="custom-inputs.html#cb339-22"></a>  <span class="kw">-webkit-transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
+<span id="cb339-23"><a href="custom-inputs.html#cb339-23"></a>  <span class="kw">transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
+<span id="cb339-24"><a href="custom-inputs.html#cb339-24"></a>}</span>
+<span id="cb339-25"><a href="custom-inputs.html#cb339-25"></a></span>
+<span id="cb339-26"><a href="custom-inputs.html#cb339-26"></a><span class="fu">.slider</span><span class="in">:before</span> {</span>
+<span id="cb339-27"><a href="custom-inputs.html#cb339-27"></a>  <span class="kw">position</span>: <span class="dv">absolute</span><span class="op">;</span></span>
+<span id="cb339-28"><a href="custom-inputs.html#cb339-28"></a>  <span class="kw">content</span>: <span class="st">&quot;&quot;</span><span class="op">;</span></span>
+<span id="cb339-29"><a href="custom-inputs.html#cb339-29"></a>  <span class="kw">height</span>: <span class="dv">26</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb339-30"><a href="custom-inputs.html#cb339-30"></a>  <span class="kw">width</span>: <span class="dv">26</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb339-31"><a href="custom-inputs.html#cb339-31"></a>  <span class="kw">left</span>: <span class="dv">4</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb339-32"><a href="custom-inputs.html#cb339-32"></a>  <span class="kw">bottom</span>: <span class="dv">4</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb339-33"><a href="custom-inputs.html#cb339-33"></a>  <span class="kw">background-color</span>: <span class="cn">white</span><span class="op">;</span></span>
+<span id="cb339-34"><a href="custom-inputs.html#cb339-34"></a>  <span class="kw">-webkit-transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
+<span id="cb339-35"><a href="custom-inputs.html#cb339-35"></a>  <span class="kw">transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
+<span id="cb339-36"><a href="custom-inputs.html#cb339-36"></a>}</span>
+<span id="cb339-37"><a href="custom-inputs.html#cb339-37"></a></span>
+<span id="cb339-38"><a href="custom-inputs.html#cb339-38"></a>input<span class="in">:checked</span> <span class="op">+</span> <span class="fu">.slider</span> {</span>
+<span id="cb339-39"><a href="custom-inputs.html#cb339-39"></a>  <span class="kw">background-color</span>: <span class="cn">#0462a1</span><span class="op">;</span></span>
+<span id="cb339-40"><a href="custom-inputs.html#cb339-40"></a>}</span>
+<span id="cb339-41"><a href="custom-inputs.html#cb339-41"></a></span>
+<span id="cb339-42"><a href="custom-inputs.html#cb339-42"></a>input<span class="in">:focus</span> <span class="op">+</span> <span class="fu">.slider</span> {</span>
+<span id="cb339-43"><a href="custom-inputs.html#cb339-43"></a>  <span class="kw">box-shadow</span>: <span class="dv">0</span> <span class="dv">0</span> <span class="dv">1</span><span class="dt">px</span> <span class="cn">#0462a1</span><span class="op">;</span></span>
+<span id="cb339-44"><a href="custom-inputs.html#cb339-44"></a>}</span>
+<span id="cb339-45"><a href="custom-inputs.html#cb339-45"></a></span>
+<span id="cb339-46"><a href="custom-inputs.html#cb339-46"></a>input<span class="in">:checked</span> <span class="op">+</span> <span class="fu">.slider</span><span class="in">:before</span> {</span>
+<span id="cb339-47"><a href="custom-inputs.html#cb339-47"></a>  <span class="kw">-webkit-transform</span>: translateX(<span class="dv">26</span><span class="dt">px</span>)<span class="op">;</span></span>
+<span id="cb339-48"><a href="custom-inputs.html#cb339-48"></a>  <span class="kw">-ms-transform</span>: translateX(<span class="dv">26</span><span class="dt">px</span>)<span class="op">;</span></span>
+<span id="cb339-49"><a href="custom-inputs.html#cb339-49"></a>  <span class="kw">transform</span>: translateX(<span class="dv">26</span><span class="dt">px</span>)<span class="op">;</span></span>
+<span id="cb339-50"><a href="custom-inputs.html#cb339-50"></a>}</span></code></pre></div>
+<p>This CSS changes a standard checkbox to look like a switch.</p>
+<div class="figure">
+<img src="images/checkbox-switch.png" alt="" />
+<p class="caption">Checkbox and styled switch input</p>
 </div>
-<div id="html-element" class="section level2" number="6.3">
-<h2><span class="header-section-number">6.3</span> HTML Element</h2>
-<p>As pointed out multiple times, the widget is generated in a <code>&lt;div&gt;</code>, which is works fine for most visualisation libraries. But we saw that chart.js requires placing it in a <code>&lt;canvas&gt;</code>, so one needs the ability to change that. It could be interesting to apply this to typed.js too as within a <code>&lt;div&gt;</code> it cannot be placed inline, using a <code>&lt;span&gt;</code>, however, this would work.</p>
-<p>This can be changed by placing a function named <code>nameOfWidget_html</code> which looked up by htmlwidgets and used if found. This function takes the three-dot construct <code>...</code> and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets needs be able to pass arguments, such as the all too critical <code>id</code>.</p>
-<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="a-realistic-widget.html#cb120-1"></a>typed_html &lt;-<span class="st"> </span><span class="cf">function</span>(...){</span>
-<span id="cb120-2"><a href="a-realistic-widget.html#cb120-2"></a>  htmltools<span class="op">::</span>tags<span class="op">$</span><span class="kw">span</span>(...)</span>
-<span id="cb120-3"><a href="a-realistic-widget.html#cb120-3"></a>}</span></code></pre></div>
-<p>Note that this can also be used to force certain attributes onto the element. For instance we could use the code below to force all output to use a red font.</p>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="a-realistic-widget.html#cb121-1"></a>typed_html &lt;-<span class="st"> </span><span class="cf">function</span>(...){</span>
-<span id="cb121-2"><a href="a-realistic-widget.html#cb121-2"></a>  htmltools<span class="op">::</span>tags<span class="op">$</span><span class="kw">span</span>(..., <span class="dt">style =</span> <span class="st">&quot;color:red;&quot;</span>)</span>
-<span id="cb121-3"><a href="a-realistic-widget.html#cb121-3"></a>}</span></code></pre></div>
-<p>We shall leave it at that and move on to building another widget but completing the package makes for an interesting exercise.</p>
+</div>
+<div id="generate-input-html" class="section level2" number="16.3">
+<h2><span class="header-section-number">16.3</span> Generate Input HTML</h2>
+<p>Let us start with the R function to be used in the shiny UI.</p>
+<div class="sourceCode" id="cb340"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb340-1"><a href="custom-inputs.html#cb340-1"></a>switchInput &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
+<span id="cb340-2"><a href="custom-inputs.html#cb340-2"></a></span>
+<span id="cb340-3"><a href="custom-inputs.html#cb340-3"></a>  <span class="co"># HTML</span></span>
+<span id="cb340-4"><a href="custom-inputs.html#cb340-4"></a>  tags<span class="op">$</span><span class="kw">label</span>(</span>
+<span id="cb340-5"><a href="custom-inputs.html#cb340-5"></a>    <span class="dt">class =</span> <span class="st">&quot;switch&quot;</span>,</span>
+<span id="cb340-6"><a href="custom-inputs.html#cb340-6"></a>    tags<span class="op">$</span><span class="kw">input</span>(<span class="dt">id =</span> id, <span class="dt">type =</span> <span class="st">&quot;checkbox&quot;</span>, <span class="dt">class =</span> <span class="st">&quot;switch-input&quot;</span>, <span class="dt">checked=</span><span class="st">&quot;true&quot;</span>),</span>
+<span id="cb340-7"><a href="custom-inputs.html#cb340-7"></a>    tags<span class="op">$</span><span class="kw">span</span>(<span class="dt">class =</span> <span class="st">&quot;slider&quot;</span>)</span>
+<span id="cb340-8"><a href="custom-inputs.html#cb340-8"></a>  )</span>
+<span id="cb340-9"><a href="custom-inputs.html#cb340-9"></a>}</span></code></pre></div>
+<p>As for the custom outputs, the dependencies (CSS and JavaScript binding) can piggy back on the generated HTML.</p>
+<div class="sourceCode" id="cb341"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb341-1"><a href="custom-inputs.html#cb341-1"></a>switchInput &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
+<span id="cb341-2"><a href="custom-inputs.html#cb341-2"></a></span>
+<span id="cb341-3"><a href="custom-inputs.html#cb341-3"></a>  <span class="co"># HTML</span></span>
+<span id="cb341-4"><a href="custom-inputs.html#cb341-4"></a>  form &lt;-<span class="st"> </span>tags<span class="op">$</span><span class="kw">label</span>(</span>
+<span id="cb341-5"><a href="custom-inputs.html#cb341-5"></a>    <span class="dt">class =</span> <span class="st">&quot;switch&quot;</span>,</span>
+<span id="cb341-6"><a href="custom-inputs.html#cb341-6"></a>    tags<span class="op">$</span><span class="kw">input</span>(<span class="dt">id =</span> id, <span class="dt">type =</span> <span class="st">&quot;checkbox&quot;</span>, <span class="dt">class =</span> <span class="st">&quot;switch-input&quot;</span>, <span class="dt">checked=</span><span class="st">&quot;true&quot;</span>),</span>
+<span id="cb341-7"><a href="custom-inputs.html#cb341-7"></a>    tags<span class="op">$</span><span class="kw">span</span>(<span class="dt">class =</span> <span class="st">&quot;slider&quot;</span>)</span>
+<span id="cb341-8"><a href="custom-inputs.html#cb341-8"></a>  )</span>
+<span id="cb341-9"><a href="custom-inputs.html#cb341-9"></a></span>
+<span id="cb341-10"><a href="custom-inputs.html#cb341-10"></a>  <span class="co"># dependencies</span></span>
+<span id="cb341-11"><a href="custom-inputs.html#cb341-11"></a>  path &lt;-<span class="st"> </span><span class="kw">normalizePath</span>(<span class="st">&quot;./assets&quot;</span>)</span>
+<span id="cb341-12"><a href="custom-inputs.html#cb341-12"></a></span>
+<span id="cb341-13"><a href="custom-inputs.html#cb341-13"></a>  deps &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
+<span id="cb341-14"><a href="custom-inputs.html#cb341-14"></a>    <span class="dt">name =</span> <span class="st">&quot;textInputPlus&quot;</span>,</span>
+<span id="cb341-15"><a href="custom-inputs.html#cb341-15"></a>    <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
+<span id="cb341-16"><a href="custom-inputs.html#cb341-16"></a>    <span class="dt">src =</span> <span class="kw">c</span>(<span class="dt">file =</span> path),</span>
+<span id="cb341-17"><a href="custom-inputs.html#cb341-17"></a>    <span class="dt">script =</span> <span class="st">&quot;binding.js&quot;</span>,</span>
+<span id="cb341-18"><a href="custom-inputs.html#cb341-18"></a>    <span class="dt">stylesheet =</span> <span class="st">&quot;styles.css&quot;</span></span>
+<span id="cb341-19"><a href="custom-inputs.html#cb341-19"></a>  )</span>
+<span id="cb341-20"><a href="custom-inputs.html#cb341-20"></a></span>
+<span id="cb341-21"><a href="custom-inputs.html#cb341-21"></a>  htmltools<span class="op">::</span><span class="kw">attachDependencies</span>(form, deps)</span>
+<span id="cb341-22"><a href="custom-inputs.html#cb341-22"></a>}</span></code></pre></div>
+</div>
+<div id="javascript-input-binding" class="section level2" number="16.4">
+<h2><span class="header-section-number">16.4</span> JavaScript Input Binding</h2>
 
 </div>
 </div>
@@ -607,8 +561,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="your-first-widget.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="the-full-monty.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="custom-outputs.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="cookies.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -639,7 +593,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/JohnCoene/javascript-for-r/edit/master/3-23-htmlwidgets-typed.Rmd",
+"link": "https://github.com/JohnCoene/javascript-for-r/edit/master/4-16-shiny-input.Rmd",
 "text": "Edit"
 },
 "history": {

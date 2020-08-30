@@ -201,7 +201,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2020-08-28}
+\date{2020-08-30}
 
 \begin{document}
 \maketitle
@@ -3670,7 +3670,7 @@ The \texttt{gio} function also has to extract the group to which the dataset bel
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "SharedData5a8f897c"
+## [1] "SharedData6a08148f"
 \end{verbatim}
 
 \begin{Shaded}
@@ -5999,20 +5999,6 @@ Note that jQuery takes a selector so one could very well use a class to hide and
 
 This is something where, again, R is leveraged in order to make it easier on the shiny developer but it must be said that it suffers from some inefficiency: the message travels from the browser (button click) to the R server where it is sent back to the browser and triggers \texttt{toggle}. It could indeed very well be rewritten in JavaScript entirely, this is however outside the scope of this book.
 
-\hypertarget{custom-input}{%
-\chapter{Custom Input}\label{custom-input}}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(shiny)}
-
-\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{()}
-\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output) \{\}}
-
-\KeywordTok{shinyApp}\NormalTok{(ui, server)}
-\end{Highlighting}
-\end{Shaded}
-
 \hypertarget{custom-outputs}{%
 \chapter{Custom Outputs}\label{custom-outputs}}
 
@@ -6055,8 +6041,8 @@ Previous work with shiny and JavaScript covered in this book had no dedicated ``
 
 Finally, the two R functions are ``bound'' JavaScript-side with an ``output binding'' that renders the data from the \texttt{render*} function with its \texttt{*output}.
 
-\hypertarget{setup}{%
-\section{Setup}\label{setup}}
+\hypertarget{setup-custom-output}{%
+\section{Setup Custom Output}\label{setup-custom-output}}
 
 The custom output will be part of a shiny application, let us thus create the basic skeleton of an application and download the dependencies. Create a project in RStudio or an empty directory, then:
 
@@ -6110,8 +6096,8 @@ This should produce the following directory structure.
     └── styles.css
 \end{verbatim}
 
-\hypertarget{r-function}{%
-\section{R Function}\label{r-function}}
+\hypertarget{output-r-function}{%
+\section{Output R Function}\label{output-r-function}}
 
 The \texttt{boxxy} function takes three arguments, a \texttt{title}, a \texttt{value} that will be animated and the background \texttt{color} to use for the box. The function, at this stage at least, does not preprocess the arguments and simply returns them as a named \texttt{list}.
 
@@ -6126,8 +6112,8 @@ The \texttt{boxxy} function takes three arguments, a \texttt{title}, a \texttt{v
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{output}{%
-\section{Output}\label{output}}
+\hypertarget{generate-output-html}{%
+\section{Generate Output HTML}\label{generate-output-html}}
 
 The \texttt{boxxyOutput} function, like all such functions (\texttt{plotOutput}, \texttt{uiOutput}, etc.) takes an \texttt{id}. This function should return an HTML tag which bears an \texttt{id}, or a \texttt{data-input-id} attribute (more on that later) and a \texttt{class}. The \texttt{id} is to be defined by the user of the function in Shiny just like any other such outputs. For instance, \texttt{plotOutput} creates a \texttt{\textless{}div\textgreater{}} the \texttt{id} of which is actually the \texttt{id} used in the \texttt{plotOutput} function.
 
@@ -6140,11 +6126,11 @@ The \texttt{boxxyOutput} function, like all such functions (\texttt{plotOutput},
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\OperatorTok{<}\NormalTok{div }
-\NormalTok{  id=}\StringTok{"myPlotId"} 
-\NormalTok{  class=}\StringTok{"shiny{-}plot{-}output"} 
-\NormalTok{  style=}\StringTok{"width: 100\% ; height: 400px"}\OperatorTok{>}
-\ErrorTok{</}\NormalTok{div}\OperatorTok{>}
+\KeywordTok{<div} 
+\OtherTok{  id=}\StringTok{"myPlotId"} 
+\OtherTok{  class=}\StringTok{"shiny{-}plot{-}output"} 
+\OtherTok{  style=}\StringTok{"width: 100\% ; height: 400px"}\KeywordTok{>}
+\KeywordTok{</div>}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6261,8 +6247,8 @@ Running the function reveals the HTML it generates at the exception of the depen
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{render}{%
-\section{Render}\label{render}}
+\hypertarget{output-renderer}{%
+\section{Output Renderer}\label{output-renderer}}
 
 The function \texttt{renderBoxxy} should accept an expression, like other such \texttt{render*} function. For instance in the example below the \texttt{renderPlot} function does accept an expression which uses, amongst other functions, \texttt{plot}.
 
@@ -6294,7 +6280,7 @@ The function \texttt{renderBoxxy} takes an expression and other arguments that a
 \end{Shaded}
 
 \hypertarget{javascript-output-binding}{%
-\section{JavaScript output binding}\label{javascript-output-binding}}
+\section{JavaScript Output Binding}\label{javascript-output-binding}}
 
 Here we create an ``output binding,'' it tells Shiny how to find the component and how to interact with it. An output binding is initialised from \texttt{Shiny.OutputBinding}. Below we initialise a new binding.
 
@@ -6413,8 +6399,8 @@ The counter has to be generated in the \texttt{\textless{}h1\textgreater{}} plac
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{background-color}{%
-\section{Background Color}\label{background-color}}
+\hypertarget{boxxy-background-color}{%
+\subsection{Boxxy Background Color}\label{boxxy-background-color}}
 
 Then we can set the background color that was passed to \texttt{boxxy} (\texttt{data.color}).
 
@@ -6445,7 +6431,7 @@ Then we can set the background color that was passed to \texttt{boxxy} (\texttt{
 \end{Shaded}
 
 \hypertarget{register-the-output-binding}{%
-\section{Register the Output Binding}\label{register-the-output-binding}}
+\subsection{Register the Output Binding}\label{register-the-output-binding}}
 
 Finally, the output binding must be registered with shiny. Note that it uses a unique string identifier, the \href{https://shiny.rstudio.com/articles/building-outputs.html}{documentation} states:
 
@@ -6485,7 +6471,7 @@ At the moment it is unused but future features may depend on it.
 Ensure that string uniquely identifies the binding to avoid future clash with other such bindings.
 
 \hypertarget{boxxy-usage}{%
-\section{Boxxy usage}\label{boxxy-usage}}
+\section{Boxxy Usage}\label{boxxy-usage}}
 
 With all of this in place one can use boxxy in a shiny application.
 
@@ -6839,6 +6825,184 @@ One the things \texttt{boxxy} could do is preprocess the input, below the functi
 \end{Shaded}
 
 This means boxxy could be used like so: \texttt{boxxy("Total",\ c(1,6,9))}.
+
+\hypertarget{custom-inputs}{%
+\chapter{Custom Inputs}\label{custom-inputs}}
+
+Shiny comes with a variety of inputs ranging from buttons to text fields, these inputs send data from the client to the R server. Custom inputs are in fact no different than from shiny's out-of-the-box inputs, they work very much the same way.
+
+To explain and demonstrate how to build such a custom input we shall build a switch input which is essentially a fancy-looking checkbox that can be toggled on and off.
+
+\begin{figure}
+\centering
+\includegraphics{images/bootstrap-input-group-addon.png}
+\caption{Bootstrap 3 input group addons}
+\end{figure}
+
+Custom shiny inputs very much resemble shiny outputs though they consist of a single R function (e.g.: \texttt{selectInput}) which generates the HTML and attaches necessary dependencies. For instance running the \texttt{shiny::textInput} function will print the HTML it generates in the R console.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{shiny}\OperatorTok{::}\KeywordTok{textInput}\NormalTok{(}\StringTok{"theId"}\NormalTok{, }\StringTok{"The label"}\NormalTok{)   }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{<div}\OtherTok{ class=}\StringTok{"form{-}group shiny{-}input{-}container"}\KeywordTok{>}
+  \KeywordTok{<label}\OtherTok{ class=}\StringTok{"control{-}label"}\OtherTok{ for=}\StringTok{"theId"}\KeywordTok{>}\NormalTok{The label}\KeywordTok{</label>}
+  \KeywordTok{<input}\OtherTok{ id=}\StringTok{"theId"}\OtherTok{ type=}\StringTok{"text"}\OtherTok{ class=}\StringTok{"form{-}control"}\OtherTok{ value=}\StringTok{""}\KeywordTok{/>}
+\KeywordTok{</div>}
+\end{Highlighting}
+\end{Shaded}
+
+The R function is paired with an input binding akin to the output binding used in the previous chapter.
+
+\hypertarget{setup}{%
+\section{Setup}\label{setup}}
+
+Let's set up the necessary files and project structure.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# create directory for application}
+\KeywordTok{dir.create}\NormalTok{(}\StringTok{"switch/assets"}\NormalTok{, }\DataTypeTok{recursive =} \OtherTok{TRUE}\NormalTok{)}
+
+\CommentTok{\# create R, JS, and CSS files}
+\KeywordTok{file.create}\NormalTok{(}\StringTok{"app.R"}\NormalTok{)}
+\KeywordTok{file.create}\NormalTok{(}\StringTok{"switch/assets/binding.js"}\NormalTok{)}
+\KeywordTok{file.create}\NormalTok{(}\StringTok{"switch/assets/styles.css"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+This should give the following directory structure.
+
+\begin{verbatim}
+.
+├── app.R
+└── assets
+    ├── binding.js
+    └── styles.css
+\end{verbatim}
+
+\hypertarget{switch-input-style}{%
+\section{Switch Input Style}\label{switch-input-style}}
+
+We will use \href{https://www.w3schools.com/howto/howto_css_switch.asp}{w3schools}' switch input template.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{.switch}\NormalTok{ \{}
+  \KeywordTok{position}\NormalTok{: }\DecValTok{relative}\OperatorTok{;}
+  \KeywordTok{display}\NormalTok{: }\DecValTok{inline{-}block}\OperatorTok{;}
+  \KeywordTok{width}\NormalTok{: }\DecValTok{60}\DataTypeTok{px}\OperatorTok{;}
+  \KeywordTok{height}\NormalTok{: }\DecValTok{34}\DataTypeTok{px}\OperatorTok{;}
+\NormalTok{\}}
+
+\FunctionTok{.switch}\NormalTok{ input \{ }
+  \KeywordTok{opacity}\NormalTok{: }\DecValTok{0}\OperatorTok{;}
+  \KeywordTok{width}\NormalTok{: }\DecValTok{0}\OperatorTok{;}
+  \KeywordTok{height}\NormalTok{: }\DecValTok{0}\OperatorTok{;}
+\NormalTok{\}}
+
+\FunctionTok{.slider}\NormalTok{ \{}
+  \KeywordTok{position}\NormalTok{: }\DecValTok{absolute}\OperatorTok{;}
+  \KeywordTok{cursor}\NormalTok{: }\DecValTok{pointer}\OperatorTok{;}
+  \KeywordTok{top}\NormalTok{: }\DecValTok{0}\OperatorTok{;}
+  \KeywordTok{left}\NormalTok{: }\DecValTok{0}\OperatorTok{;}
+  \KeywordTok{right}\NormalTok{: }\DecValTok{0}\OperatorTok{;}
+  \KeywordTok{bottom}\NormalTok{: }\DecValTok{0}\OperatorTok{;}
+  \KeywordTok{background{-}color}\NormalTok{: }\ConstantTok{\#ccc}\OperatorTok{;}
+  \KeywordTok{{-}webkit{-}transition}\NormalTok{: }\DecValTok{.4}\DataTypeTok{s}\OperatorTok{;}
+  \KeywordTok{transition}\NormalTok{: }\DecValTok{.4}\DataTypeTok{s}\OperatorTok{;}
+\NormalTok{\}}
+
+\FunctionTok{.slider}\InformationTok{:before}\NormalTok{ \{}
+  \KeywordTok{position}\NormalTok{: }\DecValTok{absolute}\OperatorTok{;}
+  \KeywordTok{content}\NormalTok{: }\StringTok{""}\OperatorTok{;}
+  \KeywordTok{height}\NormalTok{: }\DecValTok{26}\DataTypeTok{px}\OperatorTok{;}
+  \KeywordTok{width}\NormalTok{: }\DecValTok{26}\DataTypeTok{px}\OperatorTok{;}
+  \KeywordTok{left}\NormalTok{: }\DecValTok{4}\DataTypeTok{px}\OperatorTok{;}
+  \KeywordTok{bottom}\NormalTok{: }\DecValTok{4}\DataTypeTok{px}\OperatorTok{;}
+  \KeywordTok{background{-}color}\NormalTok{: }\ConstantTok{white}\OperatorTok{;}
+  \KeywordTok{{-}webkit{-}transition}\NormalTok{: }\DecValTok{.4}\DataTypeTok{s}\OperatorTok{;}
+  \KeywordTok{transition}\NormalTok{: }\DecValTok{.4}\DataTypeTok{s}\OperatorTok{;}
+\NormalTok{\}}
+
+\NormalTok{input}\InformationTok{:checked} \OperatorTok{+} \FunctionTok{.slider}\NormalTok{ \{}
+  \KeywordTok{background{-}color}\NormalTok{: }\ConstantTok{\#0462a1}\OperatorTok{;}
+\NormalTok{\}}
+
+\NormalTok{input}\InformationTok{:focus} \OperatorTok{+} \FunctionTok{.slider}\NormalTok{ \{}
+  \KeywordTok{box{-}shadow}\NormalTok{: }\DecValTok{0} \DecValTok{0} \DecValTok{1}\DataTypeTok{px} \ConstantTok{\#0462a1}\OperatorTok{;}
+\NormalTok{\}}
+
+\NormalTok{input}\InformationTok{:checked} \OperatorTok{+} \FunctionTok{.slider}\InformationTok{:before}\NormalTok{ \{}
+  \KeywordTok{{-}webkit{-}transform}\NormalTok{: translateX(}\DecValTok{26}\DataTypeTok{px}\NormalTok{)}\OperatorTok{;}
+  \KeywordTok{{-}ms{-}transform}\NormalTok{: translateX(}\DecValTok{26}\DataTypeTok{px}\NormalTok{)}\OperatorTok{;}
+  \KeywordTok{transform}\NormalTok{: translateX(}\DecValTok{26}\DataTypeTok{px}\NormalTok{)}\OperatorTok{;}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+This CSS changes a standard checkbox to look like a switch.
+
+\begin{figure}
+\centering
+\includegraphics{images/checkbox-switch.png}
+\caption{Checkbox and styled switch input}
+\end{figure}
+
+\hypertarget{generate-input-html}{%
+\section{Generate Input HTML}\label{generate-input-html}}
+
+Let us start with the R function to be used in the shiny UI.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{switchInput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id) \{}
+
+  \CommentTok{\# HTML}
+\NormalTok{  tags}\OperatorTok{$}\KeywordTok{label}\NormalTok{(}
+    \DataTypeTok{class =} \StringTok{"switch"}\NormalTok{,}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{input}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{type =} \StringTok{"checkbox"}\NormalTok{, }\DataTypeTok{class =} \StringTok{"switch{-}input"}\NormalTok{, }\DataTypeTok{checked=}\StringTok{"true"}\NormalTok{),}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{span}\NormalTok{(}\DataTypeTok{class =} \StringTok{"slider"}\NormalTok{)}
+\NormalTok{  )}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+As for the custom outputs, the dependencies (CSS and JavaScript binding) can piggy back on the generated HTML.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{switchInput <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id) \{}
+
+  \CommentTok{\# HTML}
+\NormalTok{  form <{-}}\StringTok{ }\NormalTok{tags}\OperatorTok{$}\KeywordTok{label}\NormalTok{(}
+    \DataTypeTok{class =} \StringTok{"switch"}\NormalTok{,}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{input}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{type =} \StringTok{"checkbox"}\NormalTok{, }\DataTypeTok{class =} \StringTok{"switch{-}input"}\NormalTok{, }\DataTypeTok{checked=}\StringTok{"true"}\NormalTok{),}
+\NormalTok{    tags}\OperatorTok{$}\KeywordTok{span}\NormalTok{(}\DataTypeTok{class =} \StringTok{"slider"}\NormalTok{)}
+\NormalTok{  )}
+
+  \CommentTok{\# dependencies}
+\NormalTok{  path <{-}}\StringTok{ }\KeywordTok{normalizePath}\NormalTok{(}\StringTok{"./assets"}\NormalTok{)}
+
+\NormalTok{  deps <{-}}\StringTok{ }\NormalTok{htmltools}\OperatorTok{::}\KeywordTok{htmlDependency}\NormalTok{(}
+    \DataTypeTok{name =} \StringTok{"textInputPlus"}\NormalTok{,}
+    \DataTypeTok{version =} \StringTok{"1.0.0"}\NormalTok{,}
+    \DataTypeTok{src =} \KeywordTok{c}\NormalTok{(}\DataTypeTok{file =}\NormalTok{ path),}
+    \DataTypeTok{script =} \StringTok{"binding.js"}\NormalTok{,}
+    \DataTypeTok{stylesheet =} \StringTok{"styles.css"}
+\NormalTok{  )}
+
+\NormalTok{  htmltools}\OperatorTok{::}\KeywordTok{attachDependencies}\NormalTok{(form, deps)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{javascript-input-binding}{%
+\section{JavaScript Input Binding}\label{javascript-input-binding}}
 
 \hypertarget{cookies}{%
 \chapter{Cookies}\label{cookies}}
@@ -7927,7 +8091,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Fri Aug 28 2020 21:48:26 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Aug 30 2020 17:33:26 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -7937,7 +8101,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Fri Aug 28 2020 21:48:26 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Aug 30 2020 17:33:26 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -8474,7 +8638,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 32.64
+## [1] 67.82
 \end{verbatim}
 
 \begin{Shaded}
