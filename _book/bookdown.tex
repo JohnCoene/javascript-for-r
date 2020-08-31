@@ -1463,8 +1463,8 @@ Having explored existing packages that build on top of the htmlwidgets package g
 
 Before going down the rabbit hole it is good to take a look at the types of libraries one will work with. As htmlwidgets' main clients are JavaScript visualisation libraries let us take a look at some such popular libraries and briefly analyse at how they work and what they have in common. This will greatly help conceptualise what one is trying to achieve in this chapter.
 
-\hypertarget{plotly}{%
-\subsection{Plotly}\label{plotly}}
+\hypertarget{plotly.js}{%
+\subsection{Plotly.js}\label{plotly.js}}
 
 \href{https://plotly.com/javascript/}{Plotly.js} is probably one of the more popular out there, it provides over 40 fully customiseable chart types, many of which are very sophisticated. This is indeed the JavaScript library used by the R package of the same name: plotly.
 
@@ -1619,8 +1619,8 @@ Thankfully the htmlwidgets package is there to handle most of this. Nonetheless,
 
 The previous chapter gave some indication as to how widgets work but this is overall probably still shrouded in mystery. This chapter aims at demystifying what remains confusing. This is done by building a very basic widget with the aim of rummaging through its components to observe how they interact and ultimately grasp a greater understanding of how such interactive outputs are actually produced.
 
-\hypertarget{the-scaffold}{%
-\section{The Scaffold}\label{the-scaffold}}
+\hypertarget{the-htmlwidgets-scaffold}{%
+\section{The Htmlwidgets Scaffold}\label{the-htmlwidgets-scaffold}}
 
 Though one could probably create widgets outside of an R package, it would only make things more complicated, htmlwidgets naturally take the form of R packages and are stunningly simple to create. Below we create a package named ``playground'' which will be used to mess around and explore.
 
@@ -1669,8 +1669,8 @@ It might be hard to believe, but at this stage one already has a fully functioni
 
 This displays the message in the RStudio ``Viewer,'' or the your default browser which indicates that the function does indeed create an HTML output. One can use the \includegraphics{images/open-in-browser.png} button located in the top right of the RStudio ``Viewer'' to open the message in web browser which can prove very useful to look under the hood of the widgets for debugging.
 
-\hypertarget{the-output}{%
-\section{The Output}\label{the-output}}
+\hypertarget{the-html-output}{%
+\section{The HTML Output}\label{the-html-output}}
 
 With an out-of-the-box HTML widget package one can start exploring the internals to understand how it works. Let's start by retracing the path taken by the message written in R to its seemingly magical appearance in HTML. The \texttt{play} function previously used, takes the \texttt{message} wraps it into a list which is then used in \texttt{htmlwidgets::createWidget}.
 
@@ -1749,8 +1749,8 @@ Inspecting the output also shows the dependencies imported, these are placed wit
 
 This effectively imports the \texttt{htmlwidgets.js} library as well as the \texttt{play.js} file, and were the visualisation depending on external libraries they would appear alongside those.
 
-\hypertarget{javascript-side}{%
-\section{JavaScript-side}\label{javascript-side}}
+\hypertarget{htmlwidgets-javascript-files}{%
+\section{Htmlwidgets JavaScript Files}\label{htmlwidgets-javascript-files}}
 
 Peaking inside the \texttt{play.js} file located at \texttt{inst/htmlwidgets/play.js} reveals the code below:
 
@@ -1968,8 +1968,8 @@ As done with candidate libraries, let's take a look at documentation of \href{ht
 
 The code above is not very different from what was observed in other libraries: the library is imported, there is a \texttt{\textless{}div\textgreater{}} where the output will be generated, and a script which also takes a selector and a JSON of options.
 
-\hypertarget{dependency}{%
-\section{Dependency}\label{dependency}}
+\hypertarget{typed.js-dependency}{%
+\section{Typed.js Dependency}\label{typed.js-dependency}}
 
 Once the package created and the widget scaffold laid down we need to add the JavaScript dependency without which nothing can move forward. The \href{https://github.com/mattboldt/typed.js}{documentation in the README of typed.js} states that it can be imported like so.
 
@@ -2057,8 +2057,8 @@ We should verify that this is correct by using the one R function the package fe
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{javascript}{%
-\section{JavaScript}\label{javascript}}
+\hypertarget{typed.js-javascript-code}{%
+\section{Typed.js JavaScript Code}\label{typed.js-javascript-code}}
 
 On its \href{https://mattboldt.com/demos/typed-js/}{official website}, typed.js gives the following example. The JavaScript function \texttt{Typed} takes two arguments, first the selector, the element to hold the output, second a JSON of options to specify what is being typed and a myriad of other things.
 
@@ -2198,8 +2198,8 @@ One can now add more options from the R code without having to alter any of the 
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{html-element}{%
-\section{HTML Element}\label{html-element}}
+\hypertarget{typed.js-html-element}{%
+\section{Typed.js HTML Element}\label{typed.js-html-element}}
 
 As pointed out multiple times, the widget is generated in a \texttt{\textless{}div\textgreater{}}, which is works fine for most visualisation libraries. But we saw that chart.js requires placing it in a \texttt{\textless{}canvas\textgreater{}}, so one needs the ability to change that. It could be interesting to apply this to typed.js too as within a \texttt{\textless{}div\textgreater{}} it cannot be placed inline, using a \texttt{\textless{}span\textgreater{}}, however, this would work.
 
@@ -2275,8 +2275,8 @@ Gio.js has itself a dependency, \href{https://threejs.org/}{three.js}, which nee
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{dependencies}{%
-\section{Dependencies}\label{dependencies}}
+\hypertarget{gio.js-dependencies}{%
+\section{Gio.js Dependencies}\label{gio.js-dependencies}}
 
 Handling the dependencies does not differ much, we only need to download two libraries instead of one.
 
@@ -2335,8 +2335,8 @@ The libraries have been downloaded but the \texttt{gio.yml} file is yet to be ed
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{javascript}{%
-\section{JavaScript}\label{javascript}}
+\hypertarget{gio.js-javascript}{%
+\section{Gio.js JavaScript}\label{gio.js-javascript}}
 
 Let's copy the JavaScript code from the \href{https://giojs.org/index.html}{Get Started section of gio.js} in the \texttt{gio.js} file's \texttt{renderValue} function. At this point the data format is not known so we comment the line which adds data to the visualisation.
 
@@ -2563,8 +2563,8 @@ As mentioned previously, convention has it that rectangular data (data frames) a
 
 There are multiple ways to transform the data and ensure the serialised JSON is as the JavaScript library expects it to be.
 
-\hypertarget{in-javascript}{%
-\subsection{In JavaScript}\label{in-javascript}}
+\hypertarget{using-javascript}{%
+\subsection{Using JavaScript}\label{using-javascript}}
 
 JavaScript can be used to transform the data, leaving the serialiser as-is to reshape the data in the client. The HTMLwidget JavaScript library (already imported by default) exports an object which provides a method, \texttt{dataframeToD3}, to transform the data from long to wide.
 
@@ -2584,8 +2584,8 @@ JavaScript can be used to transform the data, leaving the serialiser as-is to re
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{in-r}{%
-\subsection{In R}\label{in-r}}
+\hypertarget{using-r}{%
+\subsection{Using R}\label{using-r}}
 
 Instead of serialising the data a certain way then correct in JavaScript as demonstrated previously, one can also modify, or even replace, htmlwidgets' default serialiser. Speaking of which, below is the default serializer used by htmlwidgets.
 
@@ -2703,8 +2703,8 @@ There are pros and cons to each methods. The preferable method is probably to on
 \caption{Gio output with correct serialisation}
 \end{figure}
 
-\hypertarget{on-print}{%
-\section{On Print}\label{on-print}}
+\hypertarget{on-print-method}{%
+\section{On Print Method}\label{on-print-method}}
 
 Let's add the option to style the globe, gio.js provides mutliple \href{https://giojs.org/html/docs/colorStyle.html}{themes} but they are currently not applicable from R. As a matter of fact, gio.js provides dozens of customisation options that should be available in the package as well. These, however, probably should be split across different functions, just like they are in gio.js, rather than all be accessible from a single function containing hundreds of arguments. This begs the question, when would one use another function given the function \texttt{gio} generates the visualisation? As it happens \texttt{gio} itself (or rather the function \texttt{htmlwidgets::createWidget} it contains) does not render the output, it returns an object of class ``htmlwidget'' which actually renders the visualisation on print (literally \texttt{htmlwidget.print} method).
 
@@ -3670,7 +3670,7 @@ The \texttt{gio} function also has to extract the group to which the dataset bel
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "SharedDatafd77dffc"
+## [1] "SharedDataad4b8865"
 \end{verbatim}
 
 \begin{Shaded}
@@ -4017,8 +4017,8 @@ Below we create two shared datasets with the same group name, one for the edges 
 
 In this chapter we polish the API that gio presents its users and provide guidelines to best integrate other JavaScript libraries with R.
 
-\hypertarget{working-with-data}{%
-\section{Working with data}\label{working-with-data}}
+\hypertarget{htmlwidgets-data}{%
+\section{Htmlwidgets \& Data}\label{htmlwidgets-data}}
 
 The gio package built thus far revolves around the \texttt{gio} function which expects a dataframe with three columns named \texttt{e}, \texttt{i}, and \texttt{v}, which is not great practice; there are great reasons why very few functions do that.
 
@@ -4096,7 +4096,7 @@ The above changes allows documentation the input that \texttt{gio} accepts more 
 This small change makes the package a great deal easier to use and understand.
 
 \hypertarget{plethora-of-options}{%
-\section{Plethora of options}\label{plethora-of-options}}
+\section{Plethora of Options}\label{plethora-of-options}}
 
 Some JavaScript libraries can be extensive and come with thousands of options that can make the port to R rather bulky, never hesitate to make us of the three dots construct (\texttt{...}) to make these accessible yet saving you from having to hard-code thousands of arguments.
 
@@ -4180,7 +4180,7 @@ Below those configuration options are now used to set the initially selected cou
 \includegraphics{images/crosstalk-three-dots.png}
 
 \hypertarget{interface-design}{%
-\section{Interface design}\label{interface-design}}
+\section{Interface Design}\label{interface-design}}
 
 As you develop a wrapper to an external visualisation library you will have to make design choices. In building gio we more or less mirrored the JavaScript code one to one: where there is a JavaScript function to change the theme of the visualisation there is one in R, etc. This might not scale properly as more and more functions are added to the package.
 
@@ -4256,7 +4256,7 @@ The aim is to obtain an R interface resembling the already existing R package. I
 \end{Shaded}
 
 \hypertarget{basics-of-plotly}{%
-\section{Basics of plotly}\label{basics-of-plotly}}
+\section{Basics of Plotly}\label{basics-of-plotly}}
 
 The story starts like all other widgets: create a package and scaffold the widget. We name the package plotlier so as to not override the local installation of the actual plotly package. We also add the magrittr pipe (\texttt{\%\textgreater{}\%}) while we're at it.
 
@@ -4411,8 +4411,8 @@ At this stage the functions \texttt{devtools::document} and \texttt{devtools::lo
 \caption{Plotlier Scatter plot}
 \end{figure}
 
-\hypertarget{javascript-to-r}{%
-\section{JavaScript to R}\label{javascript-to-r}}
+\hypertarget{plotly.js-to-r}{%
+\section{Plotly.js to R}\label{plotly.js-to-r}}
 
 We can now look up plotly's documentation on \href{https://plotly.com/javascript/plotlyjs-events/}{callback} to send data to the R server when a point is clicked.
 
@@ -4462,8 +4462,8 @@ Finally, we load the package's functions using devtools to test the input.
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{r-to-javascript}{%
-\section{R to JavaScript}\label{r-to-javascript}}
+\hypertarget{r-to-plotly.js}{%
+\section{R to Plotly.js}\label{r-to-plotly.js}}
 
 Here we implement an example of passing data from R to JavaScript, name the JavaScript \texttt{addTraces} function which allows dynamically adding traces to the chart without redrawing it in its entirety.
 
@@ -4573,8 +4573,8 @@ After installing the package, one can use the new proxy function in a shiny appl
 \caption{Plotly with dynamic traces}
 \end{figure}
 
-\hypertarget{size-resize}{%
-\section{Size \& Resize}\label{size-resize}}
+\hypertarget{size-resize-plotly.js}{%
+\section{Size \& Resize Plotly.js}\label{size-resize-plotly.js}}
 
 At this stage the plotlier package does yet provide responsive visualisation: resizing the screen does not resize the visualisation. In order to ensure that it is we have to define a default width that is not defined in pixel but percentage (such as 100\%) and implement the resize method.
 
@@ -4623,8 +4623,8 @@ One can test this by resizing the browser or RStudio viewer window.
 \caption{Responsive plotly output}
 \end{figure}
 
-\hypertarget{performance-security}{%
-\section{Performance \& Security}\label{performance-security}}
+\hypertarget{performance-security-with-plotly.js}{%
+\section{Performance \& Security with Plotly.js}\label{performance-security-with-plotly.js}}
 
 The package stores the data passed to the \texttt{plotly} function in the widget object, however, as explained in a previous chapter this is insecure and a drain on performances. First, this data serialised to JSON but not used in JavaScript and thus leads to unnecessary computations. Second, this data is visible on the resulting visualisation which may cause security concerns given the user may not deliberately use all the data in the visualisation. This can be remedied to by use the \texttt{preRenderHook}.
 
@@ -4663,8 +4663,8 @@ Shiny is the web framework of choice for the R programming language. Since JavaS
 
 Then again, the goal is not to write a lot of convoluted JavaScript, on the contrary, with little knowledge of the language the aim is to write as little as possible but demonstrate to the reader that it is often enough to greatly improve the user experience of shiny applications.
 
-\hypertarget{websocket}{%
-\section{Websocket}\label{websocket}}
+\hypertarget{websocket-shiny}{%
+\section{Websocket \& Shiny}\label{websocket-shiny}}
 
 Shiny applications have two components the user interface (UI) and the server function. These two components communicate via a websocket: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server this connection is managed by shiny using the httpuv \citep{R-httpuv} and websocket \citep{R-websocket} packages, while in clients connecting to the server this connection is managed with JavaScript.
 
@@ -4697,8 +4697,8 @@ Drawing a diagram of the communication between the UI and the server reveals tha
 
 Communicating between the R server and the user interface requires JavaScript and thus makes us a reasonable chunk of this part of the book on web development with shiny.
 
-\hypertarget{walkthrough---alerts}{%
-\section{Walkthrough - Alerts}\label{walkthrough---alerts}}
+\hypertarget{alerts-an-example}{%
+\section{Alerts, An Example}\label{alerts-an-example}}
 
 Making shiny work with JavaScript can essentially be broken down into two operations: 1) passing data from the R server to the JavaScript client and 2) the other way around, from the client to the R server. This chapter covers both ways data travels between R and JavaScript in Shiny.
 
@@ -8350,6 +8350,12 @@ This forces the chart to update, applying the new style. Below we write an appli
 \caption{Gio with dynamic style}
 \end{figure}
 
+\hypertarget{part-interactive-documents}{%
+\part{Interactive Documents}\label{part-interactive-documents}}
+
+\hypertarget{introduction-to-rmarkdown}{%
+\chapter{Introduction to Rmarkdown}\label{introduction-to-rmarkdown}}
+
 \hypertarget{part-javascript-for-computations}{%
 \part{JavaScript for Computations}\label{part-javascript-for-computations}}
 
@@ -8498,7 +8504,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Mon Aug 31 2020 21:21:06 GMT+0200 (Central European Summer Time)"
+## [1] "Mon Aug 31 2020 21:41:17 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -8508,7 +8514,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Mon Aug 31 2020 21:21:06 GMT+0200 (Central European Summer Time)"
+## [1] "Mon Aug 31 2020 21:41:17 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -9045,7 +9051,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 74.77
+## [1] -1.625
 \end{verbatim}
 
 \begin{Shaded}
