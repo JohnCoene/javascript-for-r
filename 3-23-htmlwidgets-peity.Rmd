@@ -1,54 +1,59 @@
 # A Realistic Widget
 
-In this section we build a package called `typed`, which wraps the JavaScript library of the same name, [typed.js](https://github.com/mattboldt/typed.js/) that mimics text being typed. This builds upon many things we explored in the playground package.
+In this section we build a package called `peity` which wraps the JavaScript library of the same name, [peity.js](https://github.com/benpickles/peity) to create inline charts. This builds upon many things we explored in the playground package built in the previous chapter.
 
 ```r
-usethis::create_package("typed")
-htmlwidgets::scaffoldWidget("typed")
+usethis::create_package("peity")
+htmlwidgets::scaffoldWidget("peity")
 ```
 
-As done with candidate libraries, let's take a look at documentation of [typed.js](https://github.com/mattboldt/typed.js/) to see how typed.js works.
+As done with candidate libraries, let's take a look at documentation of peity.js to see how it works.
 
 ```html
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 
 <head>
-  <!-- Import library -->
-  <script src="typed.js"></script>
+  <!-- Import libraries -->
+  <script src="jquery-3.5.1.min.js"></script>
+  <script src="jquery.peity.min.js"></script>
 </head>
 
 <body>
   <!-- div to hold visualisation -->
-  <div class="element"></div>
+  <span id="bar">5,3,9,6,5,9,7,3,5,2</span>
 
   <!-- Script to create visualisation -->
   <script>
-    var typed = new Typed('.element', {
-      strings: ['First sentence.', 'And a second sentence.']
-    });
+    $("#bar").peity("bar");
   </script>
 </body>
 
 </html>
 ```
 
-The code above is not very different from what was observed in other libraries: the library is imported, there is a `<div>` where the output will be generated, and a script which also takes a selector and a JSON of options.
+Peity.js depends on jQuery, hence the latter is imported first, the data for the chart is placed in a `<span>`, and the `peity` method is used on the element containing the data.
 
-## Typed.js Dependency 
+## Peity.js Dependencies 
 
-Once the package created and the widget scaffold laid down we need to add the JavaScript dependency without which nothing can move forward. The [documentation in the README of typed.js](https://github.com/mattboldt/typed.js) states that it can be imported like so.
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
-```
+Once the package created and the widget scaffold laid down we need to add the JavaScript dependencies without which nothing can move forward.
 
 First, we will download the dependency, which consists of a single JavaScript file, instead of using the CDN as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Below we place the dependency in a "typed" directory within the "htmlwidgets" folder.
 
 ```r
+dir.create("./inst/htmlwidgets/jquery", recursive = TRUE)
 dir.create("./inst/htmlwidgets/typed")
-cdn <- "https://cdn.jsdelivr.net/npm/typed.js@2.0.11"
-download.file(cdn, "./inst/htmlwidgets/typed/typed.min.js")
+
+peity <- paste0(
+  "https://raw.githubusercontent.com/benpickles/",
+  "peity/master/jquery.peity.min.js"
+)
+jquery <- paste0(
+  "https://code.jquery.com/jquery-3.5.1.min.js"
+)
+
+download.file(jquery, "./inst/htmlwidgets/jquery/jquery.min.js")
+download.file(peity, "./inst/htmlwidgets/peity/jquery.peity.min.js")
 ```
 
 This produces a directory that looks like this:
@@ -58,13 +63,15 @@ This produces a directory that looks like this:
 ├── DESCRIPTION
 ├── NAMESPACE
 ├── R
-│   └── typed.R
+│   └── peity.R
 └── inst
     └── htmlwidgets
-        ├── typed
-        │   └── typed.min.js
-        ├── typed.js
-        └── typed.yaml
+        ├── jquery
+        │   └── jquery.min.js
+        ├── peity.js
+        ├── peity.yaml
+        └── peity
+            └── jquery.peity.min.js
 ```
 
 In htmlwidgets packages dependencies are specified in the `.yml` file located at `inst/htmlwidgets` which at first contains a commented template.
@@ -83,17 +90,21 @@ Let's uncomment those lines as instructed at the top of the file and fill it in.
 
 ```yml
 dependencies:
-  - name: typed.js
-    version: 2.0.11
-    src: htmlwidgets/typed
-    script: typed.min.js
+  - name: jQuery
+    version: 3.5.1
+    src: htmlwidgets/jquery
+    script: jquery.min.js
+  - name: peity
+    version: 3.3.0
+    src: htmlwidgets/peity
+    script: jquery.peity.min.js
 ```
 
 We remove the `stylesheet` entry as this package does not require any CSS files. The `src` specifies the path to the directory containing the scripts and stylesheets. This is akin to using the `system.file` function to return the full path to a file or directory within the package.
 
 ```r
 devtools::load_all()
-system.file("htmlwidgets/typed", package = "typed")                                         
+system.file("htmlwidgets/peity", package = "peity")                                         
 #> "/home/me/packages/typed/inst/htmlwidgets/typed"
 ```
 
@@ -106,8 +117,9 @@ We should verify that this is correct by using the one R function the package fe
 <meta charset="utf-8"/>
 <style>body{background-color:white;}</style>
 <script src="lib/htmlwidgets-1.5.1/htmlwidgets.js"></script>
-<script src="lib/typed.js-2.0.11/typed.min.js"></script>
-<script src="lib/typed-binding-0.0.0.9000/typed.js"></script>
+<script src="lib/jQuery-3.5.1/jquery.min.js"></script>
+<script src="lib/peity-3.3.0/jquery.peity.min.js"></script>
+<script src="lib/peity-binding-0.0.0.9000/peity.js"></script>
 ...
 ```
 
