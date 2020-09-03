@@ -32,13 +32,13 @@ As done with candidate libraries, let's take a look at documentation of peity.js
 </html>
 ```
 
-Peity.js depends on jQuery, hence the latter is imported first, the data for the chart is placed in a `<span>`, and the `peity` method is used on the element containing the data.
+Peity.js depends on jQuery, hence the latter is imported first, the data for the chart is placed in a `<span>`, and the `peity` method is then used on the element containing the data. Peity.js uses `<span>` HTML tags as these work inline, using a `<div>` the chart will still display but the purpose of using peity.js would be defeated.
 
 ## Peity.js Dependencies 
 
 Once the package created and the widget scaffold laid down we need to add the JavaScript dependencies without which nothing can move forward.
 
-First, we will download the dependency, which consists of a single JavaScript file, instead of using the CDN as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Below we place the dependency in a "typed" directory within the "htmlwidgets" folder.
+Two dependencies are required in order for peity.js to run: peity.js and jQuery, instead of using the CDN those are downloaded as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Each of the two library is placed in its own respective directory.
 
 ```r
 dir.create("./inst/htmlwidgets/jquery", recursive = TRUE)
@@ -74,7 +74,7 @@ This produces a directory that looks like this:
             └── jquery.peity.min.js
 ```
 
-In htmlwidgets packages dependencies are specified in the `.yml` file located at `inst/htmlwidgets` which at first contains a commented template.
+In htmlwidgets dependencies are specified in the `.yml` file located at `inst/htmlwidgets` which at first contains a commented template.
 
 ```yml
 # (uncomment to add a dependency)
@@ -86,7 +86,7 @@ In htmlwidgets packages dependencies are specified in the `.yml` file located at
 #    stylesheet:
 ```
 
-Let's uncomment those lines as instructed at the top of the file and fill it in.
+Let's uncomment those lines as instructed at the top of the file and fill it in. 
 
 ```yml
 dependencies:
@@ -100,15 +100,19 @@ dependencies:
     script: jquery.peity.min.js
 ```
 
-We remove the `stylesheet` entry as this package does not require any CSS files. The `src` specifies the path to the directory containing the scripts and stylesheets. This is akin to using the `system.file` function to return the full path to a file or directory within the package.
+```{block, type='rmdnote'}
+The order of the dependencies matters, peity.js depends on jQuery hence the latter comes first in the `.yml`.
+```
+
+The order in which one specifies the dependencies matters, just like it does in an HTML file, therefore jQuery is listed first. The `stylesheet` entries were removed as none of these libraries require CSS files. The `src` path points to the directory containing the JavaScript files and stylesheets relative to the `inst` directory of the package, this is akin to using the `system.file` function to return the full path to a file or directory within the package.
 
 ```r
 devtools::load_all()
 system.file("htmlwidgets/peity", package = "peity")                                         
-#> "/home/me/packages/typed/inst/htmlwidgets/typed"
+#> "/home/me/packages/peity/inst/htmlwidgets/peity"
 ```
 
-We should verify that this is correct by using the one R function the package features and check the source code of the output to verify that the typed.js is indeed imported. We thus run `typed("test")`, open the output in the browser (![](images/open-in-browser.png)) and look at the source code of the page (right click and select "View page source"). At the top of the page one should see `typed.min.js` imported, click the link to ensure it correctly points to the dependency.
+We should verify that this is correct by using the one R function the package features and check the source code of the output to verify that the the dependencies are well present in the HTML output. We thus run `peity("test")`, open the output in the browser (![](images/open-in-browser.png)) and look at the source code of the page. At the top of the page one should see `jquery.min.js` and `jquery.peity.min.js` imported, clicking those links will either present you with the content of the file or an error.
 
 ```html
 <!DOCTYPE html>
@@ -123,129 +127,40 @@ We should verify that this is correct by using the one R function the package fe
 ...
 ```
 
-## Typed.js JavaScript Code 
+## Peity.js JavaScript Code 
 
-On its [official website](https://mattboldt.com/demos/typed-js/), typed.js gives the following example. The JavaScript function `Typed` takes two arguments, first the selector, the element to hold the output, second a JSON of options to specify what is being typed and a myriad of other things. 
-
-```js
-var typed = new Typed('.element', {
-  strings: ["First sentence.", "Second sentence."],
-  typeSpeed: 30
-});
-```
-
-Let's place it in the package by replacing the content of the `renderValue` in `typed.js` with the above.
+Peity.js' JavaScript code is rather uncomplicated, it's just one function, but integrating it with htmlwidgets requires some thinking. In the example below, peity is applied to the element with `id = 'elementId'`, the first argument of `peity` is the type of chart to produce form the data and the second optional argument is a JSON of options.
 
 ```js
-...
-renderValue: function(x) {
-
-  var typed = new Typed('.element', {
-    strings: ["First sentence.", "Second sentence."],
-    typeSpeed: 30
-  });
-
-}
-...
+$("#elementId").peity("bar", {
+  fill: ["red", "green", "blue"]
+})
 ```
 
-One could be tempted to run `devtools::load_all` but this will not work, namely because the function uses a selector that is will not return any object; it needs to be applied to the div created by the widget not `.element`. As hinted at in the playground, the selector of the element created is accessible from the `el` object. As a matter of fact, we did log in the browser console the id of the created div taken from `el.id`. Therefore concatenating the pound sign and the element id produces the select to said element. (`.class`, `#id`)
+Also, the data that peity uses to draw the inline chart is not passed to the function but taken from the HTML element.
 
-```js
-// typed.js
-...
-renderValue: function(x) {
-
-  var typed = new Typed('#' + el.id, {
-    strings: ["First sentence.", "Second sentence."],
-    typeSpeed: 30
-  });
-
-}
-...
+```html
+<span id="elementId">5,3,9,6</span>
 ```
 
-This should now work, run `devtools::load_all` followed by `typed("whatever")` and the JavaScript animated text will appear! It's not of any use just yet as the options, including the text being typed is predefined: the package is currently not making any use the of the inputs passed from R. This can be changed by using `x.message` passed from R instead of the default strings.
-
-```js
-// typed.js
-...
-renderValue: function(x) {
-
-  var typed = new Typed('#' + el.id, {
-    strings: x.message,
-    typeSpeed: 30
-  });
-
-}
-...
-```
-
-This, however, will cause issues as the `strings` options expects and array (vector) and not a single string. 
+Therefore, the htmlwidget will have to insert the data in the HTML element then run the `peity` function to render the chart. inserting the data is not easy as much as already done by htmlwidgets by default. Indeed the default htmlwidgets template takes a `message` from the R function and inserts said message in the HTML element, passing a vector instead of a message produces precisely what peity expects!
 
 ```r
-typed("does not work") # length =  1
-typed(c("This", "will", "work")) # length > 1
+peity(c(1,5,6,2))
 ```
 
-One solution is to force the input into a list.
-
-```r
-# typed.R
-x = list(
-  message = as.list(message)
-)
+```html
+<div 
+  id="htmlwidget-495cf47d1a2a4a56c851" 
+  style="width:960px;height:500px;" 
+  class="play html-widget">
+  1,5,6,2
+</div>
 ```
 
-At this juncture the package works but there is a salient issue with the way it handles options. Why build a list in R to reconstruct it in JavaScript manually. Since the options are serialised in R to JSON and that typed.js expects a JSON of options it is actually cleaner and more convenient to construct an R list that mirrors the JSON array so one can use it as-is in JavaScript.
 
-In fact, renaming the `message` to `strings` effectively does this.
 
-```r
-# typed.R
-x = list(
-  strings = as.list(message)
-)
-```
-
-This allows greatly simplifying the code JavaScript side, making it much easier to add other options down the line, maintain, debug, and read.
-
-```js
-// typed.js
-...
-renderValue: function(x) {
-
-  var typed = new Typed('#' + el.id, x);
-
-}
-...
-```
-
-One can now add more options from the R code without having to alter any of the JavaScript. Let us demonstrate with the `loop` option.
-
-```r
-typed <- function(message, loop = FALSE, 
-  width = NULL, height = NULL, elementId = NULL) {
-
-  # forward options using x
-  x = list(
-    loop = loop,
-    strings = as.list(message)
-  )
-
-  # create widget
-  htmlwidgets::createWidget(
-    name = 'typed',
-    x,
-    width = width,
-    height = height,
-    package = 'typed',
-    elementId = elementId
-  )
-}
-```
-
-## Typed.js HTML Element 
+## Peity.js HTML Element 
 
 As pointed out multiple times, the widget is generated in a `<div>`, which is works fine for most visualisation libraries. But we saw that chart.js requires placing it in a `<canvas>`, so one needs the ability to change that. It could be interesting to apply this to typed.js too as within a `<div>` it cannot be placed inline, using a `<span>`, however, this would work.
 
