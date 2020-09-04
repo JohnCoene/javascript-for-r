@@ -1,5 +1,9 @@
 # A Realistic Widget
 
+```{r, include = FALSE, echo = FALSE}
+library(peity)
+```
+
 In this section we build a package called `peity` which wraps the JavaScript library of the same name, [peity.js](https://github.com/benpickles/peity) to create inline charts. This builds upon many things we explored in the playground package built in the previous chapter.
 
 ```r
@@ -303,7 +307,7 @@ htmltools::browsable(
 )
 ```
 
-```{r, echo = FALSE}
+```{r, eval = FALSE}
 htmltools::browsable(
   htmltools::tagList(
     peity(runif(5)),
@@ -317,26 +321,41 @@ htmltools::browsable(
 )
 ```
 
-There is nonetheless one remaining issue: peity.js is meant to create inline charts within `<span>` HTML tags but these are created within `<div>` hence each chart appears on a new line. 
+![peity output with DIV](images/peity-div.png)
+
+There is nonetheless one remaining issue: peity.js is meant to create inline charts within `<span>` HTML tags but these are created within `<div>` hence each chart appears on a new line.
 
 ## Peity.js HTML Element 
 
-As pointed out multiple times, the widget is generated in a `<div>`, which is works fine for most visualisation libraries. But we saw that chart.js requires placing it in a `<canvas>`, so one needs the ability to change that. It could be interesting to apply this to typed.js too as within a `<div>` it cannot be placed inline, using a `<span>`, however, this would work.
+As pointed out multiple times, the widget is generated in a `<div>`, which is works fine for most visualisation libraries. But we saw that peity.js works best when placed in a `<span>` as this allows placing the charts inline. 
 
-This can be changed by placing a function named `nameOfWidget_html` which looked up by htmlwidgets and used if found. This function takes the three-dot construct `...` and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets needs be able to pass arguments, such as the all too critical `id`.
+This can be changed by placing a function named `widgetname_html` which is looked up by htmlwidgets and used if found. This function takes the three-dot construct (`...`) and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets needs be able to pass other arguments, such as the all too critical `id`.
 
 ```r
-typed_html <- function(...){
+peity_html <- function(...){
   htmltools::tags$span(...)
 }
 ```
 
-Note that this can also be used to force certain attributes onto the element. For instance we could use the code below to force all output to use a red font.
+This can also come in handy if some arguments must be hard-coded such as assigning a specific class to every widget.
 
 ```r
-typed_html <- function(...){
-  htmltools::tags$span(..., style = "color:red;")
+myWidget_html <- function(..., class){
+  htmltools::tags$div(..., class = c(class, "my-class"))
 }
 ```
 
-We shall leave it at that and move on to building another widget but completing the package makes for an interesting exercise.
+Reloading the package after placing the function above anywhere in the package will produce inline charts.
+
+```r
+htmltools::browsable(
+  htmltools::tagList(
+    peity(runif(5)),
+    peity(runif(5), type = "line"),
+    peity("1/4", type = "pie", fill = c("#c6d9fd", "#4d89f9")),
+    peity(c(3,5), type = "donut")
+  )
+)
+```
+
+![peity output with SPAN](images/peity-span.png)

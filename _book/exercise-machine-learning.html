@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-09-01" />
+<meta name="date" content="2020-09-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -230,9 +230,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="6" data-path="a-realistic-widget.html"><a href="a-realistic-widget.html"><i class="fa fa-check"></i><b>6</b> A Realistic Widget</a>
 <ul>
-<li class="chapter" data-level="6.1" data-path="a-realistic-widget.html"><a href="a-realistic-widget.html#typed.js-dependency"><i class="fa fa-check"></i><b>6.1</b> Typed.js Dependency</a></li>
-<li class="chapter" data-level="6.2" data-path="a-realistic-widget.html"><a href="a-realistic-widget.html#typed.js-javascript-code"><i class="fa fa-check"></i><b>6.2</b> Typed.js JavaScript Code</a></li>
-<li class="chapter" data-level="6.3" data-path="a-realistic-widget.html"><a href="a-realistic-widget.html#typed.js-html-element"><i class="fa fa-check"></i><b>6.3</b> Typed.js HTML Element</a></li>
+<li class="chapter" data-level="6.1" data-path="a-realistic-widget.html"><a href="a-realistic-widget.html#peity.js-dependencies"><i class="fa fa-check"></i><b>6.1</b> Peity.js Dependencies</a></li>
+<li class="chapter" data-level="6.2" data-path="a-realistic-widget.html"><a href="a-realistic-widget.html#peity.js-implementation"><i class="fa fa-check"></i><b>6.2</b> Peity.js Implementation</a></li>
+<li class="chapter" data-level="6.3" data-path="a-realistic-widget.html"><a href="a-realistic-widget.html#peity.js-html-element"><i class="fa fa-check"></i><b>6.3</b> Peity.js HTML Element</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="the-full-monty.html"><a href="the-full-monty.html"><i class="fa fa-check"></i><b>7</b> The Full Monty</a>
 <ul>
@@ -441,134 +441,134 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="exercise---machine-learning" class="section level1" number="21">
 <h1><span class="header-section-number">Chapter 21</span> Exercise - Machine Learning</h1>
 <p>In this chapter we build a package that, via V8, wraps <a href="https://github.com/mljs/ml">ml.js</a>, a library which brings machine learning to JavaScript. It covers quite a few models, in this chapter we only include one: the linear regression. This is an interesting example because it reveals some proceedings that one is likely to run into when creating packages using V8.</p>
-<div class="sourceCode" id="cb445"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb445-1"><a href="exercise-machine-learning.html#cb445-1"></a><span class="kw">const</span> x <span class="op">=</span> [<span class="fl">0.5</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="fl">1.5</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="fl">2.5</span>]<span class="op">;</span></span>
-<span id="cb445-2"><a href="exercise-machine-learning.html#cb445-2"></a><span class="kw">const</span> y <span class="op">=</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span>]<span class="op">;</span></span>
-<span id="cb445-3"><a href="exercise-machine-learning.html#cb445-3"></a></span>
-<span id="cb445-4"><a href="exercise-machine-learning.html#cb445-4"></a><span class="kw">const</span> regression <span class="op">=</span> <span class="kw">new</span> <span class="va">ml</span>.<span class="at">SimpleLinearRegression</span>(x<span class="op">,</span> y)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb451"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb451-1"><a href="exercise-machine-learning.html#cb451-1"></a><span class="kw">const</span> x <span class="op">=</span> [<span class="fl">0.5</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="fl">1.5</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="fl">2.5</span>]<span class="op">;</span></span>
+<span id="cb451-2"><a href="exercise-machine-learning.html#cb451-2"></a><span class="kw">const</span> y <span class="op">=</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span>]<span class="op">;</span></span>
+<span id="cb451-3"><a href="exercise-machine-learning.html#cb451-3"></a></span>
+<span id="cb451-4"><a href="exercise-machine-learning.html#cb451-4"></a><span class="kw">const</span> regression <span class="op">=</span> <span class="kw">new</span> ml<span class="op">.</span><span class="fu">SimpleLinearRegression</span>(x<span class="op">,</span> y)<span class="op">;</span></span></code></pre></div>
 <div id="dependency" class="section level2" number="21.1">
 <h2><span class="header-section-number">21.1</span> Dependency</h2>
 <p>We start by creating a package and add the V8 package as dependency.</p>
-<div class="sourceCode" id="cb446"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb446-1"><a href="exercise-machine-learning.html#cb446-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;ml&quot;</span>)</span>
-<span id="cb446-2"><a href="exercise-machine-learning.html#cb446-2"></a>usethis<span class="op">::</span><span class="kw">use_package</span>(<span class="st">&quot;V8&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb452"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb452-1"><a href="exercise-machine-learning.html#cb452-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;ml&quot;</span>)</span>
+<span id="cb452-2"><a href="exercise-machine-learning.html#cb452-2"></a>usethis<span class="op">::</span><span class="kw">use_package</span>(<span class="st">&quot;V8&quot;</span>)</span></code></pre></div>
 <p>Then we create the <code>inst</code> directory in which we place the ml.js file downloaded from the CDN.</p>
-<div class="sourceCode" id="cb447"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb447-1"><a href="exercise-machine-learning.html#cb447-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;inst&quot;</span>)</span>
-<span id="cb447-2"><a href="exercise-machine-learning.html#cb447-2"></a><span class="kw">download.file</span>(</span>
-<span id="cb447-3"><a href="exercise-machine-learning.html#cb447-3"></a>  <span class="st">&quot;https://www.lactame.com/lib/ml/4.0.0/ml.min.js&quot;</span>, </span>
-<span id="cb447-4"><a href="exercise-machine-learning.html#cb447-4"></a>  <span class="st">&quot;inst/ml.min.js&quot;</span></span>
-<span id="cb447-5"><a href="exercise-machine-learning.html#cb447-5"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb453"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb453-1"><a href="exercise-machine-learning.html#cb453-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;inst&quot;</span>)</span>
+<span id="cb453-2"><a href="exercise-machine-learning.html#cb453-2"></a><span class="kw">download.file</span>(</span>
+<span id="cb453-3"><a href="exercise-machine-learning.html#cb453-3"></a>  <span class="st">&quot;https://www.lactame.com/lib/ml/4.0.0/ml.min.js&quot;</span>, </span>
+<span id="cb453-4"><a href="exercise-machine-learning.html#cb453-4"></a>  <span class="st">&quot;inst/ml.min.js&quot;</span></span>
+<span id="cb453-5"><a href="exercise-machine-learning.html#cb453-5"></a>)</span></code></pre></div>
 <p>With the dependency downloaded one can start working on the R code. First, a new V8 context needs to be created and the ml.js file need to be imported in it.</p>
-<div class="sourceCode" id="cb448"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb448-1"><a href="exercise-machine-learning.html#cb448-1"></a><span class="co"># zzz.R</span></span>
-<span id="cb448-2"><a href="exercise-machine-learning.html#cb448-2"></a>ml &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb448-3"><a href="exercise-machine-learning.html#cb448-3"></a></span>
-<span id="cb448-4"><a href="exercise-machine-learning.html#cb448-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
-<span id="cb448-5"><a href="exercise-machine-learning.html#cb448-5"></a>  ml &lt;&lt;-<span class="st"> </span>V8<span class="op">::</span><span class="kw">v8</span>()</span>
-<span id="cb448-6"><a href="exercise-machine-learning.html#cb448-6"></a>  mljs &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ml.min.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;ml&quot;</span>)</span>
-<span id="cb448-7"><a href="exercise-machine-learning.html#cb448-7"></a>  ml<span class="op">$</span><span class="kw">source</span>(mljs)</span>
-<span id="cb448-8"><a href="exercise-machine-learning.html#cb448-8"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb454"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb454-1"><a href="exercise-machine-learning.html#cb454-1"></a><span class="co"># zzz.R</span></span>
+<span id="cb454-2"><a href="exercise-machine-learning.html#cb454-2"></a>ml &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb454-3"><a href="exercise-machine-learning.html#cb454-3"></a></span>
+<span id="cb454-4"><a href="exercise-machine-learning.html#cb454-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
+<span id="cb454-5"><a href="exercise-machine-learning.html#cb454-5"></a>  ml &lt;&lt;-<span class="st"> </span>V8<span class="op">::</span><span class="kw">v8</span>()</span>
+<span id="cb454-6"><a href="exercise-machine-learning.html#cb454-6"></a>  mljs &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ml.min.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;ml&quot;</span>)</span>
+<span id="cb454-7"><a href="exercise-machine-learning.html#cb454-7"></a>  ml<span class="op">$</span><span class="kw">source</span>(mljs)</span>
+<span id="cb454-8"><a href="exercise-machine-learning.html#cb454-8"></a>}</span></code></pre></div>
 </div>
 <div id="simple-regression" class="section level2" number="21.2">
 <h2><span class="header-section-number">21.2</span> Simple Regression</h2>
 <p>First model we make available is the <a href="https://github.com/mljs/regression-simple-linear">“simple linear regression”</a>, which consists of a simple function that takes two arrays. We can thus create a function that takes two vectors, <code>x</code>, and <code>y</code>, and runs the regression.</p>
-<div class="sourceCode" id="cb449"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb449-1"><a href="exercise-machine-learning.html#cb449-1"></a><span class="co">#&#39; @export </span></span>
-<span id="cb449-2"><a href="exercise-machine-learning.html#cb449-2"></a>ml_simple_lm &lt;-<span class="st"> </span><span class="cf">function</span>(y, x){</span>
-<span id="cb449-3"><a href="exercise-machine-learning.html#cb449-3"></a>  <span class="co"># assign x and y</span></span>
-<span id="cb449-4"><a href="exercise-machine-learning.html#cb449-4"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;x&quot;</span>, x)</span>
-<span id="cb449-5"><a href="exercise-machine-learning.html#cb449-5"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;y&quot;</span>, y)</span>
-<span id="cb449-6"><a href="exercise-machine-learning.html#cb449-6"></a></span>
-<span id="cb449-7"><a href="exercise-machine-learning.html#cb449-7"></a>  <span class="co"># run regression</span></span>
-<span id="cb449-8"><a href="exercise-machine-learning.html#cb449-8"></a>  ml<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;var regression = new ML.SimpleLinearRegression(x, y);&quot;</span>)</span>
-<span id="cb449-9"><a href="exercise-machine-learning.html#cb449-9"></a>  </span>
-<span id="cb449-10"><a href="exercise-machine-learning.html#cb449-10"></a>  <span class="co"># return results</span></span>
-<span id="cb449-11"><a href="exercise-machine-learning.html#cb449-11"></a>  ml<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;regression&quot;</span>)</span>
-<span id="cb449-12"><a href="exercise-machine-learning.html#cb449-12"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb455"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb455-1"><a href="exercise-machine-learning.html#cb455-1"></a><span class="co">#&#39; @export </span></span>
+<span id="cb455-2"><a href="exercise-machine-learning.html#cb455-2"></a>ml_simple_lm &lt;-<span class="st"> </span><span class="cf">function</span>(y, x){</span>
+<span id="cb455-3"><a href="exercise-machine-learning.html#cb455-3"></a>  <span class="co"># assign x and y</span></span>
+<span id="cb455-4"><a href="exercise-machine-learning.html#cb455-4"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;x&quot;</span>, x)</span>
+<span id="cb455-5"><a href="exercise-machine-learning.html#cb455-5"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;y&quot;</span>, y)</span>
+<span id="cb455-6"><a href="exercise-machine-learning.html#cb455-6"></a></span>
+<span id="cb455-7"><a href="exercise-machine-learning.html#cb455-7"></a>  <span class="co"># run regression</span></span>
+<span id="cb455-8"><a href="exercise-machine-learning.html#cb455-8"></a>  ml<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;var regression = new ML.SimpleLinearRegression(x, y);&quot;</span>)</span>
+<span id="cb455-9"><a href="exercise-machine-learning.html#cb455-9"></a>  </span>
+<span id="cb455-10"><a href="exercise-machine-learning.html#cb455-10"></a>  <span class="co"># return results</span></span>
+<span id="cb455-11"><a href="exercise-machine-learning.html#cb455-11"></a>  ml<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;regression&quot;</span>)</span>
+<span id="cb455-12"><a href="exercise-machine-learning.html#cb455-12"></a>}</span></code></pre></div>
 <p>Then we can document and load the model to the function.</p>
-<div class="sourceCode" id="cb450"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb450-1"><a href="exercise-machine-learning.html#cb450-1"></a><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
-<span id="cb450-2"><a href="exercise-machine-learning.html#cb450-2"></a><span class="co">## $name</span></span>
-<span id="cb450-3"><a href="exercise-machine-learning.html#cb450-3"></a><span class="co">## [1] &quot;simpleLinearRegression&quot;</span></span>
-<span id="cb450-4"><a href="exercise-machine-learning.html#cb450-4"></a><span class="co">## </span></span>
-<span id="cb450-5"><a href="exercise-machine-learning.html#cb450-5"></a><span class="co">## $slope</span></span>
-<span id="cb450-6"><a href="exercise-machine-learning.html#cb450-6"></a><span class="co">## [1] 0.1655676</span></span>
-<span id="cb450-7"><a href="exercise-machine-learning.html#cb450-7"></a><span class="co">## </span></span>
-<span id="cb450-8"><a href="exercise-machine-learning.html#cb450-8"></a><span class="co">## $intercept</span></span>
-<span id="cb450-9"><a href="exercise-machine-learning.html#cb450-9"></a><span class="co">## [1] 8.283906</span></span></code></pre></div>
+<div class="sourceCode" id="cb456"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb456-1"><a href="exercise-machine-learning.html#cb456-1"></a><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
+<span id="cb456-2"><a href="exercise-machine-learning.html#cb456-2"></a><span class="co">## $name</span></span>
+<span id="cb456-3"><a href="exercise-machine-learning.html#cb456-3"></a><span class="co">## [1] &quot;simpleLinearRegression&quot;</span></span>
+<span id="cb456-4"><a href="exercise-machine-learning.html#cb456-4"></a><span class="co">## </span></span>
+<span id="cb456-5"><a href="exercise-machine-learning.html#cb456-5"></a><span class="co">## $slope</span></span>
+<span id="cb456-6"><a href="exercise-machine-learning.html#cb456-6"></a><span class="co">## [1] 0.1655676</span></span>
+<span id="cb456-7"><a href="exercise-machine-learning.html#cb456-7"></a><span class="co">## </span></span>
+<span id="cb456-8"><a href="exercise-machine-learning.html#cb456-8"></a><span class="co">## $intercept</span></span>
+<span id="cb456-9"><a href="exercise-machine-learning.html#cb456-9"></a><span class="co">## [1] 8.283906</span></span></code></pre></div>
 <p>This works but has a few issues, namely running two or more regression internally will override the variable <code>regression</code> in the V8 context. Let us demonstrate by implementing a function to predict.</p>
-<div class="sourceCode" id="cb451"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb451-1"><a href="exercise-machine-learning.html#cb451-1"></a><span class="co">#&#39; @export</span></span>
-<span id="cb451-2"><a href="exercise-machine-learning.html#cb451-2"></a>ml_predict &lt;-<span class="st"> </span><span class="cf">function</span>(x){</span>
-<span id="cb451-3"><a href="exercise-machine-learning.html#cb451-3"></a>  ml<span class="op">$</span><span class="kw">call</span>(<span class="st">&quot;regression.predict&quot;</span>, x)</span>
-<span id="cb451-4"><a href="exercise-machine-learning.html#cb451-4"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb457"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb457-1"><a href="exercise-machine-learning.html#cb457-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb457-2"><a href="exercise-machine-learning.html#cb457-2"></a>ml_predict &lt;-<span class="st"> </span><span class="cf">function</span>(x){</span>
+<span id="cb457-3"><a href="exercise-machine-learning.html#cb457-3"></a>  ml<span class="op">$</span><span class="kw">call</span>(<span class="st">&quot;regression.predict&quot;</span>, x)</span>
+<span id="cb457-4"><a href="exercise-machine-learning.html#cb457-4"></a>}</span></code></pre></div>
 <p>We then document and load the functions to then run two regressions in a row and observe the issue. Unlike R the model we created only exists in JavaScript, unlike the <code>lm</code>, the function <code>ml_simple_lm</code> does not return the model. Therefore, <code>ml_simple_lm</code> does not distinguish between models, unlike <code>predict</code> which takes the model as first argument and runs the prediction on it.</p>
 <p>This implementation of ml.js is indeed very dangerous.</p>
-<div class="sourceCode" id="cb452"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb452-1"><a href="exercise-machine-learning.html#cb452-1"></a><span class="co"># first model</span></span>
-<span id="cb452-2"><a href="exercise-machine-learning.html#cb452-2"></a><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
-<span id="cb452-3"><a href="exercise-machine-learning.html#cb452-3"></a><span class="kw">ml_predict</span>(<span class="dv">15</span>)</span>
-<span id="cb452-4"><a href="exercise-machine-learning.html#cb452-4"></a><span class="co">## 25.18405</span></span>
-<span id="cb452-5"><a href="exercise-machine-learning.html#cb452-5"></a></span>
-<span id="cb452-6"><a href="exercise-machine-learning.html#cb452-6"></a><span class="co"># overrides model</span></span>
-<span id="cb452-7"><a href="exercise-machine-learning.html#cb452-7"></a><span class="kw">ml_simple_lm</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="kw">runif</span>(<span class="dv">10</span>))</span>
-<span id="cb452-8"><a href="exercise-machine-learning.html#cb452-8"></a></span>
-<span id="cb452-9"><a href="exercise-machine-learning.html#cb452-9"></a><span class="co"># produces different predictions</span></span>
-<span id="cb452-10"><a href="exercise-machine-learning.html#cb452-10"></a><span class="kw">ml_predict</span>(<span class="dv">15</span>)</span>
-<span id="cb452-11"><a href="exercise-machine-learning.html#cb452-11"></a><span class="co">## 10.76742</span></span></code></pre></div>
+<div class="sourceCode" id="cb458"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb458-1"><a href="exercise-machine-learning.html#cb458-1"></a><span class="co"># first model</span></span>
+<span id="cb458-2"><a href="exercise-machine-learning.html#cb458-2"></a><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
+<span id="cb458-3"><a href="exercise-machine-learning.html#cb458-3"></a><span class="kw">ml_predict</span>(<span class="dv">15</span>)</span>
+<span id="cb458-4"><a href="exercise-machine-learning.html#cb458-4"></a><span class="co">## 25.18405</span></span>
+<span id="cb458-5"><a href="exercise-machine-learning.html#cb458-5"></a></span>
+<span id="cb458-6"><a href="exercise-machine-learning.html#cb458-6"></a><span class="co"># overrides model</span></span>
+<span id="cb458-7"><a href="exercise-machine-learning.html#cb458-7"></a><span class="kw">ml_simple_lm</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="kw">runif</span>(<span class="dv">10</span>))</span>
+<span id="cb458-8"><a href="exercise-machine-learning.html#cb458-8"></a></span>
+<span id="cb458-9"><a href="exercise-machine-learning.html#cb458-9"></a><span class="co"># produces different predictions</span></span>
+<span id="cb458-10"><a href="exercise-machine-learning.html#cb458-10"></a><span class="kw">ml_predict</span>(<span class="dv">15</span>)</span>
+<span id="cb458-11"><a href="exercise-machine-learning.html#cb458-11"></a><span class="co">## 10.76742</span></span></code></pre></div>
 <p>The package ml currently under construction should emulate R in that respect, the <code>ml_simple_lm</code> should return the model which should be usable with the <code>predict</code> function. In order to do we are going to need to track regressions internally in V8 so the <code>ml_simple_lm</code> return a proxy of the model that <code>predict</code> can use to predict on the intended model.</p>
 <p>In order to track and store regressions internally we are going to declare an empty array when the package is loaded.</p>
-<div class="sourceCode" id="cb453"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb453-1"><a href="exercise-machine-learning.html#cb453-1"></a><span class="co"># zzz.R</span></span>
-<span id="cb453-2"><a href="exercise-machine-learning.html#cb453-2"></a>ml &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb453-3"><a href="exercise-machine-learning.html#cb453-3"></a></span>
-<span id="cb453-4"><a href="exercise-machine-learning.html#cb453-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
-<span id="cb453-5"><a href="exercise-machine-learning.html#cb453-5"></a>  ml &lt;&lt;-<span class="st"> </span>V8<span class="op">::</span><span class="kw">v8</span>()</span>
-<span id="cb453-6"><a href="exercise-machine-learning.html#cb453-6"></a>  mljs &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ml.min.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;ml&quot;</span>)</span>
-<span id="cb453-7"><a href="exercise-machine-learning.html#cb453-7"></a>  ml<span class="op">$</span><span class="kw">source</span>(mljs)</span>
-<span id="cb453-8"><a href="exercise-machine-learning.html#cb453-8"></a>  ml<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;var regressions = [];&quot;</span>)</span>
-<span id="cb453-9"><a href="exercise-machine-learning.html#cb453-9"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb459"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb459-1"><a href="exercise-machine-learning.html#cb459-1"></a><span class="co"># zzz.R</span></span>
+<span id="cb459-2"><a href="exercise-machine-learning.html#cb459-2"></a>ml &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb459-3"><a href="exercise-machine-learning.html#cb459-3"></a></span>
+<span id="cb459-4"><a href="exercise-machine-learning.html#cb459-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
+<span id="cb459-5"><a href="exercise-machine-learning.html#cb459-5"></a>  ml &lt;&lt;-<span class="st"> </span>V8<span class="op">::</span><span class="kw">v8</span>()</span>
+<span id="cb459-6"><a href="exercise-machine-learning.html#cb459-6"></a>  mljs &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ml.min.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;ml&quot;</span>)</span>
+<span id="cb459-7"><a href="exercise-machine-learning.html#cb459-7"></a>  ml<span class="op">$</span><span class="kw">source</span>(mljs)</span>
+<span id="cb459-8"><a href="exercise-machine-learning.html#cb459-8"></a>  ml<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;var regressions = [];&quot;</span>)</span>
+<span id="cb459-9"><a href="exercise-machine-learning.html#cb459-9"></a>}</span></code></pre></div>
 <p>Then, one can track regressions by creating an R object which is incremented every time <code>ml_simple_lm</code> runs, this can be used as variable name in the JavaScript <code>regressions</code> array declare in <code>.onLoad</code>. This variable name must be stored in the object we intend to return so the <code>predict</code> method we will create later on can access the model and run predictions. Finally, in order to declare a new method on the <code>predict</code> function we need to return an object bearing a unique class, below we use <code>mlSimpleRegression</code>.</p>
-<div class="sourceCode" id="cb454"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb454-1"><a href="exercise-machine-learning.html#cb454-1"></a>counter &lt;-<span class="st"> </span><span class="kw">new.env</span>(<span class="dt">parent =</span> <span class="kw">emptyenv</span>())</span>
-<span id="cb454-2"><a href="exercise-machine-learning.html#cb454-2"></a>counter<span class="op">$</span>regressions &lt;-<span class="st"> </span><span class="dv">0</span></span>
-<span id="cb454-3"><a href="exercise-machine-learning.html#cb454-3"></a></span>
-<span id="cb454-4"><a href="exercise-machine-learning.html#cb454-4"></a><span class="co">#&#39; @export </span></span>
-<span id="cb454-5"><a href="exercise-machine-learning.html#cb454-5"></a>ml_simple_lm &lt;-<span class="st"> </span><span class="cf">function</span>(y, x){</span>
-<span id="cb454-6"><a href="exercise-machine-learning.html#cb454-6"></a>  counter<span class="op">$</span>regressions &lt;-<span class="st"> </span>counter<span class="op">$</span>regressions <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb454-7"><a href="exercise-machine-learning.html#cb454-7"></a></span>
-<span id="cb454-8"><a href="exercise-machine-learning.html#cb454-8"></a>  <span class="co"># assign variables</span></span>
-<span id="cb454-9"><a href="exercise-machine-learning.html#cb454-9"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;x&quot;</span>, x)</span>
-<span id="cb454-10"><a href="exercise-machine-learning.html#cb454-10"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;y&quot;</span>, y)</span>
-<span id="cb454-11"><a href="exercise-machine-learning.html#cb454-11"></a></span>
-<span id="cb454-12"><a href="exercise-machine-learning.html#cb454-12"></a>  <span class="co"># address</span></span>
-<span id="cb454-13"><a href="exercise-machine-learning.html#cb454-13"></a>  address &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;regressions[&#39;&quot;</span>, counter<span class="op">$</span>regressions, <span class="st">&quot;&#39;]&quot;</span>)</span>
-<span id="cb454-14"><a href="exercise-machine-learning.html#cb454-14"></a></span>
-<span id="cb454-15"><a href="exercise-machine-learning.html#cb454-15"></a>  <span class="co"># create regression</span></span>
-<span id="cb454-16"><a href="exercise-machine-learning.html#cb454-16"></a>  code &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb454-17"><a href="exercise-machine-learning.html#cb454-17"></a>    address, <span class="st">&quot; = new ML.SimpleLinearRegression(x, y);&quot;</span></span>
-<span id="cb454-18"><a href="exercise-machine-learning.html#cb454-18"></a>  )</span>
-<span id="cb454-19"><a href="exercise-machine-learning.html#cb454-19"></a>  ml<span class="op">$</span><span class="kw">eval</span>(code)</span>
-<span id="cb454-20"><a href="exercise-machine-learning.html#cb454-20"></a></span>
-<span id="cb454-21"><a href="exercise-machine-learning.html#cb454-21"></a>  <span class="co"># retrieve and append address</span></span>
-<span id="cb454-22"><a href="exercise-machine-learning.html#cb454-22"></a>  regression &lt;-<span class="st"> </span>ml<span class="op">$</span><span class="kw">get</span>(address)</span>
-<span id="cb454-23"><a href="exercise-machine-learning.html#cb454-23"></a>  regression<span class="op">$</span>address &lt;-<span class="st"> </span>address</span>
-<span id="cb454-24"><a href="exercise-machine-learning.html#cb454-24"></a></span>
-<span id="cb454-25"><a href="exercise-machine-learning.html#cb454-25"></a>  <span class="co"># create object of new class</span></span>
-<span id="cb454-26"><a href="exercise-machine-learning.html#cb454-26"></a>  <span class="kw">structure</span>(</span>
-<span id="cb454-27"><a href="exercise-machine-learning.html#cb454-27"></a>    regression, </span>
-<span id="cb454-28"><a href="exercise-machine-learning.html#cb454-28"></a>    <span class="dt">class =</span> <span class="kw">c</span>(<span class="st">&quot;mlSimpleRegression&quot;</span>, <span class="kw">class</span>(regression))</span>
-<span id="cb454-29"><a href="exercise-machine-learning.html#cb454-29"></a>  )</span>
-<span id="cb454-30"><a href="exercise-machine-learning.html#cb454-30"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb460"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb460-1"><a href="exercise-machine-learning.html#cb460-1"></a>counter &lt;-<span class="st"> </span><span class="kw">new.env</span>(<span class="dt">parent =</span> <span class="kw">emptyenv</span>())</span>
+<span id="cb460-2"><a href="exercise-machine-learning.html#cb460-2"></a>counter<span class="op">$</span>regressions &lt;-<span class="st"> </span><span class="dv">0</span></span>
+<span id="cb460-3"><a href="exercise-machine-learning.html#cb460-3"></a></span>
+<span id="cb460-4"><a href="exercise-machine-learning.html#cb460-4"></a><span class="co">#&#39; @export </span></span>
+<span id="cb460-5"><a href="exercise-machine-learning.html#cb460-5"></a>ml_simple_lm &lt;-<span class="st"> </span><span class="cf">function</span>(y, x){</span>
+<span id="cb460-6"><a href="exercise-machine-learning.html#cb460-6"></a>  counter<span class="op">$</span>regressions &lt;-<span class="st"> </span>counter<span class="op">$</span>regressions <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb460-7"><a href="exercise-machine-learning.html#cb460-7"></a></span>
+<span id="cb460-8"><a href="exercise-machine-learning.html#cb460-8"></a>  <span class="co"># assign variables</span></span>
+<span id="cb460-9"><a href="exercise-machine-learning.html#cb460-9"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;x&quot;</span>, x)</span>
+<span id="cb460-10"><a href="exercise-machine-learning.html#cb460-10"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;y&quot;</span>, y)</span>
+<span id="cb460-11"><a href="exercise-machine-learning.html#cb460-11"></a></span>
+<span id="cb460-12"><a href="exercise-machine-learning.html#cb460-12"></a>  <span class="co"># address</span></span>
+<span id="cb460-13"><a href="exercise-machine-learning.html#cb460-13"></a>  address &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;regressions[&#39;&quot;</span>, counter<span class="op">$</span>regressions, <span class="st">&quot;&#39;]&quot;</span>)</span>
+<span id="cb460-14"><a href="exercise-machine-learning.html#cb460-14"></a></span>
+<span id="cb460-15"><a href="exercise-machine-learning.html#cb460-15"></a>  <span class="co"># create regression</span></span>
+<span id="cb460-16"><a href="exercise-machine-learning.html#cb460-16"></a>  code &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb460-17"><a href="exercise-machine-learning.html#cb460-17"></a>    address, <span class="st">&quot; = new ML.SimpleLinearRegression(x, y);&quot;</span></span>
+<span id="cb460-18"><a href="exercise-machine-learning.html#cb460-18"></a>  )</span>
+<span id="cb460-19"><a href="exercise-machine-learning.html#cb460-19"></a>  ml<span class="op">$</span><span class="kw">eval</span>(code)</span>
+<span id="cb460-20"><a href="exercise-machine-learning.html#cb460-20"></a></span>
+<span id="cb460-21"><a href="exercise-machine-learning.html#cb460-21"></a>  <span class="co"># retrieve and append address</span></span>
+<span id="cb460-22"><a href="exercise-machine-learning.html#cb460-22"></a>  regression &lt;-<span class="st"> </span>ml<span class="op">$</span><span class="kw">get</span>(address)</span>
+<span id="cb460-23"><a href="exercise-machine-learning.html#cb460-23"></a>  regression<span class="op">$</span>address &lt;-<span class="st"> </span>address</span>
+<span id="cb460-24"><a href="exercise-machine-learning.html#cb460-24"></a></span>
+<span id="cb460-25"><a href="exercise-machine-learning.html#cb460-25"></a>  <span class="co"># create object of new class</span></span>
+<span id="cb460-26"><a href="exercise-machine-learning.html#cb460-26"></a>  <span class="kw">structure</span>(</span>
+<span id="cb460-27"><a href="exercise-machine-learning.html#cb460-27"></a>    regression, </span>
+<span id="cb460-28"><a href="exercise-machine-learning.html#cb460-28"></a>    <span class="dt">class =</span> <span class="kw">c</span>(<span class="st">&quot;mlSimpleRegression&quot;</span>, <span class="kw">class</span>(regression))</span>
+<span id="cb460-29"><a href="exercise-machine-learning.html#cb460-29"></a>  )</span>
+<span id="cb460-30"><a href="exercise-machine-learning.html#cb460-30"></a>}</span></code></pre></div>
 <p>Then on can implement the <code>predict</code> method for <code>mlSimpleRegression</code>. The function uses the <code>address</code> of the model to run the JavaScript <code>predict</code> method on that object.</p>
-<div class="sourceCode" id="cb455"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb455-1"><a href="exercise-machine-learning.html#cb455-1"></a><span class="co">#&#39; @export </span></span>
-<span id="cb455-2"><a href="exercise-machine-learning.html#cb455-2"></a>predict.mlSimpleRegression &lt;-<span class="st"> </span><span class="cf">function</span>(object, newdata, ...){</span>
-<span id="cb455-3"><a href="exercise-machine-learning.html#cb455-3"></a>  code &lt;-<span class="st"> </span><span class="kw">paste0</span>(object<span class="op">$</span>address, <span class="st">&quot;.predict&quot;</span>)</span>
-<span id="cb455-4"><a href="exercise-machine-learning.html#cb455-4"></a>  ml<span class="op">$</span><span class="kw">call</span>(code, newdata)</span>
-<span id="cb455-5"><a href="exercise-machine-learning.html#cb455-5"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb461"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb461-1"><a href="exercise-machine-learning.html#cb461-1"></a><span class="co">#&#39; @export </span></span>
+<span id="cb461-2"><a href="exercise-machine-learning.html#cb461-2"></a>predict.mlSimpleRegression &lt;-<span class="st"> </span><span class="cf">function</span>(object, newdata, ...){</span>
+<span id="cb461-3"><a href="exercise-machine-learning.html#cb461-3"></a>  code &lt;-<span class="st"> </span><span class="kw">paste0</span>(object<span class="op">$</span>address, <span class="st">&quot;.predict&quot;</span>)</span>
+<span id="cb461-4"><a href="exercise-machine-learning.html#cb461-4"></a>  ml<span class="op">$</span><span class="kw">call</span>(code, newdata)</span>
+<span id="cb461-5"><a href="exercise-machine-learning.html#cb461-5"></a>}</span></code></pre></div>
 <p>We can then build and load the package to it in action.</p>
-<div class="sourceCode" id="cb456"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb456-1"><a href="exercise-machine-learning.html#cb456-1"></a><span class="kw">library</span>(ml)</span>
-<span id="cb456-2"><a href="exercise-machine-learning.html#cb456-2"></a></span>
-<span id="cb456-3"><a href="exercise-machine-learning.html#cb456-3"></a><span class="co"># first model</span></span>
-<span id="cb456-4"><a href="exercise-machine-learning.html#cb456-4"></a>model_cars &lt;-<span class="st"> </span><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
-<span id="cb456-5"><a href="exercise-machine-learning.html#cb456-5"></a></span>
-<span id="cb456-6"><a href="exercise-machine-learning.html#cb456-6"></a><span class="co"># second model</span></span>
-<span id="cb456-7"><a href="exercise-machine-learning.html#cb456-7"></a>model_random &lt;-<span class="st"> </span><span class="kw">ml_simple_lm</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="kw">runif</span>(<span class="dv">10</span>))</span>
-<span id="cb456-8"><a href="exercise-machine-learning.html#cb456-8"></a></span>
-<span id="cb456-9"><a href="exercise-machine-learning.html#cb456-9"></a><span class="kw">predict</span>(model_random, <span class="dv">15</span>)</span></code></pre></div>
-<pre><code>## [1] -79.96</code></pre>
-<div class="sourceCode" id="cb458"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb458-1"><a href="exercise-machine-learning.html#cb458-1"></a><span class="kw">predict</span>(model_cars, <span class="dv">15</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb462"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb462-1"><a href="exercise-machine-learning.html#cb462-1"></a><span class="kw">library</span>(ml)</span>
+<span id="cb462-2"><a href="exercise-machine-learning.html#cb462-2"></a></span>
+<span id="cb462-3"><a href="exercise-machine-learning.html#cb462-3"></a><span class="co"># first model</span></span>
+<span id="cb462-4"><a href="exercise-machine-learning.html#cb462-4"></a>model_cars &lt;-<span class="st"> </span><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
+<span id="cb462-5"><a href="exercise-machine-learning.html#cb462-5"></a></span>
+<span id="cb462-6"><a href="exercise-machine-learning.html#cb462-6"></a><span class="co"># second model</span></span>
+<span id="cb462-7"><a href="exercise-machine-learning.html#cb462-7"></a>model_random &lt;-<span class="st"> </span><span class="kw">ml_simple_lm</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="kw">runif</span>(<span class="dv">10</span>))</span>
+<span id="cb462-8"><a href="exercise-machine-learning.html#cb462-8"></a></span>
+<span id="cb462-9"><a href="exercise-machine-learning.html#cb462-9"></a><span class="kw">predict</span>(model_random, <span class="dv">15</span>)</span></code></pre></div>
+<pre><code>## [1] -25.54</code></pre>
+<div class="sourceCode" id="cb464"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb464-1"><a href="exercise-machine-learning.html#cb464-1"></a><span class="kw">predict</span>(model_cars, <span class="dv">15</span>)</span></code></pre></div>
 <pre><code>## [1] 10.77</code></pre>
 
 </div>
