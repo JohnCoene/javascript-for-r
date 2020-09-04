@@ -127,7 +127,7 @@ We should verify that this is correct by using the one R function the package fe
 ...
 ```
 
-## Peity.js JavaScript Code 
+## Peity.js Implementation
 
 Peity.js' JavaScript code is rather uncomplicated, it's just one function, but integrating it with htmlwidgets requires some thinking. In the example below, peity is applied to the element with `id = 'elementId'`, the first argument of `peity` is the type of chart to produce form the data and the second optional argument is a JSON of options.
 
@@ -158,7 +158,166 @@ peity(c(1,5,6,2))
 </div>
 ```
 
+The argument ought to be renamed nonetheless from `message` to `data`.
 
+```r
+peity <- function(data, width = NULL, height = NULL, 
+  elementId = NULL) {
+
+  # forward options using x
+  x = list(
+    data = data
+  )
+
+  # create widget
+  htmlwidgets::createWidget(
+    name = 'peity',
+    x,
+    width = width,
+    height = height,
+    package = 'peity',
+    elementId = elementId
+  )
+}
+```
+
+The change in the R code must be mirrored in the `peity.js` file where it should set the `innerText` to `x.data` instead of `x.message`. 
+
+```js
+// peity.js
+// el.innerText = x.message;
+el.innerText = x.data;
+```
+
+This leaves the implementation of peity.js to turn the data into an actual chart. The way we shall go about it is to paste one of the examples in the `renderValue` function.
+
+```js
+renderValue: function(x) {
+
+  // insert data
+  el.innerText = x.data;
+
+  // run peity
+  $("#elementId").peity("bar", {
+    fill: ["red", "green", "blue"]
+  })
+
+}
+```
+
+One could be tempted to run `devtools::load_all` but this will not work, namely because the function uses a selector that is will not return any object; it needs to be applied to the div created by the widget not `#elementId`. As explained in the previous chapter, the selector of the element created is accessible from the `el` object. As a matter of fact, we did log in the browser console the id of the created div taken from `el.id`. Therefore concatenating the pound sign and the element id produces the select to said element (`.class`, `#id`).
+
+```js
+$("#" + el.id).peity("bar", {
+  fill: ["red", "green", "blue"]
+})
+```
+
+This will work but can be further simplified, there is no need to recreate a selector using the `id` of the `el` element, the latter can be used in the jQuery selector directly.
+
+```js
+$(el).peity("bar", {
+  fill: ["red", "green", "blue"]
+})
+```
+
+This will now produce a working widget, albeit limited to creating charts of a predefined type and color. Next these options defining the chart type, fill colors and others must be made available from R.
+
+Below we add a `type` argument to the `peity` function, this `type` argument is then forwarded to `x` so it is serialised and accessible in the JavaScript file.
+
+```r
+peity <- function(data, type = c("bar", "line", "pie", "donut"), 
+  width = NULL, height = NULL, elementId = NULL) {
+
+  type <- match.arg(type)
+
+  # forward options using x
+  x = list(
+    data = data,
+    type = type
+  )
+
+  # create widget
+  htmlwidgets::createWidget(
+    name = 'peity',
+    x,
+    width = width,
+    height = height,
+    package = 'peity',
+    elementId = elementId
+  )
+}
+```
+
+This should then be applied by replacing the hard-coded type (`"bar"`) to `x.type`.
+
+```js
+$(el).peity(x.type, {
+  fill: ["red", "green", "blue"]
+})
+```
+
+Reloading the package will now let one create a chart and define its type but some options remain hard-coded. These can be made available from R in a variety of ways depending on the interface one wants to provide users of the package. Here we simply make them available via the three-dot construct (`...`) which are captured in a list and forwarded to the `x` object.
+
+```r
+peity <- function(data, type = c("bar", "line", "pie", "donut"), ...,
+  width = NULL, height = NULL, elementId = NULL) {
+
+  type <- match.arg(type)
+
+  # forward options using x
+  x = list(
+    data = data,
+    type = type,
+    options = list(...)
+  )
+
+  # create widget
+  htmlwidgets::createWidget(
+    name = 'peity',
+    x,
+    width = width,
+    height = height,
+    package = 'peity',
+    elementId = elementId
+  )
+}
+```
+
+These can then be easily accessed from JavaScript.
+
+```js
+$(el).peity(x.type, x.options)
+```
+
+This makes (nearly) all of the functionalities of peity.js available from R. Below we use `htmltools::browsable` to create multiple widgets at once, the function only accepts a single value so the charts are wrapped in an `htmltools::tagList`.
+
+```r
+htmltools::browsable(
+  htmltools::tagList(
+    peity(runif(5)),
+    peity(runif(5), type = "line"),
+    peity("1/4", type = "pie", fill = c("#c6d9fd", "#4d89f9")),
+    peity(c(3,5), type = "donut")
+  )
+)
+```
+
+```{r, echo = FALSE}
+htmltools::browsable(
+  htmltools::tagList(
+    peity(runif(5)),
+    htmltools::br(),
+    peity(runif(5), type = "line"),
+    htmltools::br(),
+    peity("1/4", type = "pie", fill = c("#c6d9fd", "#4d89f9")),
+    htmltools::br(),
+    peity(c(3,5), type = "donut")
+  )
+)
+```
+
+There is nonetheless one remaining issue: peity.js is meant to create inline charts within `<span>` HTML tags but these are created within `<div>` hence each chart appears on a new line. 
 
 ## Peity.js HTML Element 
 

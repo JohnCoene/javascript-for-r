@@ -4,7 +4,7 @@
 \alias{peity}
 \title{<Add Title>}
 \usage{
-peity(data, type = "bar", width = NULL, height = NULL, elementId = NULL)
+peity(data, type = "bar", ..., width = NULL, height = NULL, elementId = NULL)
 }
 \description{
 <Add Description>

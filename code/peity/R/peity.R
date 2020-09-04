@@ -5,12 +5,13 @@
 #' @import htmlwidgets
 #'
 #' @export
-peity <- function(data, type = "bar", width = NULL, height = NULL, elementId = NULL) {
+peity <- function(data, type = "bar", ..., width = NULL, height = NULL, elementId = NULL) {
 
   # forward options using x
   x = list(
     data = data,
-    type = type
+    type = type,
+    options = list(...)
   )
 
   # create widget
@@ -22,6 +23,10 @@ peity <- function(data, type = "bar", width = NULL, height = NULL, elementId = N
     package = 'peity',
     elementId = elementId
   )
+}
+
+peity_html <- function(...){
+  htmltools::tags$span(...)
 }
 
 #' Shiny bindings for peity

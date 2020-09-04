@@ -14,7 +14,7 @@ HTMLWidgets.widget({
 
         // TODO: code to render the widget, e.g.
         el.innerText = x.data;
-        $(el).peity(x.type);
+        $(el).peity(x.type, x.options);
 
       },
 
