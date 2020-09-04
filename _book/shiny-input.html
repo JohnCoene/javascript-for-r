@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 16 Custom Inputs | JavaScript for R</title>
+  <meta name="description" content="Invite JavaScript into your Data Science workflow." />
+  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 16 Custom Inputs | JavaScript for R" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Invite JavaScript into your Data Science workflow." />
+  <meta name="github-repo" content="JohnCoene/javascript-for-r" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 16 Custom Inputs | JavaScript for R" />
+  
+  <meta name="twitter:description" content="Invite JavaScript into your Data Science workflow." />
+  
+
+<meta name="author" content="John Coene" />
+
+
+<meta name="date" content="2020-09-04" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="shiny-output.html"/>
+<link rel="next" href="shiny-cookies.html"/>
+<script src="libs/header-attrs/header-attrs.js"></script>
+<script src="libs/jquery/jquery.min.js"></script>
+<link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<script src="libs/accessible-code-block/empty-anchor.js"></script>
+<script src="libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="libs/plotly-binding/plotly.js"></script>
+<script src="libs/typedarray/typedarray.min.js"></script>
+<link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main/plotly-latest.min.js"></script>
+<script src="libs/core-js/shim.min.js"></script>
+<script src="libs/react/react.min.js"></script>
+<script src="libs/react/react-dom.min.js"></script>
+<script src="libs/reactwidget/react-tools.js"></script>
+<script src="libs/reactable-binding/reactable.js"></script>
+<script src="libs/r2d3-render/r2d3-render.js"></script>
+<script src="libs/webcomponents/webcomponents.js"></script>
+<script src="libs/r2d3-binding/r2d3.js"></script>
+<script src="libs/d3v5/d3.min.js"></script>
+<script src="libs/viz/viz.js"></script>
+<link href="libs/DiagrammeR-styles/styles.css" rel="stylesheet" />
+<script src="libs/grViz-binding/grViz.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+<link rel="stylesheet" href="css/toc.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">JavaScript for R</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#premise"><i class="fa fa-check"></i>Premise</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#book-structure"><i class="fa fa-check"></i>Book Structure</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgement"><i class="fa fa-check"></i>Acknowledgement</a></li>
+</ul></li>
+<li class="part"><span><b>I Basics &amp; Roadmap</b></span></li>
+<li class="chapter" data-level="1" data-path="intro-overview.html"><a href="intro-overview.html"><i class="fa fa-check"></i><b>1</b> Overview</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="intro-overview.html"><a href="intro-overview.html#intro-overview-rationale"><i class="fa fa-check"></i><b>1.1</b> Rationale</a></li>
+<li class="chapter" data-level="1.2" data-path="intro-overview.html"><a href="intro-overview.html#intro-methods"><i class="fa fa-check"></i><b>1.2</b> Methods</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="intro-overview.html"><a href="intro-overview.html#intro-v8"><i class="fa fa-check"></i><b>1.2.1</b> V8</a></li>
+<li class="chapter" data-level="1.2.2" data-path="intro-overview.html"><a href="intro-overview.html#intro-htmlwidgets"><i class="fa fa-check"></i><b>1.2.2</b> htmlwidgets</a></li>
+<li class="chapter" data-level="1.2.3" data-path="intro-overview.html"><a href="intro-overview.html#intro-shiny"><i class="fa fa-check"></i><b>1.2.3</b> Shiny</a></li>
+<li class="chapter" data-level="1.2.4" data-path="intro-overview.html"><a href="intro-overview.html#intro-bubble"><i class="fa fa-check"></i><b>1.2.4</b> bubble</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="intro-overview.html"><a href="intro-overview.html#intro-amiss"><i class="fa fa-check"></i><b>1.3</b> Methods Amiss</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="intro-overview.html"><a href="intro-overview.html#intro-reactr"><i class="fa fa-check"></i><b>1.3.1</b> reactR</a></li>
+<li class="chapter" data-level="1.3.2" data-path="intro-overview.html"><a href="intro-overview.html#intro-r2d3"><i class="fa fa-check"></i><b>1.3.2</b> r2d3</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="prerequisites.html"><a href="prerequisites.html"><i class="fa fa-check"></i><b>2</b> Prerequisites</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="prerequisites.html"><a href="prerequisites.html#basics-pacakge-dev"><i class="fa fa-check"></i><b>2.1</b> R Package Development</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="prerequisites.html"><a href="prerequisites.html#basics-create-pkg"><i class="fa fa-check"></i><b>2.1.1</b> Creating a Package</a></li>
+<li class="chapter" data-level="2.1.2" data-path="prerequisites.html"><a href="prerequisites.html#basics-metadata"><i class="fa fa-check"></i><b>2.1.2</b> Metadata</a></li>
+<li class="chapter" data-level="2.1.3" data-path="prerequisites.html"><a href="prerequisites.html#basics-r-code"><i class="fa fa-check"></i><b>2.1.3</b> R code</a></li>
+<li class="chapter" data-level="2.1.4" data-path="prerequisites.html"><a href="prerequisites.html#basics-documentation"><i class="fa fa-check"></i><b>2.1.4</b> Documentation</a></li>
+<li class="chapter" data-level="2.1.5" data-path="prerequisites.html"><a href="prerequisites.html#basics-installed-files"><i class="fa fa-check"></i><b>2.1.5</b> Installed files</a></li>
+<li class="chapter" data-level="2.1.6" data-path="prerequisites.html"><a href="prerequisites.html#basics-build-load-install"><i class="fa fa-check"></i><b>2.1.6</b> Build, load, and install</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="prerequisites.html"><a href="prerequisites.html#basics-json"><i class="fa fa-check"></i><b>2.2</b> JSON</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="prerequisites.html"><a href="prerequisites.html#serialising"><i class="fa fa-check"></i><b>2.2.1</b> Serialising</a></li>
+<li class="chapter" data-level="2.2.2" data-path="prerequisites.html"><a href="prerequisites.html#basics-tabular"><i class="fa fa-check"></i><b>2.2.2</b> Tabular Data</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="prerequisites.html"><a href="prerequisites.html#basics-javascript"><i class="fa fa-check"></i><b>2.3</b> JavaScript</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="prerequisites.html"><a href="prerequisites.html#basics-chrome-devtools"><i class="fa fa-check"></i><b>2.3.1</b> Developer Tools</a></li>
+<li class="chapter" data-level="2.3.2" data-path="prerequisites.html"><a href="prerequisites.html#basics-var-scope"><i class="fa fa-check"></i><b>2.3.2</b> Variable Declaration and Scope</a></li>
+<li class="chapter" data-level="2.3.3" data-path="prerequisites.html"><a href="prerequisites.html#basics-object-model"><i class="fa fa-check"></i><b>2.3.3</b> Document Object Model</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="prerequisites.html"><a href="prerequisites.html#basics-shiny"><i class="fa fa-check"></i><b>2.4</b> Shiny</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="prerequisites.html"><a href="prerequisites.html#basics-htmltools"><i class="fa fa-check"></i><b>2.4.1</b> Htmltools</a></li>
+<li class="chapter" data-level="2.4.2" data-path="prerequisites.html"><a href="prerequisites.html#basics-static-files"><i class="fa fa-check"></i><b>2.4.2</b> Static Files</a></li>
+<li class="chapter" data-level="2.4.3" data-path="prerequisites.html"><a href="prerequisites.html#basics-deps-pro-cons"><i class="fa fa-check"></i><b>2.4.3</b> Dependencies Pros and Cons</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>II Data Visualisation</b></span></li>
+<li class="chapter" data-level="3" data-path="widgets-intro-intro.html"><a href="widgets-intro-intro.html"><i class="fa fa-check"></i><b>3</b> Introduction to Widgets</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="widgets-intro-intro.html"><a href="widgets-intro-intro.html#widgets-plotly"><i class="fa fa-check"></i><b>3.1</b> Plotly package</a></li>
+<li class="chapter" data-level="3.2" data-path="widgets-intro-intro.html"><a href="widgets-intro-intro.html#widgets-intro-dt"><i class="fa fa-check"></i><b>3.2</b> DT package</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="widgets-basics.html"><a href="widgets-basics.html"><i class="fa fa-check"></i><b>4</b> Basics of Building Widgets</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="widgets-basics.html"><a href="widgets-basics.html#widgets-basics-candidates"><i class="fa fa-check"></i><b>4.1</b> Candidate Libraries</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="widgets-basics.html"><a href="widgets-basics.html#widgets-basics-candidates-plotly"><i class="fa fa-check"></i><b>4.1.1</b> Plotly.js</a></li>
+<li class="chapter" data-level="4.1.2" data-path="widgets-basics.html"><a href="widgets-basics.html#widgets-basics-candidates-highcharts"><i class="fa fa-check"></i><b>4.1.2</b> Highchart.js</a></li>
+<li class="chapter" data-level="4.1.3" data-path="widgets-basics.html"><a href="widgets-basics.html#widgets-basics-candidates-chart.js"><i class="fa fa-check"></i><b>4.1.3</b> Chart.js</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="widgets-basics.html"><a href="widgets-basics.html#widgets-basics-inner-workings"><i class="fa fa-check"></i><b>4.2</b> How it works</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="widgets-first.html"><a href="widgets-first.html"><i class="fa fa-check"></i><b>5</b> Your First Widget</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="widgets-first.html"><a href="widgets-first.html#widgets-first-scaffold"><i class="fa fa-check"></i><b>5.1</b> The Scaffold</a></li>
+<li class="chapter" data-level="5.2" data-path="widgets-first.html"><a href="widgets-first.html#widgets-first-htmloutput"><i class="fa fa-check"></i><b>5.2</b> The HTML Output</a></li>
+<li class="chapter" data-level="5.3" data-path="widgets-first.html"><a href="widgets-first.html#widgets-first-js-files"><i class="fa fa-check"></i><b>5.3</b> JavaScript Files</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="widgets-realistic.html"><a href="widgets-realistic.html"><i class="fa fa-check"></i><b>6</b> A Realistic Widget</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="widgets-realistic.html"><a href="widgets-realistic.html#widgets-realistic-deps"><i class="fa fa-check"></i><b>6.1</b> Dependencies</a></li>
+<li class="chapter" data-level="6.2" data-path="widgets-realistic.html"><a href="widgets-realistic.html#widgets-realistic-implementation"><i class="fa fa-check"></i><b>6.2</b> Implementation</a></li>
+<li class="chapter" data-level="6.3" data-path="widgets-realistic.html"><a href="widgets-realistic.html#widgets-realistic-html-element"><i class="fa fa-check"></i><b>6.3</b> HTML Element</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="widgets-full.html"><a href="widgets-full.html"><i class="fa fa-check"></i><b>7</b> The Full Monty</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-deps"><i class="fa fa-check"></i><b>7.1</b> Dependencies</a></li>
+<li class="chapter" data-level="7.2" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-js"><i class="fa fa-check"></i><b>7.2</b> JavaScript</a></li>
+<li class="chapter" data-level="7.3" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-data"><i class="fa fa-check"></i><b>7.3</b> Working with Data</a></li>
+<li class="chapter" data-level="7.4" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data"><i class="fa fa-check"></i><b>7.4</b> Transforming Data</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-js"><i class="fa fa-check"></i><b>7.4.1</b> Using JavaScript</a></li>
+<li class="chapter" data-level="7.4.2" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-r"><i class="fa fa-check"></i><b>7.4.2</b> Using R</a></li>
+<li class="chapter" data-level="7.4.3" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-conclusion"><i class="fa fa-check"></i><b>7.4.3</b> Pros &amp; Cons</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-on-print"><i class="fa fa-check"></i><b>7.5</b> On Print Method</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="widgets-adv.html"><a href="widgets-adv.html"><i class="fa fa-check"></i><b>8</b> Advanced Topics</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="widgets-adv.html"><a href="widgets-adv.html#widgets-adv-shared"><i class="fa fa-check"></i><b>8.1</b> Shared Variables</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="widgets-adv.html"><a href="widgets-adv.html#widgets-adv-sizing"><i class="fa fa-check"></i><b>8.1.1</b> Sizing</a></li>
+<li class="chapter" data-level="8.1.2" data-path="widgets-adv.html"><a href="widgets-adv.html#widgets-adv-sizing-policy"><i class="fa fa-check"></i><b>8.1.2</b> Sizing Policy</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="widgets-adv.html"><a href="widgets-adv.html#widgets-adv-resizing"><i class="fa fa-check"></i><b>8.2</b> Resizing</a></li>
+<li class="chapter" data-level="8.3" data-path="widgets-adv.html"><a href="widgets-adv.html#widgets-adv-prerender"><i class="fa fa-check"></i><b>8.3</b> Pre Render Hooks &amp; Security</a></li>
+<li class="chapter" data-level="8.4" data-path="widgets-adv.html"><a href="widgets-adv.html#widgets-adv-js"><i class="fa fa-check"></i><b>8.4</b> JavaScript Code</a></li>
+<li class="chapter" data-level="8.5" data-path="widgets-adv.html"><a href="widgets-adv.html#widgets-adv-prepend-append"><i class="fa fa-check"></i><b>8.5</b> Prepend &amp; Append Content</a></li>
+<li class="chapter" data-level="8.6" data-path="widgets-adv.html"><a href="widgets-adv.html#widgets-adv-dependencies"><i class="fa fa-check"></i><b>8.6</b> Dependencies</a></li>
+<li class="chapter" data-level="8.7" data-path="widgets-adv.html"><a href="widgets-adv.html#widgets-adv-compatibility"><i class="fa fa-check"></i><b>8.7</b> Compatibility</a></li>
+<li class="chapter" data-level="8.8" data-path="widgets-adv.html"><a href="widgets-adv.html#widgets-adv-unit-tests"><i class="fa fa-check"></i><b>8.8</b> Unit Tests</a></li>
+<li class="chapter" data-level="8.9" data-path="widgets-adv.html"><a href="widgets-adv.html#widgets-adv-performances"><i class="fa fa-check"></i><b>8.9</b> Performances</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="linking-widgets.html"><a href="linking-widgets.html"><i class="fa fa-check"></i><b>9</b> Linking Widgets</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="linking-widgets.html"><a href="linking-widgets.html#linking-widgets-examples"><i class="fa fa-check"></i><b>9.1</b> Crosstalk Examples</a></li>
+<li class="chapter" data-level="9.2" data-path="linking-widgets.html"><a href="linking-widgets.html#linking-widgets-req"><i class="fa fa-check"></i><b>9.2</b> Crosstalk Requirements</a></li>
+<li class="chapter" data-level="9.3" data-path="linking-widgets.html"><a href="linking-widgets.html#linking-widgets-inner-workings"><i class="fa fa-check"></i><b>9.3</b> How it Works</a></li>
+<li class="chapter" data-level="9.4" data-path="linking-widgets.html"><a href="linking-widgets.html#linking-widgets-gio"><i class="fa fa-check"></i><b>9.4</b> Crosstalk with Gio</a></li>
+<li class="chapter" data-level="9.5" data-path="linking-widgets.html"><a href="linking-widgets.html#linking-widgets-r"><i class="fa fa-check"></i><b>9.5</b> R code</a></li>
+<li class="chapter" data-level="9.6" data-path="linking-widgets.html"><a href="linking-widgets.html#linking-widgets-js"><i class="fa fa-check"></i><b>9.6</b> JavaScript code</a>
+<ul>
+<li class="chapter" data-level="9.6.1" data-path="linking-widgets.html"><a href="linking-widgets.html#linking-widgets-send-keys"><i class="fa fa-check"></i><b>9.6.1</b> Send Selected Keys</a></li>
+<li class="chapter" data-level="9.6.2" data-path="linking-widgets.html"><a href="linking-widgets.html#linking-widgets-set-keys"><i class="fa fa-check"></i><b>9.6.2</b> Set Selected Keys</a></li>
+<li class="chapter" data-level="9.6.3" data-path="linking-widgets.html"><a href="linking-widgets.html#linking-widgets-recap"><i class="fa fa-check"></i><b>9.6.3</b> Recap JavaScript Code</a></li>
+</ul></li>
+<li class="chapter" data-level="9.7" data-path="linking-widgets.html"><a href="linking-widgets.html#linking-widgets-using"><i class="fa fa-check"></i><b>9.7</b> Using Crosstalk with Gio</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="widgets-final.html"><a href="widgets-final.html"><i class="fa fa-check"></i><b>10</b> Final Revisions</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="widgets-final.html"><a href="widgets-final.html#widgets-final-data"><i class="fa fa-check"></i><b>10.1</b> Htmlwidgets &amp; Data</a></li>
+<li class="chapter" data-level="10.2" data-path="widgets-final.html"><a href="widgets-final.html#widgets-final-options"><i class="fa fa-check"></i><b>10.2</b> Plethora of Options</a></li>
+<li class="chapter" data-level="10.3" data-path="widgets-final.html"><a href="widgets-final.html#widgets-final-interface"><i class="fa fa-check"></i><b>10.3</b> Interface Design</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="widgets-ex-plotly.html"><a href="widgets-ex-plotly.html"><i class="fa fa-check"></i><b>11</b> Excercise - Ploty</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="widgets-ex-plotly.html"><a href="widgets-ex-plotly.html#widgets-ex-plotly-discover"><i class="fa fa-check"></i><b>11.1</b> Discover Plotly</a></li>
+<li class="chapter" data-level="11.2" data-path="widgets-ex-plotly.html"><a href="widgets-ex-plotly.html#widgets-ex-plotly-basics"><i class="fa fa-check"></i><b>11.2</b> Basics of Plotly</a></li>
+<li class="chapter" data-level="11.3" data-path="widgets-ex-plotly.html"><a href="widgets-ex-plotly.html#widgets-ex-plotly-js-to-r"><i class="fa fa-check"></i><b>11.3</b> JavaScript to R</a></li>
+<li class="chapter" data-level="11.4" data-path="widgets-ex-plotly.html"><a href="widgets-ex-plotly.html#widgets-ex-plotly-r-to-js"><i class="fa fa-check"></i><b>11.4</b> R to JavaScript</a></li>
+<li class="chapter" data-level="11.5" data-path="widgets-ex-plotly.html"><a href="widgets-ex-plotly.html#widgets-ex-plotly-sizing"><i class="fa fa-check"></i><b>11.5</b> Size &amp; Resize</a></li>
+<li class="chapter" data-level="11.6" data-path="widgets-ex-plotly.html"><a href="widgets-ex-plotly.html#widgets-ex-plotly-perf-security"><i class="fa fa-check"></i><b>11.6</b> Performance &amp; Security</a></li>
+</ul></li>
+<li class="part"><span><b>III Web Development with Shiny</b></span></li>
+<li class="chapter" data-level="12" data-path="shiny-intro.html"><a href="shiny-intro.html"><i class="fa fa-check"></i><b>12</b> Introduction to Shiny</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-websocket"><i class="fa fa-check"></i><b>12.1</b> Websocket &amp; Shiny</a></li>
+<li class="chapter" data-level="12.2" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-example"><i class="fa fa-check"></i><b>12.2</b> Alerts, An Example</a></li>
+<li class="chapter" data-level="12.3" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-r-to-js"><i class="fa fa-check"></i><b>12.3</b> From R to JavaScript</a></li>
+<li class="chapter" data-level="12.4" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-js-to-r"><i class="fa fa-check"></i><b>12.4</b> From JavaScript to R</a></li>
+<li class="chapter" data-level="12.5" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-deserialise"><i class="fa fa-check"></i><b>12.5</b> Deserialise</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="shiny-complete.html"><a href="shiny-complete.html"><i class="fa fa-check"></i><b>13</b> A Complete Integration</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="shiny-complete.html"><a href="shiny-complete.html#shiny-complete-serialise"><i class="fa fa-check"></i><b>13.1</b> Serialisation</a></li>
+<li class="chapter" data-level="13.2" data-path="shiny-complete.html"><a href="shiny-complete.html#shiny-complete-events"><i class="fa fa-check"></i><b>13.2</b> Events &amp; Callbacks</a></li>
+<li class="chapter" data-level="13.3" data-path="shiny-complete.html"><a href="shiny-complete.html#shiny-complete-pkg"><i class="fa fa-check"></i><b>13.3</b> As a Package</a>
+<ul>
+<li class="chapter" data-level="13.3.1" data-path="shiny-complete.html"><a href="shiny-complete.html#shiny-complete-pkg-deps"><i class="fa fa-check"></i><b>13.3.1</b> Dependencies</a></li>
+<li class="chapter" data-level="13.3.2" data-path="shiny-complete.html"><a href="shiny-complete.html#shiny-complete-pkg-r-code"><i class="fa fa-check"></i><b>13.3.2</b> R Code</a></li>
+<li class="chapter" data-level="13.3.3" data-path="shiny-complete.html"><a href="shiny-complete.html#shiny-complete-pkg-js-code"><i class="fa fa-check"></i><b>13.3.3</b> JavaScript Code</a></li>
+<li class="chapter" data-level="13.3.4" data-path="shiny-complete.html"><a href="shiny-complete.html#shiny-complete-pkg-input"><i class="fa fa-check"></i><b>13.3.4</b> Input Handler</a></li>
+<li class="chapter" data-level="13.3.5" data-path="shiny-complete.html"><a href="shiny-complete.html#shiny-complete-pkg-conclude"><i class="fa fa-check"></i><b>13.3.5</b> Wrapping up</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="shiny-tips.html"><a href="shiny-tips.html"><i class="fa fa-check"></i><b>14</b> Tips &amp; Tricks</a>
+<ul>
+<li class="chapter" data-level="14.1" data-path="shiny-tips.html"><a href="shiny-tips.html#shiny-tips-events"><i class="fa fa-check"></i><b>14.1</b> Shiny Events</a></li>
+<li class="chapter" data-level="14.2" data-path="shiny-tips.html"><a href="shiny-tips.html#shiny-tips-table-btn"><i class="fa fa-check"></i><b>14.2</b> Table Buttons</a></li>
+<li class="chapter" data-level="14.3" data-path="shiny-tips.html"><a href="shiny-tips.html#shiny-tips-jQuery"><i class="fa fa-check"></i><b>14.3</b> jQuery</a></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="shiny-output.html"><a href="shiny-output.html"><i class="fa fa-check"></i><b>15</b> Custom Outputs</a>
+<ul>
+<li class="chapter" data-level="15.1" data-path="shiny-output.html"><a href="shiny-output.html#shiny-output-inner-workings"><i class="fa fa-check"></i><b>15.1</b> Inner-workings</a></li>
+<li class="chapter" data-level="15.2" data-path="shiny-output.html"><a href="shiny-output.html#shiny-output-setup"><i class="fa fa-check"></i><b>15.2</b> Setup</a></li>
+<li class="chapter" data-level="15.3" data-path="shiny-output.html"><a href="shiny-output.html#shiny-output-r-fun"><i class="fa fa-check"></i><b>15.3</b> Output R Function</a></li>
+<li class="chapter" data-level="15.4" data-path="shiny-output.html"><a href="shiny-output.html#shiny-output-html"><i class="fa fa-check"></i><b>15.4</b> Generate Output HTML</a></li>
+<li class="chapter" data-level="15.5" data-path="shiny-output.html"><a href="shiny-output.html#shiny-output-renderer"><i class="fa fa-check"></i><b>15.5</b> Output Renderer</a></li>
+<li class="chapter" data-level="15.6" data-path="shiny-output.html"><a href="shiny-output.html#shiny-output-binding"><i class="fa fa-check"></i><b>15.6</b> JavaScript Output Binding</a>
+<ul>
+<li class="chapter" data-level="15.6.1" data-path="shiny-output.html"><a href="shiny-output.html#shiny-output-boxxy-title"><i class="fa fa-check"></i><b>15.6.1</b> Boxxy Title</a></li>
+<li class="chapter" data-level="15.6.2" data-path="shiny-output.html"><a href="shiny-output.html#shiny-output-boxxy-value"><i class="fa fa-check"></i><b>15.6.2</b> Boxxy Value</a></li>
+<li class="chapter" data-level="15.6.3" data-path="shiny-output.html"><a href="shiny-output.html#shiny-output-boxxy-bg-color"><i class="fa fa-check"></i><b>15.6.3</b> Boxxy Background Color</a></li>
+<li class="chapter" data-level="15.6.4" data-path="shiny-output.html"><a href="shiny-output.html#shiny-output-register"><i class="fa fa-check"></i><b>15.6.4</b> Register the Output Binding</a></li>
+</ul></li>
+<li class="chapter" data-level="15.7" data-path="shiny-output.html"><a href="shiny-output.html#shiny-output-usage"><i class="fa fa-check"></i><b>15.7</b> Boxxy Usage</a></li>
+<li class="chapter" data-level="15.8" data-path="shiny-output.html"><a href="shiny-output.html#shiny-output-inject"><i class="fa fa-check"></i><b>15.8</b> Injecting Dependencies</a></li>
+<li class="chapter" data-level="15.9" data-path="shiny-output.html"><a href="shiny-output.html#shiny-output-preprocess"><i class="fa fa-check"></i><b>15.9</b> Preprocessing Custom Outputs</a></li>
+</ul></li>
+<li class="chapter" data-level="16" data-path="shiny-input.html"><a href="shiny-input.html"><i class="fa fa-check"></i><b>16</b> Custom Inputs</a>
+<ul>
+<li class="chapter" data-level="16.1" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-setup"><i class="fa fa-check"></i><b>16.1</b> Setup</a></li>
+<li class="chapter" data-level="16.2" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-intro"><i class="fa fa-check"></i><b>16.2</b> Switch Input HTML &amp; Style</a></li>
+<li class="chapter" data-level="16.3" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-html"><i class="fa fa-check"></i><b>16.3</b> Generate Input HTML</a></li>
+<li class="chapter" data-level="16.4" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-binding"><i class="fa fa-check"></i><b>16.4</b> JavaScript Input Binding</a>
+<ul>
+<li class="chapter" data-level="16.4.1" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-find"><i class="fa fa-check"></i><b>16.4.1</b> Find Inputs</a></li>
+<li class="chapter" data-level="16.4.2" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-get-id"><i class="fa fa-check"></i><b>16.4.2</b> Get Input Id</a></li>
+<li class="chapter" data-level="16.4.3" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-get-value"><i class="fa fa-check"></i><b>16.4.3</b> Get Input Value</a></li>
+<li class="chapter" data-level="16.4.4" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-set-value"><i class="fa fa-check"></i><b>16.4.4</b> Set Input Value</a></li>
+<li class="chapter" data-level="16.4.5" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-receive-msg"><i class="fa fa-check"></i><b>16.4.5</b> Receive Input Messages</a></li>
+<li class="chapter" data-level="16.4.6" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-sub-unsub"><i class="fa fa-check"></i><b>16.4.6</b> Subscribe &amp; Unsubscribe Inputs</a></li>
+<li class="chapter" data-level="16.4.7" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-rate-policy"><i class="fa fa-check"></i><b>16.4.7</b> Input Rate Policy</a></li>
+<li class="chapter" data-level="16.4.8" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-register"><i class="fa fa-check"></i><b>16.4.8</b> Registering the Input Binding</a></li>
+</ul></li>
+<li class="chapter" data-level="16.5" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-update"><i class="fa fa-check"></i><b>16.5</b> Update Input</a></li>
+<li class="chapter" data-level="16.6" data-path="shiny-input.html"><a href="shiny-input.html#shiny-input-excercise"><i class="fa fa-check"></i><b>16.6</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="17" data-path="shiny-cookies.html"><a href="shiny-cookies.html"><i class="fa fa-check"></i><b>17</b> Cookies</a>
+<ul>
+<li class="chapter" data-level="17.1" data-path="shiny-cookies.html"><a href="shiny-cookies.html#shiny-cookies-discover"><i class="fa fa-check"></i><b>17.1</b> Discover js-cookie</a></li>
+<li class="chapter" data-level="17.2" data-path="shiny-cookies.html"><a href="shiny-cookies.html#shiny-cookies-setup"><i class="fa fa-check"></i><b>17.2</b> Setup Project</a></li>
+<li class="chapter" data-level="17.3" data-path="shiny-cookies.html"><a href="shiny-cookies.html#shiny-cookies-javascript"><i class="fa fa-check"></i><b>17.3</b> JavaScript Cookies</a></li>
+<li class="chapter" data-level="17.4" data-path="shiny-cookies.html"><a href="shiny-cookies.html#shiny-cookies-r-code"><i class="fa fa-check"></i><b>17.4</b> R Code</a></li>
+</ul></li>
+<li class="chapter" data-level="18" data-path="shiny-widgets.html"><a href="shiny-widgets.html"><i class="fa fa-check"></i><b>18</b> Widgets with Shiny</a>
+<ul>
+<li class="chapter" data-level="18.1" data-path="shiny-widgets.html"><a href="shiny-widgets.html#shiny-widgets-to-r"><i class="fa fa-check"></i><b>18.1</b> Widgets to R</a></li>
+<li class="chapter" data-level="18.2" data-path="shiny-widgets.html"><a href="shiny-widgets.html#shiny-widgets-handlers"><i class="fa fa-check"></i><b>18.2</b> Input Handlers for Widgets</a></li>
+<li class="chapter" data-level="18.3" data-path="shiny-widgets.html"><a href="shiny-widgets.html#shiny-widgets-r-to-widgets"><i class="fa fa-check"></i><b>18.3</b> R to Widgets</a>
+<ul>
+<li class="chapter" data-level="18.3.1" data-path="shiny-widgets.html"><a href="shiny-widgets.html#shiny-widgets-send-data"><i class="fa fa-check"></i><b>18.3.1</b> Send Data from Widgets</a></li>
+<li class="chapter" data-level="18.3.2" data-path="shiny-widgets.html"><a href="shiny-widgets.html#shiny-widgets-retrieve"><i class="fa fa-check"></i><b>18.3.2</b> Retrieve Widget Instance</a></li>
+<li class="chapter" data-level="18.3.3" data-path="shiny-widgets.html"><a href="shiny-widgets.html#shiny-widgets-handle-data"><i class="fa fa-check"></i><b>18.3.3</b> Handle Data</a></li>
+</ul></li>
+<li class="chapter" data-level="18.4" data-path="shiny-widgets.html"><a href="shiny-widgets.html#shiny-widgets-proxy"><i class="fa fa-check"></i><b>18.4</b> Proxy Function</a></li>
+<li class="chapter" data-level="18.5" data-path="shiny-widgets.html"><a href="shiny-widgets.html#shiny-widgets-clear-data"><i class="fa fa-check"></i><b>18.5</b> Clear Data</a></li>
+<li class="chapter" data-level="18.6" data-path="shiny-widgets.html"><a href="shiny-widgets.html#shiny-widgets-update"><i class="fa fa-check"></i><b>18.6</b> Update the Widget</a></li>
+</ul></li>
+<li class="part"><span><b>IV Interactive Documents</b></span></li>
+<li class="chapter" data-level="19" data-path="rmd-intro.html"><a href="rmd-intro.html"><i class="fa fa-check"></i><b>19</b> Introduction to Rmarkdown</a></li>
+<li class="part"><span><b>V JavaScript for Computations</b></span></li>
+<li class="chapter" data-level="20" data-path="v8.html"><a href="v8.html"><i class="fa fa-check"></i><b>20</b> The V8 Engine</a>
+<ul>
+<li class="chapter" data-level="20.1" data-path="v8.html"><a href="v8.html#v8-installation"><i class="fa fa-check"></i><b>20.1</b> Installation</a></li>
+<li class="chapter" data-level="20.2" data-path="v8.html"><a href="v8.html#v8-basics"><i class="fa fa-check"></i><b>20.2</b> Basics</a></li>
+<li class="chapter" data-level="20.3" data-path="v8.html"><a href="v8.html#v8-external"><i class="fa fa-check"></i><b>20.3</b> External Libraries</a></li>
+<li class="chapter" data-level="20.4" data-path="v8.html"><a href="v8.html#v8-npm"><i class="fa fa-check"></i><b>20.4</b> Npm Packages</a></li>
+<li class="chapter" data-level="20.5" data-path="v8.html"><a href="v8.html#v8-pkg"><i class="fa fa-check"></i><b>20.5</b> Use in Packages</a></li>
+</ul></li>
+<li class="chapter" data-level="21" data-path="v8-ml.html"><a href="v8-ml.html"><i class="fa fa-check"></i><b>21</b> Exercise - Machine Learning</a>
+<ul>
+<li class="chapter" data-level="21.1" data-path="v8-ml.html"><a href="v8-ml.html#v8-ml-dependency"><i class="fa fa-check"></i><b>21.1</b> Dependency</a></li>
+<li class="chapter" data-level="21.2" data-path="v8-ml.html"><a href="v8-ml.html#v8-ml-regression"><i class="fa fa-check"></i><b>21.2</b> Simple Regression</a></li>
+</ul></li>
+<li class="part"><span><b>VI Examples</b></span></li>
+<li class="chapter" data-level="22" data-path="v8-img.html"><a href="v8-img.html"><i class="fa fa-check"></i><b>22</b> Image Classifier</a>
+<ul>
+<li class="chapter" data-level="22.1" data-path="v8-img.html"><a href="v8-img.html#v8-img-discover"><i class="fa fa-check"></i><b>22.1</b> Discover</a></li>
+<li class="chapter" data-level="22.2" data-path="v8-img.html"><a href="v8-img.html#v8-img-setup"><i class="fa fa-check"></i><b>22.2</b> Setup</a></li>
+<li class="chapter" data-level="22.3" data-path="v8-img.html"><a href="v8-img.html#v8-img-javascript"><i class="fa fa-check"></i><b>22.3</b> JavaScript</a></li>
+<li class="chapter" data-level="22.4" data-path="v8-img.html"><a href="v8-img.html#v8-img-handler"><i class="fa fa-check"></i><b>22.4</b> Input Handler</a></li>
+</ul></li>
+<li class="chapter" data-level="23" data-path="progress.html"><a href="progress.html"><i class="fa fa-check"></i><b>23</b> Progress Bar</a>
+<ul>
+<li class="chapter" data-level="23.1" data-path="progress.html"><a href="progress.html#progress-r-code"><i class="fa fa-check"></i><b>23.1</b> R Code</a></li>
+<li class="chapter" data-level="23.2" data-path="progress.html"><a href="progress.html#progress-js-code"><i class="fa fa-check"></i><b>23.2</b> JavaScript Code</a></li>
+<li class="chapter" data-level="23.3" data-path="progress.html"><a href="progress.html#progress-events"><i class="fa fa-check"></i><b>23.3</b> Events</a></li>
+</ul></li>
+<li class="part"><span><b>VII Closing Remarks</b></span></li>
+<li class="chapter" data-level="24" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>24</b> Conclusion</a>
+<ul>
+<li class="chapter" data-level="24.1" data-path="conclusion.html"><a href="conclusion.html#conclusion-performances"><i class="fa fa-check"></i><b>24.1</b> Performances</a></li>
+<li class="chapter" data-level="24.2" data-path="conclusion.html"><a href="conclusion.html#conclusion-ahead"><i class="fa fa-check"></i><b>24.2</b> Road Ahead</a>
+<ul>
+<li class="chapter" data-level="24.2.1" data-path="conclusion.html"><a href="conclusion.html#compute"><i class="fa fa-check"></i><b>24.2.1</b> Computation</a></li>
+<li class="chapter" data-level="24.2.2" data-path="conclusion.html"><a href="conclusion.html#shiny"><i class="fa fa-check"></i><b>24.2.2</b> Shiny</a></li>
+<li class="chapter" data-level="24.2.3" data-path="conclusion.html"><a href="conclusion.html#widgets"><i class="fa fa-check"></i><b>24.2.3</b> htmlwidgets</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">JavaScript for R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="shiny-input" class="section level1" number="16">
+<h1><span class="header-section-number">Chapter 16</span> Custom Inputs</h1>
+<p>Shiny comes with a variety of inputs ranging from buttons to text fields, these inputs send data from the client to the R server. Custom inputs are in fact no different than from shiny’s out-of-the-box inputs, they work in the exact same way and are built on the same system.</p>
+<p>To explain and demonstrate how to build such a custom input we shall build a switch input which is essentially a fancy-looking checkbox that can be toggled on and off.</p>
+<p>Custom shiny inputs very much resemble shiny outputs though they consist of a single R function (e.g.: <code>selectInput</code>) which generates the HTML and attaches necessary dependencies. In fact, when run from the R console such functions will reveal the HTML they generate.</p>
+<div class="sourceCode" id="cb340"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb340-1"><a href="shiny-input.html#cb340-1"></a>shiny<span class="op">::</span><span class="kw">textInput</span>(<span class="st">&quot;theId&quot;</span>, <span class="st">&quot;The label&quot;</span>)   </span></code></pre></div>
+<div class="sourceCode" id="cb341"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb341-1"><a href="shiny-input.html#cb341-1"></a><span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;form-group shiny-input-container&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb341-2"><a href="shiny-input.html#cb341-2"></a>  <span class="kw">&lt;label</span><span class="ot"> class=</span><span class="st">&quot;control-label&quot;</span><span class="ot"> for=</span><span class="st">&quot;theId&quot;</span><span class="kw">&gt;</span>The label<span class="kw">&lt;/label&gt;</span></span>
+<span id="cb341-3"><a href="shiny-input.html#cb341-3"></a>  <span class="kw">&lt;input</span><span class="ot"> id=</span><span class="st">&quot;theId&quot;</span><span class="ot"> type=</span><span class="st">&quot;text&quot;</span><span class="ot"> class=</span><span class="st">&quot;form-control&quot;</span><span class="ot"> value=</span><span class="st">&quot;&quot;</span><span class="kw">/&gt;</span></span>
+<span id="cb341-4"><a href="shiny-input.html#cb341-4"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
+<p>The R function is paired with a JavaScript input binding akin to the output binding used in the previous chapter.</p>
+<div id="shiny-input-setup" class="section level2" number="16.1">
+<h2><span class="header-section-number">16.1</span> Setup</h2>
+<p>Let’s set up the necessary files and project structure. Below an asset directory is created along with a JavaScript file where the binding will be placed as well as a CSS file that will style the switch input, an <code>app.R</code> file is also created to hold the R code and application.</p>
+<div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb342-1"><a href="shiny-input.html#cb342-1"></a><span class="co"># create directory for application</span></span>
+<span id="cb342-2"><a href="shiny-input.html#cb342-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;switch/assets&quot;</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb342-3"><a href="shiny-input.html#cb342-3"></a></span>
+<span id="cb342-4"><a href="shiny-input.html#cb342-4"></a><span class="co"># create R, JS, and CSS files</span></span>
+<span id="cb342-5"><a href="shiny-input.html#cb342-5"></a><span class="kw">file.create</span>(<span class="st">&quot;app.R&quot;</span>)</span>
+<span id="cb342-6"><a href="shiny-input.html#cb342-6"></a><span class="kw">file.create</span>(<span class="st">&quot;switch/assets/binding.js&quot;</span>)</span>
+<span id="cb342-7"><a href="shiny-input.html#cb342-7"></a><span class="kw">file.create</span>(<span class="st">&quot;switch/assets/styles.css&quot;</span>)</span></code></pre></div>
+<p>This should create the following directory structure.</p>
+<pre><code>.
+├── app.R
+└── assets
+    ├── binding.js
+    └── styles.css</code></pre>
+</div>
+<div id="shiny-input-intro" class="section level2" number="16.2">
+<h2><span class="header-section-number">16.2</span> Switch Input HTML &amp; Style</h2>
+<p>We will use <a href="https://www.w3schools.com/howto/howto_css_switch.asp">w3schools</a>’ switch input template.</p>
+<p>The HTML of the input looks like so.</p>
+<div class="sourceCode" id="cb344"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb344-1"><a href="shiny-input.html#cb344-1"></a><span class="kw">&lt;label</span><span class="ot"> class=</span><span class="st">&quot;switch&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb344-2"><a href="shiny-input.html#cb344-2"></a>  <span class="kw">&lt;input</span><span class="ot"> type=</span><span class="st">&quot;checkbox&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb344-3"><a href="shiny-input.html#cb344-3"></a>  <span class="kw">&lt;span</span><span class="ot"> class=</span><span class="st">&quot;slider&quot;</span><span class="kw">&gt;&lt;/span&gt;</span></span>
+<span id="cb344-4"><a href="shiny-input.html#cb344-4"></a><span class="kw">&lt;/label&gt;</span></span></code></pre></div>
+<p>While the CSS which stylises the checkbox input into a switch is the following.</p>
+<div class="sourceCode" id="cb345"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb345-1"><a href="shiny-input.html#cb345-1"></a><span class="fu">.switch</span> {</span>
+<span id="cb345-2"><a href="shiny-input.html#cb345-2"></a>  <span class="kw">position</span>: <span class="dv">relative</span><span class="op">;</span></span>
+<span id="cb345-3"><a href="shiny-input.html#cb345-3"></a>  <span class="kw">display</span>: <span class="dv">inline-block</span><span class="op">;</span></span>
+<span id="cb345-4"><a href="shiny-input.html#cb345-4"></a>  <span class="kw">width</span>: <span class="dv">60</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb345-5"><a href="shiny-input.html#cb345-5"></a>  <span class="kw">height</span>: <span class="dv">34</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb345-6"><a href="shiny-input.html#cb345-6"></a>}</span>
+<span id="cb345-7"><a href="shiny-input.html#cb345-7"></a></span>
+<span id="cb345-8"><a href="shiny-input.html#cb345-8"></a><span class="fu">.switch</span> input { </span>
+<span id="cb345-9"><a href="shiny-input.html#cb345-9"></a>  <span class="kw">opacity</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-10"><a href="shiny-input.html#cb345-10"></a>  <span class="kw">width</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-11"><a href="shiny-input.html#cb345-11"></a>  <span class="kw">height</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-12"><a href="shiny-input.html#cb345-12"></a>}</span>
+<span id="cb345-13"><a href="shiny-input.html#cb345-13"></a></span>
+<span id="cb345-14"><a href="shiny-input.html#cb345-14"></a><span class="fu">.slider</span> {</span>
+<span id="cb345-15"><a href="shiny-input.html#cb345-15"></a>  <span class="kw">position</span>: <span class="dv">absolute</span><span class="op">;</span></span>
+<span id="cb345-16"><a href="shiny-input.html#cb345-16"></a>  <span class="kw">cursor</span>: <span class="dv">pointer</span><span class="op">;</span></span>
+<span id="cb345-17"><a href="shiny-input.html#cb345-17"></a>  <span class="kw">top</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-18"><a href="shiny-input.html#cb345-18"></a>  <span class="kw">left</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-19"><a href="shiny-input.html#cb345-19"></a>  <span class="kw">right</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-20"><a href="shiny-input.html#cb345-20"></a>  <span class="kw">bottom</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-21"><a href="shiny-input.html#cb345-21"></a>  <span class="kw">background-color</span>: <span class="cn">#ccc</span><span class="op">;</span></span>
+<span id="cb345-22"><a href="shiny-input.html#cb345-22"></a>  <span class="kw">-webkit-transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
+<span id="cb345-23"><a href="shiny-input.html#cb345-23"></a>  <span class="kw">transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
+<span id="cb345-24"><a href="shiny-input.html#cb345-24"></a>}</span>
+<span id="cb345-25"><a href="shiny-input.html#cb345-25"></a></span>
+<span id="cb345-26"><a href="shiny-input.html#cb345-26"></a><span class="fu">.slider</span><span class="in">:before</span> {</span>
+<span id="cb345-27"><a href="shiny-input.html#cb345-27"></a>  <span class="kw">position</span>: <span class="dv">absolute</span><span class="op">;</span></span>
+<span id="cb345-28"><a href="shiny-input.html#cb345-28"></a>  <span class="kw">content</span>: <span class="st">&quot;&quot;</span><span class="op">;</span></span>
+<span id="cb345-29"><a href="shiny-input.html#cb345-29"></a>  <span class="kw">height</span>: <span class="dv">26</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb345-30"><a href="shiny-input.html#cb345-30"></a>  <span class="kw">width</span>: <span class="dv">26</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb345-31"><a href="shiny-input.html#cb345-31"></a>  <span class="kw">left</span>: <span class="dv">4</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb345-32"><a href="shiny-input.html#cb345-32"></a>  <span class="kw">bottom</span>: <span class="dv">4</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb345-33"><a href="shiny-input.html#cb345-33"></a>  <span class="kw">background-color</span>: <span class="cn">white</span><span class="op">;</span></span>
+<span id="cb345-34"><a href="shiny-input.html#cb345-34"></a>  <span class="kw">-webkit-transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
+<span id="cb345-35"><a href="shiny-input.html#cb345-35"></a>  <span class="kw">transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
+<span id="cb345-36"><a href="shiny-input.html#cb345-36"></a>}</span>
+<span id="cb345-37"><a href="shiny-input.html#cb345-37"></a></span>
+<span id="cb345-38"><a href="shiny-input.html#cb345-38"></a>input<span class="in">:checked</span> <span class="op">+</span> <span class="fu">.slider</span> {</span>
+<span id="cb345-39"><a href="shiny-input.html#cb345-39"></a>  <span class="kw">background-color</span>: <span class="cn">#0462a1</span><span class="op">;</span></span>
+<span id="cb345-40"><a href="shiny-input.html#cb345-40"></a>}</span>
+<span id="cb345-41"><a href="shiny-input.html#cb345-41"></a></span>
+<span id="cb345-42"><a href="shiny-input.html#cb345-42"></a>input<span class="in">:focus</span> <span class="op">+</span> <span class="fu">.slider</span> {</span>
+<span id="cb345-43"><a href="shiny-input.html#cb345-43"></a>  <span class="kw">box-shadow</span>: <span class="dv">0</span> <span class="dv">0</span> <span class="dv">1</span><span class="dt">px</span> <span class="cn">#0462a1</span><span class="op">;</span></span>
+<span id="cb345-44"><a href="shiny-input.html#cb345-44"></a>}</span>
+<span id="cb345-45"><a href="shiny-input.html#cb345-45"></a></span>
+<span id="cb345-46"><a href="shiny-input.html#cb345-46"></a>input<span class="in">:checked</span> <span class="op">+</span> <span class="fu">.slider</span><span class="in">:before</span> {</span>
+<span id="cb345-47"><a href="shiny-input.html#cb345-47"></a>  <span class="kw">-webkit-transform</span>: translateX(<span class="dv">26</span><span class="dt">px</span>)<span class="op">;</span></span>
+<span id="cb345-48"><a href="shiny-input.html#cb345-48"></a>  <span class="kw">-ms-transform</span>: translateX(<span class="dv">26</span><span class="dt">px</span>)<span class="op">;</span></span>
+<span id="cb345-49"><a href="shiny-input.html#cb345-49"></a>  <span class="kw">transform</span>: translateX(<span class="dv">26</span><span class="dt">px</span>)<span class="op">;</span></span>
+<span id="cb345-50"><a href="shiny-input.html#cb345-50"></a>}</span></code></pre></div>
+<p>The above CSS should be placed in the previously created <code>assets/styles.css</code> file.</p>
+<div class="figure">
+<img src="images/checkbox-switch.png" alt="" />
+<p class="caption">Checkbox and styled switch input</p>
+</div>
+</div>
+<div id="shiny-input-html" class="section level2" number="16.3">
+<h2><span class="header-section-number">16.3</span> Generate Input HTML</h2>
+<p>Let us start with the R function to be used in the shiny UI. The <code>&lt;input&gt;</code> it generates bears a <code>switchInput</code> class which will be used to identify all switch inputs from JavaScript, this was also done in the custom output. The function accepts an <code>id</code> argument, this is also common across all inputs and outputs as a unique identifier is required in order to retrieve the input JavaScript-side.</p>
+<div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb346-1"><a href="shiny-input.html#cb346-1"></a><span class="co"># app.R</span></span>
+<span id="cb346-2"><a href="shiny-input.html#cb346-2"></a>switchInput &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
+<span id="cb346-3"><a href="shiny-input.html#cb346-3"></a></span>
+<span id="cb346-4"><a href="shiny-input.html#cb346-4"></a>  tags<span class="op">$</span><span class="kw">input</span>(</span>
+<span id="cb346-5"><a href="shiny-input.html#cb346-5"></a>    <span class="dt">id =</span> id, </span>
+<span id="cb346-6"><a href="shiny-input.html#cb346-6"></a>    <span class="dt">type =</span> <span class="st">&quot;checkbox&quot;</span>, </span>
+<span id="cb346-7"><a href="shiny-input.html#cb346-7"></a>    <span class="dt">class =</span> <span class="st">&quot;switchInput&quot;</span></span>
+<span id="cb346-8"><a href="shiny-input.html#cb346-8"></a>  )</span>
+<span id="cb346-9"><a href="shiny-input.html#cb346-9"></a></span>
+<span id="cb346-10"><a href="shiny-input.html#cb346-10"></a>}</span></code></pre></div>
+<p>The function should also accept a customary label and a <code>checked</code> argument to define the initial state of the switch.</p>
+<div class="sourceCode" id="cb347"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb347-1"><a href="shiny-input.html#cb347-1"></a><span class="co"># app.R</span></span>
+<span id="cb347-2"><a href="shiny-input.html#cb347-2"></a>switchInput &lt;-<span class="st"> </span><span class="cf">function</span>(id, label, <span class="dt">checked =</span> <span class="ot">TRUE</span>) {</span>
+<span id="cb347-3"><a href="shiny-input.html#cb347-3"></a></span>
+<span id="cb347-4"><a href="shiny-input.html#cb347-4"></a>  input &lt;-<span class="st"> </span>tags<span class="op">$</span><span class="kw">input</span>(</span>
+<span id="cb347-5"><a href="shiny-input.html#cb347-5"></a>    <span class="dt">id =</span> id, </span>
+<span id="cb347-6"><a href="shiny-input.html#cb347-6"></a>    <span class="dt">type =</span> <span class="st">&quot;checkbox&quot;</span>, </span>
+<span id="cb347-7"><a href="shiny-input.html#cb347-7"></a>    <span class="dt">class =</span> <span class="st">&quot;switchInput&quot;</span></span>
+<span id="cb347-8"><a href="shiny-input.html#cb347-8"></a>  )</span>
+<span id="cb347-9"><a href="shiny-input.html#cb347-9"></a></span>
+<span id="cb347-10"><a href="shiny-input.html#cb347-10"></a>  <span class="cf">if</span>(checked)</span>
+<span id="cb347-11"><a href="shiny-input.html#cb347-11"></a>    input &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">tagAppendAttributes</span>(input, <span class="dt">checked =</span> <span class="ot">NA</span>)</span>
+<span id="cb347-12"><a href="shiny-input.html#cb347-12"></a></span>
+<span id="cb347-13"><a href="shiny-input.html#cb347-13"></a>  form &lt;-<span class="st"> </span><span class="kw">tagList</span>(</span>
+<span id="cb347-14"><a href="shiny-input.html#cb347-14"></a>    <span class="kw">p</span>(label),</span>
+<span id="cb347-15"><a href="shiny-input.html#cb347-15"></a>    tags<span class="op">$</span><span class="kw">label</span>(</span>
+<span id="cb347-16"><a href="shiny-input.html#cb347-16"></a>      <span class="dt">class =</span> <span class="st">&quot;switch&quot;</span>,</span>
+<span id="cb347-17"><a href="shiny-input.html#cb347-17"></a>      input,</span>
+<span id="cb347-18"><a href="shiny-input.html#cb347-18"></a>      tags<span class="op">$</span><span class="kw">span</span>(<span class="dt">class =</span> <span class="st">&quot;slider&quot;</span>)</span>
+<span id="cb347-19"><a href="shiny-input.html#cb347-19"></a>    )</span>
+<span id="cb347-20"><a href="shiny-input.html#cb347-20"></a>  )</span>
+<span id="cb347-21"><a href="shiny-input.html#cb347-21"></a></span>
+<span id="cb347-22"><a href="shiny-input.html#cb347-22"></a>  <span class="kw">return</span>(form)</span>
+<span id="cb347-23"><a href="shiny-input.html#cb347-23"></a>}</span></code></pre></div>
+<p>As for the custom outputs, the dependencies (CSS and JavaScript binding) can piggy back on the generated HTML.</p>
+<div class="sourceCode" id="cb348"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb348-1"><a href="shiny-input.html#cb348-1"></a><span class="co"># app.R</span></span>
+<span id="cb348-2"><a href="shiny-input.html#cb348-2"></a>switchInput &lt;-<span class="st"> </span><span class="cf">function</span>(id, label, <span class="dt">checked =</span> <span class="ot">TRUE</span>) {</span>
+<span id="cb348-3"><a href="shiny-input.html#cb348-3"></a></span>
+<span id="cb348-4"><a href="shiny-input.html#cb348-4"></a>  input &lt;-<span class="st"> </span>tags<span class="op">$</span><span class="kw">input</span>(</span>
+<span id="cb348-5"><a href="shiny-input.html#cb348-5"></a>    <span class="dt">id =</span> id, </span>
+<span id="cb348-6"><a href="shiny-input.html#cb348-6"></a>    <span class="dt">type =</span> <span class="st">&quot;checkbox&quot;</span>, </span>
+<span id="cb348-7"><a href="shiny-input.html#cb348-7"></a>    <span class="dt">class =</span> <span class="st">&quot;switchInput&quot;</span></span>
+<span id="cb348-8"><a href="shiny-input.html#cb348-8"></a>  )</span>
+<span id="cb348-9"><a href="shiny-input.html#cb348-9"></a></span>
+<span id="cb348-10"><a href="shiny-input.html#cb348-10"></a>  <span class="cf">if</span>(checked)</span>
+<span id="cb348-11"><a href="shiny-input.html#cb348-11"></a>    input &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">tagAppendAttributes</span>(input, <span class="dt">checked =</span> <span class="ot">NA</span>)</span>
+<span id="cb348-12"><a href="shiny-input.html#cb348-12"></a></span>
+<span id="cb348-13"><a href="shiny-input.html#cb348-13"></a>  form &lt;-<span class="st"> </span><span class="kw">tagList</span>(</span>
+<span id="cb348-14"><a href="shiny-input.html#cb348-14"></a>    <span class="kw">p</span>(label),</span>
+<span id="cb348-15"><a href="shiny-input.html#cb348-15"></a>    tags<span class="op">$</span><span class="kw">label</span>(</span>
+<span id="cb348-16"><a href="shiny-input.html#cb348-16"></a>      <span class="dt">class =</span> <span class="st">&quot;switch&quot;</span>,</span>
+<span id="cb348-17"><a href="shiny-input.html#cb348-17"></a>      input,</span>
+<span id="cb348-18"><a href="shiny-input.html#cb348-18"></a>      tags<span class="op">$</span><span class="kw">span</span>(<span class="dt">class =</span> <span class="st">&quot;slider&quot;</span>)</span>
+<span id="cb348-19"><a href="shiny-input.html#cb348-19"></a>    )</span>
+<span id="cb348-20"><a href="shiny-input.html#cb348-20"></a>  )</span>
+<span id="cb348-21"><a href="shiny-input.html#cb348-21"></a></span>
+<span id="cb348-22"><a href="shiny-input.html#cb348-22"></a>  path &lt;-<span class="st"> </span><span class="kw">normalizePath</span>(<span class="st">&quot;./assets&quot;</span>)</span>
+<span id="cb348-23"><a href="shiny-input.html#cb348-23"></a></span>
+<span id="cb348-24"><a href="shiny-input.html#cb348-24"></a>  deps &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
+<span id="cb348-25"><a href="shiny-input.html#cb348-25"></a>    <span class="dt">name =</span> <span class="st">&quot;switchInput&quot;</span>,</span>
+<span id="cb348-26"><a href="shiny-input.html#cb348-26"></a>    <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
+<span id="cb348-27"><a href="shiny-input.html#cb348-27"></a>    <span class="dt">src =</span> <span class="kw">c</span>(<span class="dt">file =</span> path),</span>
+<span id="cb348-28"><a href="shiny-input.html#cb348-28"></a>    <span class="dt">script =</span> <span class="st">&quot;binding.js&quot;</span>,</span>
+<span id="cb348-29"><a href="shiny-input.html#cb348-29"></a>    <span class="dt">stylesheet =</span> <span class="st">&quot;styles.css&quot;</span></span>
+<span id="cb348-30"><a href="shiny-input.html#cb348-30"></a>  )</span>
+<span id="cb348-31"><a href="shiny-input.html#cb348-31"></a></span>
+<span id="cb348-32"><a href="shiny-input.html#cb348-32"></a>  htmltools<span class="op">::</span><span class="kw">attachDependencies</span>(form, deps)</span>
+<span id="cb348-33"><a href="shiny-input.html#cb348-33"></a>}</span></code></pre></div>
+</div>
+<div id="shiny-input-binding" class="section level2" number="16.4">
+<h2><span class="header-section-number">16.4</span> JavaScript Input Binding</h2>
+<p>The JavaScript input binding is instantiated from <code>Shiny.InputBinding</code>, this is similar to output bindings which are instantiated from <code>Shiny.OutputBinding</code>.</p>
+<div class="sourceCode" id="cb349"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb349-1"><a href="shiny-input.html#cb349-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span></code></pre></div>
+<p>Then again the binding is “extended,” this consists of adding several methods.</p>
+<ul>
+<li><code>find</code> returns all the relevant inputs.</li>
+<li><code>getId</code> returns the unique identifier of the input.</li>
+<li><code>getValue</code> returns the value of the input to be sent to the server.</li>
+<li><code>setValue</code> used to set the value of the input.</li>
+<li><code>receiveMessage</code> used to receive messages from the server.</li>
+<li><code>subscribe</code> tells shiny when and how to send the updated input value to the server.</li>
+<li><code>unsubscribe</code> removes event handlers, stops shiny from sending updated values to the server.</li>
+</ul>
+<div id="shiny-input-find" class="section level3" number="16.4.1">
+<h3><span class="header-section-number">16.4.1</span> Find Inputs</h3>
+<p>The <code>find</code> method looks for all the relevant HTML elements in the document (<code>scope</code>), and returns them as an array. Many other method we are about to implement will accept <code>el</code> as an argument, this will ultimately be one of the elements returned by <code>find</code>.</p>
+<p>Generally the <code>find</code> method is used in conjunction with a <code>class</code>, hence the <code>&lt;input&gt;</code> generated by <code>switchInput</code> bears a class of the same name <code>switchInput</code>.</p>
+<div class="sourceCode" id="cb350"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb350-1"><a href="shiny-input.html#cb350-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
+<span id="cb350-2"><a href="shiny-input.html#cb350-2"></a></span>
+<span id="cb350-3"><a href="shiny-input.html#cb350-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
+<span id="cb350-4"><a href="shiny-input.html#cb350-4"></a>  <span class="co">// find inputs</span></span>
+<span id="cb350-5"><a href="shiny-input.html#cb350-5"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
+<span id="cb350-6"><a href="shiny-input.html#cb350-6"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb350-7"><a href="shiny-input.html#cb350-7"></a>  }</span>
+<span id="cb350-8"><a href="shiny-input.html#cb350-8"></a>})<span class="op">;</span></span></code></pre></div>
+</div>
+<div id="shiny-input-get-id" class="section level3" number="16.4.2">
+<h3><span class="header-section-number">16.4.2</span> Get Input Id</h3>
+<p>The <code>getId</code> method is exactly it seems to be, it returns the <code>id</code> of the element. It looks for that id as <code>data-input-id</code> attribute and if that is not found returns the <code>id</code>; this can be observed in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/input_binding.js#L9">source code</a> (below).</p>
+<div class="sourceCode" id="cb351"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb351-1"><a href="shiny-input.html#cb351-1"></a><span class="kw">this</span><span class="op">.</span><span class="at">getId</span> <span class="op">=</span> <span class="kw">function</span>(el) {</span>
+<span id="cb351-2"><a href="shiny-input.html#cb351-2"></a>  <span class="cf">return</span> el[<span class="st">&#39;data-input-id&#39;</span>] <span class="op">||</span> el<span class="op">.</span><span class="at">id</span><span class="op">;</span></span>
+<span id="cb351-3"><a href="shiny-input.html#cb351-3"></a>}<span class="op">;</span></span></code></pre></div>
+<p>Since the default works there is no need to use it for the switch input.</p>
+</div>
+<div id="shiny-input-get-value" class="section level3" number="16.4.3">
+<h3><span class="header-section-number">16.4.3</span> Get Input Value</h3>
+<p>This retrieves the value of the input, this is often the attribute of the same name (<code>value="something"</code>) which can be obtain with the jQuery <code>val()</code> method. The switch is an input of type <code>checkbox</code> and therefore uses the <code>checked</code> prop.</p>
+<div class="sourceCode" id="cb352"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb352-1"><a href="shiny-input.html#cb352-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
+<span id="cb352-2"><a href="shiny-input.html#cb352-2"></a></span>
+<span id="cb352-3"><a href="shiny-input.html#cb352-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
+<span id="cb352-4"><a href="shiny-input.html#cb352-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
+<span id="cb352-5"><a href="shiny-input.html#cb352-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb352-6"><a href="shiny-input.html#cb352-6"></a>  }<span class="op">,</span></span>
+<span id="cb352-7"><a href="shiny-input.html#cb352-7"></a>  <span class="co">// retrieve value</span></span>
+<span id="cb352-8"><a href="shiny-input.html#cb352-8"></a>  <span class="dt">getValue</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb352-9"><a href="shiny-input.html#cb352-9"></a>    <span class="cf">return</span> $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span>)<span class="op">;</span></span>
+<span id="cb352-10"><a href="shiny-input.html#cb352-10"></a>  }</span>
+<span id="cb352-11"><a href="shiny-input.html#cb352-11"></a>})<span class="op">;</span></span></code></pre></div>
+<p>The value the <code>checked</code> prop is boolean, <code>true</code> if checked and <code>false</code> if unchecked.</p>
+<div class="rmdnote">
+<p>
+Ensure the <code>getValue</code> method actually <code>return</code>s the value.
+</p>
+</div>
+</div>
+<div id="shiny-input-set-value" class="section level3" number="16.4.4">
+<h3><span class="header-section-number">16.4.4</span> Set Input Value</h3>
+<p>The <code>setValue</code> method sets the value of the input, hence it also accepts the <code>value</code> object: the actual value to which the input should be set. Then again, most inputs will likely use the <code>value</code> attribute which can be set in jQuery with <code>val(newValue)</code> but the checkbox uses the <code>checked</code> prop.</p>
+<div class="sourceCode" id="cb353"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb353-1"><a href="shiny-input.html#cb353-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
+<span id="cb353-2"><a href="shiny-input.html#cb353-2"></a></span>
+<span id="cb353-3"><a href="shiny-input.html#cb353-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
+<span id="cb353-4"><a href="shiny-input.html#cb353-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
+<span id="cb353-5"><a href="shiny-input.html#cb353-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb353-6"><a href="shiny-input.html#cb353-6"></a>  }<span class="op">,</span></span>
+<span id="cb353-7"><a href="shiny-input.html#cb353-7"></a>  <span class="dt">getValue</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb353-8"><a href="shiny-input.html#cb353-8"></a>    <span class="cf">return</span> $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span>)<span class="op">;</span></span>
+<span id="cb353-9"><a href="shiny-input.html#cb353-9"></a>  }<span class="op">,</span></span>
+<span id="cb353-10"><a href="shiny-input.html#cb353-10"></a>  <span class="co">// check or uncheck the switch</span></span>
+<span id="cb353-11"><a href="shiny-input.html#cb353-11"></a>  <span class="dt">setValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value) {</span>
+<span id="cb353-12"><a href="shiny-input.html#cb353-12"></a>    $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span><span class="op">,</span> value)<span class="op">.</span><span class="fu">change</span>()<span class="op">;</span></span>
+<span id="cb353-13"><a href="shiny-input.html#cb353-13"></a>  }</span></code></pre></div>
+<p>Note the use of the <code>change</code> method which ensures the event is fired, otherwise the input is checked or unchecked but the <code>change</code> event is not fired and this will cause problems later on as we rely on this event.</p>
+</div>
+<div id="shiny-input-receive-msg" class="section level3" number="16.4.5">
+<h3><span class="header-section-number">16.4.5</span> Receive Input Messages</h3>
+<p>The <code>setValue</code> method previously defined is only really useful when combined with <code>receiveMessage</code>, the latter handles messages sent to the input, these are generally sent from the server via functions the likes of <code>updateSelectInput</code>. Internally it uses the <code>setValue</code> method to define the value of the input received from the server. Note that the <code>value</code> is therefore a serialised JSON input coming from the R server and can be of any complexity you desire. Below we use it such that expect a simple boolean as the checkbox (switch) can be either on (<code>true</code>) or off (<code>false</code>).</p>
+<div class="sourceCode" id="cb354"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb354-1"><a href="shiny-input.html#cb354-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
+<span id="cb354-2"><a href="shiny-input.html#cb354-2"></a></span>
+<span id="cb354-3"><a href="shiny-input.html#cb354-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
+<span id="cb354-4"><a href="shiny-input.html#cb354-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
+<span id="cb354-5"><a href="shiny-input.html#cb354-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb354-6"><a href="shiny-input.html#cb354-6"></a>  }<span class="op">,</span></span>
+<span id="cb354-7"><a href="shiny-input.html#cb354-7"></a>  <span class="dt">getValue</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb354-8"><a href="shiny-input.html#cb354-8"></a>    <span class="cf">return</span> $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span>)<span class="op">;</span></span>
+<span id="cb354-9"><a href="shiny-input.html#cb354-9"></a>  }<span class="op">,</span></span>
+<span id="cb354-10"><a href="shiny-input.html#cb354-10"></a>  <span class="dt">setValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value) {</span>
+<span id="cb354-11"><a href="shiny-input.html#cb354-11"></a>    $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span><span class="op">,</span> value)<span class="op">.</span><span class="fu">change</span>()<span class="op">;</span></span>
+<span id="cb354-12"><a href="shiny-input.html#cb354-12"></a>  }<span class="op">,</span></span>
+<span id="cb354-13"><a href="shiny-input.html#cb354-13"></a>  <span class="co">// handle messages from the server</span></span>
+<span id="cb354-14"><a href="shiny-input.html#cb354-14"></a>  <span class="dt">receiveMessage</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value){</span>
+<span id="cb354-15"><a href="shiny-input.html#cb354-15"></a>    <span class="kw">this</span><span class="op">.</span><span class="fu">setValue</span>(el<span class="op">,</span> value)<span class="op">;</span></span>
+<span id="cb354-16"><a href="shiny-input.html#cb354-16"></a>  }</span>
+<span id="cb354-17"><a href="shiny-input.html#cb354-17"></a>})<span class="op">;</span></span></code></pre></div>
+</div>
+<div id="shiny-input-sub-unsub" class="section level3" number="16.4.6">
+<h3><span class="header-section-number">16.4.6</span> Subscribe &amp; Unsubscribe Inputs</h3>
+<p>Finally, a crucial method is <code>subscribe</code>, this is ran when the input is registered (more on that later) and is used to determine when shiny sends new values of the input back to the server. This method also accepts a <code>callback</code> which is the very function that tells shiny to update the value. This callback function accepts a single boolean value which in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/input_binding.js#L18">source code</a> states is used to enable debouncing or throttling. This is covered in the next section on rate policy.</p>
+<p>This method often consists of an event listener that observes changes on the input to send its to the server. In layman terms, when the switch input changes (on to off or vice versa) run the <code>callback</code> function which sends the data to the server.</p>
+<div class="sourceCode" id="cb355"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb355-1"><a href="shiny-input.html#cb355-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
+<span id="cb355-2"><a href="shiny-input.html#cb355-2"></a></span>
+<span id="cb355-3"><a href="shiny-input.html#cb355-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
+<span id="cb355-4"><a href="shiny-input.html#cb355-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
+<span id="cb355-5"><a href="shiny-input.html#cb355-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb355-6"><a href="shiny-input.html#cb355-6"></a>  }<span class="op">,</span></span>
+<span id="cb355-7"><a href="shiny-input.html#cb355-7"></a>  <span class="dt">getValue</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb355-8"><a href="shiny-input.html#cb355-8"></a>    <span class="cf">return</span> $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span>)<span class="op">;</span></span>
+<span id="cb355-9"><a href="shiny-input.html#cb355-9"></a>  }<span class="op">,</span></span>
+<span id="cb355-10"><a href="shiny-input.html#cb355-10"></a>  <span class="dt">setValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value) {</span>
+<span id="cb355-11"><a href="shiny-input.html#cb355-11"></a>    $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span><span class="op">,</span> value)<span class="op">.</span><span class="fu">change</span>()<span class="op">;</span></span>
+<span id="cb355-12"><a href="shiny-input.html#cb355-12"></a>  }<span class="op">,</span></span>
+<span id="cb355-13"><a href="shiny-input.html#cb355-13"></a>  <span class="dt">receiveMessage</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value){</span>
+<span id="cb355-14"><a href="shiny-input.html#cb355-14"></a>    <span class="kw">this</span><span class="op">.</span><span class="fu">setValue</span>(el<span class="op">,</span> value)<span class="op">;</span></span>
+<span id="cb355-15"><a href="shiny-input.html#cb355-15"></a>  }<span class="op">,</span></span>
+<span id="cb355-16"><a href="shiny-input.html#cb355-16"></a>  <span class="dt">subscribe</span><span class="op">:</span> <span class="kw">function</span> (el<span class="op">,</span> callback) {</span>
+<span id="cb355-17"><a href="shiny-input.html#cb355-17"></a>    $(el)<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change.switchInput&quot;</span><span class="op">,</span> <span class="kw">function</span>(){</span>
+<span id="cb355-18"><a href="shiny-input.html#cb355-18"></a>      callback(<span class="kw">true</span>)<span class="op">;</span></span>
+<span id="cb355-19"><a href="shiny-input.html#cb355-19"></a>    })</span>
+<span id="cb355-20"><a href="shiny-input.html#cb355-20"></a>  }<span class="op">,</span></span>
+<span id="cb355-21"><a href="shiny-input.html#cb355-21"></a>  <span class="dt">unsubscribe</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb355-22"><a href="shiny-input.html#cb355-22"></a>    $(el)<span class="op">.</span><span class="fu">off</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb355-23"><a href="shiny-input.html#cb355-23"></a>  }</span>
+<span id="cb355-24"><a href="shiny-input.html#cb355-24"></a>})<span class="op">;</span></span></code></pre></div>
+<p>Note that in the <code>subscribe</code> method we listen for <code>change</code>s on the input, hence the <code>setValue</code> also uses jQuery’s <code>change</code> method; it ensures this event is fired and that shiny will subsequently pick it up.</p>
+<div class="rmdnote">
+<p>
+Make sure the <code>setValue</code> method triggers the event observed in <code>subscribe</code>
+</p>
+</div>
+</div>
+<div id="shiny-input-rate-policy" class="section level3" number="16.4.7">
+<h3><span class="header-section-number">16.4.7</span> Input Rate Policy</h3>
+<p>The rate policy determines how frequently the binding should send new input values back to the server. The <code>getRatePolicy</code> method should return an object that describes that, it is a JSON array with two variable <code>policy</code> and <code>delay</code>.</p>
+<p><strong>direct</strong></p>
+<p>The <code>direct</code> policy tells shiny to sends any new value directly, however often this occurs. Therefore, this policy does not make use of <code>delay</code>.</p>
+<div class="sourceCode" id="cb356"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb356-1"><a href="shiny-input.html#cb356-1"></a><span class="fu">{</span></span>
+<span id="cb356-2"><a href="shiny-input.html#cb356-2"></a>  <span class="er">policy</span><span class="fu">:</span> <span class="st">&quot;direct&quot;</span></span>
+<span id="cb356-3"><a href="shiny-input.html#cb356-3"></a><span class="fu">}</span></span></code></pre></div>
+<p><strong>debounce</strong></p>
+<p>The <code>debounce</code> policy tells shiny to ignore all new values until no new values have been received for <code>delay</code> milliseconds.</p>
+<div class="sourceCode" id="cb357"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb357-1"><a href="shiny-input.html#cb357-1"></a><span class="fu">{</span></span>
+<span id="cb357-2"><a href="shiny-input.html#cb357-2"></a>  <span class="er">policy</span><span class="fu">:</span> <span class="st">&quot;debounce&quot;</span><span class="fu">,</span></span>
+<span id="cb357-3"><a href="shiny-input.html#cb357-3"></a>  <span class="er">delay</span><span class="fu">:</span> <span class="dv">2500</span></span>
+<span id="cb357-4"><a href="shiny-input.html#cb357-4"></a><span class="fu">}</span></span></code></pre></div>
+<p><strong>throttle</strong></p>
+<p>The <code>throttle</code> policy means that no more than one value will be sent per <code>delay</code> milliseconds.</p>
+<div class="sourceCode" id="cb358"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb358-1"><a href="shiny-input.html#cb358-1"></a><span class="fu">{</span></span>
+<span id="cb358-2"><a href="shiny-input.html#cb358-2"></a>  <span class="er">policy</span><span class="fu">:</span> <span class="st">&quot;throttle&quot;</span><span class="fu">,</span></span>
+<span id="cb358-3"><a href="shiny-input.html#cb358-3"></a>  <span class="er">delay</span><span class="fu">:</span> <span class="dv">1000</span></span>
+<span id="cb358-4"><a href="shiny-input.html#cb358-4"></a><span class="fu">}</span></span></code></pre></div>
+<p>A switch input is not expected to change frequently but it’s nonetheless good practice to throttle it to ensure the server does not receive too many requests. This will admittedly be more relevant to inputs that see a higher rates of change like text fields which unless debounced send every key stroke to the server.</p>
+<div class="sourceCode" id="cb359"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb359-1"><a href="shiny-input.html#cb359-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
+<span id="cb359-2"><a href="shiny-input.html#cb359-2"></a></span>
+<span id="cb359-3"><a href="shiny-input.html#cb359-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
+<span id="cb359-4"><a href="shiny-input.html#cb359-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
+<span id="cb359-5"><a href="shiny-input.html#cb359-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb359-6"><a href="shiny-input.html#cb359-6"></a>  }<span class="op">,</span></span>
+<span id="cb359-7"><a href="shiny-input.html#cb359-7"></a>  <span class="dt">getValue</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb359-8"><a href="shiny-input.html#cb359-8"></a>    <span class="cf">return</span> $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span>)<span class="op">;</span></span>
+<span id="cb359-9"><a href="shiny-input.html#cb359-9"></a>  }<span class="op">,</span></span>
+<span id="cb359-10"><a href="shiny-input.html#cb359-10"></a>  <span class="dt">setValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value) {</span>
+<span id="cb359-11"><a href="shiny-input.html#cb359-11"></a>    $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span><span class="op">,</span> value)<span class="op">.</span><span class="fu">change</span>()<span class="op">;</span></span>
+<span id="cb359-12"><a href="shiny-input.html#cb359-12"></a>  }<span class="op">,</span></span>
+<span id="cb359-13"><a href="shiny-input.html#cb359-13"></a>  <span class="dt">receiveMessage</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value){</span>
+<span id="cb359-14"><a href="shiny-input.html#cb359-14"></a>    <span class="kw">this</span><span class="op">.</span><span class="fu">setValue</span>(el<span class="op">,</span> value)<span class="op">;</span></span>
+<span id="cb359-15"><a href="shiny-input.html#cb359-15"></a>  }<span class="op">,</span></span>
+<span id="cb359-16"><a href="shiny-input.html#cb359-16"></a>  <span class="dt">subscribe</span><span class="op">:</span> <span class="kw">function</span> (el<span class="op">,</span> callback) {</span>
+<span id="cb359-17"><a href="shiny-input.html#cb359-17"></a>    $(el)<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change.switchInput&quot;</span><span class="op">,</span> <span class="kw">function</span>(){</span>
+<span id="cb359-18"><a href="shiny-input.html#cb359-18"></a>      callback(<span class="kw">true</span>)<span class="op">;</span></span>
+<span id="cb359-19"><a href="shiny-input.html#cb359-19"></a>    })</span>
+<span id="cb359-20"><a href="shiny-input.html#cb359-20"></a>  }<span class="op">,</span></span>
+<span id="cb359-21"><a href="shiny-input.html#cb359-21"></a>  <span class="dt">unsubscribe</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb359-22"><a href="shiny-input.html#cb359-22"></a>    $(el)<span class="op">.</span><span class="fu">off</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb359-23"><a href="shiny-input.html#cb359-23"></a>  }<span class="op">,</span></span>
+<span id="cb359-24"><a href="shiny-input.html#cb359-24"></a>  <span class="co">// throttle</span></span>
+<span id="cb359-25"><a href="shiny-input.html#cb359-25"></a>  <span class="dt">getRatePolicy</span><span class="op">:</span> <span class="kw">function</span>(){</span>
+<span id="cb359-26"><a href="shiny-input.html#cb359-26"></a>    <span class="cf">return</span> {</span>
+<span id="cb359-27"><a href="shiny-input.html#cb359-27"></a>      <span class="dt">policy</span><span class="op">:</span> <span class="st">&#39;throttle&#39;</span><span class="op">,</span></span>
+<span id="cb359-28"><a href="shiny-input.html#cb359-28"></a>      <span class="dt">delay</span><span class="op">:</span> <span class="dv">1000</span></span>
+<span id="cb359-29"><a href="shiny-input.html#cb359-29"></a>    }</span>
+<span id="cb359-30"><a href="shiny-input.html#cb359-30"></a>  }</span>
+<span id="cb359-31"><a href="shiny-input.html#cb359-31"></a>})<span class="op">;</span></span></code></pre></div>
+</div>
+<div id="shiny-input-register" class="section level3" number="16.4.8">
+<h3><span class="header-section-number">16.4.8</span> Registering the Input Binding</h3>
+<p>Finally, like the custom output, the input can be registered with shiny, it too takes a unique identifier as second argument.</p>
+<div class="sourceCode" id="cb360"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb360-1"><a href="shiny-input.html#cb360-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
+<span id="cb360-2"><a href="shiny-input.html#cb360-2"></a></span>
+<span id="cb360-3"><a href="shiny-input.html#cb360-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
+<span id="cb360-4"><a href="shiny-input.html#cb360-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
+<span id="cb360-5"><a href="shiny-input.html#cb360-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb360-6"><a href="shiny-input.html#cb360-6"></a>  }<span class="op">,</span></span>
+<span id="cb360-7"><a href="shiny-input.html#cb360-7"></a>  <span class="dt">getValue</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb360-8"><a href="shiny-input.html#cb360-8"></a>    <span class="cf">return</span> $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span>)<span class="op">;</span></span>
+<span id="cb360-9"><a href="shiny-input.html#cb360-9"></a>  }<span class="op">,</span></span>
+<span id="cb360-10"><a href="shiny-input.html#cb360-10"></a>  <span class="dt">setValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value) {</span>
+<span id="cb360-11"><a href="shiny-input.html#cb360-11"></a>    $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span><span class="op">,</span> value)<span class="op">.</span><span class="fu">change</span>()<span class="op">;</span></span>
+<span id="cb360-12"><a href="shiny-input.html#cb360-12"></a>  }<span class="op">,</span></span>
+<span id="cb360-13"><a href="shiny-input.html#cb360-13"></a>  <span class="dt">receiveMessage</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value){</span>
+<span id="cb360-14"><a href="shiny-input.html#cb360-14"></a>    <span class="kw">this</span><span class="op">.</span><span class="fu">setValue</span>(el<span class="op">,</span> value)<span class="op">;</span></span>
+<span id="cb360-15"><a href="shiny-input.html#cb360-15"></a>  }<span class="op">,</span></span>
+<span id="cb360-16"><a href="shiny-input.html#cb360-16"></a>  <span class="dt">subscribe</span><span class="op">:</span> <span class="kw">function</span> (el<span class="op">,</span> callback) {</span>
+<span id="cb360-17"><a href="shiny-input.html#cb360-17"></a>    $(el)<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change.switchInput&quot;</span><span class="op">,</span> <span class="kw">function</span>(){</span>
+<span id="cb360-18"><a href="shiny-input.html#cb360-18"></a>      callback(<span class="kw">true</span>)<span class="op">;</span></span>
+<span id="cb360-19"><a href="shiny-input.html#cb360-19"></a>    })</span>
+<span id="cb360-20"><a href="shiny-input.html#cb360-20"></a>  }<span class="op">,</span></span>
+<span id="cb360-21"><a href="shiny-input.html#cb360-21"></a>  <span class="dt">unsubscribe</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb360-22"><a href="shiny-input.html#cb360-22"></a>    $(el)<span class="op">.</span><span class="fu">off</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb360-23"><a href="shiny-input.html#cb360-23"></a>  }<span class="op">,</span></span>
+<span id="cb360-24"><a href="shiny-input.html#cb360-24"></a>  <span class="dt">getRatePolicy</span><span class="op">:</span> <span class="kw">function</span>(){</span>
+<span id="cb360-25"><a href="shiny-input.html#cb360-25"></a>    <span class="cf">return</span> {</span>
+<span id="cb360-26"><a href="shiny-input.html#cb360-26"></a>      <span class="dt">policy</span><span class="op">:</span> <span class="st">&#39;throttle&#39;</span><span class="op">,</span></span>
+<span id="cb360-27"><a href="shiny-input.html#cb360-27"></a>      <span class="dt">delay</span><span class="op">:</span> <span class="dv">1000</span></span>
+<span id="cb360-28"><a href="shiny-input.html#cb360-28"></a>    }</span>
+<span id="cb360-29"><a href="shiny-input.html#cb360-29"></a>  }</span>
+<span id="cb360-30"><a href="shiny-input.html#cb360-30"></a>})<span class="op">;</span></span>
+<span id="cb360-31"><a href="shiny-input.html#cb360-31"></a></span>
+<span id="cb360-32"><a href="shiny-input.html#cb360-32"></a>Shiny<span class="op">.</span><span class="at">inputBindings</span><span class="op">.</span><span class="fu">register</span>(switchInput<span class="op">,</span> <span class="st">&#39;john.switch&#39;</span>)<span class="op">;</span></span></code></pre></div>
+<p>This wraps up a custom input, it can now be used in a shiny application</p>
+<div class="sourceCode" id="cb361"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb361-1"><a href="shiny-input.html#cb361-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb361-2"><a href="shiny-input.html#cb361-2"></a></span>
+<span id="cb361-3"><a href="shiny-input.html#cb361-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb361-4"><a href="shiny-input.html#cb361-4"></a>  <span class="kw">switchInput</span>(<span class="st">&quot;switch&quot;</span>, <span class="st">&quot;Show plot&quot;</span>, <span class="ot">FALSE</span>),</span>
+<span id="cb361-5"><a href="shiny-input.html#cb361-5"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb361-6"><a href="shiny-input.html#cb361-6"></a>)</span>
+<span id="cb361-7"><a href="shiny-input.html#cb361-7"></a></span>
+<span id="cb361-8"><a href="shiny-input.html#cb361-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb361-9"><a href="shiny-input.html#cb361-9"></a></span>
+<span id="cb361-10"><a href="shiny-input.html#cb361-10"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb361-11"><a href="shiny-input.html#cb361-11"></a>    <span class="kw">print</span>(input<span class="op">$</span><span class="cf">switch</span>)</span>
+<span id="cb361-12"><a href="shiny-input.html#cb361-12"></a></span>
+<span id="cb361-13"><a href="shiny-input.html#cb361-13"></a>    <span class="cf">if</span>(<span class="op">!</span>input<span class="op">$</span><span class="cf">switch</span>)</span>
+<span id="cb361-14"><a href="shiny-input.html#cb361-14"></a>      <span class="kw">return</span>()</span>
+<span id="cb361-15"><a href="shiny-input.html#cb361-15"></a></span>
+<span id="cb361-16"><a href="shiny-input.html#cb361-16"></a>    <span class="kw">plot</span>(cars)</span>
+<span id="cb361-17"><a href="shiny-input.html#cb361-17"></a>  })</span>
+<span id="cb361-18"><a href="shiny-input.html#cb361-18"></a>}</span>
+<span id="cb361-19"><a href="shiny-input.html#cb361-19"></a></span>
+<span id="cb361-20"><a href="shiny-input.html#cb361-20"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="figure">
+<img src="images/switch-example.png" alt="" />
+<p class="caption">Switch input example</p>
+</div>
+</div>
+</div>
+<div id="shiny-input-update" class="section level2" number="16.5">
+<h2><span class="header-section-number">16.5</span> Update Input</h2>
+<p>The JavaScript binding was provided with the required methods to receive updates from the server to change the value of the switch input but the R function that sends those updates is yet to be written.</p>
+<div class="sourceCode" id="cb362"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb362-1"><a href="shiny-input.html#cb362-1"></a>update_switch_input &lt;-<span class="st"> </span><span class="cf">function</span>(id, value, </span>
+<span id="cb362-2"><a href="shiny-input.html#cb362-2"></a>  <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</span>
+<span id="cb362-3"><a href="shiny-input.html#cb362-3"></a>  session<span class="op">$</span><span class="kw">sendInputMessage</span>(id, value)</span>
+<span id="cb362-4"><a href="shiny-input.html#cb362-4"></a>}</span></code></pre></div>
+<p>This pattern was used previously albeit using <code>sendCustomMessage</code>, with <code>sendInputMessage</code> the message can be sent straight to the <code>receiveMessage</code> handler of the input using 1) the <code>id</code> of the input and 2) the data one wants to send.</p>
+<p>We can adapt the application to make use of this button.</p>
+<div class="sourceCode" id="cb363"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb363-1"><a href="shiny-input.html#cb363-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb363-2"><a href="shiny-input.html#cb363-2"></a></span>
+<span id="cb363-3"><a href="shiny-input.html#cb363-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb363-4"><a href="shiny-input.html#cb363-4"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;chg&quot;</span>, <span class="st">&quot;Switch ON&quot;</span>),</span>
+<span id="cb363-5"><a href="shiny-input.html#cb363-5"></a>  <span class="kw">switchInput</span>(<span class="st">&quot;switch&quot;</span>, <span class="st">&quot;Switch input&quot;</span>, <span class="ot">FALSE</span>),</span>
+<span id="cb363-6"><a href="shiny-input.html#cb363-6"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb363-7"><a href="shiny-input.html#cb363-7"></a>)</span>
+<span id="cb363-8"><a href="shiny-input.html#cb363-8"></a></span>
+<span id="cb363-9"><a href="shiny-input.html#cb363-9"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb363-10"><a href="shiny-input.html#cb363-10"></a></span>
+<span id="cb363-11"><a href="shiny-input.html#cb363-11"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb363-12"><a href="shiny-input.html#cb363-12"></a>    <span class="kw">print</span>(input<span class="op">$</span><span class="cf">switch</span>)</span>
+<span id="cb363-13"><a href="shiny-input.html#cb363-13"></a>    </span>
+<span id="cb363-14"><a href="shiny-input.html#cb363-14"></a>    <span class="cf">if</span>(<span class="op">!</span>input<span class="op">$</span><span class="cf">switch</span>)</span>
+<span id="cb363-15"><a href="shiny-input.html#cb363-15"></a>      <span class="kw">return</span>()</span>
+<span id="cb363-16"><a href="shiny-input.html#cb363-16"></a></span>
+<span id="cb363-17"><a href="shiny-input.html#cb363-17"></a>    <span class="kw">plot</span>(cars)</span>
+<span id="cb363-18"><a href="shiny-input.html#cb363-18"></a>  })</span>
+<span id="cb363-19"><a href="shiny-input.html#cb363-19"></a></span>
+<span id="cb363-20"><a href="shiny-input.html#cb363-20"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>chg, {</span>
+<span id="cb363-21"><a href="shiny-input.html#cb363-21"></a>    <span class="kw">update_switch_input</span>(<span class="st">&quot;switch&quot;</span>, <span class="ot">TRUE</span>, session)</span>
+<span id="cb363-22"><a href="shiny-input.html#cb363-22"></a>  })</span>
+<span id="cb363-23"><a href="shiny-input.html#cb363-23"></a>}</span>
+<span id="cb363-24"><a href="shiny-input.html#cb363-24"></a></span>
+<span id="cb363-25"><a href="shiny-input.html#cb363-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>The diagram below attempts to summarize the various elements that were put together and used in the last application.</p>
+<p>It all starts from the <code>switchInput</code> function which generates the HTML defining the switch input and its initial state. In the <code>subscribe</code> method, an event listener checks for changes on this HTML element (<code>$(el).on('change', ...)</code>), every time it changes (check/uncheck) it fires the shiny <code>callback</code> which sends the value of the input obtained from <code>getValue</code> through the websocket. When the value of the input is changed from the server this value travels through the websocket to the front-end where <code>receiveMessage</code> uses <code>setValue</code> to programmatically change the check box which incidentally triggers the change event and back we go.</p>
+<div id="htmlwidget-9a020bb764b2e3af48ec" style="width:100%;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9a020bb764b2e3af48ec">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR]\n  node [shape=record fontsize=12];\n\n  subgraph cluster_r {\n    node [color=royalBlue];\n    \"update_switch_input\"\n    \"switchInput\"\n    \"Input list\"\n\n    label = \"R server\"\n  }\n\n  subgraph cluster_js {\n    node [color=gold];\n    \"receiveMessage\"\n    \"setValue\"\n    \"HTML input\"\n    \"subscribe\"\n    \"getValue\"\n\n    label = \"Front-end\"\n  }\n\n  edge [fontsize=10]\n  \"update_switch_input\" -> \"receiveMessage\" [xlabel=\"websocket\"]\n  \"receiveMessage\" -> \"setValue\" [label=\"value\"]\n  \"switchInput\" -> \"HTML input\" \n  \"setValue\" -> \"HTML input\" [label=\"value\"]\n  \"HTML input\" -> \"subscribe\" [label=\"event listener\"]\n  \"subscribe\" -> \"getValue\" [label=\"callback\"]\n  \"getValue\" -> \"Input list\" [label=\"websocket\"]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="shiny-input-excercise" class="section level2" number="16.6">
+<h2><span class="header-section-number">16.6</span> Exercise</h2>
+<ul>
+<li>Add a <code>toggle_switch_input</code> that toggles between states so it turns it off when it’s on and vice versa</li>
+<li>Bring support for <a href="https://getbootstrap.com/docs/3.3/components/#input-groups-basic">Bootstrap 3 text input addon</a></li>
+</ul>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="shiny-output.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="shiny-cookies.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook/js/app.min.js"></script>
+<script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/clipboard.min.js"></script>
+<script src="libs/gitbook/js/plugin-search.js"></script>
+<script src="libs/gitbook/js/plugin-sharing.js"></script>
+<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook/js/jquery.highlight.js"></script>
+<script src="libs/gitbook/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": {}
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/JohnCoene/javascript-for-r/edit/master/4-16-shiny-input.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": {},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

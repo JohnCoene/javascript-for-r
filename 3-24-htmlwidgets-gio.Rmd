@@ -1,4 +1,4 @@
-# The Full Monty
+# The Full Monty {#widgets-full}
 
 With a first widget built one can jump onto another one: [gio.js](https://giojs.org/), a library to draw arcs between countries on a 3 dimensional globe. This will include many more functionalities such packages can comprise.
 
@@ -39,7 +39,7 @@ usethis::create_package("gio")
 htmlwidgets::scaffoldWidget("gio")
 ```
 
-## Gio.js Dependencies 
+## Dependencies {#widgets-full-deps}
 
 Handling the dependencies does not differ much, we only need to download two libraries instead of one.
 
@@ -94,7 +94,7 @@ dependencies:
     script: gio.min.js
 ```
 
-## Gio.js JavaScript 
+## JavaScript {#widgets-full-js}
 
 Let's copy the JavaScript code from the [Get Started section of gio.js](https://giojs.org/index.html) in the `gio.js` file's `renderValue` function. At this point the data format is not known so we comment the line which adds data to the visualisation.
 
@@ -169,7 +169,7 @@ renderValue: function(x) {
 }
 ```
 
-## Working with Data 
+## Working with Data {#widgets-full-data}
 
 An interesting start, now onto adding data. Let's take a look at the [documentation](https://giojs.org/html/docs/dataAdd.html) to see what data the library expects.
 
@@ -270,11 +270,11 @@ jsonlite::toJSON(arcs, dataframe = "rows")
 
 As mentioned previously, convention has it that rectangular data (data frames) are serialised row-wise. This is likely to be a recurring problem.
 
-## Transforming Data 
+## Transforming Data {#widgets-full-transform-data}
 
 There are multiple ways to transform the data and ensure the serialised JSON is as the JavaScript library expects it to be. 
 
-### Using JavaScript 
+### Using JavaScript {#widgets-full-transform-data-js}
 
 JavaScript can be used to transform the data, leaving the serialiser as-is to reshape the data in the client. The HTMLwidget JavaScript library (already imported by default) exports an object which provides a method, `dataframeToD3`, to transform the data from long to wide. 
 
@@ -292,7 +292,7 @@ renderValue: function(x) {
 }
 ```
 
-### Using R 
+### Using R {#widgets-full-transform-data-r}
 
 Instead of serialising the data a certain way then correct in JavaScript as demonstrated previously, one can also modify, or even replace, htmlwidgets' default serialiser. Speaking of which, below is the default serializer used by htmlwidgets.
 
@@ -386,13 +386,13 @@ x = list(
 )
 ```
 
-### Pros & Cons 
+### Pros & Cons {#widgets-full-transform-data-conclusion}
 
 There are pros and cons to each methods. The preferable method is probably to only alter the argument(s) where needed, this is the method used in the remainder of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Moreover htmlwidgets' serialiser extends jsonlite to allow converting JavaScript code which will come in handy later on. Transforming the data in JavaScript has one drawback, `HTMLWidgets.dataframeToD3` cannot be applied to the entire `x` object, it will only work on the subsets that hold the column-wise data (`x.data`) which tends to lead to clunky code as one uses said function in various places.
 
 ![Gio output with correct serialisation](images/gio-data.png)
 
-## On Print Method
+## On Print Method {#widgets-full-on-print}
 
 Let's add the option to style the globe, gio.js provides mutliple [themes](https://giojs.org/html/docs/colorStyle.html) but they are currently not applicable from R. As a matter of fact, gio.js provides dozens of customisation options that should be available in the package as well. These, however, probably should be split across different functions, just like they are in gio.js, rather than all be accessible from a single function containing hundreds of arguments. This begs the question, when would one use another function given the function `gio` generates the visualisation? As it happens `gio` itself (or rather the function `htmlwidgets::createWidget` it contains) does not render the output, it returns an object of class "htmlwidget" which actually renders the visualisation on print (literally `htmlwidget.print` method).
 

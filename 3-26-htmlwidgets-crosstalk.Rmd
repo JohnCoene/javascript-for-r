@@ -23,7 +23,7 @@ arcs <- jsonlite::fromJSON(
 )
 ```
 
-## Crosstalk examples
+## Crosstalk Examples {#linking-widgets-examples}
 
 Both the plotly and DT packages support crosstalk, therefore using a shared dataset we can produce a scatter plot with the former and a table with the latter so that selection of data in one is reflected in the other.
 
@@ -159,7 +159,7 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-## Crosstalk requirements
+## Crosstalk Requirements {#linking-widgets-req}
 
 Crosstalk is will not work well with every widget and every dataset, in some cases it might not even be a good idea to support it at all.
 
@@ -167,7 +167,7 @@ Crosstalk works best on rectangular data: dataframes or objects that resemble da
 
 Other than tabular data, crosstalk will require the widget to have the necessary functions or methods to dispatch the selection and filtering that crosstalk enables, that is, the widget must be able to filter as well as highlight and fade selected data points as crosstalk itself does not provide this, neither the JavaScript nor the interface tools.
 
-## How it works
+## How it Works {#linking-widgets-inner-workings}
 
 As will be discovered later when support for crosstalk is brought to gio, very little changes on the R side. As might be expected, crosstalk enables communication between widgets via JavaScript, hence much of what must be adapted by widgets developers happens in JavaScript too.
 
@@ -269,7 +269,7 @@ shared_cars <- SharedData$new(mtcars, group = "cars")
 shared_cars_head <- SharedData$new(head(mtcars), group = "cars")
 ```
 
-## Crosstalk with gio
+## Crosstalk with Gio {#linking-widgets-gio}
 
 The application of crosstalk to the gio library is somewhat amiss but it makes it rather more instructive. As mentioned before, in order for crosstalk to be properly implemented a widget must be a able to select, deselect as well as filter and unfilter data points and this is not entirely the case of gio. 
 
@@ -288,7 +288,7 @@ This constraint would have to be documented and communicated to the users of the
 
 Were the constraint of having to specify the keys removed the gio package would have to interpret the keys. For instance, the widget would receive a selection, say `3` indicating that the third edge was selected in another widget, gio, not being able to highlight the edge, would have decide whether to highlight either the country where the edge comes from or the country where the edge goes to. Though this could be implemented it would be vastly more laborious and in fact be more limited as the choice of country to highlight would no longer up to the user.
 
-## Adapt the R code
+## R code {#linking-widgets-r}
 
 In any event, let us start by making the required changes to the R code first. The only changes that need to be made are in the `gio` function as it is the only that currently accepts a dataframe and thus may receive a shared dataset.
 
@@ -365,7 +365,7 @@ gio <- function(data, width = NULL, height = NULL,
 }
 ```
 
-## Change the JavaScript code
+## JavaScript code {#linking-widgets-js}
 
 What is left to do is to adapt the JavaScript code, as a reminder it must accept the keys selected in other widgets and share the selected key with other widgets. 
 
@@ -381,7 +381,7 @@ Once the selection handle created it can be used in the `renderValue` function t
 sel_handle.setGroup(x.crosstalk.group);
 ```
 
-### Send selected keys
+### Send Selected Keys {#linking-widgets-send-keys}
 
 In order for gio to share the selected country with other widgets it would first have to know which country is selected. This can be achieved with a callback function that gio supports.
 
@@ -420,7 +420,7 @@ function callback (selectedCountry) {
 controller.onCountryPicked(callback);
 ```
 
-### Set selected keys
+### Set Selected Keys {#linking-widgets-set-keys}
 
 We have implemented the necessary to share the selected country with other widgets but are yet to implemented the opposite; when users select a country in another widget the selected country in gio should change too. Gio does provide a method called `switchCountry` to programmatically change the selected country. 
 
@@ -467,7 +467,7 @@ sel_handle.on("change", function(e) {
 });
 ```
 
-### Recap JavaScript code
+### Recap JavaScript Code {#linking-widgets-recap}
 
 To recapitulate, this is what the JavaScript code should not look like.
 
@@ -534,7 +534,7 @@ HTMLWidgets.widget({
 });
 ```
 
-## Using crosstalk with gio
+## Using Crosstalk with Gio {#linking-widgets-using}
 
 Finally, now that gio supports shared dataset we can create a few examples to demonstrate how it can be used. 
 
