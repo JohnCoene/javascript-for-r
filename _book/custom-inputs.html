@@ -443,22 +443,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Shiny comes with a variety of inputs ranging from buttons to text fields, these inputs send data from the client to the R server. Custom inputs are in fact no different than from shiny’s out-of-the-box inputs, they work in the exact same way and are built on the same system.</p>
 <p>To explain and demonstrate how to build such a custom input we shall build a switch input which is essentially a fancy-looking checkbox that can be toggled on and off.</p>
 <p>Custom shiny inputs very much resemble shiny outputs though they consist of a single R function (e.g.: <code>selectInput</code>) which generates the HTML and attaches necessary dependencies. In fact, when run from the R console such functions will reveal the HTML they generate.</p>
-<div class="sourceCode" id="cb341"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb341-1"><a href="custom-inputs.html#cb341-1"></a>shiny<span class="op">::</span><span class="kw">textInput</span>(<span class="st">&quot;theId&quot;</span>, <span class="st">&quot;The label&quot;</span>)   </span></code></pre></div>
-<div class="sourceCode" id="cb342"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb342-1"><a href="custom-inputs.html#cb342-1"></a><span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;form-group shiny-input-container&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb342-2"><a href="custom-inputs.html#cb342-2"></a>  <span class="kw">&lt;label</span><span class="ot"> class=</span><span class="st">&quot;control-label&quot;</span><span class="ot"> for=</span><span class="st">&quot;theId&quot;</span><span class="kw">&gt;</span>The label<span class="kw">&lt;/label&gt;</span></span>
-<span id="cb342-3"><a href="custom-inputs.html#cb342-3"></a>  <span class="kw">&lt;input</span><span class="ot"> id=</span><span class="st">&quot;theId&quot;</span><span class="ot"> type=</span><span class="st">&quot;text&quot;</span><span class="ot"> class=</span><span class="st">&quot;form-control&quot;</span><span class="ot"> value=</span><span class="st">&quot;&quot;</span><span class="kw">/&gt;</span></span>
-<span id="cb342-4"><a href="custom-inputs.html#cb342-4"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb340"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb340-1"><a href="custom-inputs.html#cb340-1"></a>shiny<span class="op">::</span><span class="kw">textInput</span>(<span class="st">&quot;theId&quot;</span>, <span class="st">&quot;The label&quot;</span>)   </span></code></pre></div>
+<div class="sourceCode" id="cb341"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb341-1"><a href="custom-inputs.html#cb341-1"></a><span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;form-group shiny-input-container&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb341-2"><a href="custom-inputs.html#cb341-2"></a>  <span class="kw">&lt;label</span><span class="ot"> class=</span><span class="st">&quot;control-label&quot;</span><span class="ot"> for=</span><span class="st">&quot;theId&quot;</span><span class="kw">&gt;</span>The label<span class="kw">&lt;/label&gt;</span></span>
+<span id="cb341-3"><a href="custom-inputs.html#cb341-3"></a>  <span class="kw">&lt;input</span><span class="ot"> id=</span><span class="st">&quot;theId&quot;</span><span class="ot"> type=</span><span class="st">&quot;text&quot;</span><span class="ot"> class=</span><span class="st">&quot;form-control&quot;</span><span class="ot"> value=</span><span class="st">&quot;&quot;</span><span class="kw">/&gt;</span></span>
+<span id="cb341-4"><a href="custom-inputs.html#cb341-4"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
 <p>The R function is paired with a JavaScript input binding akin to the output binding used in the previous chapter.</p>
 <div id="setup-custom-input" class="section level2" number="16.1">
 <h2><span class="header-section-number">16.1</span> Setup Custom Input</h2>
 <p>Let’s set up the necessary files and project structure. Below an asset directory is created along with a JavaScript file where the binding will be placed as well as a CSS file that will style the switch input, an <code>app.R</code> file is also created to hold the R code and application.</p>
-<div class="sourceCode" id="cb343"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb343-1"><a href="custom-inputs.html#cb343-1"></a><span class="co"># create directory for application</span></span>
-<span id="cb343-2"><a href="custom-inputs.html#cb343-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;switch/assets&quot;</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb343-3"><a href="custom-inputs.html#cb343-3"></a></span>
-<span id="cb343-4"><a href="custom-inputs.html#cb343-4"></a><span class="co"># create R, JS, and CSS files</span></span>
-<span id="cb343-5"><a href="custom-inputs.html#cb343-5"></a><span class="kw">file.create</span>(<span class="st">&quot;app.R&quot;</span>)</span>
-<span id="cb343-6"><a href="custom-inputs.html#cb343-6"></a><span class="kw">file.create</span>(<span class="st">&quot;switch/assets/binding.js&quot;</span>)</span>
-<span id="cb343-7"><a href="custom-inputs.html#cb343-7"></a><span class="kw">file.create</span>(<span class="st">&quot;switch/assets/styles.css&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb342-1"><a href="custom-inputs.html#cb342-1"></a><span class="co"># create directory for application</span></span>
+<span id="cb342-2"><a href="custom-inputs.html#cb342-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;switch/assets&quot;</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb342-3"><a href="custom-inputs.html#cb342-3"></a></span>
+<span id="cb342-4"><a href="custom-inputs.html#cb342-4"></a><span class="co"># create R, JS, and CSS files</span></span>
+<span id="cb342-5"><a href="custom-inputs.html#cb342-5"></a><span class="kw">file.create</span>(<span class="st">&quot;app.R&quot;</span>)</span>
+<span id="cb342-6"><a href="custom-inputs.html#cb342-6"></a><span class="kw">file.create</span>(<span class="st">&quot;switch/assets/binding.js&quot;</span>)</span>
+<span id="cb342-7"><a href="custom-inputs.html#cb342-7"></a><span class="kw">file.create</span>(<span class="st">&quot;switch/assets/styles.css&quot;</span>)</span></code></pre></div>
 <p>This should create the following directory structure.</p>
 <pre><code>.
 ├── app.R
@@ -470,61 +470,61 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">16.2</span> Switch Input HTML &amp; Style</h2>
 <p>We will use <a href="https://www.w3schools.com/howto/howto_css_switch.asp">w3schools</a>’ switch input template.</p>
 <p>The HTML of the input looks like so.</p>
-<div class="sourceCode" id="cb345"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb345-1"><a href="custom-inputs.html#cb345-1"></a><span class="kw">&lt;label</span><span class="ot"> class=</span><span class="st">&quot;switch&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb345-2"><a href="custom-inputs.html#cb345-2"></a>  <span class="kw">&lt;input</span><span class="ot"> type=</span><span class="st">&quot;checkbox&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb345-3"><a href="custom-inputs.html#cb345-3"></a>  <span class="kw">&lt;span</span><span class="ot"> class=</span><span class="st">&quot;slider&quot;</span><span class="kw">&gt;&lt;/span&gt;</span></span>
-<span id="cb345-4"><a href="custom-inputs.html#cb345-4"></a><span class="kw">&lt;/label&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb344"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb344-1"><a href="custom-inputs.html#cb344-1"></a><span class="kw">&lt;label</span><span class="ot"> class=</span><span class="st">&quot;switch&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb344-2"><a href="custom-inputs.html#cb344-2"></a>  <span class="kw">&lt;input</span><span class="ot"> type=</span><span class="st">&quot;checkbox&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb344-3"><a href="custom-inputs.html#cb344-3"></a>  <span class="kw">&lt;span</span><span class="ot"> class=</span><span class="st">&quot;slider&quot;</span><span class="kw">&gt;&lt;/span&gt;</span></span>
+<span id="cb344-4"><a href="custom-inputs.html#cb344-4"></a><span class="kw">&lt;/label&gt;</span></span></code></pre></div>
 <p>While the CSS which stylises the checkbox input into a switch is the following.</p>
-<div class="sourceCode" id="cb346"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb346-1"><a href="custom-inputs.html#cb346-1"></a><span class="fu">.switch</span> {</span>
-<span id="cb346-2"><a href="custom-inputs.html#cb346-2"></a>  <span class="kw">position</span>: <span class="dv">relative</span><span class="op">;</span></span>
-<span id="cb346-3"><a href="custom-inputs.html#cb346-3"></a>  <span class="kw">display</span>: <span class="dv">inline-block</span><span class="op">;</span></span>
-<span id="cb346-4"><a href="custom-inputs.html#cb346-4"></a>  <span class="kw">width</span>: <span class="dv">60</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb346-5"><a href="custom-inputs.html#cb346-5"></a>  <span class="kw">height</span>: <span class="dv">34</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb346-6"><a href="custom-inputs.html#cb346-6"></a>}</span>
-<span id="cb346-7"><a href="custom-inputs.html#cb346-7"></a></span>
-<span id="cb346-8"><a href="custom-inputs.html#cb346-8"></a><span class="fu">.switch</span> input { </span>
-<span id="cb346-9"><a href="custom-inputs.html#cb346-9"></a>  <span class="kw">opacity</span>: <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb346-10"><a href="custom-inputs.html#cb346-10"></a>  <span class="kw">width</span>: <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb346-11"><a href="custom-inputs.html#cb346-11"></a>  <span class="kw">height</span>: <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb346-12"><a href="custom-inputs.html#cb346-12"></a>}</span>
-<span id="cb346-13"><a href="custom-inputs.html#cb346-13"></a></span>
-<span id="cb346-14"><a href="custom-inputs.html#cb346-14"></a><span class="fu">.slider</span> {</span>
-<span id="cb346-15"><a href="custom-inputs.html#cb346-15"></a>  <span class="kw">position</span>: <span class="dv">absolute</span><span class="op">;</span></span>
-<span id="cb346-16"><a href="custom-inputs.html#cb346-16"></a>  <span class="kw">cursor</span>: <span class="dv">pointer</span><span class="op">;</span></span>
-<span id="cb346-17"><a href="custom-inputs.html#cb346-17"></a>  <span class="kw">top</span>: <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb346-18"><a href="custom-inputs.html#cb346-18"></a>  <span class="kw">left</span>: <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb346-19"><a href="custom-inputs.html#cb346-19"></a>  <span class="kw">right</span>: <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb346-20"><a href="custom-inputs.html#cb346-20"></a>  <span class="kw">bottom</span>: <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb346-21"><a href="custom-inputs.html#cb346-21"></a>  <span class="kw">background-color</span>: <span class="cn">#ccc</span><span class="op">;</span></span>
-<span id="cb346-22"><a href="custom-inputs.html#cb346-22"></a>  <span class="kw">-webkit-transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
-<span id="cb346-23"><a href="custom-inputs.html#cb346-23"></a>  <span class="kw">transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
-<span id="cb346-24"><a href="custom-inputs.html#cb346-24"></a>}</span>
-<span id="cb346-25"><a href="custom-inputs.html#cb346-25"></a></span>
-<span id="cb346-26"><a href="custom-inputs.html#cb346-26"></a><span class="fu">.slider</span><span class="in">:before</span> {</span>
-<span id="cb346-27"><a href="custom-inputs.html#cb346-27"></a>  <span class="kw">position</span>: <span class="dv">absolute</span><span class="op">;</span></span>
-<span id="cb346-28"><a href="custom-inputs.html#cb346-28"></a>  <span class="kw">content</span>: <span class="st">&quot;&quot;</span><span class="op">;</span></span>
-<span id="cb346-29"><a href="custom-inputs.html#cb346-29"></a>  <span class="kw">height</span>: <span class="dv">26</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb346-30"><a href="custom-inputs.html#cb346-30"></a>  <span class="kw">width</span>: <span class="dv">26</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb346-31"><a href="custom-inputs.html#cb346-31"></a>  <span class="kw">left</span>: <span class="dv">4</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb346-32"><a href="custom-inputs.html#cb346-32"></a>  <span class="kw">bottom</span>: <span class="dv">4</span><span class="dt">px</span><span class="op">;</span></span>
-<span id="cb346-33"><a href="custom-inputs.html#cb346-33"></a>  <span class="kw">background-color</span>: <span class="cn">white</span><span class="op">;</span></span>
-<span id="cb346-34"><a href="custom-inputs.html#cb346-34"></a>  <span class="kw">-webkit-transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
-<span id="cb346-35"><a href="custom-inputs.html#cb346-35"></a>  <span class="kw">transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
-<span id="cb346-36"><a href="custom-inputs.html#cb346-36"></a>}</span>
-<span id="cb346-37"><a href="custom-inputs.html#cb346-37"></a></span>
-<span id="cb346-38"><a href="custom-inputs.html#cb346-38"></a>input<span class="in">:checked</span> <span class="op">+</span> <span class="fu">.slider</span> {</span>
-<span id="cb346-39"><a href="custom-inputs.html#cb346-39"></a>  <span class="kw">background-color</span>: <span class="cn">#0462a1</span><span class="op">;</span></span>
-<span id="cb346-40"><a href="custom-inputs.html#cb346-40"></a>}</span>
-<span id="cb346-41"><a href="custom-inputs.html#cb346-41"></a></span>
-<span id="cb346-42"><a href="custom-inputs.html#cb346-42"></a>input<span class="in">:focus</span> <span class="op">+</span> <span class="fu">.slider</span> {</span>
-<span id="cb346-43"><a href="custom-inputs.html#cb346-43"></a>  <span class="kw">box-shadow</span>: <span class="dv">0</span> <span class="dv">0</span> <span class="dv">1</span><span class="dt">px</span> <span class="cn">#0462a1</span><span class="op">;</span></span>
-<span id="cb346-44"><a href="custom-inputs.html#cb346-44"></a>}</span>
-<span id="cb346-45"><a href="custom-inputs.html#cb346-45"></a></span>
-<span id="cb346-46"><a href="custom-inputs.html#cb346-46"></a>input<span class="in">:checked</span> <span class="op">+</span> <span class="fu">.slider</span><span class="in">:before</span> {</span>
-<span id="cb346-47"><a href="custom-inputs.html#cb346-47"></a>  <span class="kw">-webkit-transform</span>: translateX(<span class="dv">26</span><span class="dt">px</span>)<span class="op">;</span></span>
-<span id="cb346-48"><a href="custom-inputs.html#cb346-48"></a>  <span class="kw">-ms-transform</span>: translateX(<span class="dv">26</span><span class="dt">px</span>)<span class="op">;</span></span>
-<span id="cb346-49"><a href="custom-inputs.html#cb346-49"></a>  <span class="kw">transform</span>: translateX(<span class="dv">26</span><span class="dt">px</span>)<span class="op">;</span></span>
-<span id="cb346-50"><a href="custom-inputs.html#cb346-50"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb345"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb345-1"><a href="custom-inputs.html#cb345-1"></a><span class="fu">.switch</span> {</span>
+<span id="cb345-2"><a href="custom-inputs.html#cb345-2"></a>  <span class="kw">position</span>: <span class="dv">relative</span><span class="op">;</span></span>
+<span id="cb345-3"><a href="custom-inputs.html#cb345-3"></a>  <span class="kw">display</span>: <span class="dv">inline-block</span><span class="op">;</span></span>
+<span id="cb345-4"><a href="custom-inputs.html#cb345-4"></a>  <span class="kw">width</span>: <span class="dv">60</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb345-5"><a href="custom-inputs.html#cb345-5"></a>  <span class="kw">height</span>: <span class="dv">34</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb345-6"><a href="custom-inputs.html#cb345-6"></a>}</span>
+<span id="cb345-7"><a href="custom-inputs.html#cb345-7"></a></span>
+<span id="cb345-8"><a href="custom-inputs.html#cb345-8"></a><span class="fu">.switch</span> input { </span>
+<span id="cb345-9"><a href="custom-inputs.html#cb345-9"></a>  <span class="kw">opacity</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-10"><a href="custom-inputs.html#cb345-10"></a>  <span class="kw">width</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-11"><a href="custom-inputs.html#cb345-11"></a>  <span class="kw">height</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-12"><a href="custom-inputs.html#cb345-12"></a>}</span>
+<span id="cb345-13"><a href="custom-inputs.html#cb345-13"></a></span>
+<span id="cb345-14"><a href="custom-inputs.html#cb345-14"></a><span class="fu">.slider</span> {</span>
+<span id="cb345-15"><a href="custom-inputs.html#cb345-15"></a>  <span class="kw">position</span>: <span class="dv">absolute</span><span class="op">;</span></span>
+<span id="cb345-16"><a href="custom-inputs.html#cb345-16"></a>  <span class="kw">cursor</span>: <span class="dv">pointer</span><span class="op">;</span></span>
+<span id="cb345-17"><a href="custom-inputs.html#cb345-17"></a>  <span class="kw">top</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-18"><a href="custom-inputs.html#cb345-18"></a>  <span class="kw">left</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-19"><a href="custom-inputs.html#cb345-19"></a>  <span class="kw">right</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-20"><a href="custom-inputs.html#cb345-20"></a>  <span class="kw">bottom</span>: <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb345-21"><a href="custom-inputs.html#cb345-21"></a>  <span class="kw">background-color</span>: <span class="cn">#ccc</span><span class="op">;</span></span>
+<span id="cb345-22"><a href="custom-inputs.html#cb345-22"></a>  <span class="kw">-webkit-transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
+<span id="cb345-23"><a href="custom-inputs.html#cb345-23"></a>  <span class="kw">transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
+<span id="cb345-24"><a href="custom-inputs.html#cb345-24"></a>}</span>
+<span id="cb345-25"><a href="custom-inputs.html#cb345-25"></a></span>
+<span id="cb345-26"><a href="custom-inputs.html#cb345-26"></a><span class="fu">.slider</span><span class="in">:before</span> {</span>
+<span id="cb345-27"><a href="custom-inputs.html#cb345-27"></a>  <span class="kw">position</span>: <span class="dv">absolute</span><span class="op">;</span></span>
+<span id="cb345-28"><a href="custom-inputs.html#cb345-28"></a>  <span class="kw">content</span>: <span class="st">&quot;&quot;</span><span class="op">;</span></span>
+<span id="cb345-29"><a href="custom-inputs.html#cb345-29"></a>  <span class="kw">height</span>: <span class="dv">26</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb345-30"><a href="custom-inputs.html#cb345-30"></a>  <span class="kw">width</span>: <span class="dv">26</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb345-31"><a href="custom-inputs.html#cb345-31"></a>  <span class="kw">left</span>: <span class="dv">4</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb345-32"><a href="custom-inputs.html#cb345-32"></a>  <span class="kw">bottom</span>: <span class="dv">4</span><span class="dt">px</span><span class="op">;</span></span>
+<span id="cb345-33"><a href="custom-inputs.html#cb345-33"></a>  <span class="kw">background-color</span>: <span class="cn">white</span><span class="op">;</span></span>
+<span id="cb345-34"><a href="custom-inputs.html#cb345-34"></a>  <span class="kw">-webkit-transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
+<span id="cb345-35"><a href="custom-inputs.html#cb345-35"></a>  <span class="kw">transition</span>: <span class="dv">.4</span><span class="dt">s</span><span class="op">;</span></span>
+<span id="cb345-36"><a href="custom-inputs.html#cb345-36"></a>}</span>
+<span id="cb345-37"><a href="custom-inputs.html#cb345-37"></a></span>
+<span id="cb345-38"><a href="custom-inputs.html#cb345-38"></a>input<span class="in">:checked</span> <span class="op">+</span> <span class="fu">.slider</span> {</span>
+<span id="cb345-39"><a href="custom-inputs.html#cb345-39"></a>  <span class="kw">background-color</span>: <span class="cn">#0462a1</span><span class="op">;</span></span>
+<span id="cb345-40"><a href="custom-inputs.html#cb345-40"></a>}</span>
+<span id="cb345-41"><a href="custom-inputs.html#cb345-41"></a></span>
+<span id="cb345-42"><a href="custom-inputs.html#cb345-42"></a>input<span class="in">:focus</span> <span class="op">+</span> <span class="fu">.slider</span> {</span>
+<span id="cb345-43"><a href="custom-inputs.html#cb345-43"></a>  <span class="kw">box-shadow</span>: <span class="dv">0</span> <span class="dv">0</span> <span class="dv">1</span><span class="dt">px</span> <span class="cn">#0462a1</span><span class="op">;</span></span>
+<span id="cb345-44"><a href="custom-inputs.html#cb345-44"></a>}</span>
+<span id="cb345-45"><a href="custom-inputs.html#cb345-45"></a></span>
+<span id="cb345-46"><a href="custom-inputs.html#cb345-46"></a>input<span class="in">:checked</span> <span class="op">+</span> <span class="fu">.slider</span><span class="in">:before</span> {</span>
+<span id="cb345-47"><a href="custom-inputs.html#cb345-47"></a>  <span class="kw">-webkit-transform</span>: translateX(<span class="dv">26</span><span class="dt">px</span>)<span class="op">;</span></span>
+<span id="cb345-48"><a href="custom-inputs.html#cb345-48"></a>  <span class="kw">-ms-transform</span>: translateX(<span class="dv">26</span><span class="dt">px</span>)<span class="op">;</span></span>
+<span id="cb345-49"><a href="custom-inputs.html#cb345-49"></a>  <span class="kw">transform</span>: translateX(<span class="dv">26</span><span class="dt">px</span>)<span class="op">;</span></span>
+<span id="cb345-50"><a href="custom-inputs.html#cb345-50"></a>}</span></code></pre></div>
 <p>The above CSS should be placed in the previously created <code>assets/styles.css</code> file.</p>
 <div class="figure">
 <img src="images/checkbox-switch.png" alt="" />
@@ -534,17 +534,41 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="generate-input-html" class="section level2" number="16.3">
 <h2><span class="header-section-number">16.3</span> Generate Input HTML</h2>
 <p>Let us start with the R function to be used in the shiny UI. The <code>&lt;input&gt;</code> it generates bears a <code>switchInput</code> class which will be used to identify all switch inputs from JavaScript, this was also done in the custom output. The function accepts an <code>id</code> argument, this is also common across all inputs and outputs as a unique identifier is required in order to retrieve the input JavaScript-side.</p>
+<div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb346-1"><a href="custom-inputs.html#cb346-1"></a><span class="co"># app.R</span></span>
+<span id="cb346-2"><a href="custom-inputs.html#cb346-2"></a>switchInput &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
+<span id="cb346-3"><a href="custom-inputs.html#cb346-3"></a></span>
+<span id="cb346-4"><a href="custom-inputs.html#cb346-4"></a>  tags<span class="op">$</span><span class="kw">input</span>(</span>
+<span id="cb346-5"><a href="custom-inputs.html#cb346-5"></a>    <span class="dt">id =</span> id, </span>
+<span id="cb346-6"><a href="custom-inputs.html#cb346-6"></a>    <span class="dt">type =</span> <span class="st">&quot;checkbox&quot;</span>, </span>
+<span id="cb346-7"><a href="custom-inputs.html#cb346-7"></a>    <span class="dt">class =</span> <span class="st">&quot;switchInput&quot;</span></span>
+<span id="cb346-8"><a href="custom-inputs.html#cb346-8"></a>  )</span>
+<span id="cb346-9"><a href="custom-inputs.html#cb346-9"></a></span>
+<span id="cb346-10"><a href="custom-inputs.html#cb346-10"></a>}</span></code></pre></div>
+<p>The function should also accept a customary label and a <code>checked</code> argument to define the initial state of the switch.</p>
 <div class="sourceCode" id="cb347"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb347-1"><a href="custom-inputs.html#cb347-1"></a><span class="co"># app.R</span></span>
-<span id="cb347-2"><a href="custom-inputs.html#cb347-2"></a>switchInput &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
+<span id="cb347-2"><a href="custom-inputs.html#cb347-2"></a>switchInput &lt;-<span class="st"> </span><span class="cf">function</span>(id, label, <span class="dt">checked =</span> <span class="ot">TRUE</span>) {</span>
 <span id="cb347-3"><a href="custom-inputs.html#cb347-3"></a></span>
-<span id="cb347-4"><a href="custom-inputs.html#cb347-4"></a>  tags<span class="op">$</span><span class="kw">input</span>(</span>
+<span id="cb347-4"><a href="custom-inputs.html#cb347-4"></a>  input &lt;-<span class="st"> </span>tags<span class="op">$</span><span class="kw">input</span>(</span>
 <span id="cb347-5"><a href="custom-inputs.html#cb347-5"></a>    <span class="dt">id =</span> id, </span>
 <span id="cb347-6"><a href="custom-inputs.html#cb347-6"></a>    <span class="dt">type =</span> <span class="st">&quot;checkbox&quot;</span>, </span>
 <span id="cb347-7"><a href="custom-inputs.html#cb347-7"></a>    <span class="dt">class =</span> <span class="st">&quot;switchInput&quot;</span></span>
 <span id="cb347-8"><a href="custom-inputs.html#cb347-8"></a>  )</span>
 <span id="cb347-9"><a href="custom-inputs.html#cb347-9"></a></span>
-<span id="cb347-10"><a href="custom-inputs.html#cb347-10"></a>}</span></code></pre></div>
-<p>The function should also accept a customary label and a <code>checked</code> argument to define the initial state of the switch.</p>
+<span id="cb347-10"><a href="custom-inputs.html#cb347-10"></a>  <span class="cf">if</span>(checked)</span>
+<span id="cb347-11"><a href="custom-inputs.html#cb347-11"></a>    input &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">tagAppendAttributes</span>(input, <span class="dt">checked =</span> <span class="ot">NA</span>)</span>
+<span id="cb347-12"><a href="custom-inputs.html#cb347-12"></a></span>
+<span id="cb347-13"><a href="custom-inputs.html#cb347-13"></a>  form &lt;-<span class="st"> </span><span class="kw">tagList</span>(</span>
+<span id="cb347-14"><a href="custom-inputs.html#cb347-14"></a>    <span class="kw">p</span>(label),</span>
+<span id="cb347-15"><a href="custom-inputs.html#cb347-15"></a>    tags<span class="op">$</span><span class="kw">label</span>(</span>
+<span id="cb347-16"><a href="custom-inputs.html#cb347-16"></a>      <span class="dt">class =</span> <span class="st">&quot;switch&quot;</span>,</span>
+<span id="cb347-17"><a href="custom-inputs.html#cb347-17"></a>      input,</span>
+<span id="cb347-18"><a href="custom-inputs.html#cb347-18"></a>      tags<span class="op">$</span><span class="kw">span</span>(<span class="dt">class =</span> <span class="st">&quot;slider&quot;</span>)</span>
+<span id="cb347-19"><a href="custom-inputs.html#cb347-19"></a>    )</span>
+<span id="cb347-20"><a href="custom-inputs.html#cb347-20"></a>  )</span>
+<span id="cb347-21"><a href="custom-inputs.html#cb347-21"></a></span>
+<span id="cb347-22"><a href="custom-inputs.html#cb347-22"></a>  <span class="kw">return</span>(form)</span>
+<span id="cb347-23"><a href="custom-inputs.html#cb347-23"></a>}</span></code></pre></div>
+<p>As for the custom outputs, the dependencies (CSS and JavaScript binding) can piggy back on the generated HTML.</p>
 <div class="sourceCode" id="cb348"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb348-1"><a href="custom-inputs.html#cb348-1"></a><span class="co"># app.R</span></span>
 <span id="cb348-2"><a href="custom-inputs.html#cb348-2"></a>switchInput &lt;-<span class="st"> </span><span class="cf">function</span>(id, label, <span class="dt">checked =</span> <span class="ot">TRUE</span>) {</span>
 <span id="cb348-3"><a href="custom-inputs.html#cb348-3"></a></span>
@@ -566,47 +590,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb348-19"><a href="custom-inputs.html#cb348-19"></a>    )</span>
 <span id="cb348-20"><a href="custom-inputs.html#cb348-20"></a>  )</span>
 <span id="cb348-21"><a href="custom-inputs.html#cb348-21"></a></span>
-<span id="cb348-22"><a href="custom-inputs.html#cb348-22"></a>  <span class="kw">return</span>(form)</span>
-<span id="cb348-23"><a href="custom-inputs.html#cb348-23"></a>}</span></code></pre></div>
-<p>As for the custom outputs, the dependencies (CSS and JavaScript binding) can piggy back on the generated HTML.</p>
-<div class="sourceCode" id="cb349"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb349-1"><a href="custom-inputs.html#cb349-1"></a><span class="co"># app.R</span></span>
-<span id="cb349-2"><a href="custom-inputs.html#cb349-2"></a>switchInput &lt;-<span class="st"> </span><span class="cf">function</span>(id, label, <span class="dt">checked =</span> <span class="ot">TRUE</span>) {</span>
-<span id="cb349-3"><a href="custom-inputs.html#cb349-3"></a></span>
-<span id="cb349-4"><a href="custom-inputs.html#cb349-4"></a>  input &lt;-<span class="st"> </span>tags<span class="op">$</span><span class="kw">input</span>(</span>
-<span id="cb349-5"><a href="custom-inputs.html#cb349-5"></a>    <span class="dt">id =</span> id, </span>
-<span id="cb349-6"><a href="custom-inputs.html#cb349-6"></a>    <span class="dt">type =</span> <span class="st">&quot;checkbox&quot;</span>, </span>
-<span id="cb349-7"><a href="custom-inputs.html#cb349-7"></a>    <span class="dt">class =</span> <span class="st">&quot;switchInput&quot;</span></span>
-<span id="cb349-8"><a href="custom-inputs.html#cb349-8"></a>  )</span>
-<span id="cb349-9"><a href="custom-inputs.html#cb349-9"></a></span>
-<span id="cb349-10"><a href="custom-inputs.html#cb349-10"></a>  <span class="cf">if</span>(checked)</span>
-<span id="cb349-11"><a href="custom-inputs.html#cb349-11"></a>    input &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">tagAppendAttributes</span>(input, <span class="dt">checked =</span> <span class="ot">NA</span>)</span>
-<span id="cb349-12"><a href="custom-inputs.html#cb349-12"></a></span>
-<span id="cb349-13"><a href="custom-inputs.html#cb349-13"></a>  form &lt;-<span class="st"> </span><span class="kw">tagList</span>(</span>
-<span id="cb349-14"><a href="custom-inputs.html#cb349-14"></a>    <span class="kw">p</span>(label),</span>
-<span id="cb349-15"><a href="custom-inputs.html#cb349-15"></a>    tags<span class="op">$</span><span class="kw">label</span>(</span>
-<span id="cb349-16"><a href="custom-inputs.html#cb349-16"></a>      <span class="dt">class =</span> <span class="st">&quot;switch&quot;</span>,</span>
-<span id="cb349-17"><a href="custom-inputs.html#cb349-17"></a>      input,</span>
-<span id="cb349-18"><a href="custom-inputs.html#cb349-18"></a>      tags<span class="op">$</span><span class="kw">span</span>(<span class="dt">class =</span> <span class="st">&quot;slider&quot;</span>)</span>
-<span id="cb349-19"><a href="custom-inputs.html#cb349-19"></a>    )</span>
-<span id="cb349-20"><a href="custom-inputs.html#cb349-20"></a>  )</span>
-<span id="cb349-21"><a href="custom-inputs.html#cb349-21"></a></span>
-<span id="cb349-22"><a href="custom-inputs.html#cb349-22"></a>  path &lt;-<span class="st"> </span><span class="kw">normalizePath</span>(<span class="st">&quot;./assets&quot;</span>)</span>
-<span id="cb349-23"><a href="custom-inputs.html#cb349-23"></a></span>
-<span id="cb349-24"><a href="custom-inputs.html#cb349-24"></a>  deps &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
-<span id="cb349-25"><a href="custom-inputs.html#cb349-25"></a>    <span class="dt">name =</span> <span class="st">&quot;switchInput&quot;</span>,</span>
-<span id="cb349-26"><a href="custom-inputs.html#cb349-26"></a>    <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
-<span id="cb349-27"><a href="custom-inputs.html#cb349-27"></a>    <span class="dt">src =</span> <span class="kw">c</span>(<span class="dt">file =</span> path),</span>
-<span id="cb349-28"><a href="custom-inputs.html#cb349-28"></a>    <span class="dt">script =</span> <span class="st">&quot;binding.js&quot;</span>,</span>
-<span id="cb349-29"><a href="custom-inputs.html#cb349-29"></a>    <span class="dt">stylesheet =</span> <span class="st">&quot;styles.css&quot;</span></span>
-<span id="cb349-30"><a href="custom-inputs.html#cb349-30"></a>  )</span>
-<span id="cb349-31"><a href="custom-inputs.html#cb349-31"></a></span>
-<span id="cb349-32"><a href="custom-inputs.html#cb349-32"></a>  htmltools<span class="op">::</span><span class="kw">attachDependencies</span>(form, deps)</span>
-<span id="cb349-33"><a href="custom-inputs.html#cb349-33"></a>}</span></code></pre></div>
+<span id="cb348-22"><a href="custom-inputs.html#cb348-22"></a>  path &lt;-<span class="st"> </span><span class="kw">normalizePath</span>(<span class="st">&quot;./assets&quot;</span>)</span>
+<span id="cb348-23"><a href="custom-inputs.html#cb348-23"></a></span>
+<span id="cb348-24"><a href="custom-inputs.html#cb348-24"></a>  deps &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
+<span id="cb348-25"><a href="custom-inputs.html#cb348-25"></a>    <span class="dt">name =</span> <span class="st">&quot;switchInput&quot;</span>,</span>
+<span id="cb348-26"><a href="custom-inputs.html#cb348-26"></a>    <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
+<span id="cb348-27"><a href="custom-inputs.html#cb348-27"></a>    <span class="dt">src =</span> <span class="kw">c</span>(<span class="dt">file =</span> path),</span>
+<span id="cb348-28"><a href="custom-inputs.html#cb348-28"></a>    <span class="dt">script =</span> <span class="st">&quot;binding.js&quot;</span>,</span>
+<span id="cb348-29"><a href="custom-inputs.html#cb348-29"></a>    <span class="dt">stylesheet =</span> <span class="st">&quot;styles.css&quot;</span></span>
+<span id="cb348-30"><a href="custom-inputs.html#cb348-30"></a>  )</span>
+<span id="cb348-31"><a href="custom-inputs.html#cb348-31"></a></span>
+<span id="cb348-32"><a href="custom-inputs.html#cb348-32"></a>  htmltools<span class="op">::</span><span class="kw">attachDependencies</span>(form, deps)</span>
+<span id="cb348-33"><a href="custom-inputs.html#cb348-33"></a>}</span></code></pre></div>
 </div>
 <div id="javascript-input-binding" class="section level2" number="16.4">
 <h2><span class="header-section-number">16.4</span> JavaScript Input Binding</h2>
 <p>The JavaScript input binding is instantiated from <code>Shiny.InputBinding</code>, this is similar to output bindings which are instantiated from <code>Shiny.OutputBinding</code>.</p>
-<div class="sourceCode" id="cb350"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb350-1"><a href="custom-inputs.html#cb350-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb349"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb349-1"><a href="custom-inputs.html#cb349-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span></code></pre></div>
 <p>Then again the binding is “extended,” this consists of adding several methods.</p>
 <ul>
 <li><code>find</code> returns all the relevant inputs.</li>
@@ -621,37 +621,37 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3><span class="header-section-number">16.4.1</span> Find Inputs</h3>
 <p>The <code>find</code> method looks for all the relevant HTML elements in the document (<code>scope</code>), and returns them as an array. Many other method we are about to implement will accept <code>el</code> as an argument, this will ultimately be one of the elements returned by <code>find</code>.</p>
 <p>Generally the <code>find</code> method is used in conjunction with a <code>class</code>, hence the <code>&lt;input&gt;</code> generated by <code>switchInput</code> bears a class of the same name <code>switchInput</code>.</p>
-<div class="sourceCode" id="cb351"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb351-1"><a href="custom-inputs.html#cb351-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
-<span id="cb351-2"><a href="custom-inputs.html#cb351-2"></a></span>
-<span id="cb351-3"><a href="custom-inputs.html#cb351-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
-<span id="cb351-4"><a href="custom-inputs.html#cb351-4"></a>  <span class="co">// find inputs</span></span>
-<span id="cb351-5"><a href="custom-inputs.html#cb351-5"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
-<span id="cb351-6"><a href="custom-inputs.html#cb351-6"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
-<span id="cb351-7"><a href="custom-inputs.html#cb351-7"></a>  }</span>
-<span id="cb351-8"><a href="custom-inputs.html#cb351-8"></a>})<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb350"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb350-1"><a href="custom-inputs.html#cb350-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
+<span id="cb350-2"><a href="custom-inputs.html#cb350-2"></a></span>
+<span id="cb350-3"><a href="custom-inputs.html#cb350-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
+<span id="cb350-4"><a href="custom-inputs.html#cb350-4"></a>  <span class="co">// find inputs</span></span>
+<span id="cb350-5"><a href="custom-inputs.html#cb350-5"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
+<span id="cb350-6"><a href="custom-inputs.html#cb350-6"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb350-7"><a href="custom-inputs.html#cb350-7"></a>  }</span>
+<span id="cb350-8"><a href="custom-inputs.html#cb350-8"></a>})<span class="op">;</span></span></code></pre></div>
 </div>
 <div id="get-input-id" class="section level3" number="16.4.2">
 <h3><span class="header-section-number">16.4.2</span> Get Input Id</h3>
 <p>The <code>getId</code> method is exactly it seems to be, it returns the <code>id</code> of the element. It looks for that id as <code>data-input-id</code> attribute and if that is not found returns the <code>id</code>; this can be observed in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/input_binding.js#L9">source code</a> (below).</p>
-<div class="sourceCode" id="cb352"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb352-1"><a href="custom-inputs.html#cb352-1"></a><span class="kw">this</span><span class="op">.</span><span class="at">getId</span> <span class="op">=</span> <span class="kw">function</span>(el) {</span>
-<span id="cb352-2"><a href="custom-inputs.html#cb352-2"></a>  <span class="cf">return</span> el[<span class="st">&#39;data-input-id&#39;</span>] <span class="op">||</span> el<span class="op">.</span><span class="at">id</span><span class="op">;</span></span>
-<span id="cb352-3"><a href="custom-inputs.html#cb352-3"></a>}<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb351"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb351-1"><a href="custom-inputs.html#cb351-1"></a><span class="kw">this</span><span class="op">.</span><span class="at">getId</span> <span class="op">=</span> <span class="kw">function</span>(el) {</span>
+<span id="cb351-2"><a href="custom-inputs.html#cb351-2"></a>  <span class="cf">return</span> el[<span class="st">&#39;data-input-id&#39;</span>] <span class="op">||</span> el<span class="op">.</span><span class="at">id</span><span class="op">;</span></span>
+<span id="cb351-3"><a href="custom-inputs.html#cb351-3"></a>}<span class="op">;</span></span></code></pre></div>
 <p>Since the default works there is no need to use it for the switch input.</p>
 </div>
 <div id="get-input-value" class="section level3" number="16.4.3">
 <h3><span class="header-section-number">16.4.3</span> Get Input Value</h3>
 <p>This retrieves the value of the input, this is often the attribute of the same name (<code>value="something"</code>) which can be obtain with the jQuery <code>val()</code> method. The switch is an input of type <code>checkbox</code> and therefore uses the <code>checked</code> prop.</p>
-<div class="sourceCode" id="cb353"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb353-1"><a href="custom-inputs.html#cb353-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
-<span id="cb353-2"><a href="custom-inputs.html#cb353-2"></a></span>
-<span id="cb353-3"><a href="custom-inputs.html#cb353-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
-<span id="cb353-4"><a href="custom-inputs.html#cb353-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
-<span id="cb353-5"><a href="custom-inputs.html#cb353-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
-<span id="cb353-6"><a href="custom-inputs.html#cb353-6"></a>  }<span class="op">,</span></span>
-<span id="cb353-7"><a href="custom-inputs.html#cb353-7"></a>  <span class="co">// retrieve value</span></span>
-<span id="cb353-8"><a href="custom-inputs.html#cb353-8"></a>  <span class="dt">getValue</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
-<span id="cb353-9"><a href="custom-inputs.html#cb353-9"></a>    <span class="cf">return</span> $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span>)<span class="op">;</span></span>
-<span id="cb353-10"><a href="custom-inputs.html#cb353-10"></a>  }</span>
-<span id="cb353-11"><a href="custom-inputs.html#cb353-11"></a>})<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb352"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb352-1"><a href="custom-inputs.html#cb352-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
+<span id="cb352-2"><a href="custom-inputs.html#cb352-2"></a></span>
+<span id="cb352-3"><a href="custom-inputs.html#cb352-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
+<span id="cb352-4"><a href="custom-inputs.html#cb352-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
+<span id="cb352-5"><a href="custom-inputs.html#cb352-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb352-6"><a href="custom-inputs.html#cb352-6"></a>  }<span class="op">,</span></span>
+<span id="cb352-7"><a href="custom-inputs.html#cb352-7"></a>  <span class="co">// retrieve value</span></span>
+<span id="cb352-8"><a href="custom-inputs.html#cb352-8"></a>  <span class="dt">getValue</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb352-9"><a href="custom-inputs.html#cb352-9"></a>    <span class="cf">return</span> $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span>)<span class="op">;</span></span>
+<span id="cb352-10"><a href="custom-inputs.html#cb352-10"></a>  }</span>
+<span id="cb352-11"><a href="custom-inputs.html#cb352-11"></a>})<span class="op">;</span></span></code></pre></div>
 <p>The value the <code>checked</code> prop is boolean, <code>true</code> if checked and <code>false</code> if unchecked.</p>
 <div class="rmdnote">
 <p>
@@ -662,6 +662,24 @@ Ensure the <code>getValue</code> method actually <code>return</code>s the value.
 <div id="set-input-value" class="section level3" number="16.4.4">
 <h3><span class="header-section-number">16.4.4</span> Set Input Value</h3>
 <p>The <code>setValue</code> method sets the value of the input, hence it also accepts the <code>value</code> object: the actual value to which the input should be set. Then again, most inputs will likely use the <code>value</code> attribute which can be set in jQuery with <code>val(newValue)</code> but the checkbox uses the <code>checked</code> prop.</p>
+<div class="sourceCode" id="cb353"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb353-1"><a href="custom-inputs.html#cb353-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
+<span id="cb353-2"><a href="custom-inputs.html#cb353-2"></a></span>
+<span id="cb353-3"><a href="custom-inputs.html#cb353-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
+<span id="cb353-4"><a href="custom-inputs.html#cb353-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
+<span id="cb353-5"><a href="custom-inputs.html#cb353-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb353-6"><a href="custom-inputs.html#cb353-6"></a>  }<span class="op">,</span></span>
+<span id="cb353-7"><a href="custom-inputs.html#cb353-7"></a>  <span class="dt">getValue</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb353-8"><a href="custom-inputs.html#cb353-8"></a>    <span class="cf">return</span> $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span>)<span class="op">;</span></span>
+<span id="cb353-9"><a href="custom-inputs.html#cb353-9"></a>  }<span class="op">,</span></span>
+<span id="cb353-10"><a href="custom-inputs.html#cb353-10"></a>  <span class="co">// check or uncheck the switch</span></span>
+<span id="cb353-11"><a href="custom-inputs.html#cb353-11"></a>  <span class="dt">setValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value) {</span>
+<span id="cb353-12"><a href="custom-inputs.html#cb353-12"></a>    $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span><span class="op">,</span> value)<span class="op">.</span><span class="fu">change</span>()<span class="op">;</span></span>
+<span id="cb353-13"><a href="custom-inputs.html#cb353-13"></a>  }</span></code></pre></div>
+<p>Note the use of the <code>change</code> method which ensures the event is fired, otherwise the input is checked or unchecked but the <code>change</code> event is not fired and this will cause problems later on as we rely on this event.</p>
+</div>
+<div id="receive-input-messages" class="section level3" number="16.4.5">
+<h3><span class="header-section-number">16.4.5</span> Receive Input Messages</h3>
+<p>The <code>setValue</code> method previously defined is only really useful when combined with <code>receiveMessage</code>, the latter handles messages sent to the input, these are generally sent from the server via functions the likes of <code>updateSelectInput</code>. Internally it uses the <code>setValue</code> method to define the value of the input received from the server. Note that the <code>value</code> is therefore a serialised JSON input coming from the R server and can be of any complexity you desire. Below we use it such that expect a simple boolean as the checkbox (switch) can be either on (<code>true</code>) or off (<code>false</code>).</p>
 <div class="sourceCode" id="cb354"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb354-1"><a href="custom-inputs.html#cb354-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
 <span id="cb354-2"><a href="custom-inputs.html#cb354-2"></a></span>
 <span id="cb354-3"><a href="custom-inputs.html#cb354-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
@@ -671,15 +689,19 @@ Ensure the <code>getValue</code> method actually <code>return</code>s the value.
 <span id="cb354-7"><a href="custom-inputs.html#cb354-7"></a>  <span class="dt">getValue</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
 <span id="cb354-8"><a href="custom-inputs.html#cb354-8"></a>    <span class="cf">return</span> $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span>)<span class="op">;</span></span>
 <span id="cb354-9"><a href="custom-inputs.html#cb354-9"></a>  }<span class="op">,</span></span>
-<span id="cb354-10"><a href="custom-inputs.html#cb354-10"></a>  <span class="co">// check or uncheck the switch</span></span>
-<span id="cb354-11"><a href="custom-inputs.html#cb354-11"></a>  <span class="dt">setValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value) {</span>
-<span id="cb354-12"><a href="custom-inputs.html#cb354-12"></a>    $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span><span class="op">,</span> value)<span class="op">.</span><span class="fu">change</span>()<span class="op">;</span></span>
-<span id="cb354-13"><a href="custom-inputs.html#cb354-13"></a>  }</span></code></pre></div>
-<p>Note the use of the <code>change</code> method which ensures the event is fired, otherwise the input is checked or unchecked but the <code>change</code> event is not fired and this will cause problems later on as we rely on this event.</p>
+<span id="cb354-10"><a href="custom-inputs.html#cb354-10"></a>  <span class="dt">setValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value) {</span>
+<span id="cb354-11"><a href="custom-inputs.html#cb354-11"></a>    $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span><span class="op">,</span> value)<span class="op">.</span><span class="fu">change</span>()<span class="op">;</span></span>
+<span id="cb354-12"><a href="custom-inputs.html#cb354-12"></a>  }<span class="op">,</span></span>
+<span id="cb354-13"><a href="custom-inputs.html#cb354-13"></a>  <span class="co">// handle messages from the server</span></span>
+<span id="cb354-14"><a href="custom-inputs.html#cb354-14"></a>  <span class="dt">receiveMessage</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value){</span>
+<span id="cb354-15"><a href="custom-inputs.html#cb354-15"></a>    <span class="kw">this</span><span class="op">.</span><span class="fu">setValue</span>(el<span class="op">,</span> value)<span class="op">;</span></span>
+<span id="cb354-16"><a href="custom-inputs.html#cb354-16"></a>  }</span>
+<span id="cb354-17"><a href="custom-inputs.html#cb354-17"></a>})<span class="op">;</span></span></code></pre></div>
 </div>
-<div id="receive-input-messages" class="section level3" number="16.4.5">
-<h3><span class="header-section-number">16.4.5</span> Receive Input Messages</h3>
-<p>The <code>setValue</code> method previously defined is only really useful when combined with <code>receiveMessage</code>, the latter handles messages sent to the input, these are generally sent from the server via functions the likes of <code>updateSelectInput</code>. Internally it uses the <code>setValue</code> method to define the value of the input received from the server. Note that the <code>value</code> is therefore a serialised JSON input coming from the R server and can be of any complexity you desire. Below we use it such that expect a simple boolean as the checkbox (switch) can be either on (<code>true</code>) or off (<code>false</code>).</p>
+<div id="subscribe-unsubscribe-inputs" class="section level3" number="16.4.6">
+<h3><span class="header-section-number">16.4.6</span> Subscribe &amp; Unsubscribe Inputs</h3>
+<p>Finally, a crucial method is <code>subscribe</code>, this is ran when the input is registered (more on that later) and is used to determine when shiny sends new values of the input back to the server. This method also accepts a <code>callback</code> which is the very function that tells shiny to update the value. This callback function accepts a single boolean value which in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/input_binding.js#L18">source code</a> states is used to enable debouncing or throttling. This is covered in the next section on rate policy.</p>
+<p>This method often consists of an event listener that observes changes on the input to send its to the server. In layman terms, when the switch input changes (on to off or vice versa) run the <code>callback</code> function which sends the data to the server.</p>
 <div class="sourceCode" id="cb355"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb355-1"><a href="custom-inputs.html#cb355-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
 <span id="cb355-2"><a href="custom-inputs.html#cb355-2"></a></span>
 <span id="cb355-3"><a href="custom-inputs.html#cb355-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
@@ -692,40 +714,18 @@ Ensure the <code>getValue</code> method actually <code>return</code>s the value.
 <span id="cb355-10"><a href="custom-inputs.html#cb355-10"></a>  <span class="dt">setValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value) {</span>
 <span id="cb355-11"><a href="custom-inputs.html#cb355-11"></a>    $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span><span class="op">,</span> value)<span class="op">.</span><span class="fu">change</span>()<span class="op">;</span></span>
 <span id="cb355-12"><a href="custom-inputs.html#cb355-12"></a>  }<span class="op">,</span></span>
-<span id="cb355-13"><a href="custom-inputs.html#cb355-13"></a>  <span class="co">// handle messages from the server</span></span>
-<span id="cb355-14"><a href="custom-inputs.html#cb355-14"></a>  <span class="dt">receiveMessage</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value){</span>
-<span id="cb355-15"><a href="custom-inputs.html#cb355-15"></a>    <span class="kw">this</span><span class="op">.</span><span class="fu">setValue</span>(el<span class="op">,</span> value)<span class="op">;</span></span>
-<span id="cb355-16"><a href="custom-inputs.html#cb355-16"></a>  }</span>
-<span id="cb355-17"><a href="custom-inputs.html#cb355-17"></a>})<span class="op">;</span></span></code></pre></div>
-</div>
-<div id="subscribe-unsubscribe-inputs" class="section level3" number="16.4.6">
-<h3><span class="header-section-number">16.4.6</span> Subscribe &amp; Unsubscribe Inputs</h3>
-<p>Finally, a crucial method is <code>subscribe</code>, this is ran when the input is registered (more on that later) and is used to determine when shiny sends new values of the input back to the server. This method also accepts a <code>callback</code> which is the very function that tells shiny to update the value. This callback function accepts a single boolean value which in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/input_binding.js#L18">source code</a> states is used to enable debouncing or throttling. This is covered in the next section on rate policy.</p>
-<p>This method often consists of an event listener that observes changes on the input to send its to the server. In layman terms, when the switch input changes (on to off or vice versa) run the <code>callback</code> function which sends the data to the server.</p>
-<div class="sourceCode" id="cb356"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb356-1"><a href="custom-inputs.html#cb356-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
-<span id="cb356-2"><a href="custom-inputs.html#cb356-2"></a></span>
-<span id="cb356-3"><a href="custom-inputs.html#cb356-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
-<span id="cb356-4"><a href="custom-inputs.html#cb356-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
-<span id="cb356-5"><a href="custom-inputs.html#cb356-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
-<span id="cb356-6"><a href="custom-inputs.html#cb356-6"></a>  }<span class="op">,</span></span>
-<span id="cb356-7"><a href="custom-inputs.html#cb356-7"></a>  <span class="dt">getValue</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
-<span id="cb356-8"><a href="custom-inputs.html#cb356-8"></a>    <span class="cf">return</span> $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span>)<span class="op">;</span></span>
-<span id="cb356-9"><a href="custom-inputs.html#cb356-9"></a>  }<span class="op">,</span></span>
-<span id="cb356-10"><a href="custom-inputs.html#cb356-10"></a>  <span class="dt">setValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value) {</span>
-<span id="cb356-11"><a href="custom-inputs.html#cb356-11"></a>    $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span><span class="op">,</span> value)<span class="op">.</span><span class="fu">change</span>()<span class="op">;</span></span>
-<span id="cb356-12"><a href="custom-inputs.html#cb356-12"></a>  }<span class="op">,</span></span>
-<span id="cb356-13"><a href="custom-inputs.html#cb356-13"></a>  <span class="dt">receiveMessage</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value){</span>
-<span id="cb356-14"><a href="custom-inputs.html#cb356-14"></a>    <span class="kw">this</span><span class="op">.</span><span class="fu">setValue</span>(el<span class="op">,</span> value)<span class="op">;</span></span>
-<span id="cb356-15"><a href="custom-inputs.html#cb356-15"></a>  }<span class="op">,</span></span>
-<span id="cb356-16"><a href="custom-inputs.html#cb356-16"></a>  <span class="dt">subscribe</span><span class="op">:</span> <span class="kw">function</span> (el<span class="op">,</span> callback) {</span>
-<span id="cb356-17"><a href="custom-inputs.html#cb356-17"></a>    $(el)<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change.switchInput&quot;</span><span class="op">,</span> <span class="kw">function</span>(){</span>
-<span id="cb356-18"><a href="custom-inputs.html#cb356-18"></a>      callback(<span class="kw">true</span>)<span class="op">;</span></span>
-<span id="cb356-19"><a href="custom-inputs.html#cb356-19"></a>    })</span>
-<span id="cb356-20"><a href="custom-inputs.html#cb356-20"></a>  }<span class="op">,</span></span>
-<span id="cb356-21"><a href="custom-inputs.html#cb356-21"></a>  <span class="dt">unsubscribe</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
-<span id="cb356-22"><a href="custom-inputs.html#cb356-22"></a>    $(el)<span class="op">.</span><span class="fu">off</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
-<span id="cb356-23"><a href="custom-inputs.html#cb356-23"></a>  }</span>
-<span id="cb356-24"><a href="custom-inputs.html#cb356-24"></a>})<span class="op">;</span></span></code></pre></div>
+<span id="cb355-13"><a href="custom-inputs.html#cb355-13"></a>  <span class="dt">receiveMessage</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value){</span>
+<span id="cb355-14"><a href="custom-inputs.html#cb355-14"></a>    <span class="kw">this</span><span class="op">.</span><span class="fu">setValue</span>(el<span class="op">,</span> value)<span class="op">;</span></span>
+<span id="cb355-15"><a href="custom-inputs.html#cb355-15"></a>  }<span class="op">,</span></span>
+<span id="cb355-16"><a href="custom-inputs.html#cb355-16"></a>  <span class="dt">subscribe</span><span class="op">:</span> <span class="kw">function</span> (el<span class="op">,</span> callback) {</span>
+<span id="cb355-17"><a href="custom-inputs.html#cb355-17"></a>    $(el)<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change.switchInput&quot;</span><span class="op">,</span> <span class="kw">function</span>(){</span>
+<span id="cb355-18"><a href="custom-inputs.html#cb355-18"></a>      callback(<span class="kw">true</span>)<span class="op">;</span></span>
+<span id="cb355-19"><a href="custom-inputs.html#cb355-19"></a>    })</span>
+<span id="cb355-20"><a href="custom-inputs.html#cb355-20"></a>  }<span class="op">,</span></span>
+<span id="cb355-21"><a href="custom-inputs.html#cb355-21"></a>  <span class="dt">unsubscribe</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb355-22"><a href="custom-inputs.html#cb355-22"></a>    $(el)<span class="op">.</span><span class="fu">off</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb355-23"><a href="custom-inputs.html#cb355-23"></a>  }</span>
+<span id="cb355-24"><a href="custom-inputs.html#cb355-24"></a>})<span class="op">;</span></span></code></pre></div>
 <p>Note that in the <code>subscribe</code> method we listen for <code>change</code>s on the input, hence the <code>setValue</code> also uses jQuery’s <code>change</code> method; it ensures this event is fired and that shiny will subsequently pick it up.</p>
 <div class="rmdnote">
 <p>
@@ -738,22 +738,57 @@ Make sure the <code>setValue</code> method triggers the event observed in <code>
 <p>The rate policy determines how frequently the binding should send new input values back to the server. The <code>getRatePolicy</code> method should return an object that describes that, it is a JSON array with two variable <code>policy</code> and <code>delay</code>.</p>
 <p><strong>direct</strong></p>
 <p>The <code>direct</code> policy tells shiny to sends any new value directly, however often this occurs. Therefore, this policy does not make use of <code>delay</code>.</p>
-<div class="sourceCode" id="cb357"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb357-1"><a href="custom-inputs.html#cb357-1"></a><span class="fu">{</span></span>
-<span id="cb357-2"><a href="custom-inputs.html#cb357-2"></a>  <span class="er">policy</span><span class="fu">:</span> <span class="st">&quot;direct&quot;</span></span>
-<span id="cb357-3"><a href="custom-inputs.html#cb357-3"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb356"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb356-1"><a href="custom-inputs.html#cb356-1"></a><span class="fu">{</span></span>
+<span id="cb356-2"><a href="custom-inputs.html#cb356-2"></a>  <span class="er">policy</span><span class="fu">:</span> <span class="st">&quot;direct&quot;</span></span>
+<span id="cb356-3"><a href="custom-inputs.html#cb356-3"></a><span class="fu">}</span></span></code></pre></div>
 <p><strong>debounce</strong></p>
 <p>The <code>debounce</code> policy tells shiny to ignore all new values until no new values have been received for <code>delay</code> milliseconds.</p>
-<div class="sourceCode" id="cb358"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb358-1"><a href="custom-inputs.html#cb358-1"></a><span class="fu">{</span></span>
-<span id="cb358-2"><a href="custom-inputs.html#cb358-2"></a>  <span class="er">policy</span><span class="fu">:</span> <span class="st">&quot;debounce&quot;</span><span class="fu">,</span></span>
-<span id="cb358-3"><a href="custom-inputs.html#cb358-3"></a>  <span class="er">delay</span><span class="fu">:</span> <span class="dv">2500</span></span>
-<span id="cb358-4"><a href="custom-inputs.html#cb358-4"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb357"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb357-1"><a href="custom-inputs.html#cb357-1"></a><span class="fu">{</span></span>
+<span id="cb357-2"><a href="custom-inputs.html#cb357-2"></a>  <span class="er">policy</span><span class="fu">:</span> <span class="st">&quot;debounce&quot;</span><span class="fu">,</span></span>
+<span id="cb357-3"><a href="custom-inputs.html#cb357-3"></a>  <span class="er">delay</span><span class="fu">:</span> <span class="dv">2500</span></span>
+<span id="cb357-4"><a href="custom-inputs.html#cb357-4"></a><span class="fu">}</span></span></code></pre></div>
 <p><strong>throttle</strong></p>
 <p>The <code>throttle</code> policy means that no more than one value will be sent per <code>delay</code> milliseconds.</p>
-<div class="sourceCode" id="cb359"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb359-1"><a href="custom-inputs.html#cb359-1"></a><span class="fu">{</span></span>
-<span id="cb359-2"><a href="custom-inputs.html#cb359-2"></a>  <span class="er">policy</span><span class="fu">:</span> <span class="st">&quot;throttle&quot;</span><span class="fu">,</span></span>
-<span id="cb359-3"><a href="custom-inputs.html#cb359-3"></a>  <span class="er">delay</span><span class="fu">:</span> <span class="dv">1000</span></span>
-<span id="cb359-4"><a href="custom-inputs.html#cb359-4"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb358"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb358-1"><a href="custom-inputs.html#cb358-1"></a><span class="fu">{</span></span>
+<span id="cb358-2"><a href="custom-inputs.html#cb358-2"></a>  <span class="er">policy</span><span class="fu">:</span> <span class="st">&quot;throttle&quot;</span><span class="fu">,</span></span>
+<span id="cb358-3"><a href="custom-inputs.html#cb358-3"></a>  <span class="er">delay</span><span class="fu">:</span> <span class="dv">1000</span></span>
+<span id="cb358-4"><a href="custom-inputs.html#cb358-4"></a><span class="fu">}</span></span></code></pre></div>
 <p>A switch input is not expected to change frequently but it’s nonetheless good practice to throttle it to ensure the server does not receive too many requests. This will admittedly be more relevant to inputs that see a higher rates of change like text fields which unless debounced send every key stroke to the server.</p>
+<div class="sourceCode" id="cb359"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb359-1"><a href="custom-inputs.html#cb359-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
+<span id="cb359-2"><a href="custom-inputs.html#cb359-2"></a></span>
+<span id="cb359-3"><a href="custom-inputs.html#cb359-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
+<span id="cb359-4"><a href="custom-inputs.html#cb359-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
+<span id="cb359-5"><a href="custom-inputs.html#cb359-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb359-6"><a href="custom-inputs.html#cb359-6"></a>  }<span class="op">,</span></span>
+<span id="cb359-7"><a href="custom-inputs.html#cb359-7"></a>  <span class="dt">getValue</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb359-8"><a href="custom-inputs.html#cb359-8"></a>    <span class="cf">return</span> $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span>)<span class="op">;</span></span>
+<span id="cb359-9"><a href="custom-inputs.html#cb359-9"></a>  }<span class="op">,</span></span>
+<span id="cb359-10"><a href="custom-inputs.html#cb359-10"></a>  <span class="dt">setValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value) {</span>
+<span id="cb359-11"><a href="custom-inputs.html#cb359-11"></a>    $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span><span class="op">,</span> value)<span class="op">.</span><span class="fu">change</span>()<span class="op">;</span></span>
+<span id="cb359-12"><a href="custom-inputs.html#cb359-12"></a>  }<span class="op">,</span></span>
+<span id="cb359-13"><a href="custom-inputs.html#cb359-13"></a>  <span class="dt">receiveMessage</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value){</span>
+<span id="cb359-14"><a href="custom-inputs.html#cb359-14"></a>    <span class="kw">this</span><span class="op">.</span><span class="fu">setValue</span>(el<span class="op">,</span> value)<span class="op">;</span></span>
+<span id="cb359-15"><a href="custom-inputs.html#cb359-15"></a>  }<span class="op">,</span></span>
+<span id="cb359-16"><a href="custom-inputs.html#cb359-16"></a>  <span class="dt">subscribe</span><span class="op">:</span> <span class="kw">function</span> (el<span class="op">,</span> callback) {</span>
+<span id="cb359-17"><a href="custom-inputs.html#cb359-17"></a>    $(el)<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change.switchInput&quot;</span><span class="op">,</span> <span class="kw">function</span>(){</span>
+<span id="cb359-18"><a href="custom-inputs.html#cb359-18"></a>      callback(<span class="kw">true</span>)<span class="op">;</span></span>
+<span id="cb359-19"><a href="custom-inputs.html#cb359-19"></a>    })</span>
+<span id="cb359-20"><a href="custom-inputs.html#cb359-20"></a>  }<span class="op">,</span></span>
+<span id="cb359-21"><a href="custom-inputs.html#cb359-21"></a>  <span class="dt">unsubscribe</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
+<span id="cb359-22"><a href="custom-inputs.html#cb359-22"></a>    $(el)<span class="op">.</span><span class="fu">off</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
+<span id="cb359-23"><a href="custom-inputs.html#cb359-23"></a>  }<span class="op">,</span></span>
+<span id="cb359-24"><a href="custom-inputs.html#cb359-24"></a>  <span class="co">// throttle</span></span>
+<span id="cb359-25"><a href="custom-inputs.html#cb359-25"></a>  <span class="dt">getRatePolicy</span><span class="op">:</span> <span class="kw">function</span>(){</span>
+<span id="cb359-26"><a href="custom-inputs.html#cb359-26"></a>    <span class="cf">return</span> {</span>
+<span id="cb359-27"><a href="custom-inputs.html#cb359-27"></a>      <span class="dt">policy</span><span class="op">:</span> <span class="st">&#39;throttle&#39;</span><span class="op">,</span></span>
+<span id="cb359-28"><a href="custom-inputs.html#cb359-28"></a>      <span class="dt">delay</span><span class="op">:</span> <span class="dv">1000</span></span>
+<span id="cb359-29"><a href="custom-inputs.html#cb359-29"></a>    }</span>
+<span id="cb359-30"><a href="custom-inputs.html#cb359-30"></a>  }</span>
+<span id="cb359-31"><a href="custom-inputs.html#cb359-31"></a>})<span class="op">;</span></span></code></pre></div>
+</div>
+<div id="registering-the-input" class="section level3" number="16.4.8">
+<h3><span class="header-section-number">16.4.8</span> Registering the Input</h3>
+<p>Finally, like the custom output, the input can be registered with shiny, it too takes a unique identifier as second argument.</p>
 <div class="sourceCode" id="cb360"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb360-1"><a href="custom-inputs.html#cb360-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
 <span id="cb360-2"><a href="custom-inputs.html#cb360-2"></a></span>
 <span id="cb360-3"><a href="custom-inputs.html#cb360-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
@@ -777,71 +812,36 @@ Make sure the <code>setValue</code> method triggers the event observed in <code>
 <span id="cb360-21"><a href="custom-inputs.html#cb360-21"></a>  <span class="dt">unsubscribe</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
 <span id="cb360-22"><a href="custom-inputs.html#cb360-22"></a>    $(el)<span class="op">.</span><span class="fu">off</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
 <span id="cb360-23"><a href="custom-inputs.html#cb360-23"></a>  }<span class="op">,</span></span>
-<span id="cb360-24"><a href="custom-inputs.html#cb360-24"></a>  <span class="co">// throttle</span></span>
-<span id="cb360-25"><a href="custom-inputs.html#cb360-25"></a>  <span class="dt">getRatePolicy</span><span class="op">:</span> <span class="kw">function</span>(){</span>
-<span id="cb360-26"><a href="custom-inputs.html#cb360-26"></a>    <span class="cf">return</span> {</span>
-<span id="cb360-27"><a href="custom-inputs.html#cb360-27"></a>      <span class="dt">policy</span><span class="op">:</span> <span class="st">&#39;throttle&#39;</span><span class="op">,</span></span>
-<span id="cb360-28"><a href="custom-inputs.html#cb360-28"></a>      <span class="dt">delay</span><span class="op">:</span> <span class="dv">1000</span></span>
-<span id="cb360-29"><a href="custom-inputs.html#cb360-29"></a>    }</span>
-<span id="cb360-30"><a href="custom-inputs.html#cb360-30"></a>  }</span>
-<span id="cb360-31"><a href="custom-inputs.html#cb360-31"></a>})<span class="op">;</span></span></code></pre></div>
-</div>
-<div id="registering-the-input" class="section level3" number="16.4.8">
-<h3><span class="header-section-number">16.4.8</span> Registering the Input</h3>
-<p>Finally, like the custom output, the input can be registered with shiny, it too takes a unique identifier as second argument.</p>
-<div class="sourceCode" id="cb361"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb361-1"><a href="custom-inputs.html#cb361-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> Shiny<span class="op">.</span><span class="fu">InputBinding</span>()<span class="op">;</span></span>
-<span id="cb361-2"><a href="custom-inputs.html#cb361-2"></a></span>
-<span id="cb361-3"><a href="custom-inputs.html#cb361-3"></a>$<span class="op">.</span><span class="fu">extend</span>(switchInput<span class="op">,</span> {</span>
-<span id="cb361-4"><a href="custom-inputs.html#cb361-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) {</span>
-<span id="cb361-5"><a href="custom-inputs.html#cb361-5"></a>    <span class="cf">return</span> $(scope)<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
-<span id="cb361-6"><a href="custom-inputs.html#cb361-6"></a>  }<span class="op">,</span></span>
-<span id="cb361-7"><a href="custom-inputs.html#cb361-7"></a>  <span class="dt">getValue</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
-<span id="cb361-8"><a href="custom-inputs.html#cb361-8"></a>    <span class="cf">return</span> $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span>)<span class="op">;</span></span>
-<span id="cb361-9"><a href="custom-inputs.html#cb361-9"></a>  }<span class="op">,</span></span>
-<span id="cb361-10"><a href="custom-inputs.html#cb361-10"></a>  <span class="dt">setValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value) {</span>
-<span id="cb361-11"><a href="custom-inputs.html#cb361-11"></a>    $(el)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;checked&quot;</span><span class="op">,</span> value)<span class="op">.</span><span class="fu">change</span>()<span class="op">;</span></span>
-<span id="cb361-12"><a href="custom-inputs.html#cb361-12"></a>  }<span class="op">,</span></span>
-<span id="cb361-13"><a href="custom-inputs.html#cb361-13"></a>  <span class="dt">receiveMessage</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value){</span>
-<span id="cb361-14"><a href="custom-inputs.html#cb361-14"></a>    <span class="kw">this</span><span class="op">.</span><span class="fu">setValue</span>(el<span class="op">,</span> value)<span class="op">;</span></span>
-<span id="cb361-15"><a href="custom-inputs.html#cb361-15"></a>  }<span class="op">,</span></span>
-<span id="cb361-16"><a href="custom-inputs.html#cb361-16"></a>  <span class="dt">subscribe</span><span class="op">:</span> <span class="kw">function</span> (el<span class="op">,</span> callback) {</span>
-<span id="cb361-17"><a href="custom-inputs.html#cb361-17"></a>    $(el)<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;change.switchInput&quot;</span><span class="op">,</span> <span class="kw">function</span>(){</span>
-<span id="cb361-18"><a href="custom-inputs.html#cb361-18"></a>      callback(<span class="kw">true</span>)<span class="op">;</span></span>
-<span id="cb361-19"><a href="custom-inputs.html#cb361-19"></a>    })</span>
-<span id="cb361-20"><a href="custom-inputs.html#cb361-20"></a>  }<span class="op">,</span></span>
-<span id="cb361-21"><a href="custom-inputs.html#cb361-21"></a>  <span class="dt">unsubscribe</span><span class="op">:</span> <span class="kw">function</span>(el) {</span>
-<span id="cb361-22"><a href="custom-inputs.html#cb361-22"></a>    $(el)<span class="op">.</span><span class="fu">off</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
-<span id="cb361-23"><a href="custom-inputs.html#cb361-23"></a>  }<span class="op">,</span></span>
-<span id="cb361-24"><a href="custom-inputs.html#cb361-24"></a>  <span class="dt">getRatePolicy</span><span class="op">:</span> <span class="kw">function</span>(){</span>
-<span id="cb361-25"><a href="custom-inputs.html#cb361-25"></a>    <span class="cf">return</span> {</span>
-<span id="cb361-26"><a href="custom-inputs.html#cb361-26"></a>      <span class="dt">policy</span><span class="op">:</span> <span class="st">&#39;throttle&#39;</span><span class="op">,</span></span>
-<span id="cb361-27"><a href="custom-inputs.html#cb361-27"></a>      <span class="dt">delay</span><span class="op">:</span> <span class="dv">1000</span></span>
-<span id="cb361-28"><a href="custom-inputs.html#cb361-28"></a>    }</span>
-<span id="cb361-29"><a href="custom-inputs.html#cb361-29"></a>  }</span>
-<span id="cb361-30"><a href="custom-inputs.html#cb361-30"></a>})<span class="op">;</span></span>
-<span id="cb361-31"><a href="custom-inputs.html#cb361-31"></a></span>
-<span id="cb361-32"><a href="custom-inputs.html#cb361-32"></a>Shiny<span class="op">.</span><span class="at">inputBindings</span><span class="op">.</span><span class="fu">register</span>(switchInput<span class="op">,</span> <span class="st">&#39;john.switch&#39;</span>)<span class="op">;</span></span></code></pre></div>
+<span id="cb360-24"><a href="custom-inputs.html#cb360-24"></a>  <span class="dt">getRatePolicy</span><span class="op">:</span> <span class="kw">function</span>(){</span>
+<span id="cb360-25"><a href="custom-inputs.html#cb360-25"></a>    <span class="cf">return</span> {</span>
+<span id="cb360-26"><a href="custom-inputs.html#cb360-26"></a>      <span class="dt">policy</span><span class="op">:</span> <span class="st">&#39;throttle&#39;</span><span class="op">,</span></span>
+<span id="cb360-27"><a href="custom-inputs.html#cb360-27"></a>      <span class="dt">delay</span><span class="op">:</span> <span class="dv">1000</span></span>
+<span id="cb360-28"><a href="custom-inputs.html#cb360-28"></a>    }</span>
+<span id="cb360-29"><a href="custom-inputs.html#cb360-29"></a>  }</span>
+<span id="cb360-30"><a href="custom-inputs.html#cb360-30"></a>})<span class="op">;</span></span>
+<span id="cb360-31"><a href="custom-inputs.html#cb360-31"></a></span>
+<span id="cb360-32"><a href="custom-inputs.html#cb360-32"></a>Shiny<span class="op">.</span><span class="at">inputBindings</span><span class="op">.</span><span class="fu">register</span>(switchInput<span class="op">,</span> <span class="st">&#39;john.switch&#39;</span>)<span class="op">;</span></span></code></pre></div>
 <p>This wraps up a custom input, it can now be used in a shiny application</p>
-<div class="sourceCode" id="cb362"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb362-1"><a href="custom-inputs.html#cb362-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb362-2"><a href="custom-inputs.html#cb362-2"></a></span>
-<span id="cb362-3"><a href="custom-inputs.html#cb362-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb362-4"><a href="custom-inputs.html#cb362-4"></a>  <span class="kw">switchInput</span>(<span class="st">&quot;switch&quot;</span>, <span class="st">&quot;Show plot&quot;</span>, <span class="ot">FALSE</span>),</span>
-<span id="cb362-5"><a href="custom-inputs.html#cb362-5"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
-<span id="cb362-6"><a href="custom-inputs.html#cb362-6"></a>)</span>
-<span id="cb362-7"><a href="custom-inputs.html#cb362-7"></a></span>
-<span id="cb362-8"><a href="custom-inputs.html#cb362-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb362-9"><a href="custom-inputs.html#cb362-9"></a></span>
-<span id="cb362-10"><a href="custom-inputs.html#cb362-10"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb362-11"><a href="custom-inputs.html#cb362-11"></a>    <span class="kw">print</span>(input<span class="op">$</span><span class="cf">switch</span>)</span>
-<span id="cb362-12"><a href="custom-inputs.html#cb362-12"></a></span>
-<span id="cb362-13"><a href="custom-inputs.html#cb362-13"></a>    <span class="cf">if</span>(<span class="op">!</span>input<span class="op">$</span><span class="cf">switch</span>)</span>
-<span id="cb362-14"><a href="custom-inputs.html#cb362-14"></a>      <span class="kw">return</span>()</span>
-<span id="cb362-15"><a href="custom-inputs.html#cb362-15"></a></span>
-<span id="cb362-16"><a href="custom-inputs.html#cb362-16"></a>    <span class="kw">plot</span>(cars)</span>
-<span id="cb362-17"><a href="custom-inputs.html#cb362-17"></a>  })</span>
-<span id="cb362-18"><a href="custom-inputs.html#cb362-18"></a>}</span>
-<span id="cb362-19"><a href="custom-inputs.html#cb362-19"></a></span>
-<span id="cb362-20"><a href="custom-inputs.html#cb362-20"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb361"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb361-1"><a href="custom-inputs.html#cb361-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb361-2"><a href="custom-inputs.html#cb361-2"></a></span>
+<span id="cb361-3"><a href="custom-inputs.html#cb361-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb361-4"><a href="custom-inputs.html#cb361-4"></a>  <span class="kw">switchInput</span>(<span class="st">&quot;switch&quot;</span>, <span class="st">&quot;Show plot&quot;</span>, <span class="ot">FALSE</span>),</span>
+<span id="cb361-5"><a href="custom-inputs.html#cb361-5"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb361-6"><a href="custom-inputs.html#cb361-6"></a>)</span>
+<span id="cb361-7"><a href="custom-inputs.html#cb361-7"></a></span>
+<span id="cb361-8"><a href="custom-inputs.html#cb361-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb361-9"><a href="custom-inputs.html#cb361-9"></a></span>
+<span id="cb361-10"><a href="custom-inputs.html#cb361-10"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb361-11"><a href="custom-inputs.html#cb361-11"></a>    <span class="kw">print</span>(input<span class="op">$</span><span class="cf">switch</span>)</span>
+<span id="cb361-12"><a href="custom-inputs.html#cb361-12"></a></span>
+<span id="cb361-13"><a href="custom-inputs.html#cb361-13"></a>    <span class="cf">if</span>(<span class="op">!</span>input<span class="op">$</span><span class="cf">switch</span>)</span>
+<span id="cb361-14"><a href="custom-inputs.html#cb361-14"></a>      <span class="kw">return</span>()</span>
+<span id="cb361-15"><a href="custom-inputs.html#cb361-15"></a></span>
+<span id="cb361-16"><a href="custom-inputs.html#cb361-16"></a>    <span class="kw">plot</span>(cars)</span>
+<span id="cb361-17"><a href="custom-inputs.html#cb361-17"></a>  })</span>
+<span id="cb361-18"><a href="custom-inputs.html#cb361-18"></a>}</span>
+<span id="cb361-19"><a href="custom-inputs.html#cb361-19"></a></span>
+<span id="cb361-20"><a href="custom-inputs.html#cb361-20"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div class="figure">
 <img src="images/switch-example.png" alt="" />
 <p class="caption">Switch input example</p>
@@ -851,41 +851,41 @@ Make sure the <code>setValue</code> method triggers the event observed in <code>
 <div id="update-input" class="section level2" number="16.5">
 <h2><span class="header-section-number">16.5</span> Update Input</h2>
 <p>The JavaScript binding was provided with the required methods to receive updates from the server to change the value of the switch input but the R function that sends those updates is yet to be written.</p>
-<div class="sourceCode" id="cb363"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb363-1"><a href="custom-inputs.html#cb363-1"></a>update_switch_input &lt;-<span class="st"> </span><span class="cf">function</span>(id, value, </span>
-<span id="cb363-2"><a href="custom-inputs.html#cb363-2"></a>  <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</span>
-<span id="cb363-3"><a href="custom-inputs.html#cb363-3"></a>  session<span class="op">$</span><span class="kw">sendInputMessage</span>(id, value)</span>
-<span id="cb363-4"><a href="custom-inputs.html#cb363-4"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb362"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb362-1"><a href="custom-inputs.html#cb362-1"></a>update_switch_input &lt;-<span class="st"> </span><span class="cf">function</span>(id, value, </span>
+<span id="cb362-2"><a href="custom-inputs.html#cb362-2"></a>  <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</span>
+<span id="cb362-3"><a href="custom-inputs.html#cb362-3"></a>  session<span class="op">$</span><span class="kw">sendInputMessage</span>(id, value)</span>
+<span id="cb362-4"><a href="custom-inputs.html#cb362-4"></a>}</span></code></pre></div>
 <p>This pattern was used previously albeit using <code>sendCustomMessage</code>, with <code>sendInputMessage</code> the message can be sent straight to the <code>receiveMessage</code> handler of the input using 1) the <code>id</code> of the input and 2) the data one wants to send.</p>
 <p>We can adapt the application to make use of this button.</p>
-<div class="sourceCode" id="cb364"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb364-1"><a href="custom-inputs.html#cb364-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb364-2"><a href="custom-inputs.html#cb364-2"></a></span>
-<span id="cb364-3"><a href="custom-inputs.html#cb364-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb364-4"><a href="custom-inputs.html#cb364-4"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;chg&quot;</span>, <span class="st">&quot;Switch ON&quot;</span>),</span>
-<span id="cb364-5"><a href="custom-inputs.html#cb364-5"></a>  <span class="kw">switchInput</span>(<span class="st">&quot;switch&quot;</span>, <span class="st">&quot;Switch input&quot;</span>, <span class="ot">FALSE</span>),</span>
-<span id="cb364-6"><a href="custom-inputs.html#cb364-6"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
-<span id="cb364-7"><a href="custom-inputs.html#cb364-7"></a>)</span>
-<span id="cb364-8"><a href="custom-inputs.html#cb364-8"></a></span>
-<span id="cb364-9"><a href="custom-inputs.html#cb364-9"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb364-10"><a href="custom-inputs.html#cb364-10"></a></span>
-<span id="cb364-11"><a href="custom-inputs.html#cb364-11"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb364-12"><a href="custom-inputs.html#cb364-12"></a>    <span class="kw">print</span>(input<span class="op">$</span><span class="cf">switch</span>)</span>
-<span id="cb364-13"><a href="custom-inputs.html#cb364-13"></a>    </span>
-<span id="cb364-14"><a href="custom-inputs.html#cb364-14"></a>    <span class="cf">if</span>(<span class="op">!</span>input<span class="op">$</span><span class="cf">switch</span>)</span>
-<span id="cb364-15"><a href="custom-inputs.html#cb364-15"></a>      <span class="kw">return</span>()</span>
-<span id="cb364-16"><a href="custom-inputs.html#cb364-16"></a></span>
-<span id="cb364-17"><a href="custom-inputs.html#cb364-17"></a>    <span class="kw">plot</span>(cars)</span>
-<span id="cb364-18"><a href="custom-inputs.html#cb364-18"></a>  })</span>
-<span id="cb364-19"><a href="custom-inputs.html#cb364-19"></a></span>
-<span id="cb364-20"><a href="custom-inputs.html#cb364-20"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>chg, {</span>
-<span id="cb364-21"><a href="custom-inputs.html#cb364-21"></a>    <span class="kw">update_switch_input</span>(<span class="st">&quot;switch&quot;</span>, <span class="ot">TRUE</span>, session)</span>
-<span id="cb364-22"><a href="custom-inputs.html#cb364-22"></a>  })</span>
-<span id="cb364-23"><a href="custom-inputs.html#cb364-23"></a>}</span>
-<span id="cb364-24"><a href="custom-inputs.html#cb364-24"></a></span>
-<span id="cb364-25"><a href="custom-inputs.html#cb364-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb363"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb363-1"><a href="custom-inputs.html#cb363-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb363-2"><a href="custom-inputs.html#cb363-2"></a></span>
+<span id="cb363-3"><a href="custom-inputs.html#cb363-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb363-4"><a href="custom-inputs.html#cb363-4"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;chg&quot;</span>, <span class="st">&quot;Switch ON&quot;</span>),</span>
+<span id="cb363-5"><a href="custom-inputs.html#cb363-5"></a>  <span class="kw">switchInput</span>(<span class="st">&quot;switch&quot;</span>, <span class="st">&quot;Switch input&quot;</span>, <span class="ot">FALSE</span>),</span>
+<span id="cb363-6"><a href="custom-inputs.html#cb363-6"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb363-7"><a href="custom-inputs.html#cb363-7"></a>)</span>
+<span id="cb363-8"><a href="custom-inputs.html#cb363-8"></a></span>
+<span id="cb363-9"><a href="custom-inputs.html#cb363-9"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb363-10"><a href="custom-inputs.html#cb363-10"></a></span>
+<span id="cb363-11"><a href="custom-inputs.html#cb363-11"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb363-12"><a href="custom-inputs.html#cb363-12"></a>    <span class="kw">print</span>(input<span class="op">$</span><span class="cf">switch</span>)</span>
+<span id="cb363-13"><a href="custom-inputs.html#cb363-13"></a>    </span>
+<span id="cb363-14"><a href="custom-inputs.html#cb363-14"></a>    <span class="cf">if</span>(<span class="op">!</span>input<span class="op">$</span><span class="cf">switch</span>)</span>
+<span id="cb363-15"><a href="custom-inputs.html#cb363-15"></a>      <span class="kw">return</span>()</span>
+<span id="cb363-16"><a href="custom-inputs.html#cb363-16"></a></span>
+<span id="cb363-17"><a href="custom-inputs.html#cb363-17"></a>    <span class="kw">plot</span>(cars)</span>
+<span id="cb363-18"><a href="custom-inputs.html#cb363-18"></a>  })</span>
+<span id="cb363-19"><a href="custom-inputs.html#cb363-19"></a></span>
+<span id="cb363-20"><a href="custom-inputs.html#cb363-20"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>chg, {</span>
+<span id="cb363-21"><a href="custom-inputs.html#cb363-21"></a>    <span class="kw">update_switch_input</span>(<span class="st">&quot;switch&quot;</span>, <span class="ot">TRUE</span>, session)</span>
+<span id="cb363-22"><a href="custom-inputs.html#cb363-22"></a>  })</span>
+<span id="cb363-23"><a href="custom-inputs.html#cb363-23"></a>}</span>
+<span id="cb363-24"><a href="custom-inputs.html#cb363-24"></a></span>
+<span id="cb363-25"><a href="custom-inputs.html#cb363-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>The diagram below attempts to summarize the various elements that were put together and used in the last application.</p>
 <p>It all starts from the <code>switchInput</code> function which generates the HTML defining the switch input and its initial state. In the <code>subscribe</code> method, an event listener checks for changes on this HTML element (<code>$(el).on('change', ...)</code>), every time it changes (check/uncheck) it fires the shiny <code>callback</code> which sends the value of the input obtained from <code>getValue</code> through the websocket. When the value of the input is changed from the server this value travels through the websocket to the front-end where <code>receiveMessage</code> uses <code>setValue</code> to programmatically change the check box which incidentally triggers the change event and back we go.</p>
-<div id="htmlwidget-fbf8546b682a9a885561" style="width:100%;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-fbf8546b682a9a885561">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR]\n  node [shape=record fontsize=12];\n\n  subgraph cluster_r {\n    node [color=royalBlue];\n    \"update_switch_input\"\n    \"switchInput\"\n    \"Input list\"\n\n    label = \"R server\"\n  }\n\n  subgraph cluster_js {\n    node [color=gold];\n    \"receiveMessage\"\n    \"setValue\"\n    \"HTML input\"\n    \"subscribe\"\n    \"getValue\"\n\n    label = \"Front-end\"\n  }\n\n  edge [fontsize=10]\n  \"update_switch_input\" -> \"receiveMessage\" [xlabel=\"websocket\"]\n  \"receiveMessage\" -> \"setValue\" [label=\"value\"]\n  \"switchInput\" -> \"HTML input\" \n  \"setValue\" -> \"HTML input\" [label=\"value\"]\n  \"HTML input\" -> \"subscribe\" [label=\"event listener\"]\n  \"subscribe\" -> \"getValue\" [label=\"callback\"]\n  \"getValue\" -> \"Input list\" [label=\"websocket\"]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-3304b745f05ab99c1310" style="width:100%;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3304b745f05ab99c1310">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR]\n  node [shape=record fontsize=12];\n\n  subgraph cluster_r {\n    node [color=royalBlue];\n    \"update_switch_input\"\n    \"switchInput\"\n    \"Input list\"\n\n    label = \"R server\"\n  }\n\n  subgraph cluster_js {\n    node [color=gold];\n    \"receiveMessage\"\n    \"setValue\"\n    \"HTML input\"\n    \"subscribe\"\n    \"getValue\"\n\n    label = \"Front-end\"\n  }\n\n  edge [fontsize=10]\n  \"update_switch_input\" -> \"receiveMessage\" [xlabel=\"websocket\"]\n  \"receiveMessage\" -> \"setValue\" [label=\"value\"]\n  \"switchInput\" -> \"HTML input\" \n  \"setValue\" -> \"HTML input\" [label=\"value\"]\n  \"HTML input\" -> \"subscribe\" [label=\"event listener\"]\n  \"subscribe\" -> \"getValue\" [label=\"callback\"]\n  \"getValue\" -> \"Input list\" [label=\"websocket\"]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="exercise" class="section level2" number="16.6">
 <h2><span class="header-section-number">16.6</span> Exercise</h2>

@@ -655,17 +655,6 @@ The order of the dependencies matters, peity.js depends on jQuery hence the latt
 <span id="cb123-6"><a href="a-realistic-widget.html#cb123-6"></a>    <span class="kw">peity</span>(<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">5</span>), <span class="dt">type =</span> <span class="st">&quot;donut&quot;</span>)</span>
 <span id="cb123-7"><a href="a-realistic-widget.html#cb123-7"></a>  )</span>
 <span id="cb123-8"><a href="a-realistic-widget.html#cb123-8"></a>)</span></code></pre></div>
-<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="a-realistic-widget.html#cb124-1"></a>htmltools<span class="op">::</span><span class="kw">browsable</span>(</span>
-<span id="cb124-2"><a href="a-realistic-widget.html#cb124-2"></a>  htmltools<span class="op">::</span><span class="kw">tagList</span>(</span>
-<span id="cb124-3"><a href="a-realistic-widget.html#cb124-3"></a>    <span class="kw">peity</span>(<span class="kw">runif</span>(<span class="dv">5</span>)),</span>
-<span id="cb124-4"><a href="a-realistic-widget.html#cb124-4"></a>    htmltools<span class="op">::</span><span class="kw">br</span>(),</span>
-<span id="cb124-5"><a href="a-realistic-widget.html#cb124-5"></a>    <span class="kw">peity</span>(<span class="kw">runif</span>(<span class="dv">5</span>), <span class="dt">type =</span> <span class="st">&quot;line&quot;</span>),</span>
-<span id="cb124-6"><a href="a-realistic-widget.html#cb124-6"></a>    htmltools<span class="op">::</span><span class="kw">br</span>(),</span>
-<span id="cb124-7"><a href="a-realistic-widget.html#cb124-7"></a>    <span class="kw">peity</span>(<span class="st">&quot;1/4&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;pie&quot;</span>, <span class="dt">fill =</span> <span class="kw">c</span>(<span class="st">&quot;#c6d9fd&quot;</span>, <span class="st">&quot;#4d89f9&quot;</span>)),</span>
-<span id="cb124-8"><a href="a-realistic-widget.html#cb124-8"></a>    htmltools<span class="op">::</span><span class="kw">br</span>(),</span>
-<span id="cb124-9"><a href="a-realistic-widget.html#cb124-9"></a>    <span class="kw">peity</span>(<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">5</span>), <span class="dt">type =</span> <span class="st">&quot;donut&quot;</span>)</span>
-<span id="cb124-10"><a href="a-realistic-widget.html#cb124-10"></a>  )</span>
-<span id="cb124-11"><a href="a-realistic-widget.html#cb124-11"></a>)</span></code></pre></div>
 <div class="figure">
 <img src="images/peity-div.png" alt="" />
 <p class="caption">peity output with DIV</p>
@@ -675,23 +664,23 @@ The order of the dependencies matters, peity.js depends on jQuery hence the latt
 <div id="peity.js-html-element" class="section level2" number="6.3">
 <h2><span class="header-section-number">6.3</span> Peity.js HTML Element</h2>
 <p>As pointed out multiple times, the widget is generated in a <code>&lt;div&gt;</code>, which is works fine for most visualisation libraries. But we saw that peity.js works best when placed in a <code>&lt;span&gt;</code> as this allows placing the charts inline.</p>
-<p>This can be changed by placing a function named <code>widgetname_html</code> which is looked up by htmlwidgets and used if found. This function takes the three-dot construct (<code>...</code>) and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets needs be able to pass other arguments, such as the all too critical <code>id</code>.</p>
-<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="a-realistic-widget.html#cb125-1"></a>peity_html &lt;-<span class="st"> </span><span class="cf">function</span>(...){</span>
-<span id="cb125-2"><a href="a-realistic-widget.html#cb125-2"></a>  htmltools<span class="op">::</span>tags<span class="op">$</span><span class="kw">span</span>(...)</span>
-<span id="cb125-3"><a href="a-realistic-widget.html#cb125-3"></a>}</span></code></pre></div>
+<p>This can be changed by placing a function named <code>widgetname_html</code> which is looked up by htmlwidgets and used if found. This function takes the three-dot construct (<code>...</code>) and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets needs be able to pass the <code>id</code>, <code>class</code>, and <code>style</code> attributes to the tag.</p>
+<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="a-realistic-widget.html#cb124-1"></a>peity_html &lt;-<span class="st"> </span><span class="cf">function</span>(...){</span>
+<span id="cb124-2"><a href="a-realistic-widget.html#cb124-2"></a>  htmltools<span class="op">::</span>tags<span class="op">$</span><span class="kw">span</span>(...)</span>
+<span id="cb124-3"><a href="a-realistic-widget.html#cb124-3"></a>}</span></code></pre></div>
 <p>This can also come in handy if some arguments must be hard-coded such as assigning a specific class to every widget.</p>
-<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="a-realistic-widget.html#cb126-1"></a>myWidget_html &lt;-<span class="st"> </span><span class="cf">function</span>(..., class){</span>
-<span id="cb126-2"><a href="a-realistic-widget.html#cb126-2"></a>  htmltools<span class="op">::</span>tags<span class="op">$</span><span class="kw">div</span>(..., <span class="dt">class =</span> <span class="kw">c</span>(class, <span class="st">&quot;my-class&quot;</span>))</span>
-<span id="cb126-3"><a href="a-realistic-widget.html#cb126-3"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="a-realistic-widget.html#cb125-1"></a>myWidget_html &lt;-<span class="st"> </span><span class="cf">function</span>(..., class){</span>
+<span id="cb125-2"><a href="a-realistic-widget.html#cb125-2"></a>  htmltools<span class="op">::</span>tags<span class="op">$</span><span class="kw">div</span>(..., <span class="dt">class =</span> <span class="kw">c</span>(class, <span class="st">&quot;my-class&quot;</span>))</span>
+<span id="cb125-3"><a href="a-realistic-widget.html#cb125-3"></a>}</span></code></pre></div>
 <p>Reloading the package after placing the function above anywhere in the package will produce inline charts.</p>
-<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="a-realistic-widget.html#cb127-1"></a>htmltools<span class="op">::</span><span class="kw">browsable</span>(</span>
-<span id="cb127-2"><a href="a-realistic-widget.html#cb127-2"></a>  htmltools<span class="op">::</span><span class="kw">tagList</span>(</span>
-<span id="cb127-3"><a href="a-realistic-widget.html#cb127-3"></a>    <span class="kw">peity</span>(<span class="kw">runif</span>(<span class="dv">5</span>)),</span>
-<span id="cb127-4"><a href="a-realistic-widget.html#cb127-4"></a>    <span class="kw">peity</span>(<span class="kw">runif</span>(<span class="dv">5</span>), <span class="dt">type =</span> <span class="st">&quot;line&quot;</span>),</span>
-<span id="cb127-5"><a href="a-realistic-widget.html#cb127-5"></a>    <span class="kw">peity</span>(<span class="st">&quot;1/4&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;pie&quot;</span>, <span class="dt">fill =</span> <span class="kw">c</span>(<span class="st">&quot;#c6d9fd&quot;</span>, <span class="st">&quot;#4d89f9&quot;</span>)),</span>
-<span id="cb127-6"><a href="a-realistic-widget.html#cb127-6"></a>    <span class="kw">peity</span>(<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">5</span>), <span class="dt">type =</span> <span class="st">&quot;donut&quot;</span>)</span>
-<span id="cb127-7"><a href="a-realistic-widget.html#cb127-7"></a>  )</span>
-<span id="cb127-8"><a href="a-realistic-widget.html#cb127-8"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="a-realistic-widget.html#cb126-1"></a>htmltools<span class="op">::</span><span class="kw">browsable</span>(</span>
+<span id="cb126-2"><a href="a-realistic-widget.html#cb126-2"></a>  htmltools<span class="op">::</span><span class="kw">tagList</span>(</span>
+<span id="cb126-3"><a href="a-realistic-widget.html#cb126-3"></a>    <span class="kw">peity</span>(<span class="kw">runif</span>(<span class="dv">5</span>)),</span>
+<span id="cb126-4"><a href="a-realistic-widget.html#cb126-4"></a>    <span class="kw">peity</span>(<span class="kw">runif</span>(<span class="dv">5</span>), <span class="dt">type =</span> <span class="st">&quot;line&quot;</span>),</span>
+<span id="cb126-5"><a href="a-realistic-widget.html#cb126-5"></a>    <span class="kw">peity</span>(<span class="st">&quot;1/4&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;pie&quot;</span>, <span class="dt">fill =</span> <span class="kw">c</span>(<span class="st">&quot;#c6d9fd&quot;</span>, <span class="st">&quot;#4d89f9&quot;</span>)),</span>
+<span id="cb126-6"><a href="a-realistic-widget.html#cb126-6"></a>    <span class="kw">peity</span>(<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">5</span>), <span class="dt">type =</span> <span class="st">&quot;donut&quot;</span>)</span>
+<span id="cb126-7"><a href="a-realistic-widget.html#cb126-7"></a>  )</span>
+<span id="cb126-8"><a href="a-realistic-widget.html#cb126-8"></a>)</span></code></pre></div>
 <div class="figure">
 <img src="images/peity-span.png" alt="" />
 <p class="caption">peity output with SPAN</p>

@@ -443,141 +443,141 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Thus far, this part of the book has covered both ways data travels between JavaScript and R in Shiny. However, the alerts displayed in the previous chapter are rather hideous and, though demonstrates how both languages can work together within shiny, comes short of illustrating how to make use of external libraries or how to package such code. In brief, the previous chapter is an interesting exercise but unlikely to be used in the real world. This chapter is different.</p>
 <p>Let’s exploit an external library to improve upon the work done so far: <a href="https://github.com/StephanWagner/jBox">jBox</a> allows displaying “notices,” similar to the vanilla JavaScript alerts, but much better looking and with additional functionalities.</p>
 <p>The very first thing to do is to import jBox in the project, we could download the files and use them as described in the previous static files section but it comes with very convenient CDNs detailed in the <a href="https://stephanwagner.me/jBox/get_started">get-started page</a> of the documentation.</p>
-<div class="sourceCode" id="cb264"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb264-1"><a href="a-complete-integration.html#cb264-1"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;https://code.jquery.com/jquery-3.5.1.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb264-2"><a href="a-complete-integration.html#cb264-2"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb264-3"><a href="a-complete-integration.html#cb264-3"></a><span class="kw">&lt;link</span><span class="ot"> href=</span><span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css&quot;</span><span class="ot"> rel=</span><span class="st">&quot;stylesheet&quot;</span><span class="kw">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb263"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb263-1"><a href="a-complete-integration.html#cb263-1"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;https://code.jquery.com/jquery-3.5.1.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb263-2"><a href="a-complete-integration.html#cb263-2"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb263-3"><a href="a-complete-integration.html#cb263-3"></a><span class="kw">&lt;link</span><span class="ot"> href=</span><span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css&quot;</span><span class="ot"> rel=</span><span class="st">&quot;stylesheet&quot;</span><span class="kw">&gt;</span></span></code></pre></div>
 <p>Note that the “j” in jBox stands for jQuery which is already a dependency of shiny itself, there is therefore no need to import it, on the contrary one should not in order to avoid clashes. We can import the dependencies in a shiny UI, along with a message handler.</p>
-<div class="sourceCode" id="cb265"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb265-1"><a href="a-complete-integration.html#cb265-1"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb265-2"><a href="a-complete-integration.html#cb265-2"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb265-3"><a href="a-complete-integration.html#cb265-3"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb265-4"><a href="a-complete-integration.html#cb265-4"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
-<span id="cb265-5"><a href="a-complete-integration.html#cb265-5"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb265-6"><a href="a-complete-integration.html#cb265-6"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
-<span id="cb265-7"><a href="a-complete-integration.html#cb265-7"></a>      )</span>
-<span id="cb265-8"><a href="a-complete-integration.html#cb265-8"></a>    ),</span>
-<span id="cb265-9"><a href="a-complete-integration.html#cb265-9"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
-<span id="cb265-10"><a href="a-complete-integration.html#cb265-10"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
-<span id="cb265-11"><a href="a-complete-integration.html#cb265-11"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
-<span id="cb265-12"><a href="a-complete-integration.html#cb265-12"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb265-13"><a href="a-complete-integration.html#cb265-13"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
-<span id="cb265-14"><a href="a-complete-integration.html#cb265-14"></a>      )</span>
-<span id="cb265-15"><a href="a-complete-integration.html#cb265-15"></a>    ),</span>
-<span id="cb265-16"><a href="a-complete-integration.html#cb265-16"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
-<span id="cb265-17"><a href="a-complete-integration.html#cb265-17"></a><span class="st">      type = &#39;send-alert&#39;, function(message) {</span></span>
-<span id="cb265-18"><a href="a-complete-integration.html#cb265-18"></a><span class="st">      // TO DO: code jBox</span></span>
-<span id="cb265-19"><a href="a-complete-integration.html#cb265-19"></a><span class="st">    });&quot;</span>)</span>
-<span id="cb265-20"><a href="a-complete-integration.html#cb265-20"></a>  )</span>
-<span id="cb265-21"><a href="a-complete-integration.html#cb265-21"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb264"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb264-1"><a href="a-complete-integration.html#cb264-1"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb264-2"><a href="a-complete-integration.html#cb264-2"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb264-3"><a href="a-complete-integration.html#cb264-3"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb264-4"><a href="a-complete-integration.html#cb264-4"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
+<span id="cb264-5"><a href="a-complete-integration.html#cb264-5"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb264-6"><a href="a-complete-integration.html#cb264-6"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
+<span id="cb264-7"><a href="a-complete-integration.html#cb264-7"></a>      )</span>
+<span id="cb264-8"><a href="a-complete-integration.html#cb264-8"></a>    ),</span>
+<span id="cb264-9"><a href="a-complete-integration.html#cb264-9"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
+<span id="cb264-10"><a href="a-complete-integration.html#cb264-10"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
+<span id="cb264-11"><a href="a-complete-integration.html#cb264-11"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
+<span id="cb264-12"><a href="a-complete-integration.html#cb264-12"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb264-13"><a href="a-complete-integration.html#cb264-13"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
+<span id="cb264-14"><a href="a-complete-integration.html#cb264-14"></a>      )</span>
+<span id="cb264-15"><a href="a-complete-integration.html#cb264-15"></a>    ),</span>
+<span id="cb264-16"><a href="a-complete-integration.html#cb264-16"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
+<span id="cb264-17"><a href="a-complete-integration.html#cb264-17"></a><span class="st">      type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb264-18"><a href="a-complete-integration.html#cb264-18"></a><span class="st">      // TO DO: code jBox</span></span>
+<span id="cb264-19"><a href="a-complete-integration.html#cb264-19"></a><span class="st">    });&quot;</span>)</span>
+<span id="cb264-20"><a href="a-complete-integration.html#cb264-20"></a>  )</span>
+<span id="cb264-21"><a href="a-complete-integration.html#cb264-21"></a>)</span></code></pre></div>
 <p>The jBox library comes with numerous features to display tooltips, modals, notices, and more, which would make for too long a chapter; only notices shall be covered here. Let’s first take a look at the code that generates a jBox notice.</p>
-<div class="sourceCode" id="cb266"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb266-1"><a href="a-complete-integration.html#cb266-1"></a><span class="kw">new</span> jBox(<span class="st">&#39;Notice&#39;</span><span class="op">,</span> {</span>
-<span id="cb266-2"><a href="a-complete-integration.html#cb266-2"></a>  <span class="dt">content</span><span class="op">:</span> <span class="st">&#39;Hurray! A notice!&#39;</span><span class="op">,</span></span>
-<span id="cb266-3"><a href="a-complete-integration.html#cb266-3"></a>  <span class="dt">color</span><span class="op">:</span> <span class="st">&#39;blue&#39;</span></span>
-<span id="cb266-4"><a href="a-complete-integration.html#cb266-4"></a>})<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb265"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb265-1"><a href="a-complete-integration.html#cb265-1"></a><span class="kw">new</span> jBox(<span class="st">&#39;Notice&#39;</span><span class="op">,</span> {</span>
+<span id="cb265-2"><a href="a-complete-integration.html#cb265-2"></a>  <span class="dt">content</span><span class="op">:</span> <span class="st">&#39;Hurray! A notice!&#39;</span><span class="op">,</span></span>
+<span id="cb265-3"><a href="a-complete-integration.html#cb265-3"></a>  <span class="dt">color</span><span class="op">:</span> <span class="st">&#39;blue&#39;</span></span>
+<span id="cb265-4"><a href="a-complete-integration.html#cb265-4"></a>})<span class="op">;</span></span></code></pre></div>
 <p>Let’s start by copying that in the message handler to observe what it looks like.</p>
-<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb267-1"><a href="a-complete-integration.html#cb267-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb267-2"><a href="a-complete-integration.html#cb267-2"></a></span>
-<span id="cb267-3"><a href="a-complete-integration.html#cb267-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb267-4"><a href="a-complete-integration.html#cb267-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb267-5"><a href="a-complete-integration.html#cb267-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb267-6"><a href="a-complete-integration.html#cb267-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
-<span id="cb267-7"><a href="a-complete-integration.html#cb267-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb267-8"><a href="a-complete-integration.html#cb267-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
-<span id="cb267-9"><a href="a-complete-integration.html#cb267-9"></a>      )</span>
-<span id="cb267-10"><a href="a-complete-integration.html#cb267-10"></a>    ),</span>
-<span id="cb267-11"><a href="a-complete-integration.html#cb267-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
-<span id="cb267-12"><a href="a-complete-integration.html#cb267-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
-<span id="cb267-13"><a href="a-complete-integration.html#cb267-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
-<span id="cb267-14"><a href="a-complete-integration.html#cb267-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb267-15"><a href="a-complete-integration.html#cb267-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
-<span id="cb267-16"><a href="a-complete-integration.html#cb267-16"></a>      )</span>
-<span id="cb267-17"><a href="a-complete-integration.html#cb267-17"></a>    ),</span>
-<span id="cb267-18"><a href="a-complete-integration.html#cb267-18"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
-<span id="cb267-19"><a href="a-complete-integration.html#cb267-19"></a><span class="st">      type = &#39;send-alert&#39;, function(message) {</span></span>
-<span id="cb267-20"><a href="a-complete-integration.html#cb267-20"></a><span class="st">        new jBox(&#39;Notice&#39;, {</span></span>
-<span id="cb267-21"><a href="a-complete-integration.html#cb267-21"></a><span class="st">          content: &#39;Hurray! A notice!&#39;,</span></span>
-<span id="cb267-22"><a href="a-complete-integration.html#cb267-22"></a><span class="st">          color: &#39;blue&#39;</span></span>
-<span id="cb267-23"><a href="a-complete-integration.html#cb267-23"></a><span class="st">        });</span></span>
-<span id="cb267-24"><a href="a-complete-integration.html#cb267-24"></a><span class="st">    });&quot;</span>)</span>
-<span id="cb267-25"><a href="a-complete-integration.html#cb267-25"></a>  )</span>
-<span id="cb267-26"><a href="a-complete-integration.html#cb267-26"></a>)</span>
-<span id="cb267-27"><a href="a-complete-integration.html#cb267-27"></a></span>
-<span id="cb267-28"><a href="a-complete-integration.html#cb267-28"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb267-29"><a href="a-complete-integration.html#cb267-29"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
-<span id="cb267-30"><a href="a-complete-integration.html#cb267-30"></a>    <span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;This is not used&quot;</span></span>
-<span id="cb267-31"><a href="a-complete-integration.html#cb267-31"></a>  )</span>
-<span id="cb267-32"><a href="a-complete-integration.html#cb267-32"></a>}</span>
-<span id="cb267-33"><a href="a-complete-integration.html#cb267-33"></a></span>
-<span id="cb267-34"><a href="a-complete-integration.html#cb267-34"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb266"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb266-1"><a href="a-complete-integration.html#cb266-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb266-2"><a href="a-complete-integration.html#cb266-2"></a></span>
+<span id="cb266-3"><a href="a-complete-integration.html#cb266-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb266-4"><a href="a-complete-integration.html#cb266-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb266-5"><a href="a-complete-integration.html#cb266-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb266-6"><a href="a-complete-integration.html#cb266-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
+<span id="cb266-7"><a href="a-complete-integration.html#cb266-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb266-8"><a href="a-complete-integration.html#cb266-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
+<span id="cb266-9"><a href="a-complete-integration.html#cb266-9"></a>      )</span>
+<span id="cb266-10"><a href="a-complete-integration.html#cb266-10"></a>    ),</span>
+<span id="cb266-11"><a href="a-complete-integration.html#cb266-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
+<span id="cb266-12"><a href="a-complete-integration.html#cb266-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
+<span id="cb266-13"><a href="a-complete-integration.html#cb266-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
+<span id="cb266-14"><a href="a-complete-integration.html#cb266-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb266-15"><a href="a-complete-integration.html#cb266-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
+<span id="cb266-16"><a href="a-complete-integration.html#cb266-16"></a>      )</span>
+<span id="cb266-17"><a href="a-complete-integration.html#cb266-17"></a>    ),</span>
+<span id="cb266-18"><a href="a-complete-integration.html#cb266-18"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
+<span id="cb266-19"><a href="a-complete-integration.html#cb266-19"></a><span class="st">      type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb266-20"><a href="a-complete-integration.html#cb266-20"></a><span class="st">        new jBox(&#39;Notice&#39;, {</span></span>
+<span id="cb266-21"><a href="a-complete-integration.html#cb266-21"></a><span class="st">          content: &#39;Hurray! A notice!&#39;,</span></span>
+<span id="cb266-22"><a href="a-complete-integration.html#cb266-22"></a><span class="st">          color: &#39;blue&#39;</span></span>
+<span id="cb266-23"><a href="a-complete-integration.html#cb266-23"></a><span class="st">        });</span></span>
+<span id="cb266-24"><a href="a-complete-integration.html#cb266-24"></a><span class="st">    });&quot;</span>)</span>
+<span id="cb266-25"><a href="a-complete-integration.html#cb266-25"></a>  )</span>
+<span id="cb266-26"><a href="a-complete-integration.html#cb266-26"></a>)</span>
+<span id="cb266-27"><a href="a-complete-integration.html#cb266-27"></a></span>
+<span id="cb266-28"><a href="a-complete-integration.html#cb266-28"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb266-29"><a href="a-complete-integration.html#cb266-29"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
+<span id="cb266-30"><a href="a-complete-integration.html#cb266-30"></a>    <span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;This is not used&quot;</span></span>
+<span id="cb266-31"><a href="a-complete-integration.html#cb266-31"></a>  )</span>
+<span id="cb266-32"><a href="a-complete-integration.html#cb266-32"></a>}</span>
+<span id="cb266-33"><a href="a-complete-integration.html#cb266-33"></a></span>
+<span id="cb266-34"><a href="a-complete-integration.html#cb266-34"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div class="figure">
 <img src="images/notice-1.png" alt="" />
 <p class="caption">First jBox Notice</p>
 </div>
 <p>With some minor changes the application can display the message passed, one only needs to replace ‘Hurray! A notice!’ with the <code>message</code> variable.</p>
-<div class="sourceCode" id="cb268"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb268-1"><a href="a-complete-integration.html#cb268-1"></a>tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
-<span id="cb268-2"><a href="a-complete-integration.html#cb268-2"></a><span class="st">  type = &#39;send-alert&#39;, function(message) {</span></span>
-<span id="cb268-3"><a href="a-complete-integration.html#cb268-3"></a><span class="st">    new jBox(&#39;Notice&#39;, {</span></span>
-<span id="cb268-4"><a href="a-complete-integration.html#cb268-4"></a><span class="st">      content: message,</span></span>
-<span id="cb268-5"><a href="a-complete-integration.html#cb268-5"></a><span class="st">      color: &#39;blue&#39;</span></span>
-<span id="cb268-6"><a href="a-complete-integration.html#cb268-6"></a><span class="st">    });</span></span>
-<span id="cb268-7"><a href="a-complete-integration.html#cb268-7"></a><span class="st">});&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb267-1"><a href="a-complete-integration.html#cb267-1"></a>tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
+<span id="cb267-2"><a href="a-complete-integration.html#cb267-2"></a><span class="st">  type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb267-3"><a href="a-complete-integration.html#cb267-3"></a><span class="st">    new jBox(&#39;Notice&#39;, {</span></span>
+<span id="cb267-4"><a href="a-complete-integration.html#cb267-4"></a><span class="st">      content: message,</span></span>
+<span id="cb267-5"><a href="a-complete-integration.html#cb267-5"></a><span class="st">      color: &#39;blue&#39;</span></span>
+<span id="cb267-6"><a href="a-complete-integration.html#cb267-6"></a><span class="st">    });</span></span>
+<span id="cb267-7"><a href="a-complete-integration.html#cb267-7"></a><span class="st">});&quot;</span>)</span></code></pre></div>
 <p>This though only allows passing a single variable, the message, to JavaScript but jBox has many more options.</p>
 <div id="serialisation" class="section level2" number="13.1">
 <h2><span class="header-section-number">13.1</span> Serialisation</h2>
 <p>Let’s delve deeper into the communication between the server and the front-end to understand how we can further customise the notice displayed, e.g.: change the colour.</p>
-<div class="sourceCode" id="cb269"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb269-1"><a href="a-complete-integration.html#cb269-1"></a>{</span>
-<span id="cb269-2"><a href="a-complete-integration.html#cb269-2"></a>  <span class="dt">content</span><span class="op">:</span> <span class="st">&#39;Hurray! A notice!&#39;</span><span class="op">,</span></span>
-<span id="cb269-3"><a href="a-complete-integration.html#cb269-3"></a>  <span class="dt">color</span><span class="op">:</span> <span class="st">&#39;blue&#39;</span></span>
-<span id="cb269-4"><a href="a-complete-integration.html#cb269-4"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb268"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb268-1"><a href="a-complete-integration.html#cb268-1"></a>{</span>
+<span id="cb268-2"><a href="a-complete-integration.html#cb268-2"></a>  <span class="dt">content</span><span class="op">:</span> <span class="st">&#39;Hurray! A notice!&#39;</span><span class="op">,</span></span>
+<span id="cb268-3"><a href="a-complete-integration.html#cb268-3"></a>  <span class="dt">color</span><span class="op">:</span> <span class="st">&#39;blue&#39;</span></span>
+<span id="cb268-4"><a href="a-complete-integration.html#cb268-4"></a>}</span></code></pre></div>
 <p>Notice that the jBox notice takes a JSON object containing the options that define said notice to display (example above), including but not limited to the message. The most straightforward way to make all those options accessible to the server is to construct that list of options server-side before sending it to the the front-end. For instance the JSON of options displayed above would look like the R list below.</p>
-<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb270-1"><a href="a-complete-integration.html#cb270-1"></a>options &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb270-2"><a href="a-complete-integration.html#cb270-2"></a>  <span class="dt">content =</span> <span class="st">&#39;Hurray! A notice!&#39;</span>,</span>
-<span id="cb270-3"><a href="a-complete-integration.html#cb270-3"></a>  <span class="dt">color =</span> <span class="st">&#39;blue&#39;</span></span>
-<span id="cb270-4"><a href="a-complete-integration.html#cb270-4"></a>)</span>
-<span id="cb270-5"><a href="a-complete-integration.html#cb270-5"></a></span>
-<span id="cb270-6"><a href="a-complete-integration.html#cb270-6"></a>jsonlite<span class="op">::</span><span class="kw">toJSON</span>(options, <span class="dt">pretty =</span> <span class="ot">TRUE</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="a-complete-integration.html#cb269-1"></a>options &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb269-2"><a href="a-complete-integration.html#cb269-2"></a>  <span class="dt">content =</span> <span class="st">&#39;Hurray! A notice!&#39;</span>,</span>
+<span id="cb269-3"><a href="a-complete-integration.html#cb269-3"></a>  <span class="dt">color =</span> <span class="st">&#39;blue&#39;</span></span>
+<span id="cb269-4"><a href="a-complete-integration.html#cb269-4"></a>)</span>
+<span id="cb269-5"><a href="a-complete-integration.html#cb269-5"></a></span>
+<span id="cb269-6"><a href="a-complete-integration.html#cb269-6"></a>jsonlite<span class="op">::</span><span class="kw">toJSON</span>(options, <span class="dt">pretty =</span> <span class="ot">TRUE</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>## {
 ##   &quot;content&quot;: &quot;Hurray! A notice!&quot;,
 ##   &quot;color&quot;: &quot;blue&quot;
 ## }</code></pre>
 <p>Therefore one could construct this list server-side and use it in jBox straight away, doing so means the JavaScript code can be simplified to <code>new jBox('Notice', message);</code>.</p>
-<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="a-complete-integration.html#cb272-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb272-2"><a href="a-complete-integration.html#cb272-2"></a></span>
-<span id="cb272-3"><a href="a-complete-integration.html#cb272-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb272-4"><a href="a-complete-integration.html#cb272-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb272-5"><a href="a-complete-integration.html#cb272-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb272-6"><a href="a-complete-integration.html#cb272-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
-<span id="cb272-7"><a href="a-complete-integration.html#cb272-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb272-8"><a href="a-complete-integration.html#cb272-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
-<span id="cb272-9"><a href="a-complete-integration.html#cb272-9"></a>      )</span>
-<span id="cb272-10"><a href="a-complete-integration.html#cb272-10"></a>    ),</span>
-<span id="cb272-11"><a href="a-complete-integration.html#cb272-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
-<span id="cb272-12"><a href="a-complete-integration.html#cb272-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
-<span id="cb272-13"><a href="a-complete-integration.html#cb272-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
-<span id="cb272-14"><a href="a-complete-integration.html#cb272-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb272-15"><a href="a-complete-integration.html#cb272-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
-<span id="cb272-16"><a href="a-complete-integration.html#cb272-16"></a>      )</span>
-<span id="cb272-17"><a href="a-complete-integration.html#cb272-17"></a>    ),</span>
-<span id="cb272-18"><a href="a-complete-integration.html#cb272-18"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
-<span id="cb272-19"><a href="a-complete-integration.html#cb272-19"></a><span class="st">      type = &#39;send-alert&#39;, function(message) {</span></span>
-<span id="cb272-20"><a href="a-complete-integration.html#cb272-20"></a><span class="st">        // use notice send from the server</span></span>
-<span id="cb272-21"><a href="a-complete-integration.html#cb272-21"></a><span class="st">        new jBox(&#39;Notice&#39;, message);</span></span>
-<span id="cb272-22"><a href="a-complete-integration.html#cb272-22"></a><span class="st">    });&quot;</span>)</span>
-<span id="cb272-23"><a href="a-complete-integration.html#cb272-23"></a>  )</span>
-<span id="cb272-24"><a href="a-complete-integration.html#cb272-24"></a>)</span>
-<span id="cb272-25"><a href="a-complete-integration.html#cb272-25"></a></span>
-<span id="cb272-26"><a href="a-complete-integration.html#cb272-26"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb272-27"><a href="a-complete-integration.html#cb272-27"></a></span>
-<span id="cb272-28"><a href="a-complete-integration.html#cb272-28"></a>  <span class="co"># define notice options</span></span>
-<span id="cb272-29"><a href="a-complete-integration.html#cb272-29"></a>  notice =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb272-30"><a href="a-complete-integration.html#cb272-30"></a>    <span class="dt">content =</span> <span class="st">&#39;Hello from the server&#39;</span>,</span>
-<span id="cb272-31"><a href="a-complete-integration.html#cb272-31"></a>    <span class="dt">color =</span> <span class="st">&#39;black&#39;</span></span>
-<span id="cb272-32"><a href="a-complete-integration.html#cb272-32"></a>  )</span>
-<span id="cb272-33"><a href="a-complete-integration.html#cb272-33"></a></span>
-<span id="cb272-34"><a href="a-complete-integration.html#cb272-34"></a>  <span class="co"># send the notice</span></span>
-<span id="cb272-35"><a href="a-complete-integration.html#cb272-35"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> notice)</span>
-<span id="cb272-36"><a href="a-complete-integration.html#cb272-36"></a>}</span>
-<span id="cb272-37"><a href="a-complete-integration.html#cb272-37"></a></span>
-<span id="cb272-38"><a href="a-complete-integration.html#cb272-38"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb271-1"><a href="a-complete-integration.html#cb271-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb271-2"><a href="a-complete-integration.html#cb271-2"></a></span>
+<span id="cb271-3"><a href="a-complete-integration.html#cb271-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb271-4"><a href="a-complete-integration.html#cb271-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb271-5"><a href="a-complete-integration.html#cb271-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb271-6"><a href="a-complete-integration.html#cb271-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
+<span id="cb271-7"><a href="a-complete-integration.html#cb271-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb271-8"><a href="a-complete-integration.html#cb271-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
+<span id="cb271-9"><a href="a-complete-integration.html#cb271-9"></a>      )</span>
+<span id="cb271-10"><a href="a-complete-integration.html#cb271-10"></a>    ),</span>
+<span id="cb271-11"><a href="a-complete-integration.html#cb271-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
+<span id="cb271-12"><a href="a-complete-integration.html#cb271-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
+<span id="cb271-13"><a href="a-complete-integration.html#cb271-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
+<span id="cb271-14"><a href="a-complete-integration.html#cb271-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb271-15"><a href="a-complete-integration.html#cb271-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
+<span id="cb271-16"><a href="a-complete-integration.html#cb271-16"></a>      )</span>
+<span id="cb271-17"><a href="a-complete-integration.html#cb271-17"></a>    ),</span>
+<span id="cb271-18"><a href="a-complete-integration.html#cb271-18"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
+<span id="cb271-19"><a href="a-complete-integration.html#cb271-19"></a><span class="st">      type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb271-20"><a href="a-complete-integration.html#cb271-20"></a><span class="st">        // use notice send from the server</span></span>
+<span id="cb271-21"><a href="a-complete-integration.html#cb271-21"></a><span class="st">        new jBox(&#39;Notice&#39;, message);</span></span>
+<span id="cb271-22"><a href="a-complete-integration.html#cb271-22"></a><span class="st">    });&quot;</span>)</span>
+<span id="cb271-23"><a href="a-complete-integration.html#cb271-23"></a>  )</span>
+<span id="cb271-24"><a href="a-complete-integration.html#cb271-24"></a>)</span>
+<span id="cb271-25"><a href="a-complete-integration.html#cb271-25"></a></span>
+<span id="cb271-26"><a href="a-complete-integration.html#cb271-26"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb271-27"><a href="a-complete-integration.html#cb271-27"></a></span>
+<span id="cb271-28"><a href="a-complete-integration.html#cb271-28"></a>  <span class="co"># define notice options</span></span>
+<span id="cb271-29"><a href="a-complete-integration.html#cb271-29"></a>  notice =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb271-30"><a href="a-complete-integration.html#cb271-30"></a>    <span class="dt">content =</span> <span class="st">&#39;Hello from the server&#39;</span>,</span>
+<span id="cb271-31"><a href="a-complete-integration.html#cb271-31"></a>    <span class="dt">color =</span> <span class="st">&#39;black&#39;</span></span>
+<span id="cb271-32"><a href="a-complete-integration.html#cb271-32"></a>  )</span>
+<span id="cb271-33"><a href="a-complete-integration.html#cb271-33"></a></span>
+<span id="cb271-34"><a href="a-complete-integration.html#cb271-34"></a>  <span class="co"># send the notice</span></span>
+<span id="cb271-35"><a href="a-complete-integration.html#cb271-35"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> notice)</span>
+<span id="cb271-36"><a href="a-complete-integration.html#cb271-36"></a>}</span>
+<span id="cb271-37"><a href="a-complete-integration.html#cb271-37"></a></span>
+<span id="cb271-38"><a href="a-complete-integration.html#cb271-38"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div class="figure">
 <img src="images/notice-2.png" alt="" />
 <p class="caption">Customised jBox Notice</p>
@@ -587,288 +587,288 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">13.2</span> Events &amp; Callbacks</h2>
 <p>In the example of the vanilla JavaScript alert one could simply place a line of code after the <code>alert()</code> function in order to “tell” the server whether the button on the alert had been clicked. This was feasible because <code>alert</code> stops code execution, this is, however, rather uncommon in JavaScript. What is far more common are events and callback functions which are triggered upon an action being performed by the user (like the click of a button) or when other interesting things happen in the code. jBox provides numerous such <a href="https://stephanwagner.me/jBox/options#events">events</a>; callback functions can be used when a modal is closed or when a notice is created for instance.</p>
 <p>The concept of the callback function is not totally foreign to R albeit rarely used. Shiny comes with such functions, <code>shiny::onStop</code> and <code>shiny::onStart</code>. These allows having functions run when the application starts or exits.</p>
-<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb273-1"><a href="a-complete-integration.html#cb273-1"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb273-2"><a href="a-complete-integration.html#cb273-2"></a>  shiny<span class="op">::</span><span class="kw">onStop</span>(</span>
-<span id="cb273-3"><a href="a-complete-integration.html#cb273-3"></a>    <span class="co"># callback function fired when app is closed</span></span>
-<span id="cb273-4"><a href="a-complete-integration.html#cb273-4"></a>    <span class="cf">function</span>(){</span>
-<span id="cb273-5"><a href="a-complete-integration.html#cb273-5"></a>      <span class="kw">cat</span>(<span class="st">&quot;App has been closed&quot;</span>)</span>
-<span id="cb273-6"><a href="a-complete-integration.html#cb273-6"></a>    }</span>
-<span id="cb273-7"><a href="a-complete-integration.html#cb273-7"></a>  )</span>
-<span id="cb273-8"><a href="a-complete-integration.html#cb273-8"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="a-complete-integration.html#cb272-1"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb272-2"><a href="a-complete-integration.html#cb272-2"></a>  shiny<span class="op">::</span><span class="kw">onStop</span>(</span>
+<span id="cb272-3"><a href="a-complete-integration.html#cb272-3"></a>    <span class="co"># callback function fired when app is closed</span></span>
+<span id="cb272-4"><a href="a-complete-integration.html#cb272-4"></a>    <span class="cf">function</span>(){</span>
+<span id="cb272-5"><a href="a-complete-integration.html#cb272-5"></a>      <span class="kw">cat</span>(<span class="st">&quot;App has been closed&quot;</span>)</span>
+<span id="cb272-6"><a href="a-complete-integration.html#cb272-6"></a>    }</span>
+<span id="cb272-7"><a href="a-complete-integration.html#cb272-7"></a>  )</span>
+<span id="cb272-8"><a href="a-complete-integration.html#cb272-8"></a>}</span></code></pre></div>
 <p>In jBox, these callback functions are included in the JSON of options, below the <code>onClose</code> event is fired when the notice is closed.</p>
-<div class="sourceCode" id="cb274"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb274-1"><a href="a-complete-integration.html#cb274-1"></a>{</span>
-<span id="cb274-2"><a href="a-complete-integration.html#cb274-2"></a>  <span class="dt">content</span><span class="op">:</span> <span class="st">&#39;Alert!&#39;</span><span class="op">,</span></span>
-<span id="cb274-3"><a href="a-complete-integration.html#cb274-3"></a>  <span class="dt">onClose</span><span class="op">:</span> <span class="kw">function</span>(){</span>
-<span id="cb274-4"><a href="a-complete-integration.html#cb274-4"></a>    <span class="co">// Fired when closed </span></span>
-<span id="cb274-5"><a href="a-complete-integration.html#cb274-5"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Alert is closed&#39;</span>)<span class="op">;</span></span>
-<span id="cb274-6"><a href="a-complete-integration.html#cb274-6"></a>  }</span>
-<span id="cb274-7"><a href="a-complete-integration.html#cb274-7"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb273"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb273-1"><a href="a-complete-integration.html#cb273-1"></a>{</span>
+<span id="cb273-2"><a href="a-complete-integration.html#cb273-2"></a>  <span class="dt">content</span><span class="op">:</span> <span class="st">&#39;Alert!&#39;</span><span class="op">,</span></span>
+<span id="cb273-3"><a href="a-complete-integration.html#cb273-3"></a>  <span class="dt">onClose</span><span class="op">:</span> <span class="kw">function</span>(){</span>
+<span id="cb273-4"><a href="a-complete-integration.html#cb273-4"></a>    <span class="co">// Fired when closed </span></span>
+<span id="cb273-5"><a href="a-complete-integration.html#cb273-5"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Alert is closed&#39;</span>)<span class="op">;</span></span>
+<span id="cb273-6"><a href="a-complete-integration.html#cb273-6"></a>  }</span>
+<span id="cb273-7"><a href="a-complete-integration.html#cb273-7"></a>}</span></code></pre></div>
 <p>This raises one issue, one cannot truly serialise to executable code. The attempt below serialises the function to a string, not a function that will be evaluated in JavaScript.</p>
-<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb275-1"><a href="a-complete-integration.html#cb275-1"></a><span class="co"># try to serialise an R function</span></span>
-<span id="cb275-2"><a href="a-complete-integration.html#cb275-2"></a>jsonlite<span class="op">::</span><span class="kw">toJSON</span>(<span class="st">&quot;function(x){x + 1}&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb274-1"><a href="a-complete-integration.html#cb274-1"></a><span class="co"># try to serialise an R function</span></span>
+<span id="cb274-2"><a href="a-complete-integration.html#cb274-2"></a>jsonlite<span class="op">::</span><span class="kw">toJSON</span>(<span class="st">&quot;function(x){x + 1}&quot;</span>)</span></code></pre></div>
 <pre><code>## [&quot;function(x){x + 1}&quot;]</code></pre>
 <p>One solution is to append the callback function to the object of options JavaScript-side.</p>
-<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb277-1"><a href="a-complete-integration.html#cb277-1"></a>tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
-<span id="cb277-2"><a href="a-complete-integration.html#cb277-2"></a><span class="st">  type = &#39;send-alert&#39;, function(message) {</span></span>
-<span id="cb277-3"><a href="a-complete-integration.html#cb277-3"></a><span class="st">    // append callback</span></span>
-<span id="cb277-4"><a href="a-complete-integration.html#cb277-4"></a><span class="st">    message.onClose = function(){</span></span>
-<span id="cb277-5"><a href="a-complete-integration.html#cb277-5"></a><span class="st">      Shiny.setInputValue(&#39;alert_close&#39;, true);</span></span>
-<span id="cb277-6"><a href="a-complete-integration.html#cb277-6"></a><span class="st">    }</span></span>
-<span id="cb277-7"><a href="a-complete-integration.html#cb277-7"></a><span class="st">    new jBox(&#39;Notice&#39;, message);</span></span>
-<span id="cb277-8"><a href="a-complete-integration.html#cb277-8"></a><span class="st">});&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb276-1"><a href="a-complete-integration.html#cb276-1"></a>tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
+<span id="cb276-2"><a href="a-complete-integration.html#cb276-2"></a><span class="st">  type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb276-3"><a href="a-complete-integration.html#cb276-3"></a><span class="st">    // append callback</span></span>
+<span id="cb276-4"><a href="a-complete-integration.html#cb276-4"></a><span class="st">    message.onClose = function(){</span></span>
+<span id="cb276-5"><a href="a-complete-integration.html#cb276-5"></a><span class="st">      Shiny.setInputValue(&#39;alert_close&#39;, true);</span></span>
+<span id="cb276-6"><a href="a-complete-integration.html#cb276-6"></a><span class="st">    }</span></span>
+<span id="cb276-7"><a href="a-complete-integration.html#cb276-7"></a><span class="st">    new jBox(&#39;Notice&#39;, message);</span></span>
+<span id="cb276-8"><a href="a-complete-integration.html#cb276-8"></a><span class="st">});&quot;</span>)</span></code></pre></div>
 <p>Placing a function inside a JSON object is common in JavaScript, in contrast with R where though it works is rarely if ever done (reference class/R6 are somewhat similar). The above JavaScript code to append the callback function could look something like the snippet below in R.</p>
-<div class="sourceCode" id="cb278"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb278-1"><a href="a-complete-integration.html#cb278-1"></a>message &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">content =</span> <span class="st">&quot;hello&quot;</span>)</span>
-<span id="cb278-2"><a href="a-complete-integration.html#cb278-2"></a>message<span class="op">$</span>onClose &lt;-<span class="st"> </span><span class="cf">function</span>(x){</span>
-<span id="cb278-3"><a href="a-complete-integration.html#cb278-3"></a>  x <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb278-4"><a href="a-complete-integration.html#cb278-4"></a>}</span>
-<span id="cb278-5"><a href="a-complete-integration.html#cb278-5"></a></span>
-<span id="cb278-6"><a href="a-complete-integration.html#cb278-6"></a>message<span class="op">$</span><span class="kw">onClose</span>(<span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb277-1"><a href="a-complete-integration.html#cb277-1"></a>message &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">content =</span> <span class="st">&quot;hello&quot;</span>)</span>
+<span id="cb277-2"><a href="a-complete-integration.html#cb277-2"></a>message<span class="op">$</span>onClose &lt;-<span class="st"> </span><span class="cf">function</span>(x){</span>
+<span id="cb277-3"><a href="a-complete-integration.html#cb277-3"></a>  x <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb277-4"><a href="a-complete-integration.html#cb277-4"></a>}</span>
+<span id="cb277-5"><a href="a-complete-integration.html#cb277-5"></a></span>
+<span id="cb277-6"><a href="a-complete-integration.html#cb277-6"></a>message<span class="op">$</span><span class="kw">onClose</span>(<span class="dv">2</span>)</span></code></pre></div>
 <pre><code>## [1] 3</code></pre>
 <p>That done it can be incorporated into the application built thus far. Something interesting could be done server-side but for the sake of this example we merely print the value of the input to the R console.</p>
-<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="a-complete-integration.html#cb280-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb280-2"><a href="a-complete-integration.html#cb280-2"></a></span>
-<span id="cb280-3"><a href="a-complete-integration.html#cb280-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb280-4"><a href="a-complete-integration.html#cb280-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb280-5"><a href="a-complete-integration.html#cb280-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb280-6"><a href="a-complete-integration.html#cb280-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
-<span id="cb280-7"><a href="a-complete-integration.html#cb280-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb280-8"><a href="a-complete-integration.html#cb280-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
-<span id="cb280-9"><a href="a-complete-integration.html#cb280-9"></a>      )</span>
-<span id="cb280-10"><a href="a-complete-integration.html#cb280-10"></a>    ),</span>
-<span id="cb280-11"><a href="a-complete-integration.html#cb280-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
-<span id="cb280-12"><a href="a-complete-integration.html#cb280-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
-<span id="cb280-13"><a href="a-complete-integration.html#cb280-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
-<span id="cb280-14"><a href="a-complete-integration.html#cb280-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb280-15"><a href="a-complete-integration.html#cb280-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
-<span id="cb280-16"><a href="a-complete-integration.html#cb280-16"></a>      )</span>
-<span id="cb280-17"><a href="a-complete-integration.html#cb280-17"></a>    ),</span>
-<span id="cb280-18"><a href="a-complete-integration.html#cb280-18"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
-<span id="cb280-19"><a href="a-complete-integration.html#cb280-19"></a><span class="st">      type = &#39;send-alert&#39;, function(message) {</span></span>
-<span id="cb280-20"><a href="a-complete-integration.html#cb280-20"></a><span class="st">        message.onClose = function(){</span></span>
-<span id="cb280-21"><a href="a-complete-integration.html#cb280-21"></a><span class="st">          Shiny.setInputValue(&#39;alert_close&#39;, true);</span></span>
-<span id="cb280-22"><a href="a-complete-integration.html#cb280-22"></a><span class="st">        }</span></span>
-<span id="cb280-23"><a href="a-complete-integration.html#cb280-23"></a><span class="st">        new jBox(&#39;Notice&#39;, message);</span></span>
-<span id="cb280-24"><a href="a-complete-integration.html#cb280-24"></a><span class="st">    });&quot;</span>)</span>
-<span id="cb280-25"><a href="a-complete-integration.html#cb280-25"></a>  )</span>
-<span id="cb280-26"><a href="a-complete-integration.html#cb280-26"></a>)</span>
-<span id="cb280-27"><a href="a-complete-integration.html#cb280-27"></a></span>
-<span id="cb280-28"><a href="a-complete-integration.html#cb280-28"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb280-29"><a href="a-complete-integration.html#cb280-29"></a></span>
-<span id="cb280-30"><a href="a-complete-integration.html#cb280-30"></a>  <span class="co"># define notice options</span></span>
-<span id="cb280-31"><a href="a-complete-integration.html#cb280-31"></a>  notice =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb280-32"><a href="a-complete-integration.html#cb280-32"></a>    <span class="dt">content =</span> <span class="st">&#39;Hello from the server&#39;</span>,</span>
-<span id="cb280-33"><a href="a-complete-integration.html#cb280-33"></a>    <span class="dt">color =</span> <span class="st">&#39;black&#39;</span></span>
-<span id="cb280-34"><a href="a-complete-integration.html#cb280-34"></a>  )</span>
-<span id="cb280-35"><a href="a-complete-integration.html#cb280-35"></a></span>
-<span id="cb280-36"><a href="a-complete-integration.html#cb280-36"></a>  <span class="co"># send the notice</span></span>
-<span id="cb280-37"><a href="a-complete-integration.html#cb280-37"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
-<span id="cb280-38"><a href="a-complete-integration.html#cb280-38"></a>    <span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> notice</span>
-<span id="cb280-39"><a href="a-complete-integration.html#cb280-39"></a>  )</span>
-<span id="cb280-40"><a href="a-complete-integration.html#cb280-40"></a></span>
-<span id="cb280-41"><a href="a-complete-integration.html#cb280-41"></a>  <span class="co"># print the output of the alert_close event (when fired)</span></span>
-<span id="cb280-42"><a href="a-complete-integration.html#cb280-42"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>alert_close, {</span>
-<span id="cb280-43"><a href="a-complete-integration.html#cb280-43"></a>    <span class="kw">print</span>(input<span class="op">$</span>alert_close)</span>
-<span id="cb280-44"><a href="a-complete-integration.html#cb280-44"></a>  })</span>
-<span id="cb280-45"><a href="a-complete-integration.html#cb280-45"></a>}</span>
-<span id="cb280-46"><a href="a-complete-integration.html#cb280-46"></a></span>
-<span id="cb280-47"><a href="a-complete-integration.html#cb280-47"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="a-complete-integration.html#cb279-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb279-2"><a href="a-complete-integration.html#cb279-2"></a></span>
+<span id="cb279-3"><a href="a-complete-integration.html#cb279-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb279-4"><a href="a-complete-integration.html#cb279-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb279-5"><a href="a-complete-integration.html#cb279-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb279-6"><a href="a-complete-integration.html#cb279-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
+<span id="cb279-7"><a href="a-complete-integration.html#cb279-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb279-8"><a href="a-complete-integration.html#cb279-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
+<span id="cb279-9"><a href="a-complete-integration.html#cb279-9"></a>      )</span>
+<span id="cb279-10"><a href="a-complete-integration.html#cb279-10"></a>    ),</span>
+<span id="cb279-11"><a href="a-complete-integration.html#cb279-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
+<span id="cb279-12"><a href="a-complete-integration.html#cb279-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
+<span id="cb279-13"><a href="a-complete-integration.html#cb279-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
+<span id="cb279-14"><a href="a-complete-integration.html#cb279-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb279-15"><a href="a-complete-integration.html#cb279-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
+<span id="cb279-16"><a href="a-complete-integration.html#cb279-16"></a>      )</span>
+<span id="cb279-17"><a href="a-complete-integration.html#cb279-17"></a>    ),</span>
+<span id="cb279-18"><a href="a-complete-integration.html#cb279-18"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
+<span id="cb279-19"><a href="a-complete-integration.html#cb279-19"></a><span class="st">      type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb279-20"><a href="a-complete-integration.html#cb279-20"></a><span class="st">        message.onClose = function(){</span></span>
+<span id="cb279-21"><a href="a-complete-integration.html#cb279-21"></a><span class="st">          Shiny.setInputValue(&#39;alert_close&#39;, true);</span></span>
+<span id="cb279-22"><a href="a-complete-integration.html#cb279-22"></a><span class="st">        }</span></span>
+<span id="cb279-23"><a href="a-complete-integration.html#cb279-23"></a><span class="st">        new jBox(&#39;Notice&#39;, message);</span></span>
+<span id="cb279-24"><a href="a-complete-integration.html#cb279-24"></a><span class="st">    });&quot;</span>)</span>
+<span id="cb279-25"><a href="a-complete-integration.html#cb279-25"></a>  )</span>
+<span id="cb279-26"><a href="a-complete-integration.html#cb279-26"></a>)</span>
+<span id="cb279-27"><a href="a-complete-integration.html#cb279-27"></a></span>
+<span id="cb279-28"><a href="a-complete-integration.html#cb279-28"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb279-29"><a href="a-complete-integration.html#cb279-29"></a></span>
+<span id="cb279-30"><a href="a-complete-integration.html#cb279-30"></a>  <span class="co"># define notice options</span></span>
+<span id="cb279-31"><a href="a-complete-integration.html#cb279-31"></a>  notice =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb279-32"><a href="a-complete-integration.html#cb279-32"></a>    <span class="dt">content =</span> <span class="st">&#39;Hello from the server&#39;</span>,</span>
+<span id="cb279-33"><a href="a-complete-integration.html#cb279-33"></a>    <span class="dt">color =</span> <span class="st">&#39;black&#39;</span></span>
+<span id="cb279-34"><a href="a-complete-integration.html#cb279-34"></a>  )</span>
+<span id="cb279-35"><a href="a-complete-integration.html#cb279-35"></a></span>
+<span id="cb279-36"><a href="a-complete-integration.html#cb279-36"></a>  <span class="co"># send the notice</span></span>
+<span id="cb279-37"><a href="a-complete-integration.html#cb279-37"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
+<span id="cb279-38"><a href="a-complete-integration.html#cb279-38"></a>    <span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> notice</span>
+<span id="cb279-39"><a href="a-complete-integration.html#cb279-39"></a>  )</span>
+<span id="cb279-40"><a href="a-complete-integration.html#cb279-40"></a></span>
+<span id="cb279-41"><a href="a-complete-integration.html#cb279-41"></a>  <span class="co"># print the output of the alert_close event (when fired)</span></span>
+<span id="cb279-42"><a href="a-complete-integration.html#cb279-42"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>alert_close, {</span>
+<span id="cb279-43"><a href="a-complete-integration.html#cb279-43"></a>    <span class="kw">print</span>(input<span class="op">$</span>alert_close)</span>
+<span id="cb279-44"><a href="a-complete-integration.html#cb279-44"></a>  })</span>
+<span id="cb279-45"><a href="a-complete-integration.html#cb279-45"></a>}</span>
+<span id="cb279-46"><a href="a-complete-integration.html#cb279-46"></a></span>
+<span id="cb279-47"><a href="a-complete-integration.html#cb279-47"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="as-a-package" class="section level2" number="13.3">
 <h2><span class="header-section-number">13.3</span> As a Package</h2>
 <p>Packages are a fundamental part of R and allow conveniently sharing and reusing code. The work done so far is probably fitting for a single application but one should not have to reproduce all of that every time one wants to use jBox in a shiny application: we ought to wrap these functionalities into a handy package that can be used, reused and shared with others. Moreover, this will benefit from all the other advantages that R packages bring to code such as documentation, reproducibility, and tests.</p>
 <p>Before we delve into building the package let us think through what it should include. The application using jBox gives some indication as to what the package will look like. Users of the package should be able to reproduce what is executed in the application, namely import dependencies (including the message handler) as well as send data to the JavaScript front-end. One difference with the application is the provision of a static directory of dependencies to avoid relying on the CDNs as this ensures reproducibility and more robustness (code hosted online by a third-party might change and break the package). Concretely, the package will export a <code>useJbox</code> function to be placed in the shiny ui to import the dependencies and a <code>send_alert</code> function to send the alert from the server to the client.</p>
 <p>Let’s start by creating an R package, here we name it “jbox,” after the JavaScript library, partly because the author lacks creativity: feel free to name it however you want.</p>
-<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="a-complete-integration.html#cb281-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;jbox&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="a-complete-integration.html#cb280-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;jbox&quot;</span>)</span></code></pre></div>
 <div id="dependencies" class="section level3" number="13.3.1">
 <h3><span class="header-section-number">13.3.1</span> Dependencies</h3>
 <p>The very first thing that is required are the dependencies without which nothing can work, let’s create a directory of static assets, download and place the jBox CSS and JavaScript files within it. We create the directory “inst” as per the R package convention and within it create another to hold the assets.</p>
-<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="a-complete-integration.html#cb282-1"></a><span class="co"># create directories</span></span>
-<span id="cb282-2"><a href="a-complete-integration.html#cb282-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;inst/assets&quot;</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="a-complete-integration.html#cb281-1"></a><span class="co"># create directories</span></span>
+<span id="cb281-2"><a href="a-complete-integration.html#cb281-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;inst/assets&quot;</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <p>The jBox files can be downloaded from the CDN and placed within the directory that was created above. Moreover, we also create an empty JavaScript file that will eventually contain the custom JavaScript code that “connects” R to JavaScript.</p>
-<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="a-complete-integration.html#cb283-1"></a><span class="co"># URLs of CDNs</span></span>
-<span id="cb283-2"><a href="a-complete-integration.html#cb283-2"></a>js_dep &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb283-3"><a href="a-complete-integration.html#cb283-3"></a>  <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb283-4"><a href="a-complete-integration.html#cb283-4"></a>  <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
-<span id="cb283-5"><a href="a-complete-integration.html#cb283-5"></a>)</span>
-<span id="cb283-6"><a href="a-complete-integration.html#cb283-6"></a>css_dep &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb283-7"><a href="a-complete-integration.html#cb283-7"></a>  <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb283-8"><a href="a-complete-integration.html#cb283-8"></a>  <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
-<span id="cb283-9"><a href="a-complete-integration.html#cb283-9"></a>)</span>
-<span id="cb283-10"><a href="a-complete-integration.html#cb283-10"></a></span>
-<span id="cb283-11"><a href="a-complete-integration.html#cb283-11"></a><span class="co"># download</span></span>
-<span id="cb283-12"><a href="a-complete-integration.html#cb283-12"></a><span class="kw">download.file</span>(js_dep, <span class="dt">destfile=</span><span class="st">&quot;./inst/assets/jBox.all.min.js&quot;</span>)</span>
-<span id="cb283-13"><a href="a-complete-integration.html#cb283-13"></a><span class="kw">download.file</span>(css_dep, <span class="dt">destfile=</span><span class="st">&quot;./inst/assets/jBox.all.min.css&quot;</span>)</span>
-<span id="cb283-14"><a href="a-complete-integration.html#cb283-14"></a></span>
-<span id="cb283-15"><a href="a-complete-integration.html#cb283-15"></a><span class="co"># create file to eventually hold custom JavaScript</span></span>
-<span id="cb283-16"><a href="a-complete-integration.html#cb283-16"></a><span class="kw">file.create</span>(<span class="st">&quot;./inst/assets/custom.js&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="a-complete-integration.html#cb282-1"></a><span class="co"># URLs of CDNs</span></span>
+<span id="cb282-2"><a href="a-complete-integration.html#cb282-2"></a>js_dep &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb282-3"><a href="a-complete-integration.html#cb282-3"></a>  <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb282-4"><a href="a-complete-integration.html#cb282-4"></a>  <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
+<span id="cb282-5"><a href="a-complete-integration.html#cb282-5"></a>)</span>
+<span id="cb282-6"><a href="a-complete-integration.html#cb282-6"></a>css_dep &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb282-7"><a href="a-complete-integration.html#cb282-7"></a>  <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb282-8"><a href="a-complete-integration.html#cb282-8"></a>  <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
+<span id="cb282-9"><a href="a-complete-integration.html#cb282-9"></a>)</span>
+<span id="cb282-10"><a href="a-complete-integration.html#cb282-10"></a></span>
+<span id="cb282-11"><a href="a-complete-integration.html#cb282-11"></a><span class="co"># download</span></span>
+<span id="cb282-12"><a href="a-complete-integration.html#cb282-12"></a><span class="kw">download.file</span>(js_dep, <span class="dt">destfile=</span><span class="st">&quot;./inst/assets/jBox.all.min.js&quot;</span>)</span>
+<span id="cb282-13"><a href="a-complete-integration.html#cb282-13"></a><span class="kw">download.file</span>(css_dep, <span class="dt">destfile=</span><span class="st">&quot;./inst/assets/jBox.all.min.css&quot;</span>)</span>
+<span id="cb282-14"><a href="a-complete-integration.html#cb282-14"></a></span>
+<span id="cb282-15"><a href="a-complete-integration.html#cb282-15"></a><span class="co"># create file to eventually hold custom JavaScript</span></span>
+<span id="cb282-16"><a href="a-complete-integration.html#cb282-16"></a><span class="kw">file.create</span>(<span class="st">&quot;./inst/assets/custom.js&quot;</span>)</span></code></pre></div>
 <p>This done one should obtain a directory that looks similar to the tree below (some files and folders omitted for brevity).</p>
-<div class="sourceCode" id="cb284"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb284-1"><a href="a-complete-integration.html#cb284-1"></a><span class="ex">DESCRIPTION</span></span>
-<span id="cb284-2"><a href="a-complete-integration.html#cb284-2"></a><span class="ex">R/</span></span>
-<span id="cb284-3"><a href="a-complete-integration.html#cb284-3"></a><span class="ex">inst/</span></span>
-<span id="cb284-4"><a href="a-complete-integration.html#cb284-4"></a>├── <span class="ex">assets/</span></span>
-<span id="cb284-5"><a href="a-complete-integration.html#cb284-5"></a>│    ├── <span class="ex">custom.js</span></span>
-<span id="cb284-6"><a href="a-complete-integration.html#cb284-6"></a>│    ├── <span class="ex">jBox.all.min.js</span></span>
-<span id="cb284-7"><a href="a-complete-integration.html#cb284-7"></a>│    └── <span class="ex">jBox.all.min.css</span></span></code></pre></div>
+<div class="sourceCode" id="cb283"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb283-1"><a href="a-complete-integration.html#cb283-1"></a><span class="ex">DESCRIPTION</span></span>
+<span id="cb283-2"><a href="a-complete-integration.html#cb283-2"></a><span class="ex">R/</span></span>
+<span id="cb283-3"><a href="a-complete-integration.html#cb283-3"></a><span class="ex">inst/</span></span>
+<span id="cb283-4"><a href="a-complete-integration.html#cb283-4"></a>├── <span class="ex">assets/</span></span>
+<span id="cb283-5"><a href="a-complete-integration.html#cb283-5"></a>│    ├── <span class="ex">custom.js</span></span>
+<span id="cb283-6"><a href="a-complete-integration.html#cb283-6"></a>│    ├── <span class="ex">jBox.all.min.js</span></span>
+<span id="cb283-7"><a href="a-complete-integration.html#cb283-7"></a>│    └── <span class="ex">jBox.all.min.css</span></span></code></pre></div>
 <p>Next, one needs to have those files served, the user of the package could be asked to use <code>shiny::addResourcePath</code> but it’s very inelegant, it should instead be built-in the package so the user does not even have to know this happening in the background. Therefore, we ought to ensure the static files are served when the user uses the package. Packages can optionally run functions when they are loaded or attached, Hadley Wickham writes about it extensively in the namespace chapter of his book on <a href="http://r-pkgs.had.co.nz/namespace.html">R packages</a>. By convention, these functions are placed in a <code>zzz.R</code> file.</p>
-<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="a-complete-integration.html#cb285-1"></a><span class="kw">file.create</span>(<span class="st">&quot;./R/zzz.R&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="a-complete-integration.html#cb284-1"></a><span class="kw">file.create</span>(<span class="st">&quot;./R/zzz.R&quot;</span>)</span></code></pre></div>
 <p>The difference between loading and attaching a package can be subtle, in this case it’s probably best to run the function when the package is loaded using <code>.onLoad</code> which the R Packages book describes as:</p>
 <blockquote>
 <p>Loading will load code, data and any DLLs; register S3 and S4 methods; and run the .onLoad() function. After loading, the package is available in memory, but because it’s not in the search path, you won’t be able to access its components without using ::. Confusingly, :: will also load a package automatically if it isn’t already loaded. It’s rare to load a package explicitly, but you can do so with requireNamespace() or loadNamespace().</p>
 <p>— R Packages Book</p>
 </blockquote>
 <p>The <code>addResourcePath</code> function should thus be placed within the <code>.onLoad</code> function, this way the files are served by shiny when the package is loaded. Note the few changes below, we refer to the path using <code>system.file</code> and change the prefix to <code>jbox-assets</code> to avoid the url serving the static files to clash with others.</p>
-<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="a-complete-integration.html#cb286-1"></a><span class="co"># R/zzz.R</span></span>
-<span id="cb286-2"><a href="a-complete-integration.html#cb286-2"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname) {</span>
-<span id="cb286-3"><a href="a-complete-integration.html#cb286-3"></a>  path &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;assets&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;jbox&quot;</span>)</span>
-<span id="cb286-4"><a href="a-complete-integration.html#cb286-4"></a>  shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;jbox-assets&quot;</span>, path)</span>
-<span id="cb286-5"><a href="a-complete-integration.html#cb286-5"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="a-complete-integration.html#cb285-1"></a><span class="co"># R/zzz.R</span></span>
+<span id="cb285-2"><a href="a-complete-integration.html#cb285-2"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname) {</span>
+<span id="cb285-3"><a href="a-complete-integration.html#cb285-3"></a>  path &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;assets&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;jbox&quot;</span>)</span>
+<span id="cb285-4"><a href="a-complete-integration.html#cb285-4"></a>  shiny<span class="op">::</span><span class="kw">addResourcePath</span>(<span class="st">&quot;jbox-assets&quot;</span>, path)</span>
+<span id="cb285-5"><a href="a-complete-integration.html#cb285-5"></a>}</span></code></pre></div>
 <p>This serves the file and allows not having to explicitly use <code>addResourcePath</code> but the package nonetheless needs to feature a function to let the user import them into their application.</p>
-<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="a-complete-integration.html#cb287-1"></a><span class="co">#&#39; Import Dependencies</span></span>
-<span id="cb287-2"><a href="a-complete-integration.html#cb287-2"></a><span class="co">#&#39; @export</span></span>
-<span id="cb287-3"><a href="a-complete-integration.html#cb287-3"></a>usejBox &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb287-4"><a href="a-complete-integration.html#cb287-4"></a>  shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb287-5"><a href="a-complete-integration.html#cb287-5"></a>    shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb287-6"><a href="a-complete-integration.html#cb287-6"></a>      <span class="dt">src =</span> <span class="st">&quot;jbox-assets/jBox.all.min.js&quot;</span></span>
-<span id="cb287-7"><a href="a-complete-integration.html#cb287-7"></a>    ),</span>
-<span id="cb287-8"><a href="a-complete-integration.html#cb287-8"></a>    shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">link</span>(</span>
-<span id="cb287-9"><a href="a-complete-integration.html#cb287-9"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>, </span>
-<span id="cb287-10"><a href="a-complete-integration.html#cb287-10"></a>      <span class="dt">href =</span> <span class="st">&quot;jbox-assets/jBox.all.min.css&quot;</span></span>
-<span id="cb287-11"><a href="a-complete-integration.html#cb287-11"></a>    ),</span>
-<span id="cb287-12"><a href="a-complete-integration.html#cb287-12"></a>    shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb287-13"><a href="a-complete-integration.html#cb287-13"></a>      <span class="dt">src =</span> <span class="st">&quot;jbox-assets/custom.js&quot;</span></span>
-<span id="cb287-14"><a href="a-complete-integration.html#cb287-14"></a>    )</span>
-<span id="cb287-15"><a href="a-complete-integration.html#cb287-15"></a>  )</span>
-<span id="cb287-16"><a href="a-complete-integration.html#cb287-16"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="a-complete-integration.html#cb286-1"></a><span class="co">#&#39; Import Dependencies</span></span>
+<span id="cb286-2"><a href="a-complete-integration.html#cb286-2"></a><span class="co">#&#39; @export</span></span>
+<span id="cb286-3"><a href="a-complete-integration.html#cb286-3"></a>usejBox &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb286-4"><a href="a-complete-integration.html#cb286-4"></a>  shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb286-5"><a href="a-complete-integration.html#cb286-5"></a>    shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb286-6"><a href="a-complete-integration.html#cb286-6"></a>      <span class="dt">src =</span> <span class="st">&quot;jbox-assets/jBox.all.min.js&quot;</span></span>
+<span id="cb286-7"><a href="a-complete-integration.html#cb286-7"></a>    ),</span>
+<span id="cb286-8"><a href="a-complete-integration.html#cb286-8"></a>    shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">link</span>(</span>
+<span id="cb286-9"><a href="a-complete-integration.html#cb286-9"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>, </span>
+<span id="cb286-10"><a href="a-complete-integration.html#cb286-10"></a>      <span class="dt">href =</span> <span class="st">&quot;jbox-assets/jBox.all.min.css&quot;</span></span>
+<span id="cb286-11"><a href="a-complete-integration.html#cb286-11"></a>    ),</span>
+<span id="cb286-12"><a href="a-complete-integration.html#cb286-12"></a>    shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb286-13"><a href="a-complete-integration.html#cb286-13"></a>      <span class="dt">src =</span> <span class="st">&quot;jbox-assets/custom.js&quot;</span></span>
+<span id="cb286-14"><a href="a-complete-integration.html#cb286-14"></a>    )</span>
+<span id="cb286-15"><a href="a-complete-integration.html#cb286-15"></a>  )</span>
+<span id="cb286-16"><a href="a-complete-integration.html#cb286-16"></a>}</span></code></pre></div>
 </div>
 <div id="r-code" class="section level3" number="13.3.2">
 <h3><span class="header-section-number">13.3.2</span> R Code</h3>
 <p>Not much changes from what was written before, however, it poses interesting questions with regard to the interface we want to provide users. From the user’s perspective the core of the package is the function that actually sends an alert to the clients, here created in <code>R/core.R</code>.</p>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="a-complete-integration.html#cb287-1"></a><span class="co">#&#39; Create an Alert</span></span>
+<span id="cb287-2"><a href="a-complete-integration.html#cb287-2"></a><span class="co">#&#39; @export</span></span>
+<span id="cb287-3"><a href="a-complete-integration.html#cb287-3"></a>send_alert &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">content =</span> <span class="st">&quot;alert&quot;</span>, <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>, session){</span>
+<span id="cb287-4"><a href="a-complete-integration.html#cb287-4"></a>  <span class="co"># define notice options</span></span>
+<span id="cb287-5"><a href="a-complete-integration.html#cb287-5"></a>  notice =<span class="st"> </span><span class="kw">list</span>(<span class="dt">content =</span> content, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>)</span>
+<span id="cb287-6"><a href="a-complete-integration.html#cb287-6"></a></span>
+<span id="cb287-7"><a href="a-complete-integration.html#cb287-7"></a>  <span class="co"># send the notice</span></span>
+<span id="cb287-8"><a href="a-complete-integration.html#cb287-8"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> notice)</span>
+<span id="cb287-9"><a href="a-complete-integration.html#cb287-9"></a>}</span></code></pre></div>
+<p>One could leave it at the function above, it could be sufficient in providing a functional~ish R package, it could be greatly improved upon though. The function requires the <code>session</code> object, which confuses many, most R developers have little understanding of it. This can be mitigated by providing a default using <code>shiny::getDefaultReactiveDomain</code> which, notwithstanding its grandiose name, simply returns the shiny <code>session</code> object.</p>
 <div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="a-complete-integration.html#cb288-1"></a><span class="co">#&#39; Create an Alert</span></span>
 <span id="cb288-2"><a href="a-complete-integration.html#cb288-2"></a><span class="co">#&#39; @export</span></span>
-<span id="cb288-3"><a href="a-complete-integration.html#cb288-3"></a>send_alert &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">content =</span> <span class="st">&quot;alert&quot;</span>, <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>, session){</span>
-<span id="cb288-4"><a href="a-complete-integration.html#cb288-4"></a>  <span class="co"># define notice options</span></span>
-<span id="cb288-5"><a href="a-complete-integration.html#cb288-5"></a>  notice =<span class="st"> </span><span class="kw">list</span>(<span class="dt">content =</span> content, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>)</span>
-<span id="cb288-6"><a href="a-complete-integration.html#cb288-6"></a></span>
-<span id="cb288-7"><a href="a-complete-integration.html#cb288-7"></a>  <span class="co"># send the notice</span></span>
-<span id="cb288-8"><a href="a-complete-integration.html#cb288-8"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> notice)</span>
-<span id="cb288-9"><a href="a-complete-integration.html#cb288-9"></a>}</span></code></pre></div>
-<p>One could leave it at the function above, it could be sufficient in providing a functional~ish R package, it could be greatly improved upon though. The function requires the <code>session</code> object, which confuses many, most R developers have little understanding of it. This can be mitigated by providing a default using <code>shiny::getDefaultReactiveDomain</code> which, notwithstanding its grandiose name, simply returns the shiny <code>session</code> object.</p>
-<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="a-complete-integration.html#cb289-1"></a><span class="co">#&#39; Create an Alert</span></span>
-<span id="cb289-2"><a href="a-complete-integration.html#cb289-2"></a><span class="co">#&#39; @export</span></span>
-<span id="cb289-3"><a href="a-complete-integration.html#cb289-3"></a>send_alert &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">content =</span> <span class="st">&quot;alert&quot;</span>, <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>, </span>
-<span id="cb289-4"><a href="a-complete-integration.html#cb289-4"></a>  <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</span>
-<span id="cb289-5"><a href="a-complete-integration.html#cb289-5"></a>  </span>
-<span id="cb289-6"><a href="a-complete-integration.html#cb289-6"></a>  <span class="co"># define notice options</span></span>
-<span id="cb289-7"><a href="a-complete-integration.html#cb289-7"></a>  notice =<span class="st"> </span><span class="kw">list</span>(<span class="dt">content =</span> content, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>)</span>
-<span id="cb289-8"><a href="a-complete-integration.html#cb289-8"></a></span>
-<span id="cb289-9"><a href="a-complete-integration.html#cb289-9"></a>  <span class="co"># send the notice</span></span>
-<span id="cb289-10"><a href="a-complete-integration.html#cb289-10"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> notice)</span>
-<span id="cb289-11"><a href="a-complete-integration.html#cb289-11"></a>}</span></code></pre></div>
+<span id="cb288-3"><a href="a-complete-integration.html#cb288-3"></a>send_alert &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">content =</span> <span class="st">&quot;alert&quot;</span>, <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>, </span>
+<span id="cb288-4"><a href="a-complete-integration.html#cb288-4"></a>  <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</span>
+<span id="cb288-5"><a href="a-complete-integration.html#cb288-5"></a>  </span>
+<span id="cb288-6"><a href="a-complete-integration.html#cb288-6"></a>  <span class="co"># define notice options</span></span>
+<span id="cb288-7"><a href="a-complete-integration.html#cb288-7"></a>  notice =<span class="st"> </span><span class="kw">list</span>(<span class="dt">content =</span> content, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>)</span>
+<span id="cb288-8"><a href="a-complete-integration.html#cb288-8"></a></span>
+<span id="cb288-9"><a href="a-complete-integration.html#cb288-9"></a>  <span class="co"># send the notice</span></span>
+<span id="cb288-10"><a href="a-complete-integration.html#cb288-10"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> notice)</span>
+<span id="cb288-11"><a href="a-complete-integration.html#cb288-11"></a>}</span></code></pre></div>
 <p>This covers most of the R code that needs to be written, though we will come back to it shortly on as we uncover an interesting caveat.</p>
 </div>
 <div id="javascript-code" class="section level3" number="13.3.3">
 <h3><span class="header-section-number">13.3.3</span> JavaScript Code</h3>
 <p>Onto the JavaScript code, the <code>custom.js</code> to host said code is already created but remains empty. Simply using the code that was written previously will do the job for now.</p>
-<div class="sourceCode" id="cb290"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb290-1"><a href="a-complete-integration.html#cb290-1"></a><span class="co">// custom.js</span></span>
-<span id="cb290-2"><a href="a-complete-integration.html#cb290-2"></a>Shiny<span class="op">.</span><span class="fu">addCustomMessageHandler</span>(</span>
-<span id="cb290-3"><a href="a-complete-integration.html#cb290-3"></a>  type <span class="op">=</span> <span class="st">&#39;send-alert&#39;</span><span class="op">,</span> <span class="kw">function</span>(message) {</span>
-<span id="cb290-4"><a href="a-complete-integration.html#cb290-4"></a>    message<span class="op">.</span><span class="at">onClose</span> <span class="op">=</span> <span class="kw">function</span>(){</span>
-<span id="cb290-5"><a href="a-complete-integration.html#cb290-5"></a>      Shiny<span class="op">.</span><span class="fu">setInputValue</span>(<span class="st">&#39;alert_close&#39;</span><span class="op">,</span> <span class="kw">true</span>)<span class="op">;</span></span>
-<span id="cb290-6"><a href="a-complete-integration.html#cb290-6"></a>    }</span>
-<span id="cb290-7"><a href="a-complete-integration.html#cb290-7"></a>    <span class="kw">new</span> jBox(<span class="st">&#39;Notice&#39;</span><span class="op">,</span> message)<span class="op">;</span></span>
-<span id="cb290-8"><a href="a-complete-integration.html#cb290-8"></a>})<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb289"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb289-1"><a href="a-complete-integration.html#cb289-1"></a><span class="co">// custom.js</span></span>
+<span id="cb289-2"><a href="a-complete-integration.html#cb289-2"></a>Shiny<span class="op">.</span><span class="fu">addCustomMessageHandler</span>(</span>
+<span id="cb289-3"><a href="a-complete-integration.html#cb289-3"></a>  type <span class="op">=</span> <span class="st">&#39;send-alert&#39;</span><span class="op">,</span> <span class="kw">function</span>(message) {</span>
+<span id="cb289-4"><a href="a-complete-integration.html#cb289-4"></a>    message<span class="op">.</span><span class="at">onClose</span> <span class="op">=</span> <span class="kw">function</span>(){</span>
+<span id="cb289-5"><a href="a-complete-integration.html#cb289-5"></a>      Shiny<span class="op">.</span><span class="fu">setInputValue</span>(<span class="st">&#39;alert_close&#39;</span><span class="op">,</span> <span class="kw">true</span>)<span class="op">;</span></span>
+<span id="cb289-6"><a href="a-complete-integration.html#cb289-6"></a>    }</span>
+<span id="cb289-7"><a href="a-complete-integration.html#cb289-7"></a>    <span class="kw">new</span> jBox(<span class="st">&#39;Notice&#39;</span><span class="op">,</span> message)<span class="op">;</span></span>
+<span id="cb289-8"><a href="a-complete-integration.html#cb289-8"></a>})<span class="op">;</span></span></code></pre></div>
 <p>At this stage one has a fully functional package: run <code>devtools::document</code>, load the functions (<code>devtools::load_all</code>), and it is ready to be tested.</p>
-<div class="sourceCode" id="cb291"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb291-1"><a href="a-complete-integration.html#cb291-1"></a>devtools<span class="op">::</span><span class="kw">document</span>()</span>
-<span id="cb291-2"><a href="a-complete-integration.html#cb291-2"></a>devtools<span class="op">::</span><span class="kw">load_all</span>()</span>
-<span id="cb291-3"><a href="a-complete-integration.html#cb291-3"></a></span>
-<span id="cb291-4"><a href="a-complete-integration.html#cb291-4"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb291-5"><a href="a-complete-integration.html#cb291-5"></a></span>
-<span id="cb291-6"><a href="a-complete-integration.html#cb291-6"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb291-7"><a href="a-complete-integration.html#cb291-7"></a>  <span class="kw">usejBox</span>(),</span>
-<span id="cb291-8"><a href="a-complete-integration.html#cb291-8"></a>  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;callback&quot;</span>)</span>
-<span id="cb291-9"><a href="a-complete-integration.html#cb291-9"></a>)</span>
-<span id="cb291-10"><a href="a-complete-integration.html#cb291-10"></a></span>
-<span id="cb291-11"><a href="a-complete-integration.html#cb291-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb291-12"><a href="a-complete-integration.html#cb291-12"></a>  <span class="kw">send_alert</span>(<span class="st">&quot;Hello from the server!&quot;</span>)</span>
-<span id="cb291-13"><a href="a-complete-integration.html#cb291-13"></a></span>
-<span id="cb291-14"><a href="a-complete-integration.html#cb291-14"></a>  output<span class="op">$</span>callback &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
-<span id="cb291-15"><a href="a-complete-integration.html#cb291-15"></a>    <span class="kw">paste</span>(<span class="st">&quot;Is the alert closed: &quot;</span>, input<span class="op">$</span>alert_close)</span>
-<span id="cb291-16"><a href="a-complete-integration.html#cb291-16"></a>  })</span>
-<span id="cb291-17"><a href="a-complete-integration.html#cb291-17"></a>}</span>
-<span id="cb291-18"><a href="a-complete-integration.html#cb291-18"></a></span>
-<span id="cb291-19"><a href="a-complete-integration.html#cb291-19"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb290-1"><a href="a-complete-integration.html#cb290-1"></a>devtools<span class="op">::</span><span class="kw">document</span>()</span>
+<span id="cb290-2"><a href="a-complete-integration.html#cb290-2"></a>devtools<span class="op">::</span><span class="kw">load_all</span>()</span>
+<span id="cb290-3"><a href="a-complete-integration.html#cb290-3"></a></span>
+<span id="cb290-4"><a href="a-complete-integration.html#cb290-4"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb290-5"><a href="a-complete-integration.html#cb290-5"></a></span>
+<span id="cb290-6"><a href="a-complete-integration.html#cb290-6"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb290-7"><a href="a-complete-integration.html#cb290-7"></a>  <span class="kw">usejBox</span>(),</span>
+<span id="cb290-8"><a href="a-complete-integration.html#cb290-8"></a>  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;callback&quot;</span>)</span>
+<span id="cb290-9"><a href="a-complete-integration.html#cb290-9"></a>)</span>
+<span id="cb290-10"><a href="a-complete-integration.html#cb290-10"></a></span>
+<span id="cb290-11"><a href="a-complete-integration.html#cb290-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb290-12"><a href="a-complete-integration.html#cb290-12"></a>  <span class="kw">send_alert</span>(<span class="st">&quot;Hello from the server!&quot;</span>)</span>
+<span id="cb290-13"><a href="a-complete-integration.html#cb290-13"></a></span>
+<span id="cb290-14"><a href="a-complete-integration.html#cb290-14"></a>  output<span class="op">$</span>callback &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb290-15"><a href="a-complete-integration.html#cb290-15"></a>    <span class="kw">paste</span>(<span class="st">&quot;Is the alert closed: &quot;</span>, input<span class="op">$</span>alert_close)</span>
+<span id="cb290-16"><a href="a-complete-integration.html#cb290-16"></a>  })</span>
+<span id="cb290-17"><a href="a-complete-integration.html#cb290-17"></a>}</span>
+<span id="cb290-18"><a href="a-complete-integration.html#cb290-18"></a></span>
+<span id="cb290-19"><a href="a-complete-integration.html#cb290-19"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>However, while the above will work for a single alert it will run into issues when creating more than one alert as multiple alerts will set a value for a single input (<code>input$alert_close</code>). This is can be remedied to.</p>
 <p>The package needs to provide the user a way to distinguish between alerts in order to be able to observe the correct inputs server-side.
 A simple solution consists in asking the user to provide an identifier (<code>id</code>). This identifier must be passed to the JavaScript client so the function can dynamically set the input value for that identifier, therefore it is included in the <code>message</code>, below we do so in such a way that the original JSON of options remains unchanged.</p>
-<div class="sourceCode" id="cb292"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb292-1"><a href="a-complete-integration.html#cb292-1"></a><span class="co">#&#39; Create an Alert</span></span>
-<span id="cb292-2"><a href="a-complete-integration.html#cb292-2"></a><span class="co">#&#39; @export</span></span>
-<span id="cb292-3"><a href="a-complete-integration.html#cb292-3"></a>send_alert &lt;-<span class="st"> </span><span class="cf">function</span>(id, <span class="dt">content =</span> <span class="st">&quot;alert&quot;</span>, <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>, </span>
-<span id="cb292-4"><a href="a-complete-integration.html#cb292-4"></a>  <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</span>
-<span id="cb292-5"><a href="a-complete-integration.html#cb292-5"></a>  <span class="co"># define notice options</span></span>
-<span id="cb292-6"><a href="a-complete-integration.html#cb292-6"></a>  notice =<span class="st"> </span><span class="kw">list</span>(<span class="dt">content =</span> content, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>)</span>
-<span id="cb292-7"><a href="a-complete-integration.html#cb292-7"></a></span>
-<span id="cb292-8"><a href="a-complete-integration.html#cb292-8"></a>  <span class="co"># add id</span></span>
-<span id="cb292-9"><a href="a-complete-integration.html#cb292-9"></a>  message &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">id =</span> id, <span class="dt">notice =</span> notice)</span>
-<span id="cb292-10"><a href="a-complete-integration.html#cb292-10"></a></span>
-<span id="cb292-11"><a href="a-complete-integration.html#cb292-11"></a>  <span class="co"># send the notice</span></span>
-<span id="cb292-12"><a href="a-complete-integration.html#cb292-12"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
-<span id="cb292-13"><a href="a-complete-integration.html#cb292-13"></a>    <span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> message</span>
-<span id="cb292-14"><a href="a-complete-integration.html#cb292-14"></a>  )</span>
-<span id="cb292-15"><a href="a-complete-integration.html#cb292-15"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb291"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb291-1"><a href="a-complete-integration.html#cb291-1"></a><span class="co">#&#39; Create an Alert</span></span>
+<span id="cb291-2"><a href="a-complete-integration.html#cb291-2"></a><span class="co">#&#39; @export</span></span>
+<span id="cb291-3"><a href="a-complete-integration.html#cb291-3"></a>send_alert &lt;-<span class="st"> </span><span class="cf">function</span>(id, <span class="dt">content =</span> <span class="st">&quot;alert&quot;</span>, <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>, </span>
+<span id="cb291-4"><a href="a-complete-integration.html#cb291-4"></a>  <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</span>
+<span id="cb291-5"><a href="a-complete-integration.html#cb291-5"></a>  <span class="co"># define notice options</span></span>
+<span id="cb291-6"><a href="a-complete-integration.html#cb291-6"></a>  notice =<span class="st"> </span><span class="kw">list</span>(<span class="dt">content =</span> content, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>)</span>
+<span id="cb291-7"><a href="a-complete-integration.html#cb291-7"></a></span>
+<span id="cb291-8"><a href="a-complete-integration.html#cb291-8"></a>  <span class="co"># add id</span></span>
+<span id="cb291-9"><a href="a-complete-integration.html#cb291-9"></a>  message &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">id =</span> id, <span class="dt">notice =</span> notice)</span>
+<span id="cb291-10"><a href="a-complete-integration.html#cb291-10"></a></span>
+<span id="cb291-11"><a href="a-complete-integration.html#cb291-11"></a>  <span class="co"># send the notice</span></span>
+<span id="cb291-12"><a href="a-complete-integration.html#cb291-12"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
+<span id="cb291-13"><a href="a-complete-integration.html#cb291-13"></a>    <span class="dt">type =</span> <span class="st">&quot;send-alert&quot;</span>, <span class="dt">message =</span> message</span>
+<span id="cb291-14"><a href="a-complete-integration.html#cb291-14"></a>  )</span>
+<span id="cb291-15"><a href="a-complete-integration.html#cb291-15"></a>}</span></code></pre></div>
 <p>Now one can adapt the JavaScript code to make use of the identifier. One needs to include said identifier in the name of the input the value of which is set, below we concatenate before the original input name. This is not forced upon the developer but is a convention, packages like DT and plotly approach the issue the same way: <code>id + name_of_input</code>. The event is thus now appended to <code>message.notice</code>, which is also used when creating the jBox alert.</p>
-<div class="sourceCode" id="cb293"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb293-1"><a href="a-complete-integration.html#cb293-1"></a><span class="co">// custom.js</span></span>
-<span id="cb293-2"><a href="a-complete-integration.html#cb293-2"></a>Shiny<span class="op">.</span><span class="fu">addCustomMessageHandler</span>(</span>
-<span id="cb293-3"><a href="a-complete-integration.html#cb293-3"></a>  type <span class="op">=</span> <span class="st">&#39;send-alert&#39;</span><span class="op">,</span> <span class="kw">function</span>(message) {</span>
-<span id="cb293-4"><a href="a-complete-integration.html#cb293-4"></a>    message<span class="op">.</span><span class="at">notice</span><span class="op">.</span><span class="at">onClose</span> <span class="op">=</span> <span class="kw">function</span>(){</span>
-<span id="cb293-5"><a href="a-complete-integration.html#cb293-5"></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;close&quot;</span>)<span class="op">;</span></span>
-<span id="cb293-6"><a href="a-complete-integration.html#cb293-6"></a>      Shiny<span class="op">.</span><span class="fu">setInputValue</span>(message<span class="op">.</span><span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_alert_close&#39;</span><span class="op">,</span> <span class="kw">true</span>)<span class="op">;</span></span>
-<span id="cb293-7"><a href="a-complete-integration.html#cb293-7"></a>    }</span>
-<span id="cb293-8"><a href="a-complete-integration.html#cb293-8"></a>    <span class="kw">new</span> jBox(<span class="st">&#39;Notice&#39;</span><span class="op">,</span> message<span class="op">.</span><span class="at">notice</span>)<span class="op">;</span></span>
-<span id="cb293-9"><a href="a-complete-integration.html#cb293-9"></a>})<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb292"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb292-1"><a href="a-complete-integration.html#cb292-1"></a><span class="co">// custom.js</span></span>
+<span id="cb292-2"><a href="a-complete-integration.html#cb292-2"></a>Shiny<span class="op">.</span><span class="fu">addCustomMessageHandler</span>(</span>
+<span id="cb292-3"><a href="a-complete-integration.html#cb292-3"></a>  type <span class="op">=</span> <span class="st">&#39;send-alert&#39;</span><span class="op">,</span> <span class="kw">function</span>(message) {</span>
+<span id="cb292-4"><a href="a-complete-integration.html#cb292-4"></a>    message<span class="op">.</span><span class="at">notice</span><span class="op">.</span><span class="at">onClose</span> <span class="op">=</span> <span class="kw">function</span>(){</span>
+<span id="cb292-5"><a href="a-complete-integration.html#cb292-5"></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;close&quot;</span>)<span class="op">;</span></span>
+<span id="cb292-6"><a href="a-complete-integration.html#cb292-6"></a>      Shiny<span class="op">.</span><span class="fu">setInputValue</span>(message<span class="op">.</span><span class="at">id</span> <span class="op">+</span> <span class="st">&#39;_alert_close&#39;</span><span class="op">,</span> <span class="kw">true</span>)<span class="op">;</span></span>
+<span id="cb292-7"><a href="a-complete-integration.html#cb292-7"></a>    }</span>
+<span id="cb292-8"><a href="a-complete-integration.html#cb292-8"></a>    <span class="kw">new</span> jBox(<span class="st">&#39;Notice&#39;</span><span class="op">,</span> message<span class="op">.</span><span class="at">notice</span>)<span class="op">;</span></span>
+<span id="cb292-9"><a href="a-complete-integration.html#cb292-9"></a>})<span class="op">;</span></span></code></pre></div>
 </div>
 <div id="input-handler" class="section level3" number="13.3.4">
 <h3><span class="header-section-number">13.3.4</span> Input Handler</h3>
 <p>The input defined in this package simply consists of a boolean value which does not warrant the use of an input handler. However, were one required the place to put it would be in the <code>.onLoad</code> function as the handler can only be registered once.</p>
-<div class="sourceCode" id="cb294"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb294-1"><a href="a-complete-integration.html#cb294-1"></a><span class="co"># R/zzz.R</span></span>
-<span id="cb294-2"><a href="a-complete-integration.html#cb294-2"></a></span>
-<span id="cb294-3"><a href="a-complete-integration.html#cb294-3"></a>jbox_handler &lt;-<span class="st"> </span><span class="cf">function</span>(data, session, inputname){</span>
-<span id="cb294-4"><a href="a-complete-integration.html#cb294-4"></a>  <span class="kw">list</span>(</span>
-<span id="cb294-5"><a href="a-complete-integration.html#cb294-5"></a>    <span class="dt">data =</span> data,</span>
-<span id="cb294-6"><a href="a-complete-integration.html#cb294-6"></a>    <span class="dt">meta =</span> <span class="st">&quot;This is some metadata&quot;</span></span>
-<span id="cb294-7"><a href="a-complete-integration.html#cb294-7"></a>  )</span>
-<span id="cb294-8"><a href="a-complete-integration.html#cb294-8"></a>}</span>
-<span id="cb294-9"><a href="a-complete-integration.html#cb294-9"></a></span>
-<span id="cb294-10"><a href="a-complete-integration.html#cb294-10"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname) {</span>
-<span id="cb294-11"><a href="a-complete-integration.html#cb294-11"></a>  <span class="co"># serve static files</span></span>
-<span id="cb294-12"><a href="a-complete-integration.html#cb294-12"></a>  shiny<span class="op">::</span><span class="kw">addResourcePath</span>(</span>
-<span id="cb294-13"><a href="a-complete-integration.html#cb294-13"></a>    <span class="st">&quot;jbox-assets&quot;</span>,</span>
-<span id="cb294-14"><a href="a-complete-integration.html#cb294-14"></a>    <span class="kw">system.file</span>(<span class="st">&quot;assets&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;jbox&quot;</span>)</span>
-<span id="cb294-15"><a href="a-complete-integration.html#cb294-15"></a>  )</span>
-<span id="cb294-16"><a href="a-complete-integration.html#cb294-16"></a></span>
-<span id="cb294-17"><a href="a-complete-integration.html#cb294-17"></a>  <span class="co"># register input handler</span></span>
-<span id="cb294-18"><a href="a-complete-integration.html#cb294-18"></a>  <span class="kw">registerInputHandler</span>(<span class="st">&quot;jbox.alert.handler&quot;</span>, jbox_handler)</span>
-<span id="cb294-19"><a href="a-complete-integration.html#cb294-19"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb293"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb293-1"><a href="a-complete-integration.html#cb293-1"></a><span class="co"># R/zzz.R</span></span>
+<span id="cb293-2"><a href="a-complete-integration.html#cb293-2"></a></span>
+<span id="cb293-3"><a href="a-complete-integration.html#cb293-3"></a>jbox_handler &lt;-<span class="st"> </span><span class="cf">function</span>(data, session, inputname){</span>
+<span id="cb293-4"><a href="a-complete-integration.html#cb293-4"></a>  <span class="kw">list</span>(</span>
+<span id="cb293-5"><a href="a-complete-integration.html#cb293-5"></a>    <span class="dt">data =</span> data,</span>
+<span id="cb293-6"><a href="a-complete-integration.html#cb293-6"></a>    <span class="dt">meta =</span> <span class="st">&quot;This is some metadata&quot;</span></span>
+<span id="cb293-7"><a href="a-complete-integration.html#cb293-7"></a>  )</span>
+<span id="cb293-8"><a href="a-complete-integration.html#cb293-8"></a>}</span>
+<span id="cb293-9"><a href="a-complete-integration.html#cb293-9"></a></span>
+<span id="cb293-10"><a href="a-complete-integration.html#cb293-10"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname) {</span>
+<span id="cb293-11"><a href="a-complete-integration.html#cb293-11"></a>  <span class="co"># serve static files</span></span>
+<span id="cb293-12"><a href="a-complete-integration.html#cb293-12"></a>  shiny<span class="op">::</span><span class="kw">addResourcePath</span>(</span>
+<span id="cb293-13"><a href="a-complete-integration.html#cb293-13"></a>    <span class="st">&quot;jbox-assets&quot;</span>,</span>
+<span id="cb293-14"><a href="a-complete-integration.html#cb293-14"></a>    <span class="kw">system.file</span>(<span class="st">&quot;assets&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;jbox&quot;</span>)</span>
+<span id="cb293-15"><a href="a-complete-integration.html#cb293-15"></a>  )</span>
+<span id="cb293-16"><a href="a-complete-integration.html#cb293-16"></a></span>
+<span id="cb293-17"><a href="a-complete-integration.html#cb293-17"></a>  <span class="co"># register input handler</span></span>
+<span id="cb293-18"><a href="a-complete-integration.html#cb293-18"></a>  <span class="kw">registerInputHandler</span>(<span class="st">&quot;jbox.alert.handler&quot;</span>, jbox_handler)</span>
+<span id="cb293-19"><a href="a-complete-integration.html#cb293-19"></a>}</span></code></pre></div>
 </div>
 <div id="wrapping-up" class="section level3" number="13.3.5">
 <h3><span class="header-section-number">13.3.5</span> Wrapping up</h3>
 <p>Building and installing the package will now provide the user an interface demonstrated below.</p>
-<div class="sourceCode" id="cb295"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb295-1"><a href="a-complete-integration.html#cb295-1"></a><span class="kw">library</span>(jbox)</span>
-<span id="cb295-2"><a href="a-complete-integration.html#cb295-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb295-3"><a href="a-complete-integration.html#cb295-3"></a></span>
-<span id="cb295-4"><a href="a-complete-integration.html#cb295-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb295-5"><a href="a-complete-integration.html#cb295-5"></a>  <span class="kw">usejBox</span>(),</span>
-<span id="cb295-6"><a href="a-complete-integration.html#cb295-6"></a>  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;callback&quot;</span>)</span>
-<span id="cb295-7"><a href="a-complete-integration.html#cb295-7"></a>)</span>
-<span id="cb295-8"><a href="a-complete-integration.html#cb295-8"></a></span>
-<span id="cb295-9"><a href="a-complete-integration.html#cb295-9"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb295-10"><a href="a-complete-integration.html#cb295-10"></a>  <span class="kw">send_alert</span>(<span class="st">&quot;myid&quot;</span>, <span class="st">&quot;Hello from the server!&quot;</span>)</span>
-<span id="cb295-11"><a href="a-complete-integration.html#cb295-11"></a></span>
-<span id="cb295-12"><a href="a-complete-integration.html#cb295-12"></a>  output<span class="op">$</span>callback &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
-<span id="cb295-13"><a href="a-complete-integration.html#cb295-13"></a>    <span class="kw">paste</span>(<span class="st">&quot;Is the alert closed: &quot;</span>, input<span class="op">$</span>myid_alert_close)</span>
-<span id="cb295-14"><a href="a-complete-integration.html#cb295-14"></a>  })</span>
-<span id="cb295-15"><a href="a-complete-integration.html#cb295-15"></a>}</span>
-<span id="cb295-16"><a href="a-complete-integration.html#cb295-16"></a></span>
-<span id="cb295-17"><a href="a-complete-integration.html#cb295-17"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb294"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb294-1"><a href="a-complete-integration.html#cb294-1"></a><span class="kw">library</span>(jbox)</span>
+<span id="cb294-2"><a href="a-complete-integration.html#cb294-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb294-3"><a href="a-complete-integration.html#cb294-3"></a></span>
+<span id="cb294-4"><a href="a-complete-integration.html#cb294-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb294-5"><a href="a-complete-integration.html#cb294-5"></a>  <span class="kw">usejBox</span>(),</span>
+<span id="cb294-6"><a href="a-complete-integration.html#cb294-6"></a>  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;callback&quot;</span>)</span>
+<span id="cb294-7"><a href="a-complete-integration.html#cb294-7"></a>)</span>
+<span id="cb294-8"><a href="a-complete-integration.html#cb294-8"></a></span>
+<span id="cb294-9"><a href="a-complete-integration.html#cb294-9"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb294-10"><a href="a-complete-integration.html#cb294-10"></a>  <span class="kw">send_alert</span>(<span class="st">&quot;myid&quot;</span>, <span class="st">&quot;Hello from the server!&quot;</span>)</span>
+<span id="cb294-11"><a href="a-complete-integration.html#cb294-11"></a></span>
+<span id="cb294-12"><a href="a-complete-integration.html#cb294-12"></a>  output<span class="op">$</span>callback &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb294-13"><a href="a-complete-integration.html#cb294-13"></a>    <span class="kw">paste</span>(<span class="st">&quot;Is the alert closed: &quot;</span>, input<span class="op">$</span>myid_alert_close)</span>
+<span id="cb294-14"><a href="a-complete-integration.html#cb294-14"></a>  })</span>
+<span id="cb294-15"><a href="a-complete-integration.html#cb294-15"></a>}</span>
+<span id="cb294-16"><a href="a-complete-integration.html#cb294-16"></a></span>
+<span id="cb294-17"><a href="a-complete-integration.html#cb294-17"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>It must be noted that though the package will be fully functional it will not pass any checks as documentation is poor and the DESCRIPTION incomplete. The API provided to the user is probably subpar in places, namely with the use of the id, which, unless the user needs to observe the respective input, is not necessary: forcing the user to provide it is not great design, consider making this optional.</p>
 
 </div>
