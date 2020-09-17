@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-09-04" />
+<meta name="date" content="2020-09-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -380,7 +380,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="18.6" data-path="shiny-widgets.html"><a href="shiny-widgets.html#shiny-widgets-update"><i class="fa fa-check"></i><b>18.6</b> Update the Widget</a></li>
 </ul></li>
 <li class="part"><span><b>IV Interactive Documents</b></span></li>
-<li class="chapter" data-level="19" data-path="rmd-intro.html"><a href="rmd-intro.html"><i class="fa fa-check"></i><b>19</b> Introduction to Rmarkdown</a></li>
+<li class="chapter" data-level="19" data-path="rmd-intro.html"><a href="rmd-intro.html"><i class="fa fa-check"></i><b>19</b> Rmarkdown</a>
+<ul>
+<li class="chapter" data-level="19.0.1" data-path="rmd-intro.html"><a href="rmd-intro.html#xaringanextra"><i class="fa fa-check"></i><b>19.0.1</b> xaringanExtra</a></li>
+</ul></li>
 <li class="part"><span><b>V JavaScript for Computations</b></span></li>
 <li class="chapter" data-level="20" data-path="v8.html"><a href="v8.html"><i class="fa fa-check"></i><b>20</b> The V8 Engine</a>
 <ul>
@@ -615,17 +618,18 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 <h3><span class="header-section-number">2.2.1</span> Serialising</h3>
 <p>JSON is to all intents and purposes the equivalent of lists in R; a flexible data format that can store pretty much anything–expect data.frames a structure that does not exist in JavaScript. Below we create a nested list and convert it to JSON with the help of jsonlite, we set <code>pretty</code> to <code>TRUE</code> to add indentation for clearer printing but this is an argument you should omit when writing production code, it will reduce the file size (fewer spaces = smaller file size).</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="prerequisites.html#cb26-1"></a><span class="co"># install.packages(&quot;jsonlite&quot;)</span></span>
-<span id="cb26-2"><a href="prerequisites.html#cb26-2"></a><span class="kw">library</span>(jsonlite)</span>
-<span id="cb26-3"><a href="prerequisites.html#cb26-3"></a></span>
-<span id="cb26-4"><a href="prerequisites.html#cb26-4"></a>lst &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb26-5"><a href="prerequisites.html#cb26-5"></a>  <span class="dt">a =</span> <span class="dv">1</span>,</span>
-<span id="cb26-6"><a href="prerequisites.html#cb26-6"></a>  <span class="dt">b =</span> <span class="kw">list</span>(</span>
-<span id="cb26-7"><a href="prerequisites.html#cb26-7"></a>    <span class="dt">c =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>)</span>
-<span id="cb26-8"><a href="prerequisites.html#cb26-8"></a>  ),</span>
-<span id="cb26-9"><a href="prerequisites.html#cb26-9"></a>  <span class="dt">d =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span></span>
-<span id="cb26-10"><a href="prerequisites.html#cb26-10"></a>)</span>
-<span id="cb26-11"><a href="prerequisites.html#cb26-11"></a></span>
-<span id="cb26-12"><a href="prerequisites.html#cb26-12"></a><span class="kw">toJSON</span>(lst, <span class="dt">pretty =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<span id="cb26-2"><a href="prerequisites.html#cb26-2"></a><span class="kw">library</span>(jsonlite)</span></code></pre></div>
+<pre><code>## Warning: package &#39;jsonlite&#39; was built under R version
+## 4.0.2</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="prerequisites.html#cb28-1"></a>lst &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb28-2"><a href="prerequisites.html#cb28-2"></a>  <span class="dt">a =</span> <span class="dv">1</span>,</span>
+<span id="cb28-3"><a href="prerequisites.html#cb28-3"></a>  <span class="dt">b =</span> <span class="kw">list</span>(</span>
+<span id="cb28-4"><a href="prerequisites.html#cb28-4"></a>    <span class="dt">c =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>)</span>
+<span id="cb28-5"><a href="prerequisites.html#cb28-5"></a>  ),</span>
+<span id="cb28-6"><a href="prerequisites.html#cb28-6"></a>  <span class="dt">d =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span></span>
+<span id="cb28-7"><a href="prerequisites.html#cb28-7"></a>)</span>
+<span id="cb28-8"><a href="prerequisites.html#cb28-8"></a></span>
+<span id="cb28-9"><a href="prerequisites.html#cb28-9"></a><span class="kw">toJSON</span>(lst, <span class="dt">pretty =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>## {
 ##   &quot;a&quot;: [1],
 ##   &quot;b&quot;: {
@@ -634,13 +638,13 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 ##   &quot;d&quot;: [1, 2, 3, 4, 5]
 ## }</code></pre>
 <p>Looking closely at the list and JSON output above one quickly sees the resemblance. Something seems odd though, the first value in the list (<code>a = 1</code>) was serialised to an array (vector) of length one (<code>"a": [1]</code>) where one would probably expect an integer instead, <code>1</code> not <code>[1]</code>. This is not a mistake, we often forget that there are no scalar types in R and that <code>a</code> is in fact a vector as we can observe below.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="prerequisites.html#cb28-1"></a>x &lt;-<span class="st"> </span><span class="dv">1</span></span>
-<span id="cb28-2"><a href="prerequisites.html#cb28-2"></a><span class="kw">length</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="prerequisites.html#cb30-1"></a>x &lt;-<span class="st"> </span><span class="dv">1</span></span>
+<span id="cb30-2"><a href="prerequisites.html#cb30-2"></a><span class="kw">length</span>(x)</span></code></pre></div>
 <pre><code>## [1] 1</code></pre>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="prerequisites.html#cb30-1"></a><span class="kw">is.vector</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="prerequisites.html#cb32-1"></a><span class="kw">is.vector</span>(x)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 <p>JavaScript, on the other hand, does have scalar types, more often than not we will want to convert the vectors of length one to scalar types rather than arrays of length one. To do so we need use the <code>auto_unbox</code> argument in <code>jsonlite::toJSON</code>, we’ll do this most of the time we have to convert data to JSON.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="prerequisites.html#cb32-1"></a><span class="kw">toJSON</span>(lst, <span class="dt">pretty =</span> <span class="ot">TRUE</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="prerequisites.html#cb34-1"></a><span class="kw">toJSON</span>(lst, <span class="dt">pretty =</span> <span class="ot">TRUE</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>## {
 ##   &quot;a&quot;: 1,
 ##   &quot;b&quot;: {
@@ -653,10 +657,10 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 <div id="basics-tabular" class="section level3" number="2.2.2">
 <h3><span class="header-section-number">2.2.2</span> Tabular Data</h3>
 <p>If JSON is more or less the equivalent of lists in R one might wonder how jsonlite handles dataframes since they do not exist in JavaScript.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="prerequisites.html#cb34-1"></a><span class="co"># subset of built-in dataset</span></span>
-<span id="cb34-2"><a href="prerequisites.html#cb34-2"></a>df &lt;-<span class="st"> </span>cars[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</span>
-<span id="cb34-3"><a href="prerequisites.html#cb34-3"></a></span>
-<span id="cb34-4"><a href="prerequisites.html#cb34-4"></a><span class="kw">toJSON</span>(df, <span class="dt">pretty =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="prerequisites.html#cb36-1"></a><span class="co"># subset of built-in dataset</span></span>
+<span id="cb36-2"><a href="prerequisites.html#cb36-2"></a>df &lt;-<span class="st"> </span>cars[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</span>
+<span id="cb36-3"><a href="prerequisites.html#cb36-3"></a></span>
+<span id="cb36-4"><a href="prerequisites.html#cb36-4"></a><span class="kw">toJSON</span>(df, <span class="dt">pretty =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>## [
 ##   {
 ##     &quot;speed&quot;: 4,
@@ -673,10 +677,10 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 <p class="caption">console.table output</p>
 </div>
 <p>We can reproduce this with the snippet below, we remove row names and use apply to turn every row into a list.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="prerequisites.html#cb36-1"></a><span class="kw">row.names</span>(df) &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb36-2"><a href="prerequisites.html#cb36-2"></a>df_list &lt;-<span class="st"> </span><span class="kw">apply</span>(df, <span class="dv">1</span>, as.list)</span>
-<span id="cb36-3"><a href="prerequisites.html#cb36-3"></a></span>
-<span id="cb36-4"><a href="prerequisites.html#cb36-4"></a><span class="kw">toJSON</span>(df_list, <span class="dt">pretty =</span> <span class="ot">TRUE</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="prerequisites.html#cb38-1"></a><span class="kw">row.names</span>(df) &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb38-2"><a href="prerequisites.html#cb38-2"></a>df_list &lt;-<span class="st"> </span><span class="kw">apply</span>(df, <span class="dv">1</span>, as.list)</span>
+<span id="cb38-3"><a href="prerequisites.html#cb38-3"></a></span>
+<span id="cb38-4"><a href="prerequisites.html#cb38-4"></a><span class="kw">toJSON</span>(df_list, <span class="dt">pretty =</span> <span class="ot">TRUE</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>## [
 ##   {
 ##     &quot;speed&quot;: 4,
@@ -688,16 +692,16 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 ##   }
 ## ]</code></pre>
 <p>Jsonlite of course also enables reading data from JSON into R with the function <code>fromJSON</code>.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="prerequisites.html#cb38-1"></a>json &lt;-<span class="st"> </span><span class="kw">toJSON</span>(df) <span class="co"># convert to JSON</span></span>
-<span id="cb38-2"><a href="prerequisites.html#cb38-2"></a><span class="kw">fromJSON</span>(json) <span class="co"># read from JSON</span></span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="prerequisites.html#cb40-1"></a>json &lt;-<span class="st"> </span><span class="kw">toJSON</span>(df) <span class="co"># convert to JSON</span></span>
+<span id="cb40-2"><a href="prerequisites.html#cb40-2"></a><span class="kw">fromJSON</span>(json) <span class="co"># read from JSON</span></span></code></pre></div>
 <pre><code>##   speed dist
 ## 1     4    2
 ## 2     4   10</code></pre>
 <p>It’s important to note that jsonlite did the conversion back to a data frame. Therefore the code below also returns a data frame even though the object we initially converted to JSON is a list.</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="prerequisites.html#cb40-1"></a><span class="kw">class</span>(df_list)</span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="prerequisites.html#cb42-1"></a><span class="kw">class</span>(df_list)</span></code></pre></div>
 <pre><code>## [1] &quot;list&quot;</code></pre>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="prerequisites.html#cb42-1"></a>json &lt;-<span class="st"> </span><span class="kw">toJSON</span>(df_list)</span>
-<span id="cb42-2"><a href="prerequisites.html#cb42-2"></a><span class="kw">fromJSON</span>(json)</span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="prerequisites.html#cb44-1"></a>json &lt;-<span class="st"> </span><span class="kw">toJSON</span>(df_list)</span>
+<span id="cb44-2"><a href="prerequisites.html#cb44-2"></a><span class="kw">fromJSON</span>(json)</span></code></pre></div>
 <pre><code>##   speed dist
 ## 1     4    2
 ## 2     4   10</code></pre>
@@ -708,18 +712,18 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 <h2><span class="header-section-number">2.3</span> JavaScript</h2>
 <p>The book is not meant to teach one JavaScript, only to show how graciously it can work with R. Let us thus go through the very basics to ensure we know enough to get started with the coming chapters.</p>
 <p>The easiest way to run JavaScript interactively is probably to create an HTML file (e.g.: <code>try.html</code>), write your code within a <code>&lt;script&gt;</code> tags and open the file in your web browser. The console output can be observed in the console of the browser, developer tools (more on that below).</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb44-1"><a href="prerequisites.html#cb44-1"></a><span class="er">&lt;</span>!–– index.html ––&gt;</span>
-<span id="cb44-2"><a href="prerequisites.html#cb44-2"></a><span class="kw">&lt;html&gt;</span></span>
-<span id="cb44-3"><a href="prerequisites.html#cb44-3"></a>  <span class="kw">&lt;head&gt;</span></span>
-<span id="cb44-4"><a href="prerequisites.html#cb44-4"></a>  <span class="kw">&lt;/head&gt;</span></span>
-<span id="cb44-5"><a href="prerequisites.html#cb44-5"></a>  <span class="kw">&lt;body&gt;</span></span>
-<span id="cb44-6"><a href="prerequisites.html#cb44-6"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb44-7"><a href="prerequisites.html#cb44-7"></a>  <span class="kw">&lt;/body&gt;</span></span>
-<span id="cb44-8"><a href="prerequisites.html#cb44-8"></a>  <span class="kw">&lt;script&gt;</span></span>
-<span id="cb44-9"><a href="prerequisites.html#cb44-9"></a>    <span class="co">// place your JavaScript code here</span></span>
-<span id="cb44-10"><a href="prerequisites.html#cb44-10"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Hello JavaScript!&#39;</span>)</span>
-<span id="cb44-11"><a href="prerequisites.html#cb44-11"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb44-12"><a href="prerequisites.html#cb44-12"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb46-1"><a href="prerequisites.html#cb46-1"></a><span class="er">&lt;</span>!–– index.html ––&gt;</span>
+<span id="cb46-2"><a href="prerequisites.html#cb46-2"></a><span class="kw">&lt;html&gt;</span></span>
+<span id="cb46-3"><a href="prerequisites.html#cb46-3"></a>  <span class="kw">&lt;head&gt;</span></span>
+<span id="cb46-4"><a href="prerequisites.html#cb46-4"></a>  <span class="kw">&lt;/head&gt;</span></span>
+<span id="cb46-5"><a href="prerequisites.html#cb46-5"></a>  <span class="kw">&lt;body&gt;</span></span>
+<span id="cb46-6"><a href="prerequisites.html#cb46-6"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb46-7"><a href="prerequisites.html#cb46-7"></a>  <span class="kw">&lt;/body&gt;</span></span>
+<span id="cb46-8"><a href="prerequisites.html#cb46-8"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb46-9"><a href="prerequisites.html#cb46-9"></a>    <span class="co">// place your JavaScript code here</span></span>
+<span id="cb46-10"><a href="prerequisites.html#cb46-10"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Hello JavaScript!&#39;</span>)</span>
+<span id="cb46-11"><a href="prerequisites.html#cb46-11"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb46-12"><a href="prerequisites.html#cb46-12"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
 <p><img src="images/tryingjs.png" /></p>
 <div id="basics-chrome-devtools" class="section level3" number="2.3.1">
 <h3><span class="header-section-number">2.3.1</span> Developer Tools</h3>
@@ -743,48 +747,48 @@ The RStudio IDE is built on Chromium, some of these tools will therefore also wo
 <div id="basics-var-scope" class="section level3" number="2.3.2">
 <h3><span class="header-section-number">2.3.2</span> Variable Declaration and Scope</h3>
 <p>One major way JavaScript differs from R is that variables must be declared using one of three keywords, <code>var</code>, <code>let</code>, or <code>const</code> which mainly affect the scope where the declared variable will be accessible from.</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb45-1"><a href="prerequisites.html#cb45-1"></a>x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> <span class="co">// error</span></span>
-<span id="cb45-2"><a href="prerequisites.html#cb45-2"></a><span class="kw">var</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> <span class="co">// works</span></span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb47-1"><a href="prerequisites.html#cb47-1"></a>x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> <span class="co">// error</span></span>
+<span id="cb47-2"><a href="prerequisites.html#cb47-2"></a><span class="kw">var</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> <span class="co">// works</span></span></code></pre></div>
 <p>One can declare a variable without assigning a value to it, to then do so later on.</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb46-1"><a href="prerequisites.html#cb46-1"></a><span class="kw">var</span> y<span class="op">;</span> <span class="co">// declare </span></span>
-<span id="cb46-2"><a href="prerequisites.html#cb46-2"></a>y <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span><span class="dv">2</span><span class="op">,</span><span class="dv">3</span>]<span class="op">;</span> <span class="co">// define it as array</span></span>
-<span id="cb46-3"><a href="prerequisites.html#cb46-3"></a>y <span class="op">=</span> <span class="st">&#39;string&#39;</span><span class="op">;</span> <span class="co">// change to character string</span></span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb48-1"><a href="prerequisites.html#cb48-1"></a><span class="kw">var</span> y<span class="op">;</span> <span class="co">// declare </span></span>
+<span id="cb48-2"><a href="prerequisites.html#cb48-2"></a>y <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span><span class="dv">2</span><span class="op">,</span><span class="dv">3</span>]<span class="op">;</span> <span class="co">// define it as array</span></span>
+<span id="cb48-3"><a href="prerequisites.html#cb48-3"></a>y <span class="op">=</span> <span class="st">&#39;string&#39;</span><span class="op">;</span> <span class="co">// change to character string</span></span></code></pre></div>
 <p>The <code>let</code> and <code>const</code> keywords were added in ES2015, the <code>const</code> is used to defined a constant: a variable that once declared cannot be changed.</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb47-1"><a href="prerequisites.html#cb47-1"></a><span class="kw">const</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> <span class="co">// declare constant</span></span>
-<span id="cb47-2"><a href="prerequisites.html#cb47-2"></a>x <span class="op">=</span> <span class="dv">2</span><span class="op">;</span> <span class="co">// error</span></span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb49-1"><a href="prerequisites.html#cb49-1"></a><span class="kw">const</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> <span class="co">// declare constant</span></span>
+<span id="cb49-2"><a href="prerequisites.html#cb49-2"></a>x <span class="op">=</span> <span class="dv">2</span><span class="op">;</span> <span class="co">// error</span></span></code></pre></div>
 <p>Though this is probably only rarely done in R, one can produce something similar by locking the binding for a variable in its environment.</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="prerequisites.html#cb48-1"></a>x &lt;-<span class="st"> </span><span class="dv">1</span> <span class="co"># declare x</span></span>
-<span id="cb48-2"><a href="prerequisites.html#cb48-2"></a><span class="kw">lockBinding</span>(<span class="st">&quot;x&quot;</span>, <span class="dt">env =</span> .GlobalEnv) <span class="co"># make constant</span></span>
-<span id="cb48-3"><a href="prerequisites.html#cb48-3"></a>x &lt;-<span class="st"> </span><span class="dv">2</span> <span class="co"># error</span></span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="prerequisites.html#cb50-1"></a>x &lt;-<span class="st"> </span><span class="dv">1</span> <span class="co"># declare x</span></span>
+<span id="cb50-2"><a href="prerequisites.html#cb50-2"></a><span class="kw">lockBinding</span>(<span class="st">&quot;x&quot;</span>, <span class="dt">env =</span> .GlobalEnv) <span class="co"># make constant</span></span>
+<span id="cb50-3"><a href="prerequisites.html#cb50-3"></a>x &lt;-<span class="st"> </span><span class="dv">2</span> <span class="co"># error</span></span></code></pre></div>
 <pre><code>## Error in eval(expr, envir, enclos): cannot change value of locked binding for &#39;x&#39;</code></pre>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="prerequisites.html#cb50-1"></a><span class="kw">unlockBinding</span>(<span class="st">&quot;x&quot;</span>, <span class="dt">env =</span> .GlobalEnv) <span class="co"># unlock binding</span></span>
-<span id="cb50-2"><a href="prerequisites.html#cb50-2"></a>x &lt;-<span class="st"> </span><span class="dv">2</span> <span class="co"># works</span></span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="prerequisites.html#cb52-1"></a><span class="kw">unlockBinding</span>(<span class="st">&quot;x&quot;</span>, <span class="dt">env =</span> .GlobalEnv) <span class="co"># unlock binding</span></span>
+<span id="cb52-2"><a href="prerequisites.html#cb52-2"></a>x &lt;-<span class="st"> </span><span class="dv">2</span> <span class="co"># works</span></span></code></pre></div>
 <p>The <code>let</code> keyword is akin to declaring a variable with the <code>var</code> keyword, however <code>let</code> (and <code>const</code>) will declare the variable in the “block scope.” This in effect further narrows down the scope where the variable will be accessible, a block scope is generally the area within <code>if</code>, <code>switch</code> conditions or <code>for</code> and <code>while</code> loops: areas within curly brackets.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb51-1"><a href="prerequisites.html#cb51-1"></a><span class="cf">if</span>(<span class="kw">true</span>){</span>
-<span id="cb51-2"><a href="prerequisites.html#cb51-2"></a>  <span class="kw">let</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
-<span id="cb51-3"><a href="prerequisites.html#cb51-3"></a>  <span class="kw">var</span> y <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
-<span id="cb51-4"><a href="prerequisites.html#cb51-4"></a>}</span>
-<span id="cb51-5"><a href="prerequisites.html#cb51-5"></a></span>
-<span id="cb51-6"><a href="prerequisites.html#cb51-6"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(x) <span class="co">// error x does not exist</span></span>
-<span id="cb51-7"><a href="prerequisites.html#cb51-7"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(y) <span class="co">// works</span></span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb53-1"><a href="prerequisites.html#cb53-1"></a><span class="cf">if</span>(<span class="kw">true</span>){</span>
+<span id="cb53-2"><a href="prerequisites.html#cb53-2"></a>  <span class="kw">let</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb53-3"><a href="prerequisites.html#cb53-3"></a>  <span class="kw">var</span> y <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb53-4"><a href="prerequisites.html#cb53-4"></a>}</span>
+<span id="cb53-5"><a href="prerequisites.html#cb53-5"></a></span>
+<span id="cb53-6"><a href="prerequisites.html#cb53-6"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(x) <span class="co">// error x does not exist</span></span>
+<span id="cb53-7"><a href="prerequisites.html#cb53-7"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(y) <span class="co">// works</span></span></code></pre></div>
 <p>In the above example <code>x</code> is only accessible within the if statement as it is declared with <code>let</code>, <code>var</code> does not have a block scope.</p>
 <p>While on the subject of scope, in R like in JavaScript, variables can be accessed from the parent environment (often referred to as “context” in the latter). One immense difference though is that while it is seen as bad practice in R it is not in JavaScript where it is extremely useful.</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="prerequisites.html#cb52-1"></a><span class="co"># it works but don&#39;t do this in R</span></span>
-<span id="cb52-2"><a href="prerequisites.html#cb52-2"></a>x &lt;-<span class="st"> </span><span class="dv">123</span></span>
-<span id="cb52-3"><a href="prerequisites.html#cb52-3"></a>foo &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb52-4"><a href="prerequisites.html#cb52-4"></a>  <span class="kw">print</span>(x)</span>
-<span id="cb52-5"><a href="prerequisites.html#cb52-5"></a>}</span>
-<span id="cb52-6"><a href="prerequisites.html#cb52-6"></a><span class="kw">foo</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="prerequisites.html#cb54-1"></a><span class="co"># it works but don&#39;t do this in R</span></span>
+<span id="cb54-2"><a href="prerequisites.html#cb54-2"></a>x &lt;-<span class="st"> </span><span class="dv">123</span></span>
+<span id="cb54-3"><a href="prerequisites.html#cb54-3"></a>foo &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb54-4"><a href="prerequisites.html#cb54-4"></a>  <span class="kw">print</span>(x)</span>
+<span id="cb54-5"><a href="prerequisites.html#cb54-5"></a>}</span>
+<span id="cb54-6"><a href="prerequisites.html#cb54-6"></a><span class="kw">foo</span>()</span></code></pre></div>
 <pre><code>## [1] 123</code></pre>
 <p>The above R code can be re-written in JavaScript. Note the slight variation in the function declaration.</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb54-1"><a href="prerequisites.html#cb54-1"></a><span class="co">// this is perfectly fine</span></span>
-<span id="cb54-2"><a href="prerequisites.html#cb54-2"></a><span class="kw">var</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
-<span id="cb54-3"><a href="prerequisites.html#cb54-3"></a></span>
-<span id="cb54-4"><a href="prerequisites.html#cb54-4"></a><span class="kw">function</span> <span class="fu">foo</span>(){</span>
-<span id="cb54-5"><a href="prerequisites.html#cb54-5"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(x)<span class="op">;</span> <span class="co">// print to console</span></span>
-<span id="cb54-6"><a href="prerequisites.html#cb54-6"></a>}</span>
-<span id="cb54-7"><a href="prerequisites.html#cb54-7"></a></span>
-<span id="cb54-8"><a href="prerequisites.html#cb54-8"></a>foo()<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb56-1"><a href="prerequisites.html#cb56-1"></a><span class="co">// this is perfectly fine</span></span>
+<span id="cb56-2"><a href="prerequisites.html#cb56-2"></a><span class="kw">var</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb56-3"><a href="prerequisites.html#cb56-3"></a></span>
+<span id="cb56-4"><a href="prerequisites.html#cb56-4"></a><span class="kw">function</span> <span class="fu">foo</span>(){</span>
+<span id="cb56-5"><a href="prerequisites.html#cb56-5"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(x)<span class="op">;</span> <span class="co">// print to console</span></span>
+<span id="cb56-6"><a href="prerequisites.html#cb56-6"></a>}</span>
+<span id="cb56-7"><a href="prerequisites.html#cb56-7"></a></span>
+<span id="cb56-8"><a href="prerequisites.html#cb56-8"></a>foo()<span class="op">;</span></span></code></pre></div>
 <div class="rmdnote">
 <p>
 Accessing variables from the parent environment (context) is useful in JavaScript but should not be done in R
@@ -795,46 +799,46 @@ Accessing variables from the parent environment (context) is useful in JavaScrip
 <h3><span class="header-section-number">2.3.3</span> Document Object Model</h3>
 <p>One concept which does not exist in R is that of the “DOM” which stands for Document Object Model. When a web page is loaded, the browser creates a Document Object Model of the web page which can be accessed in JavaScript from the <code>document</code> object. This lets the developer programmatically manipulate the page itself so one can for instance, add an element (e.g.: a button), change the text of another, and plenty more.</p>
 <p>The JavaScript code below grabs the element where <code>id='content'</code> from the <code>document</code> with <code>getElementById</code> and replaces the text (<code>innerText</code>). Even though the page only contains “Trying JavaScript!” when the page is opened (loaded) in the web browser JavaScript runs the code and changes it: this happens very fast so the original text cannot be seen.</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb55-1"><a href="prerequisites.html#cb55-1"></a> <span class="er">&lt;</span>!–– index.html ––&gt;</span>
-<span id="cb55-2"><a href="prerequisites.html#cb55-2"></a><span class="kw">&lt;html&gt;</span></span>
-<span id="cb55-3"><a href="prerequisites.html#cb55-3"></a>  <span class="kw">&lt;head&gt;</span></span>
-<span id="cb55-4"><a href="prerequisites.html#cb55-4"></a>  <span class="kw">&lt;/head&gt;</span></span>
-<span id="cb55-5"><a href="prerequisites.html#cb55-5"></a>  <span class="kw">&lt;body&gt;</span></span>
-<span id="cb55-6"><a href="prerequisites.html#cb55-6"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb55-7"><a href="prerequisites.html#cb55-7"></a>  <span class="kw">&lt;/body&gt;</span></span>
-<span id="cb55-8"><a href="prerequisites.html#cb55-8"></a>  <span class="kw">&lt;script&gt;</span></span>
-<span id="cb55-9"><a href="prerequisites.html#cb55-9"></a>    <span class="kw">var</span> cnt <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;content&quot;</span>)<span class="op">;</span></span>
-<span id="cb55-10"><a href="prerequisites.html#cb55-10"></a>    cnt<span class="op">.</span><span class="at">innerText</span> <span class="op">=</span> <span class="st">&quot;The text has changed&quot;</span><span class="op">;</span></span>
-<span id="cb55-11"><a href="prerequisites.html#cb55-11"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb55-12"><a href="prerequisites.html#cb55-12"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb57-1"><a href="prerequisites.html#cb57-1"></a> <span class="er">&lt;</span>!–– index.html ––&gt;</span>
+<span id="cb57-2"><a href="prerequisites.html#cb57-2"></a><span class="kw">&lt;html&gt;</span></span>
+<span id="cb57-3"><a href="prerequisites.html#cb57-3"></a>  <span class="kw">&lt;head&gt;</span></span>
+<span id="cb57-4"><a href="prerequisites.html#cb57-4"></a>  <span class="kw">&lt;/head&gt;</span></span>
+<span id="cb57-5"><a href="prerequisites.html#cb57-5"></a>  <span class="kw">&lt;body&gt;</span></span>
+<span id="cb57-6"><a href="prerequisites.html#cb57-6"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb57-7"><a href="prerequisites.html#cb57-7"></a>  <span class="kw">&lt;/body&gt;</span></span>
+<span id="cb57-8"><a href="prerequisites.html#cb57-8"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb57-9"><a href="prerequisites.html#cb57-9"></a>    <span class="kw">var</span> cnt <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;content&quot;</span>)<span class="op">;</span></span>
+<span id="cb57-10"><a href="prerequisites.html#cb57-10"></a>    cnt<span class="op">.</span><span class="at">innerText</span> <span class="op">=</span> <span class="st">&quot;The text has changed&quot;</span><span class="op">;</span></span>
+<span id="cb57-11"><a href="prerequisites.html#cb57-11"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb57-12"><a href="prerequisites.html#cb57-12"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
 <p>One final thing to note for future reference, though not limited to the ids or classes most such selection of elements from the DOM are done with those where the pound sign refers to an element’s id (<code>#id</code>) and a dot refers to an element’s class (<code>.class</code>), just like in CSS.</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb56-1"><a href="prerequisites.html#cb56-1"></a> <span class="er">&lt;</span>!–– index.html ––&gt;</span>
-<span id="cb56-2"><a href="prerequisites.html#cb56-2"></a><span class="kw">&lt;html&gt;</span></span>
-<span id="cb56-3"><a href="prerequisites.html#cb56-3"></a>  <span class="kw">&lt;head&gt;</span></span>
-<span id="cb56-4"><a href="prerequisites.html#cb56-4"></a>  <span class="kw">&lt;/head&gt;</span></span>
-<span id="cb56-5"><a href="prerequisites.html#cb56-5"></a>  <span class="kw">&lt;body&gt;</span></span>
-<span id="cb56-6"><a href="prerequisites.html#cb56-6"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="ot"> class=</span><span class="st">&quot;stuff&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb56-7"><a href="prerequisites.html#cb56-7"></a>  <span class="kw">&lt;/body&gt;</span></span>
-<span id="cb56-8"><a href="prerequisites.html#cb56-8"></a>  <span class="kw">&lt;script&gt;</span></span>
-<span id="cb56-9"><a href="prerequisites.html#cb56-9"></a>    <span class="co">// select by id</span></span>
-<span id="cb56-10"><a href="prerequisites.html#cb56-10"></a>    <span class="kw">var</span> x <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;content&quot;</span>)<span class="op">;</span></span>
-<span id="cb56-11"><a href="prerequisites.html#cb56-11"></a>    <span class="kw">var</span> y <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">querySelector</span>(<span class="st">&quot;#content&quot;</span>)<span class="op">;</span></span>
-<span id="cb56-12"><a href="prerequisites.html#cb56-12"></a></span>
-<span id="cb56-13"><a href="prerequisites.html#cb56-13"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(x <span class="op">==</span> y)<span class="op">;</span> <span class="co">// true</span></span>
-<span id="cb56-14"><a href="prerequisites.html#cb56-14"></a></span>
-<span id="cb56-15"><a href="prerequisites.html#cb56-15"></a>    <span class="co">// select by class</span></span>
-<span id="cb56-16"><a href="prerequisites.html#cb56-16"></a>    <span class="kw">var</span> z <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">querySelector</span>(<span class="st">&quot;.stuff&quot;</span>)<span class="op">;</span></span>
-<span id="cb56-17"><a href="prerequisites.html#cb56-17"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb56-18"><a href="prerequisites.html#cb56-18"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb58-1"><a href="prerequisites.html#cb58-1"></a> <span class="er">&lt;</span>!–– index.html ––&gt;</span>
+<span id="cb58-2"><a href="prerequisites.html#cb58-2"></a><span class="kw">&lt;html&gt;</span></span>
+<span id="cb58-3"><a href="prerequisites.html#cb58-3"></a>  <span class="kw">&lt;head&gt;</span></span>
+<span id="cb58-4"><a href="prerequisites.html#cb58-4"></a>  <span class="kw">&lt;/head&gt;</span></span>
+<span id="cb58-5"><a href="prerequisites.html#cb58-5"></a>  <span class="kw">&lt;body&gt;</span></span>
+<span id="cb58-6"><a href="prerequisites.html#cb58-6"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="ot"> class=</span><span class="st">&quot;stuff&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb58-7"><a href="prerequisites.html#cb58-7"></a>  <span class="kw">&lt;/body&gt;</span></span>
+<span id="cb58-8"><a href="prerequisites.html#cb58-8"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb58-9"><a href="prerequisites.html#cb58-9"></a>    <span class="co">// select by id</span></span>
+<span id="cb58-10"><a href="prerequisites.html#cb58-10"></a>    <span class="kw">var</span> x <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;content&quot;</span>)<span class="op">;</span></span>
+<span id="cb58-11"><a href="prerequisites.html#cb58-11"></a>    <span class="kw">var</span> y <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">querySelector</span>(<span class="st">&quot;#content&quot;</span>)<span class="op">;</span></span>
+<span id="cb58-12"><a href="prerequisites.html#cb58-12"></a></span>
+<span id="cb58-13"><a href="prerequisites.html#cb58-13"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(x <span class="op">==</span> y)<span class="op">;</span> <span class="co">// true</span></span>
+<span id="cb58-14"><a href="prerequisites.html#cb58-14"></a></span>
+<span id="cb58-15"><a href="prerequisites.html#cb58-15"></a>    <span class="co">// select by class</span></span>
+<span id="cb58-16"><a href="prerequisites.html#cb58-16"></a>    <span class="kw">var</span> z <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">querySelector</span>(<span class="st">&quot;.stuff&quot;</span>)<span class="op">;</span></span>
+<span id="cb58-17"><a href="prerequisites.html#cb58-17"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb58-18"><a href="prerequisites.html#cb58-18"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
 <p>Getting elements from the DOM is a very common operation in JavaScript. While a class can be applied to multiple elements which is useful to get and apply actions to multiple elements, the id attribute must be unique (no two elements can bear the same id in the HTML document) is useful to retrieve a specific element.</p>
 <p>Interestingly some of that mechanism is used by shiny to retrieve and manipulate inputs, the argument <code>inputId</code> of shiny inputs effectively define the HTML <code>id</code> attribute of said input. Shiny can then internally make use of functions the likes of <code>getElementById</code> in order to get those inputs, set or update their values, etc.</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="prerequisites.html#cb57-1"></a>shiny<span class="op">::</span><span class="kw">actionButton</span>(<span class="dt">inputId =</span> <span class="st">&quot;theId&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;the label&quot;</span>) </span></code></pre></div>
-<div class="sourceCode" id="cb58"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb58-1"><a href="prerequisites.html#cb58-1"></a><span class="kw">&lt;button</span> </span>
-<span id="cb58-2"><a href="prerequisites.html#cb58-2"></a><span class="ot">  id=</span><span class="st">&quot;theId&quot;</span> </span>
-<span id="cb58-3"><a href="prerequisites.html#cb58-3"></a><span class="ot">  type=</span><span class="st">&quot;button&quot;</span> </span>
-<span id="cb58-4"><a href="prerequisites.html#cb58-4"></a><span class="ot">  class=</span><span class="st">&quot;btn btn-default action-button&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb58-5"><a href="prerequisites.html#cb58-5"></a>  the label</span>
-<span id="cb58-6"><a href="prerequisites.html#cb58-6"></a><span class="kw">&lt;/button&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="prerequisites.html#cb59-1"></a>shiny<span class="op">::</span><span class="kw">actionButton</span>(<span class="dt">inputId =</span> <span class="st">&quot;theId&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;the label&quot;</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb60-1"><a href="prerequisites.html#cb60-1"></a><span class="kw">&lt;button</span> </span>
+<span id="cb60-2"><a href="prerequisites.html#cb60-2"></a><span class="ot">  id=</span><span class="st">&quot;theId&quot;</span> </span>
+<span id="cb60-3"><a href="prerequisites.html#cb60-3"></a><span class="ot">  type=</span><span class="st">&quot;button&quot;</span> </span>
+<span id="cb60-4"><a href="prerequisites.html#cb60-4"></a><span class="ot">  class=</span><span class="st">&quot;btn btn-default action-button&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb60-5"><a href="prerequisites.html#cb60-5"></a>  the label</span>
+<span id="cb60-6"><a href="prerequisites.html#cb60-6"></a><span class="kw">&lt;/button&gt;</span></span></code></pre></div>
 <p>This of course only scratches the surface of JavaScript thus this provides ample understanding of the language to keep up with the next chapters. Also, a somewhat interesting fact that will prove useful later in the book: the RStudio IDE is actually a browser, therefore, in the IDE, one can right-click and “inspect element” to view the rendered source code.</p>
 </div>
 </div>
@@ -845,59 +849,59 @@ Accessing variables from the parent environment (context) is useful in JavaScrip
 <div id="basics-htmltools" class="section level3" number="2.4.1">
 <h3><span class="header-section-number">2.4.1</span> Htmltools</h3>
 <p>The htmltools package powers much of the shiny UI, most of the tags that comprise the UI are indeed imported by shiny from htmltools. For instance <code>shiny::actionButton</code> is just a light wrapper around htmltools <code>tags</code>.</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="prerequisites.html#cb59-1"></a>shiny<span class="op">::</span>actionButton</span></code></pre></div>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="prerequisites.html#cb60-1"></a><span class="cf">function</span> (inputId, label, <span class="dt">icon =</span> <span class="ot">NULL</span>, <span class="dt">width =</span> <span class="ot">NULL</span>, ...) </span>
-<span id="cb60-2"><a href="prerequisites.html#cb60-2"></a>{</span>
-<span id="cb60-3"><a href="prerequisites.html#cb60-3"></a>    value &lt;-<span class="st"> </span><span class="kw">restoreInput</span>(<span class="dt">id =</span> inputId, <span class="dt">default =</span> <span class="ot">NULL</span>)</span>
-<span id="cb60-4"><a href="prerequisites.html#cb60-4"></a>    tags<span class="op">$</span><span class="kw">button</span>(</span>
-<span id="cb60-5"><a href="prerequisites.html#cb60-5"></a>      <span class="dt">id =</span> inputId, <span class="dt">style =</span> <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.null</span>(width)) </span>
-<span id="cb60-6"><a href="prerequisites.html#cb60-6"></a>      <span class="kw">paste0</span>(<span class="st">&quot;width: &quot;</span>, <span class="kw">validateCssUnit</span>(width), <span class="st">&quot;;&quot;</span>),</span>
-<span id="cb60-7"><a href="prerequisites.html#cb60-7"></a>      <span class="dt">type =</span> <span class="st">&quot;button&quot;</span>, <span class="dt">class =</span> <span class="st">&quot;btn btn-default action-button&quot;</span>, </span>
-<span id="cb60-8"><a href="prerequisites.html#cb60-8"></a>      <span class="st">`</span><span class="dt">data-val</span><span class="st">`</span> =<span class="st"> </span>value, <span class="kw">list</span>(<span class="kw">validateIcon</span>(icon), label), </span>
-<span id="cb60-9"><a href="prerequisites.html#cb60-9"></a>      ...</span>
-<span id="cb60-10"><a href="prerequisites.html#cb60-10"></a>    )</span>
-<span id="cb60-11"><a href="prerequisites.html#cb60-11"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="prerequisites.html#cb61-1"></a>shiny<span class="op">::</span>actionButton</span></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="prerequisites.html#cb62-1"></a><span class="cf">function</span> (inputId, label, <span class="dt">icon =</span> <span class="ot">NULL</span>, <span class="dt">width =</span> <span class="ot">NULL</span>, ...) </span>
+<span id="cb62-2"><a href="prerequisites.html#cb62-2"></a>{</span>
+<span id="cb62-3"><a href="prerequisites.html#cb62-3"></a>    value &lt;-<span class="st"> </span><span class="kw">restoreInput</span>(<span class="dt">id =</span> inputId, <span class="dt">default =</span> <span class="ot">NULL</span>)</span>
+<span id="cb62-4"><a href="prerequisites.html#cb62-4"></a>    tags<span class="op">$</span><span class="kw">button</span>(</span>
+<span id="cb62-5"><a href="prerequisites.html#cb62-5"></a>      <span class="dt">id =</span> inputId, <span class="dt">style =</span> <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.null</span>(width)) </span>
+<span id="cb62-6"><a href="prerequisites.html#cb62-6"></a>      <span class="kw">paste0</span>(<span class="st">&quot;width: &quot;</span>, <span class="kw">validateCssUnit</span>(width), <span class="st">&quot;;&quot;</span>),</span>
+<span id="cb62-7"><a href="prerequisites.html#cb62-7"></a>      <span class="dt">type =</span> <span class="st">&quot;button&quot;</span>, <span class="dt">class =</span> <span class="st">&quot;btn btn-default action-button&quot;</span>, </span>
+<span id="cb62-8"><a href="prerequisites.html#cb62-8"></a>      <span class="st">`</span><span class="dt">data-val</span><span class="st">`</span> =<span class="st"> </span>value, <span class="kw">list</span>(<span class="kw">validateIcon</span>(icon), label), </span>
+<span id="cb62-9"><a href="prerequisites.html#cb62-9"></a>      ...</span>
+<span id="cb62-10"><a href="prerequisites.html#cb62-10"></a>    )</span>
+<span id="cb62-11"><a href="prerequisites.html#cb62-11"></a>}</span></code></pre></div>
 <p>As the name indicates htmltools goes beyond the generation of HTML tags and provides broader tools to work with HTML from R, this includes working the dependencies. dependencies may appear simple at first, after all were one working with an HTML document in order to import HTML or CSS one could simply use HTML tags.</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb61-1"><a href="prerequisites.html#cb61-1"></a> <span class="er">&lt;</span>!–– index.html ––&gt;</span>
-<span id="cb61-2"><a href="prerequisites.html#cb61-2"></a><span class="kw">&lt;html&gt;</span></span>
-<span id="cb61-3"><a href="prerequisites.html#cb61-3"></a>  <span class="kw">&lt;head&gt;</span></span>
-<span id="cb61-4"><a href="prerequisites.html#cb61-4"></a>    <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;path/to/script.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb61-5"><a href="prerequisites.html#cb61-5"></a>    <span class="kw">&lt;link</span><span class="ot"> rel=</span><span class="st">&quot;stylesheet&quot;</span><span class="ot"> href=</span><span class="st">&quot;path/to/styles.css&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb61-6"><a href="prerequisites.html#cb61-6"></a>  <span class="kw">&lt;/head&gt;</span></span>
-<span id="cb61-7"><a href="prerequisites.html#cb61-7"></a>  <span class="kw">&lt;body&gt;&lt;/body&gt;</span></span>
-<span id="cb61-8"><a href="prerequisites.html#cb61-8"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb63-1"><a href="prerequisites.html#cb63-1"></a> <span class="er">&lt;</span>!–– index.html ––&gt;</span>
+<span id="cb63-2"><a href="prerequisites.html#cb63-2"></a><span class="kw">&lt;html&gt;</span></span>
+<span id="cb63-3"><a href="prerequisites.html#cb63-3"></a>  <span class="kw">&lt;head&gt;</span></span>
+<span id="cb63-4"><a href="prerequisites.html#cb63-4"></a>    <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;path/to/script.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb63-5"><a href="prerequisites.html#cb63-5"></a>    <span class="kw">&lt;link</span><span class="ot"> rel=</span><span class="st">&quot;stylesheet&quot;</span><span class="ot"> href=</span><span class="st">&quot;path/to/styles.css&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb63-6"><a href="prerequisites.html#cb63-6"></a>  <span class="kw">&lt;/head&gt;</span></span>
+<span id="cb63-7"><a href="prerequisites.html#cb63-7"></a>  <span class="kw">&lt;body&gt;&lt;/body&gt;</span></span>
+<span id="cb63-8"><a href="prerequisites.html#cb63-8"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
 <p>However, it can quickly get out of hand when working with modules and packages. Imagine having to manage the generation of dependencies such as the above when multiple functions rely on a dependency but being a dependency it should only be imported once? The unified framework htmltools provides helps immensely in dealing with this sort of issues.</p>
 <p>The htmltools package provides utilities to import dependencies and ensure these are only rendered once, as they should be. The way this works is by creating a dependency object that packages like Shiny and R markdown can understand and translate into HTML dependencies. This is handled with the <code>htmlDependency</code> function which returns an object of class <code>html_dependency</code>.</p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="prerequisites.html#cb62-1"></a>dependency &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
-<span id="cb62-2"><a href="prerequisites.html#cb62-2"></a>  <span class="dt">name =</span> <span class="st">&quot;myDependency&quot;</span>,</span>
-<span id="cb62-3"><a href="prerequisites.html#cb62-3"></a>  <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
-<span id="cb62-4"><a href="prerequisites.html#cb62-4"></a>  <span class="dt">src =</span> <span class="st">&quot;path/to/directory&quot;</span>,</span>
-<span id="cb62-5"><a href="prerequisites.html#cb62-5"></a>  <span class="dt">script =</span> <span class="kw">c</span>(<span class="dt">file =</span> <span class="st">&quot;script.js&quot;</span>),</span>
-<span id="cb62-6"><a href="prerequisites.html#cb62-6"></a>  <span class="dt">stylesheet =</span> <span class="kw">c</span>(<span class="dt">file =</span> <span class="st">&quot;styles.css&quot;</span>)</span>
-<span id="cb62-7"><a href="prerequisites.html#cb62-7"></a>)</span></code></pre></div>
-<p>There are a few noteworthy things about the above. First, the <code>src</code> argument points to a directory, not the file one wants to import. Second, the <code>script</code> and <code>stylesheet</code> arguments are named vectors that point to files within the <code>src</code> directory. One can use the name <code>file</code> to point to a local file (as done above) or use <code>href</code> to point to a remote file hosted on a CDN.</p>
-<p>Shiny, R markdown, and other packages where htmltools is relevant will then be able to translate an <code>html_dependency</code> object into actual HTML dependencies. The above would for instance generate the following HTML.</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb63-1"><a href="prerequisites.html#cb63-1"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;path/to/directory/script.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb63-2"><a href="prerequisites.html#cb63-2"></a><span class="kw">&lt;link</span><span class="ot"> rel=</span><span class="st">&quot;stylesheet&quot;</span><span class="ot"> href=</span><span class="st">&quot;path/to/directory/styles.css&quot;</span><span class="kw">&gt;</span></span></code></pre></div>
-<p>Importantly, the <code>htmltools::htmlDependency</code> also takes a <code>package</code> argument which makes it such that the <code>src</code> path becomes relative to the package directory (the <code>inst</code> folder). Hence the snippet below imports a file located at <code>myPackage/inst/assets/script.js</code>; the ultimate full path will of course depend on where the package is installed on the users’ machine.</p>
 <div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="prerequisites.html#cb64-1"></a>dependency &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
 <span id="cb64-2"><a href="prerequisites.html#cb64-2"></a>  <span class="dt">name =</span> <span class="st">&quot;myDependency&quot;</span>,</span>
 <span id="cb64-3"><a href="prerequisites.html#cb64-3"></a>  <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
-<span id="cb64-4"><a href="prerequisites.html#cb64-4"></a>  <span class="dt">src =</span> <span class="st">&quot;assets&quot;</span>,</span>
+<span id="cb64-4"><a href="prerequisites.html#cb64-4"></a>  <span class="dt">src =</span> <span class="st">&quot;path/to/directory&quot;</span>,</span>
 <span id="cb64-5"><a href="prerequisites.html#cb64-5"></a>  <span class="dt">script =</span> <span class="kw">c</span>(<span class="dt">file =</span> <span class="st">&quot;script.js&quot;</span>),</span>
-<span id="cb64-6"><a href="prerequisites.html#cb64-6"></a>  <span class="dt">package =</span> <span class="st">&quot;myPackage&quot;</span> <span class="co"># user package</span></span>
+<span id="cb64-6"><a href="prerequisites.html#cb64-6"></a>  <span class="dt">stylesheet =</span> <span class="kw">c</span>(<span class="dt">file =</span> <span class="st">&quot;styles.css&quot;</span>)</span>
 <span id="cb64-7"><a href="prerequisites.html#cb64-7"></a>)</span></code></pre></div>
+<p>There are a few noteworthy things about the above. First, the <code>src</code> argument points to a directory, not the file one wants to import. Second, the <code>script</code> and <code>stylesheet</code> arguments are named vectors that point to files within the <code>src</code> directory. One can use the name <code>file</code> to point to a local file (as done above) or use <code>href</code> to point to a remote file hosted on a CDN.</p>
+<p>Shiny, R markdown, and other packages where htmltools is relevant will then be able to translate an <code>html_dependency</code> object into actual HTML dependencies. The above would for instance generate the following HTML.</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb65-1"><a href="prerequisites.html#cb65-1"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;path/to/directory/script.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb65-2"><a href="prerequisites.html#cb65-2"></a><span class="kw">&lt;link</span><span class="ot"> rel=</span><span class="st">&quot;stylesheet&quot;</span><span class="ot"> href=</span><span class="st">&quot;path/to/directory/styles.css&quot;</span><span class="kw">&gt;</span></span></code></pre></div>
+<p>Importantly, the <code>htmltools::htmlDependency</code> also takes a <code>package</code> argument which makes it such that the <code>src</code> path becomes relative to the package directory (the <code>inst</code> folder). Hence the snippet below imports a file located at <code>myPackage/inst/assets/script.js</code>; the ultimate full path will of course depend on where the package is installed on the users’ machine.</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="prerequisites.html#cb66-1"></a>dependency &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
+<span id="cb66-2"><a href="prerequisites.html#cb66-2"></a>  <span class="dt">name =</span> <span class="st">&quot;myDependency&quot;</span>,</span>
+<span id="cb66-3"><a href="prerequisites.html#cb66-3"></a>  <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
+<span id="cb66-4"><a href="prerequisites.html#cb66-4"></a>  <span class="dt">src =</span> <span class="st">&quot;assets&quot;</span>,</span>
+<span id="cb66-5"><a href="prerequisites.html#cb66-5"></a>  <span class="dt">script =</span> <span class="kw">c</span>(<span class="dt">file =</span> <span class="st">&quot;script.js&quot;</span>),</span>
+<span id="cb66-6"><a href="prerequisites.html#cb66-6"></a>  <span class="dt">package =</span> <span class="st">&quot;myPackage&quot;</span> <span class="co"># user package</span></span>
+<span id="cb66-7"><a href="prerequisites.html#cb66-7"></a>)</span></code></pre></div>
 <p>But does one use it in R markdown or shiny? Well simply placing it in the Shiny UI or an evaluated R markdown chunk will the the job.</p>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="prerequisites.html#cb65-1"></a><span class="co"># place it in the shiny UI</span></span>
-<span id="cb65-2"><a href="prerequisites.html#cb65-2"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb65-3"><a href="prerequisites.html#cb65-3"></a>  htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
-<span id="cb65-4"><a href="prerequisites.html#cb65-4"></a>    <span class="dt">name =</span> <span class="st">&quot;myDependency&quot;</span>,</span>
-<span id="cb65-5"><a href="prerequisites.html#cb65-5"></a>    <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
-<span id="cb65-6"><a href="prerequisites.html#cb65-6"></a>    <span class="dt">src =</span> <span class="st">&quot;assets&quot;</span>,</span>
-<span id="cb65-7"><a href="prerequisites.html#cb65-7"></a>    <span class="dt">script =</span> <span class="kw">c</span>(<span class="dt">file =</span> <span class="st">&quot;script.js&quot;</span>),</span>
-<span id="cb65-8"><a href="prerequisites.html#cb65-8"></a>    <span class="dt">package =</span> <span class="st">&quot;myPackage&quot;</span> <span class="co"># user package</span></span>
-<span id="cb65-9"><a href="prerequisites.html#cb65-9"></a>  )</span>
-<span id="cb65-10"><a href="prerequisites.html#cb65-10"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="prerequisites.html#cb67-1"></a><span class="co"># place it in the shiny UI</span></span>
+<span id="cb67-2"><a href="prerequisites.html#cb67-2"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb67-3"><a href="prerequisites.html#cb67-3"></a>  htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
+<span id="cb67-4"><a href="prerequisites.html#cb67-4"></a>    <span class="dt">name =</span> <span class="st">&quot;myDependency&quot;</span>,</span>
+<span id="cb67-5"><a href="prerequisites.html#cb67-5"></a>    <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
+<span id="cb67-6"><a href="prerequisites.html#cb67-6"></a>    <span class="dt">src =</span> <span class="st">&quot;assets&quot;</span>,</span>
+<span id="cb67-7"><a href="prerequisites.html#cb67-7"></a>    <span class="dt">script =</span> <span class="kw">c</span>(<span class="dt">file =</span> <span class="st">&quot;script.js&quot;</span>),</span>
+<span id="cb67-8"><a href="prerequisites.html#cb67-8"></a>    <span class="dt">package =</span> <span class="st">&quot;myPackage&quot;</span> <span class="co"># user package</span></span>
+<span id="cb67-9"><a href="prerequisites.html#cb67-9"></a>  )</span>
+<span id="cb67-10"><a href="prerequisites.html#cb67-10"></a>)</span></code></pre></div>
 </div>
 <div id="basics-static-files" class="section level3" number="2.4.2">
 <h3><span class="header-section-number">2.4.2</span> Static Files</h3>
@@ -907,28 +911,28 @@ Accessing variables from the parent environment (context) is useful in JavaScrip
 <p>In order to ensure the code in this book can run regardless of the reader’s machine or editor, the asset directory (when used) is always specified explicitly. This is probably advised to steer clear of the potential headaches as, unlike the default, it’ll work regardless of the environment. If you are using golem <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> to develop your application then you should not worry about this as it specifies the directory internally.</p>
 <p>Below we build a basic shiny application, however, before we define the ui and server we use the <code>shiny::addResourcePath</code> function to specify the location of the directory of static files that will be served by the server and thus accessible by the client. This function takes two arguments, first the <code>prefix</code>, which is the path (URL) at which the assets will be available, second the path to the directory of static assets.</p>
 <p>We thus create the “assets” directory and a JavaScript file called <code>script.js</code> within it.</p>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="prerequisites.html#cb66-1"></a><span class="co"># run from root of app (where app.R is located)</span></span>
-<span id="cb66-2"><a href="prerequisites.html#cb66-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;assets&quot;</span>)</span>
-<span id="cb66-3"><a href="prerequisites.html#cb66-3"></a><span class="kw">writeLines</span>(<span class="st">&quot;console.log(&#39;Hello JS!&#39;);&quot;</span>, <span class="dt">con =</span> <span class="st">&quot;assets/script.js&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="prerequisites.html#cb68-1"></a><span class="co"># run from root of app (where app.R is located)</span></span>
+<span id="cb68-2"><a href="prerequisites.html#cb68-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb68-3"><a href="prerequisites.html#cb68-3"></a><span class="kw">writeLines</span>(<span class="st">&quot;console.log(&#39;Hello JS!&#39;);&quot;</span>, <span class="dt">con =</span> <span class="st">&quot;assets/script.js&quot;</span>)</span></code></pre></div>
 <p>We can now use the <code>shiny::addResourcePath</code> to point to this directory. Generally the same name for the directory of static assets and prefix is used so as to avoid confusion, below we name them differently in order for the reader to clearly distinguish which is which.</p>
-<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="prerequisites.html#cb67-1"></a><span class="co"># app.R</span></span>
-<span id="cb67-2"><a href="prerequisites.html#cb67-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb67-3"><a href="prerequisites.html#cb67-3"></a></span>
-<span id="cb67-4"><a href="prerequisites.html#cb67-4"></a><span class="co"># serve the files</span></span>
-<span id="cb67-5"><a href="prerequisites.html#cb67-5"></a><span class="kw">addResourcePath</span>(</span>
-<span id="cb67-6"><a href="prerequisites.html#cb67-6"></a>  <span class="co"># will be accessible at /files</span></span>
-<span id="cb67-7"><a href="prerequisites.html#cb67-7"></a>  <span class="dt">prefix =</span> <span class="st">&quot;files&quot;</span>, </span>
-<span id="cb67-8"><a href="prerequisites.html#cb67-8"></a>  <span class="co"># path to the assets directory</span></span>
-<span id="cb67-9"><a href="prerequisites.html#cb67-9"></a>  <span class="dt">directoryPath =</span> <span class="st">&quot;assets&quot;</span></span>
-<span id="cb67-10"><a href="prerequisites.html#cb67-10"></a>)</span>
-<span id="cb67-11"><a href="prerequisites.html#cb67-11"></a></span>
-<span id="cb67-12"><a href="prerequisites.html#cb67-12"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb67-13"><a href="prerequisites.html#cb67-13"></a>  <span class="kw">h1</span>(<span class="st">&quot;R and JavaScript&quot;</span>)</span>
-<span id="cb67-14"><a href="prerequisites.html#cb67-14"></a>)</span>
-<span id="cb67-15"><a href="prerequisites.html#cb67-15"></a></span>
-<span id="cb67-16"><a href="prerequisites.html#cb67-16"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){}</span>
-<span id="cb67-17"><a href="prerequisites.html#cb67-17"></a></span>
-<span id="cb67-18"><a href="prerequisites.html#cb67-18"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="prerequisites.html#cb69-1"></a><span class="co"># app.R</span></span>
+<span id="cb69-2"><a href="prerequisites.html#cb69-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb69-3"><a href="prerequisites.html#cb69-3"></a></span>
+<span id="cb69-4"><a href="prerequisites.html#cb69-4"></a><span class="co"># serve the files</span></span>
+<span id="cb69-5"><a href="prerequisites.html#cb69-5"></a><span class="kw">addResourcePath</span>(</span>
+<span id="cb69-6"><a href="prerequisites.html#cb69-6"></a>  <span class="co"># will be accessible at /files</span></span>
+<span id="cb69-7"><a href="prerequisites.html#cb69-7"></a>  <span class="dt">prefix =</span> <span class="st">&quot;files&quot;</span>, </span>
+<span id="cb69-8"><a href="prerequisites.html#cb69-8"></a>  <span class="co"># path to the assets directory</span></span>
+<span id="cb69-9"><a href="prerequisites.html#cb69-9"></a>  <span class="dt">directoryPath =</span> <span class="st">&quot;assets&quot;</span></span>
+<span id="cb69-10"><a href="prerequisites.html#cb69-10"></a>)</span>
+<span id="cb69-11"><a href="prerequisites.html#cb69-11"></a></span>
+<span id="cb69-12"><a href="prerequisites.html#cb69-12"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb69-13"><a href="prerequisites.html#cb69-13"></a>  <span class="kw">h1</span>(<span class="st">&quot;R and JavaScript&quot;</span>)</span>
+<span id="cb69-14"><a href="prerequisites.html#cb69-14"></a>)</span>
+<span id="cb69-15"><a href="prerequisites.html#cb69-15"></a></span>
+<span id="cb69-16"><a href="prerequisites.html#cb69-16"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){}</span>
+<span id="cb69-17"><a href="prerequisites.html#cb69-17"></a></span>
+<span id="cb69-18"><a href="prerequisites.html#cb69-18"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>If you then run the application and open it at the <code>/files/script.js</code> path (e.g.: <code>127.0.0.1:3000/files/script.js</code>) you should see the content of the JavaScript file (<code>console.log('Hello JS!')</code>), commenting the <code>addResourcePath</code> line will have a “Not Found” error displayed on the page instead.</p>
 <p>All files in your asset directory will be served online and accessible to anyone: do not place sensitive files in it.</p>
 <p>Though one may create multiple such directory and correspondingly use <code>addResourcePath</code> to specify multiple paths and prefixes, one will routinely specify a single one, named “assets” or “static,” which contains multiple subdirectories, one for each type of static file to obtain a directory that looks something like the tree below. This is, however, an unwritten convention which is by no means forced upon the developer: do as you wish.</p>
@@ -940,44 +944,44 @@ Accessing variables from the parent environment (context) is useful in JavaScrip
 └── img/
      └── pic.png</code></pre>
 <p>At this stage we have made the JavaScript file we created accessible by the clients but we still have to source this file in the <code>ui</code> as currently this file is, though served, not used by the application. Were one creating a static HTML page one would use the <code>script</code> to <code>src</code> the file in the <code>head</code> of the page.</p>
-<div class="sourceCode" id="cb69"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb69-1"><a href="prerequisites.html#cb69-1"></a><span class="kw">&lt;html&gt;</span></span>
-<span id="cb69-2"><a href="prerequisites.html#cb69-2"></a>  <span class="kw">&lt;head&gt;</span></span>
-<span id="cb69-3"><a href="prerequisites.html#cb69-3"></a>    <span class="er">&lt;</span>!–– source the JavaScript file ––&gt;</span>
-<span id="cb69-4"><a href="prerequisites.html#cb69-4"></a>    <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;path/to/script.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
-<span id="cb69-5"><a href="prerequisites.html#cb69-5"></a>  <span class="kw">&lt;/head&gt;</span></span>
-<span id="cb69-6"><a href="prerequisites.html#cb69-6"></a>  <span class="kw">&lt;body&gt;</span></span>
-<span id="cb69-7"><a href="prerequisites.html#cb69-7"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb69-8"><a href="prerequisites.html#cb69-8"></a>  <span class="kw">&lt;/body&gt;</span></span>
-<span id="cb69-9"><a href="prerequisites.html#cb69-9"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb71-1"><a href="prerequisites.html#cb71-1"></a><span class="kw">&lt;html&gt;</span></span>
+<span id="cb71-2"><a href="prerequisites.html#cb71-2"></a>  <span class="kw">&lt;head&gt;</span></span>
+<span id="cb71-3"><a href="prerequisites.html#cb71-3"></a>    <span class="er">&lt;</span>!–– source the JavaScript file ––&gt;</span>
+<span id="cb71-4"><a href="prerequisites.html#cb71-4"></a>    <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;path/to/script.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb71-5"><a href="prerequisites.html#cb71-5"></a>  <span class="kw">&lt;/head&gt;</span></span>
+<span id="cb71-6"><a href="prerequisites.html#cb71-6"></a>  <span class="kw">&lt;body&gt;</span></span>
+<span id="cb71-7"><a href="prerequisites.html#cb71-7"></a>    <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;content&quot;</span><span class="kw">&gt;</span>Trying JavaScript!<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb71-8"><a href="prerequisites.html#cb71-8"></a>  <span class="kw">&lt;/body&gt;</span></span>
+<span id="cb71-9"><a href="prerequisites.html#cb71-9"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
 <p>In shiny we write the ui in R and not in HTML (though this is also supported). Given the resemblance between the names of HTML tags and shiny UI functions it’s pretty straightforward, the html page above would look something like the shiny <code>ui</code> below.</p>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="prerequisites.html#cb70-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb70-2"><a href="prerequisites.html#cb70-2"></a></span>
-<span id="cb70-3"><a href="prerequisites.html#cb70-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb70-4"><a href="prerequisites.html#cb70-4"></a>  <span class="kw">singleton</span>(</span>
-<span id="cb70-5"><a href="prerequisites.html#cb70-5"></a>    tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb70-6"><a href="prerequisites.html#cb70-6"></a>      tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;path/to/script.js&quot;</span>)</span>
-<span id="cb70-7"><a href="prerequisites.html#cb70-7"></a>    )</span>
-<span id="cb70-8"><a href="prerequisites.html#cb70-8"></a>  ),</span>
-<span id="cb70-9"><a href="prerequisites.html#cb70-9"></a>  <span class="kw">p</span>(<span class="dt">id =</span> <span class="st">&quot;content&quot;</span>, <span class="st">&quot;Trying JavaScript!&quot;</span>)</span>
-<span id="cb70-10"><a href="prerequisites.html#cb70-10"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="prerequisites.html#cb72-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb72-2"><a href="prerequisites.html#cb72-2"></a></span>
+<span id="cb72-3"><a href="prerequisites.html#cb72-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb72-4"><a href="prerequisites.html#cb72-4"></a>  <span class="kw">singleton</span>(</span>
+<span id="cb72-5"><a href="prerequisites.html#cb72-5"></a>    tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb72-6"><a href="prerequisites.html#cb72-6"></a>      tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;path/to/script.js&quot;</span>)</span>
+<span id="cb72-7"><a href="prerequisites.html#cb72-7"></a>    )</span>
+<span id="cb72-8"><a href="prerequisites.html#cb72-8"></a>  ),</span>
+<span id="cb72-9"><a href="prerequisites.html#cb72-9"></a>  <span class="kw">p</span>(<span class="dt">id =</span> <span class="st">&quot;content&quot;</span>, <span class="st">&quot;Trying JavaScript!&quot;</span>)</span>
+<span id="cb72-10"><a href="prerequisites.html#cb72-10"></a>)</span></code></pre></div>
 <p>The dependency is used in the <code>singleton</code> function (from htmltools) ensure that its content is <em>only imported in the document once.</em></p>
 <p>Note that we use the <code>tags</code> object which comes from the shiny package and includes HTML tags that are not exported as standalone functions. For instance, you can create a <code>&lt;div&gt;</code> in shiny with the <code>div</code> function but <code>tags$div</code> will also work. This can now be applied to the shiny application, the <code>path/to/script.js</code> should be changed to <code>files/script.js</code> where <code>files</code> is the prefix we defined in <code>addResourcePath</code>.</p>
-<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="prerequisites.html#cb71-1"></a><span class="co"># app.R</span></span>
-<span id="cb71-2"><a href="prerequisites.html#cb71-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb71-3"><a href="prerequisites.html#cb71-3"></a></span>
-<span id="cb71-4"><a href="prerequisites.html#cb71-4"></a><span class="co"># serve the files</span></span>
-<span id="cb71-5"><a href="prerequisites.html#cb71-5"></a><span class="kw">addResourcePath</span>(<span class="dt">prefix =</span> <span class="st">&quot;files&quot;</span>, <span class="dt">directoryPath =</span> <span class="st">&quot;assets&quot;</span>)</span>
-<span id="cb71-6"><a href="prerequisites.html#cb71-6"></a></span>
-<span id="cb71-7"><a href="prerequisites.html#cb71-7"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb71-8"><a href="prerequisites.html#cb71-8"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb71-9"><a href="prerequisites.html#cb71-9"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;files/script.js&quot;</span>)</span>
-<span id="cb71-10"><a href="prerequisites.html#cb71-10"></a>  ),</span>
-<span id="cb71-11"><a href="prerequisites.html#cb71-11"></a>  <span class="kw">h1</span>(<span class="st">&quot;R and JavaScript&quot;</span>)</span>
-<span id="cb71-12"><a href="prerequisites.html#cb71-12"></a>)</span>
-<span id="cb71-13"><a href="prerequisites.html#cb71-13"></a></span>
-<span id="cb71-14"><a href="prerequisites.html#cb71-14"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){}</span>
-<span id="cb71-15"><a href="prerequisites.html#cb71-15"></a></span>
-<span id="cb71-16"><a href="prerequisites.html#cb71-16"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="prerequisites.html#cb73-1"></a><span class="co"># app.R</span></span>
+<span id="cb73-2"><a href="prerequisites.html#cb73-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb73-3"><a href="prerequisites.html#cb73-3"></a></span>
+<span id="cb73-4"><a href="prerequisites.html#cb73-4"></a><span class="co"># serve the files</span></span>
+<span id="cb73-5"><a href="prerequisites.html#cb73-5"></a><span class="kw">addResourcePath</span>(<span class="dt">prefix =</span> <span class="st">&quot;files&quot;</span>, <span class="dt">directoryPath =</span> <span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb73-6"><a href="prerequisites.html#cb73-6"></a></span>
+<span id="cb73-7"><a href="prerequisites.html#cb73-7"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb73-8"><a href="prerequisites.html#cb73-8"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb73-9"><a href="prerequisites.html#cb73-9"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;files/script.js&quot;</span>)</span>
+<span id="cb73-10"><a href="prerequisites.html#cb73-10"></a>  ),</span>
+<span id="cb73-11"><a href="prerequisites.html#cb73-11"></a>  <span class="kw">h1</span>(<span class="st">&quot;R and JavaScript&quot;</span>)</span>
+<span id="cb73-12"><a href="prerequisites.html#cb73-12"></a>)</span>
+<span id="cb73-13"><a href="prerequisites.html#cb73-13"></a></span>
+<span id="cb73-14"><a href="prerequisites.html#cb73-14"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){}</span>
+<span id="cb73-15"><a href="prerequisites.html#cb73-15"></a></span>
+<span id="cb73-16"><a href="prerequisites.html#cb73-16"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>From the browser, inspecting page (right click &gt; inspect &gt; console tab) one should see <code>Hello JS!</code> in the console which means the application correctly ran the code in the JavaScript file.</p>
 </div>
 <div id="basics-deps-pro-cons" class="section level3" number="2.4.3">
@@ -1006,7 +1010,7 @@ Accessing variables from the parent environment (context) is useful in JavaScrip
 <p>Guyader, Vincent, Colin Fay, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://CRAN.R-project.org/package=golem">https://CRAN.R-project.org/package=golem</a>.</p>
 </div>
 <div id="ref-R-jsonlite">
-<p>Ooms, Jeroen. 2020. <em>Jsonlite: A Robust, High Performance Json Parser and Generator for R</em>. <a href="https://CRAN.R-project.org/package=jsonlite">https://CRAN.R-project.org/package=jsonlite</a>.</p>
+<p>Ooms, Jeroen. 2020. <em>Jsonlite: A Simple and Robust Json Parser and Generator for R</em>. <a href="https://CRAN.R-project.org/package=jsonlite">https://CRAN.R-project.org/package=jsonlite</a>.</p>
 </div>
 <div id="ref-R-stringr">
 <p>Wickham, Hadley. 2019. <em>Stringr: Simple, Consistent Wrappers for Common String Operations</em>. <a href="https://CRAN.R-project.org/package=stringr">https://CRAN.R-project.org/package=stringr</a>.</p>

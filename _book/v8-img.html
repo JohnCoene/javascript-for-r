@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-09-04" />
+<meta name="date" content="2020-09-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -380,7 +380,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="18.6" data-path="shiny-widgets.html"><a href="shiny-widgets.html#shiny-widgets-update"><i class="fa fa-check"></i><b>18.6</b> Update the Widget</a></li>
 </ul></li>
 <li class="part"><span><b>IV Interactive Documents</b></span></li>
-<li class="chapter" data-level="19" data-path="rmd-intro.html"><a href="rmd-intro.html"><i class="fa fa-check"></i><b>19</b> Introduction to Rmarkdown</a></li>
+<li class="chapter" data-level="19" data-path="rmd-intro.html"><a href="rmd-intro.html"><i class="fa fa-check"></i><b>19</b> Rmarkdown</a>
+<ul>
+<li class="chapter" data-level="19.0.1" data-path="rmd-intro.html"><a href="rmd-intro.html#xaringanextra"><i class="fa fa-check"></i><b>19.0.1</b> xaringanExtra</a></li>
+</ul></li>
 <li class="part"><span><b>V JavaScript for Computations</b></span></li>
 <li class="chapter" data-level="20" data-path="v8.html"><a href="v8.html"><i class="fa fa-check"></i><b>20</b> The V8 Engine</a>
 <ul>
@@ -444,140 +447,68 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="v8-img-discover" class="section level2" number="22.1">
 <h2><span class="header-section-number">22.1</span> Discover</h2>
 <p>Then again the journey starts by exploring ml5.js and the classifier we are going to use. One starts by instantiating an image classifier, specifying the model to use (ml5.js comes with a few out of the box but also allows using custom models), then the classifier is used on an image present in the DOM.</p>
-<div class="sourceCode" id="cb465"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb465-1"><a href="v8-img.html#cb465-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
-<span id="cb465-2"><a href="v8-img.html#cb465-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb465-3"><a href="v8-img.html#cb465-3"></a></span>
-<span id="cb465-4"><a href="v8-img.html#cb465-4"></a><span class="kw">&lt;head&gt;</span></span>
-<span id="cb465-5"><a href="v8-img.html#cb465-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
-<span id="cb465-6"><a href="v8-img.html#cb465-6"></a>  <span class="kw">&lt;script</span> </span>
-<span id="cb465-7"><a href="v8-img.html#cb465-7"></a><span class="ot">    src=</span><span class="st">&quot;https://unpkg.com/ml5@0.4.3/dist/ml5.min.js&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb465-8"><a href="v8-img.html#cb465-8"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb465-9"><a href="v8-img.html#cb465-9"></a><span class="kw">&lt;/head&gt;</span></span>
-<span id="cb465-10"><a href="v8-img.html#cb465-10"></a></span>
-<span id="cb465-11"><a href="v8-img.html#cb465-11"></a><span class="kw">&lt;body&gt;</span></span>
-<span id="cb465-12"><a href="v8-img.html#cb465-12"></a>  <span class="co">&lt;!-- image to classify --&gt;</span></span>
-<span id="cb465-13"><a href="v8-img.html#cb465-13"></a>  <span class="kw">&lt;img</span><span class="ot"> id=</span><span class="st">&quot;dog&quot;</span><span class="ot"> src=</span><span class="st">&quot;www/doge.jpg&quot;</span><span class="kw">/&gt;</span></span>
-<span id="cb465-14"><a href="v8-img.html#cb465-14"></a></span>
-<span id="cb465-15"><a href="v8-img.html#cb465-15"></a>  <span class="co">&lt;!-- Script to run classifier --&gt;</span></span>
-<span id="cb465-16"><a href="v8-img.html#cb465-16"></a>  <span class="kw">&lt;script&gt;</span></span>
-<span id="cb465-17"><a href="v8-img.html#cb465-17"></a>    <span class="co">// Initialize the Image Classifier method with MobileNet</span></span>
-<span id="cb465-18"><a href="v8-img.html#cb465-18"></a>    <span class="kw">const</span> classifier <span class="op">=</span> ml5<span class="op">.</span><span class="fu">imageClassifier</span>(</span>
-<span id="cb465-19"><a href="v8-img.html#cb465-19"></a>      <span class="st">&#39;MobileNet&#39;</span><span class="op">,</span> modelLoaded</span>
-<span id="cb465-20"><a href="v8-img.html#cb465-20"></a>    )<span class="op">;</span></span>
-<span id="cb465-21"><a href="v8-img.html#cb465-21"></a></span>
-<span id="cb465-22"><a href="v8-img.html#cb465-22"></a>    <span class="co">// Runs when the model is loaded</span></span>
-<span id="cb465-23"><a href="v8-img.html#cb465-23"></a>    <span class="kw">function</span> <span class="fu">modelLoaded</span>() {</span>
-<span id="cb465-24"><a href="v8-img.html#cb465-24"></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Model Loaded!&#39;</span>)<span class="op">;</span></span>
-<span id="cb465-25"><a href="v8-img.html#cb465-25"></a>    }</span>
-<span id="cb465-26"><a href="v8-img.html#cb465-26"></a></span>
-<span id="cb465-27"><a href="v8-img.html#cb465-27"></a>    <span class="co">// Make a prediction with a selected image</span></span>
-<span id="cb465-28"><a href="v8-img.html#cb465-28"></a>    classifier<span class="op">.</span><span class="fu">classify</span>(</span>
-<span id="cb465-29"><a href="v8-img.html#cb465-29"></a>      <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&#39;dog&#39;</span>)<span class="op">,</span> (err<span class="op">,</span> results) <span class="kw">=&gt;</span> {</span>
-<span id="cb465-30"><a href="v8-img.html#cb465-30"></a>        <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(results)<span class="op">;</span></span>
-<span id="cb465-31"><a href="v8-img.html#cb465-31"></a>    })<span class="op">;</span></span>
-<span id="cb465-32"><a href="v8-img.html#cb465-32"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb465-33"><a href="v8-img.html#cb465-33"></a><span class="kw">&lt;/body&gt;</span></span>
-<span id="cb465-34"><a href="v8-img.html#cb465-34"></a></span>
-<span id="cb465-35"><a href="v8-img.html#cb465-35"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb467"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb467-1"><a href="v8-img.html#cb467-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
+<span id="cb467-2"><a href="v8-img.html#cb467-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb467-3"><a href="v8-img.html#cb467-3"></a></span>
+<span id="cb467-4"><a href="v8-img.html#cb467-4"></a><span class="kw">&lt;head&gt;</span></span>
+<span id="cb467-5"><a href="v8-img.html#cb467-5"></a>  <span class="co">&lt;!-- Import library --&gt;</span></span>
+<span id="cb467-6"><a href="v8-img.html#cb467-6"></a>  <span class="kw">&lt;script</span> </span>
+<span id="cb467-7"><a href="v8-img.html#cb467-7"></a><span class="ot">    src=</span><span class="st">&quot;https://unpkg.com/ml5@0.4.3/dist/ml5.min.js&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb467-8"><a href="v8-img.html#cb467-8"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb467-9"><a href="v8-img.html#cb467-9"></a><span class="kw">&lt;/head&gt;</span></span>
+<span id="cb467-10"><a href="v8-img.html#cb467-10"></a></span>
+<span id="cb467-11"><a href="v8-img.html#cb467-11"></a><span class="kw">&lt;body&gt;</span></span>
+<span id="cb467-12"><a href="v8-img.html#cb467-12"></a>  <span class="co">&lt;!-- image to classify --&gt;</span></span>
+<span id="cb467-13"><a href="v8-img.html#cb467-13"></a>  <span class="kw">&lt;img</span><span class="ot"> id=</span><span class="st">&quot;dog&quot;</span><span class="ot"> src=</span><span class="st">&quot;www/doge.jpg&quot;</span><span class="kw">/&gt;</span></span>
+<span id="cb467-14"><a href="v8-img.html#cb467-14"></a></span>
+<span id="cb467-15"><a href="v8-img.html#cb467-15"></a>  <span class="co">&lt;!-- Script to run classifier --&gt;</span></span>
+<span id="cb467-16"><a href="v8-img.html#cb467-16"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb467-17"><a href="v8-img.html#cb467-17"></a>    <span class="co">// Initialize the Image Classifier method with MobileNet</span></span>
+<span id="cb467-18"><a href="v8-img.html#cb467-18"></a>    <span class="kw">const</span> classifier <span class="op">=</span> ml5<span class="op">.</span><span class="fu">imageClassifier</span>(</span>
+<span id="cb467-19"><a href="v8-img.html#cb467-19"></a>      <span class="st">&#39;MobileNet&#39;</span><span class="op">,</span> modelLoaded</span>
+<span id="cb467-20"><a href="v8-img.html#cb467-20"></a>    )<span class="op">;</span></span>
+<span id="cb467-21"><a href="v8-img.html#cb467-21"></a></span>
+<span id="cb467-22"><a href="v8-img.html#cb467-22"></a>    <span class="co">// Runs when the model is loaded</span></span>
+<span id="cb467-23"><a href="v8-img.html#cb467-23"></a>    <span class="kw">function</span> <span class="fu">modelLoaded</span>() {</span>
+<span id="cb467-24"><a href="v8-img.html#cb467-24"></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Model Loaded!&#39;</span>)<span class="op">;</span></span>
+<span id="cb467-25"><a href="v8-img.html#cb467-25"></a>    }</span>
+<span id="cb467-26"><a href="v8-img.html#cb467-26"></a></span>
+<span id="cb467-27"><a href="v8-img.html#cb467-27"></a>    <span class="co">// Make a prediction with a selected image</span></span>
+<span id="cb467-28"><a href="v8-img.html#cb467-28"></a>    classifier<span class="op">.</span><span class="fu">classify</span>(</span>
+<span id="cb467-29"><a href="v8-img.html#cb467-29"></a>      <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&#39;dog&#39;</span>)<span class="op">,</span> (err<span class="op">,</span> results) <span class="kw">=&gt;</span> {</span>
+<span id="cb467-30"><a href="v8-img.html#cb467-30"></a>        <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(results)<span class="op">;</span></span>
+<span id="cb467-31"><a href="v8-img.html#cb467-31"></a>    })<span class="op">;</span></span>
+<span id="cb467-32"><a href="v8-img.html#cb467-32"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb467-33"><a href="v8-img.html#cb467-33"></a><span class="kw">&lt;/body&gt;</span></span>
+<span id="cb467-34"><a href="v8-img.html#cb467-34"></a></span>
+<span id="cb467-35"><a href="v8-img.html#cb467-35"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
 </div>
 <div id="v8-img-setup" class="section level2" number="22.2">
 <h2><span class="header-section-number">22.2</span> Setup</h2>
 <p>In shiny, we would need to pass the id of the image (<code>dog</code> above) to be sent from the server and the callback function to return the results to R. The projects starts from an empty directory, before creating actual application let us create the directory of static files that will contain the JavaScript file (<code>classify.js</code>) and the images to classify. Feel free download whichever images you want, below we download images of birds from Wikipedia.</p>
-<div class="sourceCode" id="cb466"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb466-1"><a href="v8-img.html#cb466-1"></a><span class="co"># static files</span></span>
-<span id="cb466-2"><a href="v8-img.html#cb466-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
-<span id="cb466-3"><a href="v8-img.html#cb466-3"></a><span class="kw">file.create</span>(<span class="st">&quot;www/classify.js&quot;</span>)</span>
-<span id="cb466-4"><a href="v8-img.html#cb466-4"></a></span>
-<span id="cb466-5"><a href="v8-img.html#cb466-5"></a><span class="co"># flamingo</span></span>
-<span id="cb466-6"><a href="v8-img.html#cb466-6"></a>fl &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb466-7"><a href="v8-img.html#cb466-7"></a>  <span class="st">&quot;https://upload.wikimedia.org/wikipedia/&quot;</span>,</span>
-<span id="cb466-8"><a href="v8-img.html#cb466-8"></a>  <span class="st">&quot;commons/thumb/7/72/American_flamingo&quot;</span>,</span>
-<span id="cb466-9"><a href="v8-img.html#cb466-9"></a>  <span class="st">&quot;_%28Phoenicopterus_ruber%29.JPG/256px-&quot;</span>,</span>
-<span id="cb466-10"><a href="v8-img.html#cb466-10"></a>  <span class="st">&quot;American_flamingo_%28Phoenicopterus_ruber%29.JPG&quot;</span></span>
-<span id="cb466-11"><a href="v8-img.html#cb466-11"></a>)</span>
-<span id="cb466-12"><a href="v8-img.html#cb466-12"></a></span>
-<span id="cb466-13"><a href="v8-img.html#cb466-13"></a><span class="co"># lorikeet</span></span>
-<span id="cb466-14"><a href="v8-img.html#cb466-14"></a>lo &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb466-15"><a href="v8-img.html#cb466-15"></a>  <span class="st">&quot;https://upload.wikimedia.org/wikipedia/&quot;</span>,</span>
-<span id="cb466-16"><a href="v8-img.html#cb466-16"></a>  <span class="st">&quot;commons/thumb/c/c2/Rainbow_lorikeet.jpg/&quot;</span>,</span>
-<span id="cb466-17"><a href="v8-img.html#cb466-17"></a>  <span class="st">&quot;256px-Rainbow_lorikeet.jpg&quot;</span></span>
-<span id="cb466-18"><a href="v8-img.html#cb466-18"></a>)</span>
-<span id="cb466-19"><a href="v8-img.html#cb466-19"></a></span>
-<span id="cb466-20"><a href="v8-img.html#cb466-20"></a><span class="co"># download</span></span>
-<span id="cb466-21"><a href="v8-img.html#cb466-21"></a><span class="kw">download.file</span>(fl, <span class="dt">destfile =</span> <span class="st">&quot;www/flamingo.jpg&quot;</span>)</span>
-<span id="cb466-22"><a href="v8-img.html#cb466-22"></a><span class="kw">download.file</span>(lo, <span class="dt">destfile =</span> <span class="st">&quot;www/lorikeet.jpg&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb468"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb468-1"><a href="v8-img.html#cb468-1"></a><span class="co"># static files</span></span>
+<span id="cb468-2"><a href="v8-img.html#cb468-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
+<span id="cb468-3"><a href="v8-img.html#cb468-3"></a><span class="kw">file.create</span>(<span class="st">&quot;www/classify.js&quot;</span>)</span>
+<span id="cb468-4"><a href="v8-img.html#cb468-4"></a></span>
+<span id="cb468-5"><a href="v8-img.html#cb468-5"></a><span class="co"># flamingo</span></span>
+<span id="cb468-6"><a href="v8-img.html#cb468-6"></a>fl &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb468-7"><a href="v8-img.html#cb468-7"></a>  <span class="st">&quot;https://upload.wikimedia.org/wikipedia/&quot;</span>,</span>
+<span id="cb468-8"><a href="v8-img.html#cb468-8"></a>  <span class="st">&quot;commons/thumb/7/72/American_flamingo&quot;</span>,</span>
+<span id="cb468-9"><a href="v8-img.html#cb468-9"></a>  <span class="st">&quot;_%28Phoenicopterus_ruber%29.JPG/256px-&quot;</span>,</span>
+<span id="cb468-10"><a href="v8-img.html#cb468-10"></a>  <span class="st">&quot;American_flamingo_%28Phoenicopterus_ruber%29.JPG&quot;</span></span>
+<span id="cb468-11"><a href="v8-img.html#cb468-11"></a>)</span>
+<span id="cb468-12"><a href="v8-img.html#cb468-12"></a></span>
+<span id="cb468-13"><a href="v8-img.html#cb468-13"></a><span class="co"># lorikeet</span></span>
+<span id="cb468-14"><a href="v8-img.html#cb468-14"></a>lo &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb468-15"><a href="v8-img.html#cb468-15"></a>  <span class="st">&quot;https://upload.wikimedia.org/wikipedia/&quot;</span>,</span>
+<span id="cb468-16"><a href="v8-img.html#cb468-16"></a>  <span class="st">&quot;commons/thumb/c/c2/Rainbow_lorikeet.jpg/&quot;</span>,</span>
+<span id="cb468-17"><a href="v8-img.html#cb468-17"></a>  <span class="st">&quot;256px-Rainbow_lorikeet.jpg&quot;</span></span>
+<span id="cb468-18"><a href="v8-img.html#cb468-18"></a>)</span>
+<span id="cb468-19"><a href="v8-img.html#cb468-19"></a></span>
+<span id="cb468-20"><a href="v8-img.html#cb468-20"></a><span class="co"># download</span></span>
+<span id="cb468-21"><a href="v8-img.html#cb468-21"></a><span class="kw">download.file</span>(fl, <span class="dt">destfile =</span> <span class="st">&quot;www/flamingo.jpg&quot;</span>)</span>
+<span id="cb468-22"><a href="v8-img.html#cb468-22"></a><span class="kw">download.file</span>(lo, <span class="dt">destfile =</span> <span class="st">&quot;www/lorikeet.jpg&quot;</span>)</span></code></pre></div>
 <p>Once images are downloaded we can build the basic skeleton of the app. We import ml5.js from the CDN, create a select input to switch between the two images of birds that were downloaded and use <code>renderUI</code> to dynamically render the selected image. Finally, we create a button to trigger the classification, though it currently sends an empty list to a message handler that we are yet to create.</p>
-<div class="sourceCode" id="cb467"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb467-1"><a href="v8-img.html#cb467-1"></a><span class="kw">library</span>(<span class="st">&quot;shiny&quot;</span>)</span>
-<span id="cb467-2"><a href="v8-img.html#cb467-2"></a></span>
-<span id="cb467-3"><a href="v8-img.html#cb467-3"></a><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
-<span id="cb467-4"><a href="v8-img.html#cb467-4"></a></span>
-<span id="cb467-5"><a href="v8-img.html#cb467-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb467-6"><a href="v8-img.html#cb467-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb467-7"><a href="v8-img.html#cb467-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb467-8"><a href="v8-img.html#cb467-8"></a>      <span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/ml5@0.4.3/dist/ml5.min.js&quot;</span></span>
-<span id="cb467-9"><a href="v8-img.html#cb467-9"></a>    )</span>
-<span id="cb467-10"><a href="v8-img.html#cb467-10"></a>  ),</span>
-<span id="cb467-11"><a href="v8-img.html#cb467-11"></a>  <span class="kw">fluidRow</span>(</span>
-<span id="cb467-12"><a href="v8-img.html#cb467-12"></a>    <span class="kw">column</span>(</span>
-<span id="cb467-13"><a href="v8-img.html#cb467-13"></a>      <span class="dv">2</span>,</span>
-<span id="cb467-14"><a href="v8-img.html#cb467-14"></a>      <span class="kw">selectInput</span>(</span>
-<span id="cb467-15"><a href="v8-img.html#cb467-15"></a>        <span class="st">&quot;select&quot;</span>, <span class="st">&quot;Select an image to classify&quot;</span>,</span>
-<span id="cb467-16"><a href="v8-img.html#cb467-16"></a>        <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;lorikeet&quot;</span>, <span class="st">&quot;flamingo&quot;</span>)</span>
-<span id="cb467-17"><a href="v8-img.html#cb467-17"></a>      )</span>
-<span id="cb467-18"><a href="v8-img.html#cb467-18"></a>    ),</span>
-<span id="cb467-19"><a href="v8-img.html#cb467-19"></a>    <span class="kw">column</span>(</span>
-<span id="cb467-20"><a href="v8-img.html#cb467-20"></a>      <span class="dv">2</span>, <span class="kw">br</span>(), </span>
-<span id="cb467-21"><a href="v8-img.html#cb467-21"></a>      <span class="kw">actionButton</span>(</span>
-<span id="cb467-22"><a href="v8-img.html#cb467-22"></a>        <span class="st">&quot;classify&quot;</span>, <span class="st">&quot;Classify&quot;</span>, <span class="dt">icon =</span> <span class="kw">icon</span>(<span class="st">&quot;search&quot;</span>)</span>
-<span id="cb467-23"><a href="v8-img.html#cb467-23"></a>      )</span>
-<span id="cb467-24"><a href="v8-img.html#cb467-24"></a>    )</span>
-<span id="cb467-25"><a href="v8-img.html#cb467-25"></a>  ),</span>
-<span id="cb467-26"><a href="v8-img.html#cb467-26"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;img&quot;</span>)</span>
-<span id="cb467-27"><a href="v8-img.html#cb467-27"></a>)</span>
-<span id="cb467-28"><a href="v8-img.html#cb467-28"></a></span>
-<span id="cb467-29"><a href="v8-img.html#cb467-29"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb467-30"><a href="v8-img.html#cb467-30"></a></span>
-<span id="cb467-31"><a href="v8-img.html#cb467-31"></a>  output<span class="op">$</span>img &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
-<span id="cb467-32"><a href="v8-img.html#cb467-32"></a>    path &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;www/&quot;</span>, input<span class="op">$</span>select, <span class="st">&quot;.jpg&quot;</span>)</span>
-<span id="cb467-33"><a href="v8-img.html#cb467-33"></a>    tags<span class="op">$</span><span class="kw">img</span>(<span class="dt">src =</span> path, <span class="dt">id =</span> <span class="st">&quot;bird&quot;</span>)</span>
-<span id="cb467-34"><a href="v8-img.html#cb467-34"></a>  })</span>
-<span id="cb467-35"><a href="v8-img.html#cb467-35"></a></span>
-<span id="cb467-36"><a href="v8-img.html#cb467-36"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>classify, {</span>
-<span id="cb467-37"><a href="v8-img.html#cb467-37"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;classify&#39;</span>, <span class="kw">list</span>())</span>
-<span id="cb467-38"><a href="v8-img.html#cb467-38"></a>  })</span>
-<span id="cb467-39"><a href="v8-img.html#cb467-39"></a></span>
-<span id="cb467-40"><a href="v8-img.html#cb467-40"></a>}</span>
-<span id="cb467-41"><a href="v8-img.html#cb467-41"></a></span>
-<span id="cb467-42"><a href="v8-img.html#cb467-42"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<div class="figure">
-<img src="images/ml5-init.png" alt="" />
-<p class="caption">Classifier skeleton</p>
-</div>
-</div>
-<div id="v8-img-javascript" class="section level2" number="22.3">
-<h2><span class="header-section-number">22.3</span> JavaScript</h2>
-<p>With this in place one can start thinking about the JavaScript, when the “classify” button is clicked the classification must be triggered in the client and the result sent back. To do so we need to define the message handler called “classify” to which the data is sent.</p>
-<div class="sourceCode" id="cb468"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb468-1"><a href="v8-img.html#cb468-1"></a><span class="co">// classify.js</span></span>
-<span id="cb468-2"><a href="v8-img.html#cb468-2"></a></span>
-<span id="cb468-3"><a href="v8-img.html#cb468-3"></a><span class="co">// Initialize </span></span>
-<span id="cb468-4"><a href="v8-img.html#cb468-4"></a><span class="kw">const</span> classifier <span class="op">=</span> ml5<span class="op">.</span><span class="fu">imageClassifier</span>(<span class="st">&#39;MobileNet&#39;</span><span class="op">,</span> modelLoaded)<span class="op">;</span></span>
-<span id="cb468-5"><a href="v8-img.html#cb468-5"></a></span>
-<span id="cb468-6"><a href="v8-img.html#cb468-6"></a><span class="kw">function</span> <span class="fu">modelLoaded</span>() {</span>
-<span id="cb468-7"><a href="v8-img.html#cb468-7"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Model Loaded!&#39;</span>)<span class="op">;</span></span>
-<span id="cb468-8"><a href="v8-img.html#cb468-8"></a>}</span>
-<span id="cb468-9"><a href="v8-img.html#cb468-9"></a></span>
-<span id="cb468-10"><a href="v8-img.html#cb468-10"></a>Shiny<span class="op">.</span><span class="fu">addCustomMessageHandler</span>(<span class="st">&#39;classify&#39;</span><span class="op">,</span> <span class="kw">function</span>(data){</span>
-<span id="cb468-11"><a href="v8-img.html#cb468-11"></a>  <span class="co">// Make a prediction with a selected image</span></span>
-<span id="cb468-12"><a href="v8-img.html#cb468-12"></a>  classifier<span class="op">.</span><span class="fu">classify</span>(</span>
-<span id="cb468-13"><a href="v8-img.html#cb468-13"></a>    <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;bird&quot;</span>)<span class="op">,</span> (err<span class="op">,</span> results) <span class="kw">=&gt;</span> {</span>
-<span id="cb468-14"><a href="v8-img.html#cb468-14"></a>      Shiny<span class="op">.</span><span class="fu">setInputValue</span>(<span class="st">&quot;classification&quot;</span><span class="op">,</span> results)<span class="op">;</span></span>
-<span id="cb468-15"><a href="v8-img.html#cb468-15"></a>    }</span>
-<span id="cb468-16"><a href="v8-img.html#cb468-16"></a>  )<span class="op">;</span></span>
-<span id="cb468-17"><a href="v8-img.html#cb468-17"></a>})<span class="op">;</span></span></code></pre></div>
-<p>A few things to note on the above. The classifier is created outside of the message handler as this only has to be done once and not every time the “classify” button is clicked. While the message handler accepts the <code>data</code> objects it does not make use of it, which is fine, the argument must nonetheless be specified. In the aforementioned callback function the input “classification” is defined.</p>
-</div>
-<div id="v8-img-handler" class="section level2" number="22.4">
-<h2><span class="header-section-number">22.4</span> Input Handler</h2>
-<p>We can then proceed to running the shiny application and observe the classifier in action.</p>
 <div class="sourceCode" id="cb469"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb469-1"><a href="v8-img.html#cb469-1"></a><span class="kw">library</span>(<span class="st">&quot;shiny&quot;</span>)</span>
 <span id="cb469-2"><a href="v8-img.html#cb469-2"></a></span>
 <span id="cb469-3"><a href="v8-img.html#cb469-3"></a><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
@@ -586,108 +517,180 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb469-6"><a href="v8-img.html#cb469-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
 <span id="cb469-7"><a href="v8-img.html#cb469-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
 <span id="cb469-8"><a href="v8-img.html#cb469-8"></a>      <span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/ml5@0.4.3/dist/ml5.min.js&quot;</span></span>
-<span id="cb469-9"><a href="v8-img.html#cb469-9"></a>    ),</span>
-<span id="cb469-10"><a href="v8-img.html#cb469-10"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/classify.js&quot;</span>)</span>
-<span id="cb469-11"><a href="v8-img.html#cb469-11"></a>  ),</span>
-<span id="cb469-12"><a href="v8-img.html#cb469-12"></a>  <span class="kw">fluidRow</span>(</span>
-<span id="cb469-13"><a href="v8-img.html#cb469-13"></a>    <span class="kw">column</span>(</span>
-<span id="cb469-14"><a href="v8-img.html#cb469-14"></a>      <span class="dv">2</span>,</span>
-<span id="cb469-15"><a href="v8-img.html#cb469-15"></a>      <span class="kw">selectInput</span>(</span>
-<span id="cb469-16"><a href="v8-img.html#cb469-16"></a>        <span class="st">&quot;select&quot;</span>, <span class="st">&quot;Select an image to classify&quot;</span>,</span>
-<span id="cb469-17"><a href="v8-img.html#cb469-17"></a>        <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;lorikeet&quot;</span>, <span class="st">&quot;flamingo&quot;</span>)</span>
-<span id="cb469-18"><a href="v8-img.html#cb469-18"></a>      )</span>
-<span id="cb469-19"><a href="v8-img.html#cb469-19"></a>    ),</span>
-<span id="cb469-20"><a href="v8-img.html#cb469-20"></a>    <span class="kw">column</span>(</span>
-<span id="cb469-21"><a href="v8-img.html#cb469-21"></a>      <span class="dv">2</span>, <span class="kw">br</span>(), </span>
-<span id="cb469-22"><a href="v8-img.html#cb469-22"></a>      <span class="kw">actionButton</span>(</span>
-<span id="cb469-23"><a href="v8-img.html#cb469-23"></a>        <span class="st">&quot;classify&quot;</span>, <span class="st">&quot;Classify&quot;</span>, <span class="dt">icon =</span> <span class="kw">icon</span>(<span class="st">&quot;search&quot;</span>)</span>
-<span id="cb469-24"><a href="v8-img.html#cb469-24"></a>      )</span>
-<span id="cb469-25"><a href="v8-img.html#cb469-25"></a>    )</span>
-<span id="cb469-26"><a href="v8-img.html#cb469-26"></a>  ),</span>
-<span id="cb469-27"><a href="v8-img.html#cb469-27"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;img&quot;</span>),</span>
-<span id="cb469-28"><a href="v8-img.html#cb469-28"></a>  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;results&quot;</span>) <span class="co"># print output</span></span>
-<span id="cb469-29"><a href="v8-img.html#cb469-29"></a>)</span>
+<span id="cb469-9"><a href="v8-img.html#cb469-9"></a>    )</span>
+<span id="cb469-10"><a href="v8-img.html#cb469-10"></a>  ),</span>
+<span id="cb469-11"><a href="v8-img.html#cb469-11"></a>  <span class="kw">fluidRow</span>(</span>
+<span id="cb469-12"><a href="v8-img.html#cb469-12"></a>    <span class="kw">column</span>(</span>
+<span id="cb469-13"><a href="v8-img.html#cb469-13"></a>      <span class="dv">2</span>,</span>
+<span id="cb469-14"><a href="v8-img.html#cb469-14"></a>      <span class="kw">selectInput</span>(</span>
+<span id="cb469-15"><a href="v8-img.html#cb469-15"></a>        <span class="st">&quot;select&quot;</span>, <span class="st">&quot;Select an image to classify&quot;</span>,</span>
+<span id="cb469-16"><a href="v8-img.html#cb469-16"></a>        <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;lorikeet&quot;</span>, <span class="st">&quot;flamingo&quot;</span>)</span>
+<span id="cb469-17"><a href="v8-img.html#cb469-17"></a>      )</span>
+<span id="cb469-18"><a href="v8-img.html#cb469-18"></a>    ),</span>
+<span id="cb469-19"><a href="v8-img.html#cb469-19"></a>    <span class="kw">column</span>(</span>
+<span id="cb469-20"><a href="v8-img.html#cb469-20"></a>      <span class="dv">2</span>, <span class="kw">br</span>(), </span>
+<span id="cb469-21"><a href="v8-img.html#cb469-21"></a>      <span class="kw">actionButton</span>(</span>
+<span id="cb469-22"><a href="v8-img.html#cb469-22"></a>        <span class="st">&quot;classify&quot;</span>, <span class="st">&quot;Classify&quot;</span>, <span class="dt">icon =</span> <span class="kw">icon</span>(<span class="st">&quot;search&quot;</span>)</span>
+<span id="cb469-23"><a href="v8-img.html#cb469-23"></a>      )</span>
+<span id="cb469-24"><a href="v8-img.html#cb469-24"></a>    )</span>
+<span id="cb469-25"><a href="v8-img.html#cb469-25"></a>  ),</span>
+<span id="cb469-26"><a href="v8-img.html#cb469-26"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;img&quot;</span>)</span>
+<span id="cb469-27"><a href="v8-img.html#cb469-27"></a>)</span>
+<span id="cb469-28"><a href="v8-img.html#cb469-28"></a></span>
+<span id="cb469-29"><a href="v8-img.html#cb469-29"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
 <span id="cb469-30"><a href="v8-img.html#cb469-30"></a></span>
-<span id="cb469-31"><a href="v8-img.html#cb469-31"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb469-32"><a href="v8-img.html#cb469-32"></a></span>
-<span id="cb469-33"><a href="v8-img.html#cb469-33"></a>  output<span class="op">$</span>img &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
-<span id="cb469-34"><a href="v8-img.html#cb469-34"></a>    path &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;www/&quot;</span>, input<span class="op">$</span>select, <span class="st">&quot;.jpg&quot;</span>)</span>
-<span id="cb469-35"><a href="v8-img.html#cb469-35"></a>    tags<span class="op">$</span><span class="kw">img</span>(<span class="dt">src =</span> path, <span class="dt">id =</span> <span class="st">&quot;bird&quot;</span>)</span>
-<span id="cb469-36"><a href="v8-img.html#cb469-36"></a>  })</span>
-<span id="cb469-37"><a href="v8-img.html#cb469-37"></a></span>
-<span id="cb469-38"><a href="v8-img.html#cb469-38"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>classify, {</span>
-<span id="cb469-39"><a href="v8-img.html#cb469-39"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;classify&#39;</span>, <span class="kw">list</span>())</span>
-<span id="cb469-40"><a href="v8-img.html#cb469-40"></a>  })</span>
+<span id="cb469-31"><a href="v8-img.html#cb469-31"></a>  output<span class="op">$</span>img &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
+<span id="cb469-32"><a href="v8-img.html#cb469-32"></a>    path &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;www/&quot;</span>, input<span class="op">$</span>select, <span class="st">&quot;.jpg&quot;</span>)</span>
+<span id="cb469-33"><a href="v8-img.html#cb469-33"></a>    tags<span class="op">$</span><span class="kw">img</span>(<span class="dt">src =</span> path, <span class="dt">id =</span> <span class="st">&quot;bird&quot;</span>)</span>
+<span id="cb469-34"><a href="v8-img.html#cb469-34"></a>  })</span>
+<span id="cb469-35"><a href="v8-img.html#cb469-35"></a></span>
+<span id="cb469-36"><a href="v8-img.html#cb469-36"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>classify, {</span>
+<span id="cb469-37"><a href="v8-img.html#cb469-37"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;classify&#39;</span>, <span class="kw">list</span>())</span>
+<span id="cb469-38"><a href="v8-img.html#cb469-38"></a>  })</span>
+<span id="cb469-39"><a href="v8-img.html#cb469-39"></a></span>
+<span id="cb469-40"><a href="v8-img.html#cb469-40"></a>}</span>
 <span id="cb469-41"><a href="v8-img.html#cb469-41"></a></span>
-<span id="cb469-42"><a href="v8-img.html#cb469-42"></a>  <span class="co"># render classification</span></span>
-<span id="cb469-43"><a href="v8-img.html#cb469-43"></a>  output<span class="op">$</span>results &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
-<span id="cb469-44"><a href="v8-img.html#cb469-44"></a>    input<span class="op">$</span>classification</span>
-<span id="cb469-45"><a href="v8-img.html#cb469-45"></a>  })</span>
-<span id="cb469-46"><a href="v8-img.html#cb469-46"></a></span>
-<span id="cb469-47"><a href="v8-img.html#cb469-47"></a>}</span>
-<span id="cb469-48"><a href="v8-img.html#cb469-48"></a></span>
-<span id="cb469-49"><a href="v8-img.html#cb469-49"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<span id="cb469-42"><a href="v8-img.html#cb469-42"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="figure">
+<img src="images/ml5-init.png" alt="" />
+<p class="caption">Classifier skeleton</p>
+</div>
+</div>
+<div id="v8-img-javascript" class="section level2" number="22.3">
+<h2><span class="header-section-number">22.3</span> JavaScript</h2>
+<p>With this in place one can start thinking about the JavaScript, when the “classify” button is clicked the classification must be triggered in the client and the result sent back. To do so we need to define the message handler called “classify” to which the data is sent.</p>
+<div class="sourceCode" id="cb470"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb470-1"><a href="v8-img.html#cb470-1"></a><span class="co">// classify.js</span></span>
+<span id="cb470-2"><a href="v8-img.html#cb470-2"></a></span>
+<span id="cb470-3"><a href="v8-img.html#cb470-3"></a><span class="co">// Initialize </span></span>
+<span id="cb470-4"><a href="v8-img.html#cb470-4"></a><span class="kw">const</span> classifier <span class="op">=</span> ml5<span class="op">.</span><span class="fu">imageClassifier</span>(<span class="st">&#39;MobileNet&#39;</span><span class="op">,</span> modelLoaded)<span class="op">;</span></span>
+<span id="cb470-5"><a href="v8-img.html#cb470-5"></a></span>
+<span id="cb470-6"><a href="v8-img.html#cb470-6"></a><span class="kw">function</span> <span class="fu">modelLoaded</span>() {</span>
+<span id="cb470-7"><a href="v8-img.html#cb470-7"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Model Loaded!&#39;</span>)<span class="op">;</span></span>
+<span id="cb470-8"><a href="v8-img.html#cb470-8"></a>}</span>
+<span id="cb470-9"><a href="v8-img.html#cb470-9"></a></span>
+<span id="cb470-10"><a href="v8-img.html#cb470-10"></a>Shiny<span class="op">.</span><span class="fu">addCustomMessageHandler</span>(<span class="st">&#39;classify&#39;</span><span class="op">,</span> <span class="kw">function</span>(data){</span>
+<span id="cb470-11"><a href="v8-img.html#cb470-11"></a>  <span class="co">// Make a prediction with a selected image</span></span>
+<span id="cb470-12"><a href="v8-img.html#cb470-12"></a>  classifier<span class="op">.</span><span class="fu">classify</span>(</span>
+<span id="cb470-13"><a href="v8-img.html#cb470-13"></a>    <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;bird&quot;</span>)<span class="op">,</span> (err<span class="op">,</span> results) <span class="kw">=&gt;</span> {</span>
+<span id="cb470-14"><a href="v8-img.html#cb470-14"></a>      Shiny<span class="op">.</span><span class="fu">setInputValue</span>(<span class="st">&quot;classification&quot;</span><span class="op">,</span> results)<span class="op">;</span></span>
+<span id="cb470-15"><a href="v8-img.html#cb470-15"></a>    }</span>
+<span id="cb470-16"><a href="v8-img.html#cb470-16"></a>  )<span class="op">;</span></span>
+<span id="cb470-17"><a href="v8-img.html#cb470-17"></a>})<span class="op">;</span></span></code></pre></div>
+<p>A few things to note on the above. The classifier is created outside of the message handler as this only has to be done once and not every time the “classify” button is clicked. While the message handler accepts the <code>data</code> objects it does not make use of it, which is fine, the argument must nonetheless be specified. In the aforementioned callback function the input “classification” is defined.</p>
+</div>
+<div id="v8-img-handler" class="section level2" number="22.4">
+<h2><span class="header-section-number">22.4</span> Input Handler</h2>
+<p>We can then proceed to running the shiny application and observe the classifier in action.</p>
+<div class="sourceCode" id="cb471"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb471-1"><a href="v8-img.html#cb471-1"></a><span class="kw">library</span>(<span class="st">&quot;shiny&quot;</span>)</span>
+<span id="cb471-2"><a href="v8-img.html#cb471-2"></a></span>
+<span id="cb471-3"><a href="v8-img.html#cb471-3"></a><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb471-4"><a href="v8-img.html#cb471-4"></a></span>
+<span id="cb471-5"><a href="v8-img.html#cb471-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb471-6"><a href="v8-img.html#cb471-6"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb471-7"><a href="v8-img.html#cb471-7"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb471-8"><a href="v8-img.html#cb471-8"></a>      <span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/ml5@0.4.3/dist/ml5.min.js&quot;</span></span>
+<span id="cb471-9"><a href="v8-img.html#cb471-9"></a>    ),</span>
+<span id="cb471-10"><a href="v8-img.html#cb471-10"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/classify.js&quot;</span>)</span>
+<span id="cb471-11"><a href="v8-img.html#cb471-11"></a>  ),</span>
+<span id="cb471-12"><a href="v8-img.html#cb471-12"></a>  <span class="kw">fluidRow</span>(</span>
+<span id="cb471-13"><a href="v8-img.html#cb471-13"></a>    <span class="kw">column</span>(</span>
+<span id="cb471-14"><a href="v8-img.html#cb471-14"></a>      <span class="dv">2</span>,</span>
+<span id="cb471-15"><a href="v8-img.html#cb471-15"></a>      <span class="kw">selectInput</span>(</span>
+<span id="cb471-16"><a href="v8-img.html#cb471-16"></a>        <span class="st">&quot;select&quot;</span>, <span class="st">&quot;Select an image to classify&quot;</span>,</span>
+<span id="cb471-17"><a href="v8-img.html#cb471-17"></a>        <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;lorikeet&quot;</span>, <span class="st">&quot;flamingo&quot;</span>)</span>
+<span id="cb471-18"><a href="v8-img.html#cb471-18"></a>      )</span>
+<span id="cb471-19"><a href="v8-img.html#cb471-19"></a>    ),</span>
+<span id="cb471-20"><a href="v8-img.html#cb471-20"></a>    <span class="kw">column</span>(</span>
+<span id="cb471-21"><a href="v8-img.html#cb471-21"></a>      <span class="dv">2</span>, <span class="kw">br</span>(), </span>
+<span id="cb471-22"><a href="v8-img.html#cb471-22"></a>      <span class="kw">actionButton</span>(</span>
+<span id="cb471-23"><a href="v8-img.html#cb471-23"></a>        <span class="st">&quot;classify&quot;</span>, <span class="st">&quot;Classify&quot;</span>, <span class="dt">icon =</span> <span class="kw">icon</span>(<span class="st">&quot;search&quot;</span>)</span>
+<span id="cb471-24"><a href="v8-img.html#cb471-24"></a>      )</span>
+<span id="cb471-25"><a href="v8-img.html#cb471-25"></a>    )</span>
+<span id="cb471-26"><a href="v8-img.html#cb471-26"></a>  ),</span>
+<span id="cb471-27"><a href="v8-img.html#cb471-27"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;img&quot;</span>),</span>
+<span id="cb471-28"><a href="v8-img.html#cb471-28"></a>  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;results&quot;</span>) <span class="co"># print output</span></span>
+<span id="cb471-29"><a href="v8-img.html#cb471-29"></a>)</span>
+<span id="cb471-30"><a href="v8-img.html#cb471-30"></a></span>
+<span id="cb471-31"><a href="v8-img.html#cb471-31"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb471-32"><a href="v8-img.html#cb471-32"></a></span>
+<span id="cb471-33"><a href="v8-img.html#cb471-33"></a>  output<span class="op">$</span>img &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
+<span id="cb471-34"><a href="v8-img.html#cb471-34"></a>    path &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;www/&quot;</span>, input<span class="op">$</span>select, <span class="st">&quot;.jpg&quot;</span>)</span>
+<span id="cb471-35"><a href="v8-img.html#cb471-35"></a>    tags<span class="op">$</span><span class="kw">img</span>(<span class="dt">src =</span> path, <span class="dt">id =</span> <span class="st">&quot;bird&quot;</span>)</span>
+<span id="cb471-36"><a href="v8-img.html#cb471-36"></a>  })</span>
+<span id="cb471-37"><a href="v8-img.html#cb471-37"></a></span>
+<span id="cb471-38"><a href="v8-img.html#cb471-38"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>classify, {</span>
+<span id="cb471-39"><a href="v8-img.html#cb471-39"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;classify&#39;</span>, <span class="kw">list</span>())</span>
+<span id="cb471-40"><a href="v8-img.html#cb471-40"></a>  })</span>
+<span id="cb471-41"><a href="v8-img.html#cb471-41"></a></span>
+<span id="cb471-42"><a href="v8-img.html#cb471-42"></a>  <span class="co"># render classification</span></span>
+<span id="cb471-43"><a href="v8-img.html#cb471-43"></a>  output<span class="op">$</span>results &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb471-44"><a href="v8-img.html#cb471-44"></a>    input<span class="op">$</span>classification</span>
+<span id="cb471-45"><a href="v8-img.html#cb471-45"></a>  })</span>
+<span id="cb471-46"><a href="v8-img.html#cb471-46"></a></span>
+<span id="cb471-47"><a href="v8-img.html#cb471-47"></a>}</span>
+<span id="cb471-48"><a href="v8-img.html#cb471-48"></a></span>
+<span id="cb471-49"><a href="v8-img.html#cb471-49"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div class="figure">
 <img src="images/ml5-output.png" alt="" />
 <p class="caption">Classifier output</p>
 </div>
 <p>This returns three results, the label (classification) and the confidence, which could be improved, we ought to build an input handler to transform that into a readable table. Below we add the input handler and register it with shiny. Do not forget to use it in the message handler in JavaScript like so: <code>Shiny.setInputValue("classification:class", results);</code>.</p>
-<div class="sourceCode" id="cb470"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb470-1"><a href="v8-img.html#cb470-1"></a><span class="kw">library</span>(<span class="st">&quot;shiny&quot;</span>)</span>
-<span id="cb470-2"><a href="v8-img.html#cb470-2"></a></span>
-<span id="cb470-3"><a href="v8-img.html#cb470-3"></a><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
-<span id="cb470-4"><a href="v8-img.html#cb470-4"></a></span>
-<span id="cb470-5"><a href="v8-img.html#cb470-5"></a><span class="co"># create handler</span></span>
-<span id="cb470-6"><a href="v8-img.html#cb470-6"></a>handler &lt;-<span class="st"> </span><span class="cf">function</span>(data, ...){</span>
-<span id="cb470-7"><a href="v8-img.html#cb470-7"></a>  purrr<span class="op">::</span><span class="kw">map_dfr</span>(data, as.data.frame)</span>
-<span id="cb470-8"><a href="v8-img.html#cb470-8"></a>}</span>
-<span id="cb470-9"><a href="v8-img.html#cb470-9"></a></span>
-<span id="cb470-10"><a href="v8-img.html#cb470-10"></a><span class="co"># register handler</span></span>
-<span id="cb470-11"><a href="v8-img.html#cb470-11"></a>shiny<span class="op">::</span><span class="kw">registerInputHandler</span>(<span class="st">&quot;class&quot;</span>, handler)</span>
-<span id="cb470-12"><a href="v8-img.html#cb470-12"></a></span>
-<span id="cb470-13"><a href="v8-img.html#cb470-13"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb470-14"><a href="v8-img.html#cb470-14"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb470-15"><a href="v8-img.html#cb470-15"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb470-16"><a href="v8-img.html#cb470-16"></a>      <span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/ml5@0.4.3/dist/ml5.min.js&quot;</span></span>
-<span id="cb470-17"><a href="v8-img.html#cb470-17"></a>    ),</span>
-<span id="cb470-18"><a href="v8-img.html#cb470-18"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/classify.js&quot;</span>)</span>
-<span id="cb470-19"><a href="v8-img.html#cb470-19"></a>  ),</span>
-<span id="cb470-20"><a href="v8-img.html#cb470-20"></a>  <span class="kw">fluidRow</span>(</span>
-<span id="cb470-21"><a href="v8-img.html#cb470-21"></a>    <span class="kw">column</span>(</span>
-<span id="cb470-22"><a href="v8-img.html#cb470-22"></a>      <span class="dv">2</span>,</span>
-<span id="cb470-23"><a href="v8-img.html#cb470-23"></a>      <span class="kw">selectInput</span>(</span>
-<span id="cb470-24"><a href="v8-img.html#cb470-24"></a>        <span class="st">&quot;select&quot;</span>, <span class="st">&quot;Select an image to classify&quot;</span>,</span>
-<span id="cb470-25"><a href="v8-img.html#cb470-25"></a>        <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;lorikeet&quot;</span>, <span class="st">&quot;flamingo&quot;</span>)</span>
-<span id="cb470-26"><a href="v8-img.html#cb470-26"></a>      )</span>
-<span id="cb470-27"><a href="v8-img.html#cb470-27"></a>    ),</span>
-<span id="cb470-28"><a href="v8-img.html#cb470-28"></a>    <span class="kw">column</span>(</span>
-<span id="cb470-29"><a href="v8-img.html#cb470-29"></a>      <span class="dv">2</span>, <span class="kw">br</span>(), </span>
-<span id="cb470-30"><a href="v8-img.html#cb470-30"></a>      <span class="kw">actionButton</span>(</span>
-<span id="cb470-31"><a href="v8-img.html#cb470-31"></a>        <span class="st">&quot;classify&quot;</span>, <span class="st">&quot;Classify&quot;</span>, <span class="dt">icon =</span> <span class="kw">icon</span>(<span class="st">&quot;search&quot;</span>)</span>
-<span id="cb470-32"><a href="v8-img.html#cb470-32"></a>      )</span>
-<span id="cb470-33"><a href="v8-img.html#cb470-33"></a>    )</span>
-<span id="cb470-34"><a href="v8-img.html#cb470-34"></a>  ),</span>
-<span id="cb470-35"><a href="v8-img.html#cb470-35"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;img&quot;</span>),</span>
-<span id="cb470-36"><a href="v8-img.html#cb470-36"></a>  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;results&quot;</span>)</span>
-<span id="cb470-37"><a href="v8-img.html#cb470-37"></a>)</span>
-<span id="cb470-38"><a href="v8-img.html#cb470-38"></a></span>
-<span id="cb470-39"><a href="v8-img.html#cb470-39"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb470-40"><a href="v8-img.html#cb470-40"></a></span>
-<span id="cb470-41"><a href="v8-img.html#cb470-41"></a>  output<span class="op">$</span>img &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
-<span id="cb470-42"><a href="v8-img.html#cb470-42"></a>    path &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;www/&quot;</span>, input<span class="op">$</span>select, <span class="st">&quot;.jpg&quot;</span>)</span>
-<span id="cb470-43"><a href="v8-img.html#cb470-43"></a>    tags<span class="op">$</span><span class="kw">img</span>(<span class="dt">src =</span> path, <span class="dt">id =</span> <span class="st">&quot;bird&quot;</span>)</span>
-<span id="cb470-44"><a href="v8-img.html#cb470-44"></a>  })</span>
-<span id="cb470-45"><a href="v8-img.html#cb470-45"></a></span>
-<span id="cb470-46"><a href="v8-img.html#cb470-46"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>classify, {</span>
-<span id="cb470-47"><a href="v8-img.html#cb470-47"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;classify&#39;</span>, <span class="kw">list</span>())</span>
-<span id="cb470-48"><a href="v8-img.html#cb470-48"></a>  })</span>
-<span id="cb470-49"><a href="v8-img.html#cb470-49"></a></span>
-<span id="cb470-50"><a href="v8-img.html#cb470-50"></a>  output<span class="op">$</span>results &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
-<span id="cb470-51"><a href="v8-img.html#cb470-51"></a>    input<span class="op">$</span>classification</span>
-<span id="cb470-52"><a href="v8-img.html#cb470-52"></a>  })</span>
-<span id="cb470-53"><a href="v8-img.html#cb470-53"></a></span>
-<span id="cb470-54"><a href="v8-img.html#cb470-54"></a>}</span>
-<span id="cb470-55"><a href="v8-img.html#cb470-55"></a></span>
-<span id="cb470-56"><a href="v8-img.html#cb470-56"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb472"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb472-1"><a href="v8-img.html#cb472-1"></a><span class="kw">library</span>(<span class="st">&quot;shiny&quot;</span>)</span>
+<span id="cb472-2"><a href="v8-img.html#cb472-2"></a></span>
+<span id="cb472-3"><a href="v8-img.html#cb472-3"></a><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
+<span id="cb472-4"><a href="v8-img.html#cb472-4"></a></span>
+<span id="cb472-5"><a href="v8-img.html#cb472-5"></a><span class="co"># create handler</span></span>
+<span id="cb472-6"><a href="v8-img.html#cb472-6"></a>handler &lt;-<span class="st"> </span><span class="cf">function</span>(data, ...){</span>
+<span id="cb472-7"><a href="v8-img.html#cb472-7"></a>  purrr<span class="op">::</span><span class="kw">map_dfr</span>(data, as.data.frame)</span>
+<span id="cb472-8"><a href="v8-img.html#cb472-8"></a>}</span>
+<span id="cb472-9"><a href="v8-img.html#cb472-9"></a></span>
+<span id="cb472-10"><a href="v8-img.html#cb472-10"></a><span class="co"># register handler</span></span>
+<span id="cb472-11"><a href="v8-img.html#cb472-11"></a>shiny<span class="op">::</span><span class="kw">registerInputHandler</span>(<span class="st">&quot;class&quot;</span>, handler)</span>
+<span id="cb472-12"><a href="v8-img.html#cb472-12"></a></span>
+<span id="cb472-13"><a href="v8-img.html#cb472-13"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb472-14"><a href="v8-img.html#cb472-14"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb472-15"><a href="v8-img.html#cb472-15"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb472-16"><a href="v8-img.html#cb472-16"></a>      <span class="dt">src =</span> <span class="st">&quot;https://unpkg.com/ml5@0.4.3/dist/ml5.min.js&quot;</span></span>
+<span id="cb472-17"><a href="v8-img.html#cb472-17"></a>    ),</span>
+<span id="cb472-18"><a href="v8-img.html#cb472-18"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="dt">src =</span> <span class="st">&quot;www/classify.js&quot;</span>)</span>
+<span id="cb472-19"><a href="v8-img.html#cb472-19"></a>  ),</span>
+<span id="cb472-20"><a href="v8-img.html#cb472-20"></a>  <span class="kw">fluidRow</span>(</span>
+<span id="cb472-21"><a href="v8-img.html#cb472-21"></a>    <span class="kw">column</span>(</span>
+<span id="cb472-22"><a href="v8-img.html#cb472-22"></a>      <span class="dv">2</span>,</span>
+<span id="cb472-23"><a href="v8-img.html#cb472-23"></a>      <span class="kw">selectInput</span>(</span>
+<span id="cb472-24"><a href="v8-img.html#cb472-24"></a>        <span class="st">&quot;select&quot;</span>, <span class="st">&quot;Select an image to classify&quot;</span>,</span>
+<span id="cb472-25"><a href="v8-img.html#cb472-25"></a>        <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;lorikeet&quot;</span>, <span class="st">&quot;flamingo&quot;</span>)</span>
+<span id="cb472-26"><a href="v8-img.html#cb472-26"></a>      )</span>
+<span id="cb472-27"><a href="v8-img.html#cb472-27"></a>    ),</span>
+<span id="cb472-28"><a href="v8-img.html#cb472-28"></a>    <span class="kw">column</span>(</span>
+<span id="cb472-29"><a href="v8-img.html#cb472-29"></a>      <span class="dv">2</span>, <span class="kw">br</span>(), </span>
+<span id="cb472-30"><a href="v8-img.html#cb472-30"></a>      <span class="kw">actionButton</span>(</span>
+<span id="cb472-31"><a href="v8-img.html#cb472-31"></a>        <span class="st">&quot;classify&quot;</span>, <span class="st">&quot;Classify&quot;</span>, <span class="dt">icon =</span> <span class="kw">icon</span>(<span class="st">&quot;search&quot;</span>)</span>
+<span id="cb472-32"><a href="v8-img.html#cb472-32"></a>      )</span>
+<span id="cb472-33"><a href="v8-img.html#cb472-33"></a>    )</span>
+<span id="cb472-34"><a href="v8-img.html#cb472-34"></a>  ),</span>
+<span id="cb472-35"><a href="v8-img.html#cb472-35"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;img&quot;</span>),</span>
+<span id="cb472-36"><a href="v8-img.html#cb472-36"></a>  <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;results&quot;</span>)</span>
+<span id="cb472-37"><a href="v8-img.html#cb472-37"></a>)</span>
+<span id="cb472-38"><a href="v8-img.html#cb472-38"></a></span>
+<span id="cb472-39"><a href="v8-img.html#cb472-39"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb472-40"><a href="v8-img.html#cb472-40"></a></span>
+<span id="cb472-41"><a href="v8-img.html#cb472-41"></a>  output<span class="op">$</span>img &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
+<span id="cb472-42"><a href="v8-img.html#cb472-42"></a>    path &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;www/&quot;</span>, input<span class="op">$</span>select, <span class="st">&quot;.jpg&quot;</span>)</span>
+<span id="cb472-43"><a href="v8-img.html#cb472-43"></a>    tags<span class="op">$</span><span class="kw">img</span>(<span class="dt">src =</span> path, <span class="dt">id =</span> <span class="st">&quot;bird&quot;</span>)</span>
+<span id="cb472-44"><a href="v8-img.html#cb472-44"></a>  })</span>
+<span id="cb472-45"><a href="v8-img.html#cb472-45"></a></span>
+<span id="cb472-46"><a href="v8-img.html#cb472-46"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>classify, {</span>
+<span id="cb472-47"><a href="v8-img.html#cb472-47"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&#39;classify&#39;</span>, <span class="kw">list</span>())</span>
+<span id="cb472-48"><a href="v8-img.html#cb472-48"></a>  })</span>
+<span id="cb472-49"><a href="v8-img.html#cb472-49"></a></span>
+<span id="cb472-50"><a href="v8-img.html#cb472-50"></a>  output<span class="op">$</span>results &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb472-51"><a href="v8-img.html#cb472-51"></a>    input<span class="op">$</span>classification</span>
+<span id="cb472-52"><a href="v8-img.html#cb472-52"></a>  })</span>
+<span id="cb472-53"><a href="v8-img.html#cb472-53"></a></span>
+<span id="cb472-54"><a href="v8-img.html#cb472-54"></a>}</span>
+<span id="cb472-55"><a href="v8-img.html#cb472-55"></a></span>
+<span id="cb472-56"><a href="v8-img.html#cb472-56"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div class="figure">
 <img src="images/ml5-table.png" alt="" />
 <p class="caption">Classifier table output</p>
