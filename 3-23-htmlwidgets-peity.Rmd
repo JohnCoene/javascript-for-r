@@ -294,7 +294,7 @@ These can then be easily accessed from JavaScript.
 $(el).peity(x.type, x.options)
 ```
 
-This makes (nearly) all of the functionalities of peity.js available from R. Below we use `htmltools::browsable` to create multiple widgets at once, the function only accepts a single value so the charts are wrapped in an `htmltools::tagList`.
+This makes (nearly) all of the functionalities of peity.js available from R. Below we use `htmltools::browsable` to create multiple widgets at once, the function only accepts a single value so the charts are wrapped in an `htmltools::tagList`. Let's explain those in reverse order, `tagList` accepts a group of tags or valid HTML outputs like htmlwidgets and wraps them into one, it is necessary here because the function `browsable` only accepts one value. Normally htmltools tags are just printed in the console, here we need them to be opened in the browser instead.
 
 ```r
 library(htmltools)
@@ -331,7 +331,7 @@ There is nonetheless one remaining issue: peity.js is meant to create inline cha
 
 As pointed out multiple times, the widget is generated in a `<div>`, which is works fine for most visualisation libraries. But we saw that peity.js works best when placed in a `<span>` as this allows placing the charts inline. 
 
-This can be changed by placing a function named `widgetname_html` which is looked up by htmlwidgets and used if found. This function takes the three-dot construct (`...`) and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets needs be able to pass the `id`, `class`, and `style` attributes to the tag.
+This can be changed by placing a function named `widgetname_html` which is looked up by htmlwidgets and used if found. This is probably the first such function one encounters and is rather uncommon but it is literally how the htmlwidgets package does it: it scans the namespace of the package looking for a function that starts with the name of the widget and ends in `_html` and if found uses it, otherwise it uses the default `div`. This function takes the three-dot construct (`...`) and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets needs be able to pass the `id`, `class`, and `style` attributes to the tag.
 
 ```r
 peity_html <- function(...){
