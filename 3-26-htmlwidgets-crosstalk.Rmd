@@ -1,5 +1,9 @@
 # Linking Widgets {#linking-widgets}
 
+```{r, include=FALSE}
+library(crosstalk)
+```
+
 Widgets can be linked with one another using the crosstalk [@R-crosstalk] package, a fantastic add-on for htmlwidgets that implements inter-widget interactions, namely selection and filtering. This in effect allows the selection or filtering of data points in one widget to be mirrored in another. This is enabled with the creation of "shared datasets" that can be used across widgets; outputs that share datasets share interactions.
 
 Crosstalk provides a straightforward interface to the users and instead requires effort from developers for their widgets to support shared datasets.
@@ -202,15 +206,51 @@ digraph G {
 ", width = "100%", height = 250)
 ```
 
-Indeed the bi-directional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. This internally works with `key`s that are assigned to every row of the dataframe which enable crosstalk to track which are selected or filtered. These keys can be explicitly set by the user and otherwise default to the row names of the data.frame, and if these are not available the `SharedData` function will create row numbers.
+Indeed the bi-directional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. 
+
+### Keys {#linking-widgets-keys}
+
+This internally works with `key`s that are assigned to every row of the dataframe which enable crosstalk to track which are selected or filtered.
+
+When creating a shared dataset crosstalk will by default use the row names of the data.frame, and if these are not available the `SharedData` function will create row numbers.
+
+```{r}
+sd_cars <- SharedData$new(cars[1:2,])
+```
+
+You can therefore _mentally represent_ the above shared dataset as the table, note the emphasis, internally crosstalk does not actually add a column to the dataset: it leaves it as-is.
+
+```{r, echo=FALSE}
+cars2 <- cars[1:5,]
+cars2$key <- as.character(1:5)
+cars2 <- cars2[,c(3,1,2)]
+knitr::kable(cars2)
+```
+
+The keys assigned can be retrieve with the `key` method on the shared dataset itself.
+
+```{r}
+sd_cars$key()
+```
+
+Otherwise these keys can be explicitly set by the user when creating the package.
 
 ```{r}
 # assign keys
-df <- data.frame(x = runif(26))
-sd <- SharedData$new(df, key = letters)
+df <- data.frame(x = runif(5))
+sd <- SharedData$new(df, key = letters[1:5])
+sd$key()
 ```
 
-In a sense, while crosstalk establishes lines of communication to transport `key`s between widgets, developers of the respective widgets must handle what `key`s are sent and what to do with incoming `key`s. There are two such lines of communication, one for `key`s of rows to be filtered meant to narrow down the selection of data points displayed on a widget, and another for selection (what crosstalk refers to as "linked brushing") to highlight certain data points.
+### Communication Lines {#linking-widgets-communication-lines}
+
+In a sense, while crosstalk establishes lines of communication to transport `key`s between widgets, developers of the respective widgets must handle what `key`s are sent to other widgets and what to do with incoming `key`s (that are selected or filtered in other widgets). There are two such lines of communication, one for `key`s of rows to be filtered, meant to narrow down the selection of data points displayed on a widget, and another for selection (what crosstalk refers to as "linked brushing") to highlight certain data points (fading out other data points).
+
+In JavaScript, a widget "receives" the keys of selected and filtered data points and must, when filtering or selection is observed, "send" said selected or filtered keys to other widgets. 
+
+### Groups {#linking-widgets-groups}
+
+Internally crosstalk knows what to share across widgets with `group`s groups share `key`s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other. 
 
 ```{r, echo=FALSE}
 DiagrammeR::grViz("
@@ -255,8 +295,6 @@ digraph G {
 }
 ", width = "100%", height=250)
 ```
-
-In JavaScript, a widget "receives" the keys of selected and filtered data points and must, when filtering or selection is observed, "send" said selected or filtered keys to other widgets. Internally crosstalk knows what to share across widgets with `group`s groups share `key`s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other. 
 
 ```{block, type='rmdnote'}
 Crosstalk groups share keys.

@@ -3727,23 +3727,75 @@ Other than tabular data, crosstalk will require the widget to have the necessary
 
 As will be discovered later when support for crosstalk is brought to gio, very little changes on the R side. As might be expected, crosstalk enables communication between widgets via JavaScript, hence much of what must be adapted by widgets developers happens in JavaScript too.
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-44-1.png}
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-45-1.png}
 
-Indeed the bi-directional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. This internally works with \texttt{key}s that are assigned to every row of the dataframe which enable crosstalk to track which are selected or filtered. These keys can be explicitly set by the user and otherwise default to the row names of the data.frame, and if these are not available the \texttt{SharedData} function will create row numbers.
+Indeed the bi-directional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser.
+
+\hypertarget{linking-widgets-keys}{%
+\subsection{Keys}\label{linking-widgets-keys}}
+
+This internally works with \texttt{key}s that are assigned to every row of the dataframe which enable crosstalk to track which are selected or filtered.
+
+When creating a shared dataset crosstalk will by default use the row names of the data.frame, and if these are not available the \texttt{SharedData} function will create row numbers.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sd\_cars <{-}}\StringTok{ }\NormalTok{SharedData}\OperatorTok{$}\KeywordTok{new}\NormalTok{(cars[}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{,])}
+\end{Highlighting}
+\end{Shaded}
+
+You can therefore \emph{mentally represent} the above shared dataset as the table, note the emphasis, internally crosstalk does not actually add a column to the dataset: it leaves it as-is.
+
+\begin{tabular}{l|r|r}
+\hline
+key & speed & dist\\
+\hline
+1 & 4 & 2\\
+\hline
+2 & 4 & 10\\
+\hline
+\end{tabular}
+
+The keys assigned can be retrieve with the \texttt{key} method on the shared dataset itself.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sd\_cars}\OperatorTok{$}\KeywordTok{key}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "1" "2"
+\end{verbatim}
+
+Otherwise these keys can be explicitly set by the user when creating the package.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# assign keys}
-\NormalTok{df <{-}}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{runif}\NormalTok{(}\DecValTok{26}\NormalTok{))}
-\NormalTok{sd <{-}}\StringTok{ }\NormalTok{SharedData}\OperatorTok{$}\KeywordTok{new}\NormalTok{(df, }\DataTypeTok{key =}\NormalTok{ letters)}
+\NormalTok{df <{-}}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{runif}\NormalTok{(}\DecValTok{5}\NormalTok{))}
+\NormalTok{sd <{-}}\StringTok{ }\NormalTok{SharedData}\OperatorTok{$}\KeywordTok{new}\NormalTok{(df, }\DataTypeTok{key =}\NormalTok{ letters[}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{])}
+\NormalTok{sd}\OperatorTok{$}\KeywordTok{key}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
 
-In a sense, while crosstalk establishes lines of communication to transport \texttt{key}s between widgets, developers of the respective widgets must handle what \texttt{key}s are sent and what to do with incoming \texttt{key}s. There are two such lines of communication, one for \texttt{key}s of rows to be filtered meant to narrow down the selection of data points displayed on a widget, and another for selection (what crosstalk refers to as ``linked brushing'') to highlight certain data points.
+\begin{verbatim}
+## [1] "a" "b" "c" "d" "e"
+\end{verbatim}
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-46-1.png}
+\hypertarget{linking-widgets-communication-lines}{%
+\subsection{Communication Lines}\label{linking-widgets-communication-lines}}
 
-In JavaScript, a widget ``receives'' the keys of selected and filtered data points and must, when filtering or selection is observed, ``send'' said selected or filtered keys to other widgets. Internally crosstalk knows what to share across widgets with \texttt{group}s groups share \texttt{key}s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other.
+In a sense, while crosstalk establishes lines of communication to transport \texttt{key}s between widgets, developers of the respective widgets must handle what \texttt{key}s are sent to other widgets and what to do with incoming \texttt{key}s (that are selected or filtered in other widgets). There are two such lines of communication, one for \texttt{key}s of rows to be filtered, meant to narrow down the selection of data points displayed on a widget, and another for selection (what crosstalk refers to as ``linked brushing'') to highlight certain data points (fading out other data points).
+
+In JavaScript, a widget ``receives'' the keys of selected and filtered data points and must, when filtering or selection is observed, ``send'' said selected or filtered keys to other widgets.
+
+\hypertarget{linking-widgets-groups}{%
+\subsection{Groups}\label{linking-widgets-groups}}
+
+Internally crosstalk knows what to share across widgets with \texttt{group}s groups share \texttt{key}s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other.
+
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-50-1.png}
 
 \begin{rmdnote}
 Crosstalk groups share keys.
@@ -3832,7 +3884,7 @@ The \texttt{gio} function also has to extract the group to which the dataset bel
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "SharedDatac901f234"
+## [1] "SharedData4d8fe90e"
 \end{verbatim}
 
 \begin{Shaded}
@@ -4130,7 +4182,7 @@ The simplest way is probably to convert the edges to a shared dataset specifying
 
 Thankfully we can use the \texttt{group} argument in order to create edges and nodes that share keys and produce a more sensible link between widgets.
 
-\includegraphics{bookdown_files/figure-latex/unnamed-chunk-52-1.png}
+\includegraphics{bookdown_files/figure-latex/unnamed-chunk-56-1.png}
 
 Below we create two shared datasets with the same group name, one for the edges and another for the nodes and use one for the gio visualisation and the other for the plotly graph.
 
@@ -4832,7 +4884,7 @@ Then again, the goal is not to write a lot of convoluted JavaScript, on the cont
 
 Shiny applications have two components the user interface (UI) and the server function. These two components communicate via a websocket: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server this connection is managed by shiny using the httpuv \citep{R-httpuv} and websocket \citep{R-websocket} packages, while in clients connecting to the server this connection is managed with JavaScript.
 
-\begin{center}\includegraphics[width=1\linewidth]{bookdown_files/figure-latex/unnamed-chunk-55-1} \end{center}
+\begin{center}\includegraphics[width=1\linewidth]{bookdown_files/figure-latex/unnamed-chunk-59-1} \end{center}
 
 With that in mind we can put together a shiny applications which though simple exploits bi-directional communication. The application takes a text input, sends the value of the input to the R server which sends it back to the UI.
 
@@ -4857,7 +4909,7 @@ With that in mind we can put together a shiny applications which though simple e
 
 Drawing a diagram of the communication between the UI and the server reveals that thought this is a simple application a lot is happening.
 
-\begin{center}\includegraphics[width=1\linewidth]{bookdown_files/figure-latex/unnamed-chunk-56-1} \end{center}
+\begin{center}\includegraphics[width=1\linewidth]{bookdown_files/figure-latex/unnamed-chunk-60-1} \end{center}
 
 Communicating between the R server and the user interface requires JavaScript and thus makes us a reasonable chunk of this part of the book on web development with shiny.
 
@@ -7610,7 +7662,7 @@ The diagram below attempts to summarize the various elements that were put toget
 
 It all starts from the \texttt{switchInput} function which generates the HTML defining the switch input and its initial state. In the \texttt{subscribe} method, an event listener checks for changes on this HTML element (\texttt{\$(el).on(\textquotesingle{}change\textquotesingle{},\ ...)}), every time it changes (check/uncheck) it fires the shiny \texttt{callback} which sends the value of the input obtained from \texttt{getValue} through the websocket. When the value of the input is changed from the server this value travels through the websocket to the front-end where \texttt{receiveMessage} uses \texttt{setValue} to programmatically change the check box which incidentally triggers the change event and back we go.
 
-\begin{center}\includegraphics[width=1\linewidth]{bookdown_files/figure-latex/unnamed-chunk-65-1} \end{center}
+\begin{center}\includegraphics[width=1\linewidth]{bookdown_files/figure-latex/unnamed-chunk-69-1} \end{center}
 
 \hypertarget{shiny-input-excercise}{%
 \section{Exercise}\label{shiny-input-excercise}}
@@ -8710,7 +8762,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Oct 11 2020 21:21:58 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Oct 11 2020 21:49:06 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -8720,7 +8772,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Oct 11 2020 21:21:58 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Oct 11 2020 21:49:06 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -9257,7 +9309,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] -4.326
+## [1] -43.55
 \end{verbatim}
 
 \begin{Shaded}
