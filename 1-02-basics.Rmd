@@ -484,94 +484,9 @@ This of course only scratches the surface of JavaScript thus this provides ample
 
 It is assumed that the reader has basic knowledge of the shiny framework and already used it to build applications. However, there are some more obscure functionalities that one may not know but that become essential when introducing JavaScript to applications. Chiefly, how to import external dependencies; JavaScript or otherwise.
 
-There are two ways to make dependencies: using the htmltools [@R-htmltools] package to create a dependency object that shiny can understand or manually serving and importing the files with shiny.
+There are two ways to import dependencies: using the htmltools [@R-htmltools] package to create a dependency object that shiny can understand or manually serving and importing the files with shiny.
 
-### Htmltools {#basics-htmltools}
-
-The htmltools package powers much of the shiny UI, most of the tags that comprise the UI are indeed imported by shiny from htmltools. For instance `shiny::actionButton` is just a light wrapper around htmltools `tags`.
-
-```r
-shiny::actionButton
-```
-
-```r
-function (inputId, label, icon = NULL, width = NULL, ...) 
-{
-    value <- restoreInput(id = inputId, default = NULL)
-    tags$button(
-      id = inputId, style = if (!is.null(width)) 
-      paste0("width: ", validateCssUnit(width), ";"),
-      type = "button", class = "btn btn-default action-button", 
-      `data-val` = value, list(validateIcon(icon), label), 
-      ...
-    )
-}
-```
-
-As the name indicates htmltools goes beyond the generation of HTML tags and provides broader tools to work with HTML from R, this includes working the dependencies. dependencies may appear simple at first, after all were one working with an HTML document in order to import HTML or CSS one could simply use HTML tags.
-
-```html
- <!–– index.html ––>
-<html>
-  <head>
-    <script src="path/to/script.js"></script>
-    <link rel="stylesheet" href="path/to/styles.css">
-  </head>
-  <body></body>
-</html>
-```
-
-However, it can quickly get out of hand when working with modules and packages. Imagine having to manage the generation of dependencies such as the above when multiple functions rely on a dependency but being a dependency it should only be imported once? The unified framework htmltools provides helps immensely in dealing with this sort of issues.
-
-The htmltools package provides utilities to import dependencies and ensure these are only rendered once, as they should be. The way this works is by creating a dependency object that packages like Shiny and R markdown can understand and translate into HTML dependencies. This is handled with the `htmlDependency` function which returns an object of class `html_dependency`.
-
-```r
-dependency <- htmltools::htmlDependency(
-  name = "myDependency",
-  version = "1.0.0",
-  src = "path/to/directory",
-  script = c(file = "script.js"),
-  stylesheet = c(file = "styles.css")
-)
-```
-
-There are a few noteworthy things about the above. First, the `src` argument points to a directory, not the file one wants to import. Second, the `script` and `stylesheet` arguments are named vectors that point to files within the `src` directory. One can use the name `file` to point to a local file (as done above) or use `href` to point to a remote file hosted on a CDN.
-
-Shiny, R markdown, and other packages where htmltools is relevant will then be able to translate an `html_dependency` object into actual HTML dependencies. The above would for instance generate the following HTML.
-
-```html
-<script src="path/to/directory/script.js"></script>
-<link rel="stylesheet" href="path/to/directory/styles.css">
-```
-
-Importantly, the `htmltools::htmlDependency` also takes a `package` argument which makes it such that the `src` path becomes relative to the package directory (the `inst` folder). Hence the snippet below imports a file located at `myPackage/inst/assets/script.js`; the ultimate full path will of course depend on where the package is installed on the users' machine.
-
-```r
-dependency <- htmltools::htmlDependency(
-  name = "myDependency",
-  version = "1.0.0",
-  src = "assets",
-  script = c(file = "script.js"),
-  package = "myPackage" # user package
-)
-```
-
-But does one use it in R markdown or shiny? Well simply placing it in the Shiny UI or an evaluated R markdown chunk will the the job.
-
-```r
-# place it in the shiny UI
-ui <- fluidPage(
-  htmltools::htmlDependency(
-    name = "myDependency",
-    version = "1.0.0",
-    src = "assets",
-    script = c(file = "script.js"),
-    package = "myPackage" # user package
-  )
-)
-```
-
-### Static Files {#basics-static-files}
+### Serving Static Files {#basics-static-files}
 
 Static files are files that are downloaded by the clients, in this case web browsers accessing shiny applications, as-is, these generally include images, CSS (`.css`), and JavaScript (`.js`).
 
@@ -686,9 +601,119 @@ shinyApp(ui, server)
 
 From the browser, inspecting page (right click > inspect > console tab) one should see `Hello JS!` in the console which means the application correctly ran the code in the JavaScript file.
 
-### Dependencies Pros and Cons {#basics-deps-pro-cons}
+### Htmltools {#basics-htmltools}
 
-For multiple reasons, the best way to include dependencies is probably the former using htmltools. First, it will work with both shiny and rmarkdown [@R-rmarkdown] reducing the cognitive load on the developer; learn to use this method and you import dependencies for many different output types. Moreover it comes with neat features that will be explored later in the book, e.g.: dynamic dependencies for interactive visualisations or shiny.
+The htmltools package powers much of the shiny UI, most of the tags that comprise the UI are indeed imported by shiny from htmltools. For instance `shiny::actionButton` is just a light wrapper around htmltools `tags`.
+
+```r
+shiny::actionButton
+```
+
+```r
+function (inputId, label, icon = NULL, width = NULL, ...) 
+{
+    value <- restoreInput(id = inputId, default = NULL)
+    tags$button(
+      id = inputId, style = if (!is.null(width)) 
+      paste0("width: ", validateCssUnit(width), ";"),
+      type = "button", class = "btn btn-default action-button", 
+      `data-val` = value, list(validateIcon(icon), label), 
+      ...
+    )
+}
+```
+
+As the name indicates htmltools goes beyond the generation of HTML tags and provides broader tools to work with HTML from R, this includes working the dependencies. These may appear simple at first, after all were one working with an HTML document in order to import HTML or CSS one could simply use HTML tags.
+
+```html
+ <!–– index.html ––>
+<html>
+  <head>
+    <script src="path/to/script.js"></script>
+    <link rel="stylesheet" href="path/to/styles.css">
+  </head>
+  <body></body>
+</html>
+```
+
+However, it can quickly get out of hand when working with modules and packages. Imagine having to manage the generation of dependencies such as the above when multiple functions rely on a dependency but being a dependency it should only be imported once? The unified framework htmltools helps immensely in dealing with these sorts of issues.
+
+The htmltools package provides utilities to import dependencies and ensure these are only rendered once, as they should be. The way this works is by creating a dependency object that packages like Shiny and R markdown can understand and translate into HTML dependencies. This is handled with the `htmlDependency` function which returns an object of class `html_dependency`.
+
+```r
+dependency <- htmltools::htmlDependency(
+  name = "myDependency",
+  version = "1.0.0",
+  src = c(file = "path/to/directory"),
+  script = "script.js",
+  stylesheet = "styles.css"
+)
+```
+
+About the above, the `src` argument points to the directory that contains the dependencies (`script` and `stylesheet`), this is done with a named vector where `file` indicates the path is a local directory and `href` indicates it is a remote serve, generally a CDN. Note that one can also pass multiple `script` and `stylesheet` by using vectors, e.g.: `c("script.js", "anotherScript.js")`
+
+```{block, class='rmdnote'}
+CDN stands for Content Delivery Network, a geographically distributed group of servers that provide fast transfer of dependencies.
+```
+
+```r
+# dependency to the latest jQuery
+dependency <- htmltools::htmlDependency(
+  name = "myDependency",
+  version = "1.0.0",
+  src = c(
+    href = "https://cdn.jsdelivr.net/gh/jquery/jquery/dist/"
+  ),
+  script = "jquery.min.js"
+)
+```
+
+Shiny, R markdown, and other packages where htmltools is relevant will then be able to translate an `html_dependency` object into actual HTML dependencies. The above would for instance generate the following HTML.
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/jquery/jquery/dist/jquery.min.js"></script>
+```
+
+Importantly, the `htmltools::htmlDependency` also takes a `package` argument which makes it such that the `src` path becomes relative to the package directory (the `inst` folder). Hence the snippet below imports a file located at `myPackage/inst/assets/script.js`; the ultimate full path will of course depend on where the package is installed on the users' machine.
+
+```r
+dependency <- htmltools::htmlDependency(
+  name = "myDependency",
+  version = "1.0.0",
+  src = "assets",
+  script = c(file = "script.js"),
+  package = "myPackage" # user package
+)
+```
+
+But does one use it in R markdown or shiny? Well simply placing it in the Shiny UI or an evaluated R markdown chunk will the the job.
+
+```r
+# place it in the shiny UI
+ui <- fluidPage(
+  htmltools::htmlDependency(
+    name = "myDependency",
+    version = "1.0.0",
+    src = "assets",
+    script = c(file = "script.js"),
+    package = "myPackage" # user package
+  )
+)
+```
+
+### Serving vs. htmltools {#basics-deps-pro-cons}
+
+For multiple reasons, the best way to include dependencies is probably the former using htmltools. First, it will work with both shiny and rmarkdown [@R-rmarkdown] (whereas the other method shown only works with shiny) reducing the cognitive load on the developer (you); learn to use this method and you will be bale to import dependencies for many different output types. Moreover it comes with neat features that will be explored later in the book, e.g.: dynamic dependencies for interactive visualisations or shiny.
+
+Also, using htmltools dependencies will allow other package developers to easily assess and access the dependencies you build. The function `findDependencies` will accept another function from which it can extract the dependencies. The object it returns can then be used elsewhere making dependencies portable. Below we use this function to extract the dependencies of the `fluidPage` function from the shiny package.
+
+```{r}
+htmltools::findDependencies(
+  shiny::fluidPage()
+) 
+```
+
+Extracting dependencies from other packages will become useful later in the book as we try to assess and whether package we build can work together with other packages: making sure dependencies do not clash or importing dependencies from other packages.
 
 Using `shiny::addResourcePath` has one advantage, its use is not limited to making CSS and JavaScript files available in Shiny, it can be used to serve other file types such as JSON or images that may also be needed in the application.
 
