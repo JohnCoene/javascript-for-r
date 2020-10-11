@@ -236,7 +236,7 @@ without whom I should have finished this book two years earlier
 
 \emph{This is the online version of JavaScript for R, a book currently under development and intended for release as part of the \href{https://www.routledge.com/Chapman--HallCRC-The-R-Series/book-series/CRCTHERSER}{R series by CRC Press}.}
 
-{Photo by davisco on Unsplash}
+{Photo by davisuko on Unsplash}
 
 The R programming language has seen the integration of many languages; C, C++, Python, to name a few, can be seamlessly embedded into R so one can easily call code written in other languages from the R console. Little known to many, R works just as well with JavaScript---this book delves into the various ways both languages can work together.
 
@@ -248,9 +248,7 @@ Throughout the book several shiny applications and R packages are put together a
 \section*{Premise}\label{premise}}
 
 
-The R programming language has been propelled into web browsers with the introduction of packages such as \href{https://shiny.rstudio.com/}{shiny} \citep{R-shiny} and \href{https://rmarkdown.rstudio.com/}{rmarkdown} \citep{R-rmarkdown} which have greatly improved how R users can communicate complex insights by building interactive web applications and interactive documents. Yet most R developers are not familiar with one of web browsers' core technology: JavaScript. This books aims to remedy to that.
-
-The book is nonetheless not about learning JavaScript, even though it is aimed at R developers with little knowledge of the language. This statement might appear counter-intuitive at first but, we hope, the book gradually reveals just how little JavaScript is actually needed in order to observe immense benefits otherwise locked away from R developers.
+The R programming language has been propelled into web browsers with the introduction of packages such as \href{https://shiny.rstudio.com/}{shiny} \citep{R-shiny} and \href{https://rmarkdown.rstudio.com/}{rmarkdown} \citep{R-rmarkdown} which have greatly improved how R users can communicate complex insights by building interactive web applications and interactive documents. Yet most R developers are not familiar with one of web browsers' core technology: JavaScript. This books aims to remedy to that by revealing how much JavaScript can greatly enhance various stages of data science pipelines from the analysis to the communication of results.
 
 Importantly, the focus of the book truly is the integration of JavaScript with R where both languages either actively interact with one another, or where JavaScript enables doing things otherwise not accessible to R users---it is not merely about including JavaScript code that works alongside R.
 
@@ -1206,7 +1204,10 @@ We can now use the \texttt{shiny::addResourcePath} to point to this directory. G
 
 If you then run the application and open it at the \texttt{/files/script.js} path (e.g.: \texttt{127.0.0.1:3000/files/script.js}) you should see the content of the JavaScript file (\texttt{console.log(\textquotesingle{}Hello\ JS!\textquotesingle{})}), commenting the \texttt{addResourcePath} line will have a ``Not Found'' error displayed on the page instead.
 
-All files in your asset directory will be served online and accessible to anyone: do not place sensitive files in it.
+\begin{rmdnote}
+All files in your asset directory will be served online and accessible
+to anyone: do not place sensitive files in it.
+\end{rmdnote}
 
 Though one may create multiple such directory and correspondingly use \texttt{addResourcePath} to specify multiple paths and prefixes, one will routinely specify a single one, named ``assets'' or ``static,'' which contains multiple subdirectories, one for each type of static file to obtain a directory that looks something like the tree below. This is, however, an unwritten convention which is by no means forced upon the developer: do as you wish.
 
@@ -1340,7 +1341,10 @@ The htmltools package provides utilities to import dependencies and ensure these
 
 About the above, the \texttt{src} argument points to the directory that contains the dependencies (\texttt{script} and \texttt{stylesheet}), this is done with a named vector where \texttt{file} indicates the path is a local directory and \texttt{href} indicates it is a remote serve, generally a CDN. Note that one can also pass multiple \texttt{script} and \texttt{stylesheet} by using vectors, e.g.: \texttt{c("script.js",\ "anotherScript.js")}
 
-CDN stands for Content Delivery Network, a geographically distributed group of servers that provide fast transfer of dependencies.
+\begin{rmdnote}
+CDN stands for Content Delivery Network, a geographically distributed
+group of servers that provide fast transfer of dependencies.
+\end{rmdnote}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2310,7 +2314,7 @@ These can then be easily accessed from JavaScript.
 \end{Highlighting}
 \end{Shaded}
 
-This makes (nearly) all of the functionalities of peity.js available from R. Below we use \texttt{htmltools::browsable} to create multiple widgets at once, the function only accepts a single value so the charts are wrapped in an \texttt{htmltools::tagList}.
+This makes (nearly) all of the functionalities of peity.js available from R. Below we use \texttt{htmltools::browsable} to create multiple widgets at once, the function only accepts a single value so the charts are wrapped in an \texttt{htmltools::tagList}. Let's explain those in reverse order, \texttt{tagList} accepts a group of tags or valid HTML outputs like htmlwidgets and wraps them into one, it is necessary here because the function \texttt{browsable} only accepts one value. Normally htmltools tags are just printed in the console, here we need them to be opened in the browser instead.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2340,7 +2344,7 @@ There is nonetheless one remaining issue: peity.js is meant to create inline cha
 
 As pointed out multiple times, the widget is generated in a \texttt{\textless{}div\textgreater{}}, which is works fine for most visualisation libraries. But we saw that peity.js works best when placed in a \texttt{\textless{}span\textgreater{}} as this allows placing the charts inline.
 
-This can be changed by placing a function named \texttt{widgetname\_html} which is looked up by htmlwidgets and used if found. This function takes the three-dot construct (\texttt{...}) and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets needs be able to pass the \texttt{id}, \texttt{class}, and \texttt{style} attributes to the tag.
+This can be changed by placing a function named \texttt{widgetname\_html} which is looked up by htmlwidgets and used if found. This is probably the first such function one encounters and is rather uncommon but it is literally how the htmlwidgets package does it: it scans the namespace of the package looking for a function that starts with the name of the widget and ends in \texttt{\_html} and if found uses it, otherwise it uses the default \texttt{div}. This function takes the three-dot construct (\texttt{...}) and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets needs be able to pass the \texttt{id}, \texttt{class}, and \texttt{style} attributes to the tag.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3581,7 +3585,7 @@ As alluded to earlier on this can be achieved by using a shared dataset which ca
 \caption{Crosstalk Example}
 \end{figure}
 
-Basic usage of crosstalk datasets in shiny is also straightforward since it accepts reactive expressions to create shared datasets. Note that it takes the expression itself (\texttt{reactive}) not the output of the expression (\texttt{expression()}), the crosstalk documentation explains it best:
+Basic usage of crosstalk datasets in shiny is also straightforward since it accepts reactive expressions to create shared datasets. "Note that it takes the expression itself (\texttt{expression}) not the output of the expression (\texttt{expression()}), the crosstalk documentation explains it best:
 
 \begin{quote}
 If this feels foreign to you, think of how you pass a function name, not a function call, to \texttt{lapply}; that's exactly analogous to what we're doing here.
@@ -3628,8 +3632,8 @@ If this feels foreign to you, think of how you pass a function name, not a funct
 \end{Shaded}
 
 \begin{rmdnote}
-Create the shared dataset in the server function or some things that
-follow might not work as expected.
+When working with shiny create the shared dataset in the server function
+or some things that follow might not work as expected.
 \end{rmdnote}
 
 One can also use the \texttt{data} method on the crosstalk object in reactive expressions, which allows accessing the Javascript selection where crosstalk is not directly supported, like below in a custom UI block. Note that the argument \texttt{withSelection} is set to \texttt{TRUE} in order to retrieve the selection state of the rows.
@@ -3828,7 +3832,7 @@ The \texttt{gio} function also has to extract the group to which the dataset bel
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "SharedData177804bb"
+## [1] "SharedDatac901f234"
 \end{verbatim}
 
 \begin{Shaded}
@@ -8706,7 +8710,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Oct 11 2020 15:01:52 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Oct 11 2020 21:21:58 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -8716,7 +8720,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Sun Oct 11 2020 15:01:52 GMT+0200 (Central European Summer Time)"
+## [1] "Sun Oct 11 2020 21:21:58 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -9253,7 +9257,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] -42.34
+## [1] -4.326
 \end{verbatim}
 
 \begin{Shaded}
