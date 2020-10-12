@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-10-11" />
+<meta name="date" content="2020-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -169,11 +169,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="1.2.1" data-path="intro-overview.html"><a href="intro-overview.html#intro-v8"><i class="fa fa-check"></i><b>1.2.1</b> V8</a></li>
 <li class="chapter" data-level="1.2.2" data-path="intro-overview.html"><a href="intro-overview.html#intro-htmlwidgets"><i class="fa fa-check"></i><b>1.2.2</b> htmlwidgets</a></li>
 <li class="chapter" data-level="1.2.3" data-path="intro-overview.html"><a href="intro-overview.html#intro-shiny"><i class="fa fa-check"></i><b>1.2.3</b> Shiny</a></li>
-<li class="chapter" data-level="1.2.4" data-path="intro-overview.html"><a href="intro-overview.html#intro-bubble"><i class="fa fa-check"></i><b>1.2.4</b> bubble</a></li>
 </ul></li>
 <li class="chapter" data-level="1.3" data-path="intro-overview.html"><a href="intro-overview.html#intro-amiss"><i class="fa fa-check"></i><b>1.3</b> Methods Amiss</a>
 <ul>
-<li class="chapter" data-level="1.3.1" data-path="intro-overview.html"><a href="intro-overview.html#intro-reactr"><i class="fa fa-check"></i><b>1.3.1</b> reactR</a></li>
+<li class="chapter" data-level="1.3.1" data-path="intro-overview.html"><a href="intro-overview.html#intro-reactr-vuer"><i class="fa fa-check"></i><b>1.3.1</b> reactR &amp; vueR</a></li>
 <li class="chapter" data-level="1.3.2" data-path="intro-overview.html"><a href="intro-overview.html#intro-r2d3"><i class="fa fa-check"></i><b>1.3.2</b> r2d3</a></li>
 </ul></li>
 </ul></li>
@@ -242,8 +241,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.4" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data"><i class="fa fa-check"></i><b>7.4</b> Transforming Data</a>
 <ul>
 <li class="chapter" data-level="7.4.1" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-js"><i class="fa fa-check"></i><b>7.4.1</b> Using JavaScript</a></li>
-<li class="chapter" data-level="7.4.2" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-r"><i class="fa fa-check"></i><b>7.4.2</b> Using R</a></li>
-<li class="chapter" data-level="7.4.3" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-conclusion"><i class="fa fa-check"></i><b>7.4.3</b> Pros &amp; Cons</a></li>
+<li class="chapter" data-level="7.4.2" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-modify"><i class="fa fa-check"></i><b>7.4.2</b> Modify Serialiser</a></li>
+<li class="chapter" data-level="7.4.3" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-replace"><i class="fa fa-check"></i><b>7.4.3</b> Replace Serialiser</a></li>
+<li class="chapter" data-level="7.4.4" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-modify-data"><i class="fa fa-check"></i><b>7.4.4</b> Modify the Data</a></li>
+<li class="chapter" data-level="7.4.5" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-conclusion"><i class="fa fa-check"></i><b>7.4.5</b> Pros &amp; Cons</a></li>
 </ul></li>
 <li class="chapter" data-level="7.5" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-on-print"><i class="fa fa-check"></i><b>7.5</b> On Print Method</a></li>
 </ul></li>
@@ -445,19 +446,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1><span class="header-section-number">Chapter 15</span> Custom Outputs</h1>
 <p>In this chapter we create a custom shiny output, in practical terms this creates custom <code>render*</code> and <code>*Output</code> functions to use in Shiny. This will be demonstrated by creating something akin to the <code>valueBox</code> available in the shinydashboard <span class="citation">(Chang and Borges Ribeiro <a href="#ref-R-shinydashboard" role="doc-biblioref">2018</a>)</span> package. While similar to what shinydashboard provides this box will 1) be fully customisable and 2) available in any shiny application 3) have additional functionalities.</p>
 <p>The <code>valueBox</code> equivalent we shall build in this chapter is named “boxxy,” and allows creating simple but colourful value boxes with animated numbers (by counting up to it) using <a href="https://github.com/inorganik/countUp.js">countUp.js</a>.</p>
-<div class="sourceCode" id="cb314"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb314-1"><a href="shiny-output.html#cb314-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb314-2"><a href="shiny-output.html#cb314-2"></a></span>
-<span id="cb314-3"><a href="shiny-output.html#cb314-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb314-4"><a href="shiny-output.html#cb314-4"></a>  <span class="kw">boxxyOutput</span>(<span class="st">&quot;countries&quot;</span>)</span>
-<span id="cb314-5"><a href="shiny-output.html#cb314-5"></a>)</span>
-<span id="cb314-6"><a href="shiny-output.html#cb314-6"></a></span>
-<span id="cb314-7"><a href="shiny-output.html#cb314-7"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb314-8"><a href="shiny-output.html#cb314-8"></a>  output<span class="op">$</span>countries &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
-<span id="cb314-9"><a href="shiny-output.html#cb314-9"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Countries&quot;</span>, <span class="dv">95</span>)</span>
-<span id="cb314-10"><a href="shiny-output.html#cb314-10"></a>  })</span>
-<span id="cb314-11"><a href="shiny-output.html#cb314-11"></a>}</span>
-<span id="cb314-12"><a href="shiny-output.html#cb314-12"></a></span>
-<span id="cb314-13"><a href="shiny-output.html#cb314-13"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb312"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb312-1"><a href="shiny-output.html#cb312-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb312-2"><a href="shiny-output.html#cb312-2"></a></span>
+<span id="cb312-3"><a href="shiny-output.html#cb312-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb312-4"><a href="shiny-output.html#cb312-4"></a>  <span class="kw">boxxyOutput</span>(<span class="st">&quot;countries&quot;</span>)</span>
+<span id="cb312-5"><a href="shiny-output.html#cb312-5"></a>)</span>
+<span id="cb312-6"><a href="shiny-output.html#cb312-6"></a></span>
+<span id="cb312-7"><a href="shiny-output.html#cb312-7"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb312-8"><a href="shiny-output.html#cb312-8"></a>  output<span class="op">$</span>countries &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
+<span id="cb312-9"><a href="shiny-output.html#cb312-9"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Countries&quot;</span>, <span class="dv">95</span>)</span>
+<span id="cb312-10"><a href="shiny-output.html#cb312-10"></a>  })</span>
+<span id="cb312-11"><a href="shiny-output.html#cb312-11"></a>}</span>
+<span id="cb312-12"><a href="shiny-output.html#cb312-12"></a></span>
+<span id="cb312-13"><a href="shiny-output.html#cb312-13"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div class="figure">
 <img src="images/boxxy-example.png" alt="" />
 <p class="caption">Custom output example</p>
@@ -479,25 +480,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Create a <code>binding.js</code> JavaScript file for the JavaScript binding within the previously created <code>assets</code> directory.</li>
 <li>Create a <code>styles.css</code> file in the <code>assets</code> directory.</li>
 </ol>
-<div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb315-1"><a href="shiny-output.html#cb315-1"></a><span class="co"># application file</span></span>
-<span id="cb315-2"><a href="shiny-output.html#cb315-2"></a><span class="kw">file.create</span>(<span class="st">&quot;app.R&quot;</span>)</span>
-<span id="cb315-3"><a href="shiny-output.html#cb315-3"></a></span>
-<span id="cb315-4"><a href="shiny-output.html#cb315-4"></a><span class="co"># static file directory</span></span>
-<span id="cb315-5"><a href="shiny-output.html#cb315-5"></a><span class="kw">dir.create</span>(<span class="st">&quot;assets&quot;</span>)</span>
-<span id="cb315-6"><a href="shiny-output.html#cb315-6"></a></span>
-<span id="cb315-7"><a href="shiny-output.html#cb315-7"></a><span class="co"># countup dependency</span></span>
-<span id="cb315-8"><a href="shiny-output.html#cb315-8"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb315-9"><a href="shiny-output.html#cb315-9"></a>  <span class="st">&quot;https://cdn.jsdelivr.net/npm/&quot;</span>,</span>
-<span id="cb315-10"><a href="shiny-output.html#cb315-10"></a>  <span class="st">&quot;countup@1.8.2/countUp.js&quot;</span></span>
-<span id="cb315-11"><a href="shiny-output.html#cb315-11"></a>)</span>
-<span id="cb315-12"><a href="shiny-output.html#cb315-12"></a></span>
-<span id="cb315-13"><a href="shiny-output.html#cb315-13"></a><span class="kw">download.file</span>(url, <span class="st">&quot;assets/countup.js&quot;</span>)</span>
-<span id="cb315-14"><a href="shiny-output.html#cb315-14"></a></span>
-<span id="cb315-15"><a href="shiny-output.html#cb315-15"></a><span class="co"># create binding file</span></span>
-<span id="cb315-16"><a href="shiny-output.html#cb315-16"></a><span class="kw">file.create</span>(<span class="st">&quot;assets/binding.js&quot;</span>)</span>
-<span id="cb315-17"><a href="shiny-output.html#cb315-17"></a></span>
-<span id="cb315-18"><a href="shiny-output.html#cb315-18"></a><span class="co"># CSS file</span></span>
-<span id="cb315-19"><a href="shiny-output.html#cb315-19"></a><span class="kw">file.create</span>(<span class="st">&quot;assets/styles.css&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb313-1"><a href="shiny-output.html#cb313-1"></a><span class="co"># application file</span></span>
+<span id="cb313-2"><a href="shiny-output.html#cb313-2"></a><span class="kw">file.create</span>(<span class="st">&quot;app.R&quot;</span>)</span>
+<span id="cb313-3"><a href="shiny-output.html#cb313-3"></a></span>
+<span id="cb313-4"><a href="shiny-output.html#cb313-4"></a><span class="co"># static file directory</span></span>
+<span id="cb313-5"><a href="shiny-output.html#cb313-5"></a><span class="kw">dir.create</span>(<span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb313-6"><a href="shiny-output.html#cb313-6"></a></span>
+<span id="cb313-7"><a href="shiny-output.html#cb313-7"></a><span class="co"># countup dependency</span></span>
+<span id="cb313-8"><a href="shiny-output.html#cb313-8"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb313-9"><a href="shiny-output.html#cb313-9"></a>  <span class="st">&quot;https://cdn.jsdelivr.net/npm/&quot;</span>,</span>
+<span id="cb313-10"><a href="shiny-output.html#cb313-10"></a>  <span class="st">&quot;countup@1.8.2/countUp.js&quot;</span></span>
+<span id="cb313-11"><a href="shiny-output.html#cb313-11"></a>)</span>
+<span id="cb313-12"><a href="shiny-output.html#cb313-12"></a></span>
+<span id="cb313-13"><a href="shiny-output.html#cb313-13"></a><span class="kw">download.file</span>(url, <span class="st">&quot;assets/countup.js&quot;</span>)</span>
+<span id="cb313-14"><a href="shiny-output.html#cb313-14"></a></span>
+<span id="cb313-15"><a href="shiny-output.html#cb313-15"></a><span class="co"># create binding file</span></span>
+<span id="cb313-16"><a href="shiny-output.html#cb313-16"></a><span class="kw">file.create</span>(<span class="st">&quot;assets/binding.js&quot;</span>)</span>
+<span id="cb313-17"><a href="shiny-output.html#cb313-17"></a></span>
+<span id="cb313-18"><a href="shiny-output.html#cb313-18"></a><span class="co"># CSS file</span></span>
+<span id="cb313-19"><a href="shiny-output.html#cb313-19"></a><span class="kw">file.create</span>(<span class="st">&quot;assets/styles.css&quot;</span>)</span></code></pre></div>
 <p>This should produce the following directory structure.</p>
 <pre><code>.
 ├── app.R
@@ -509,140 +510,140 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="shiny-output-r-fun" class="section level2" number="15.3">
 <h2><span class="header-section-number">15.3</span> Output R Function</h2>
 <p>The <code>boxxy</code> function takes three arguments, a <code>title</code>, a <code>value</code> that will be animated and the background <code>color</code> to use for the box. The function, at this stage at least, does not preprocess the arguments and simply returns them as a named <code>list</code>.</p>
-<div class="sourceCode" id="cb317"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb317-1"><a href="shiny-output.html#cb317-1"></a><span class="co"># app.R</span></span>
-<span id="cb317-2"><a href="shiny-output.html#cb317-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb317-3"><a href="shiny-output.html#cb317-3"></a></span>
-<span id="cb317-4"><a href="shiny-output.html#cb317-4"></a>boxxy &lt;-<span class="st"> </span><span class="cf">function</span>(title, value, <span class="dt">color =</span> <span class="st">&quot;#ef476f&quot;</span>){</span>
-<span id="cb317-5"><a href="shiny-output.html#cb317-5"></a>  <span class="kw">list</span>(<span class="dt">title =</span> title, <span class="dt">value =</span> value, <span class="dt">color =</span> color)</span>
-<span id="cb317-6"><a href="shiny-output.html#cb317-6"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb315-1"><a href="shiny-output.html#cb315-1"></a><span class="co"># app.R</span></span>
+<span id="cb315-2"><a href="shiny-output.html#cb315-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb315-3"><a href="shiny-output.html#cb315-3"></a></span>
+<span id="cb315-4"><a href="shiny-output.html#cb315-4"></a>boxxy &lt;-<span class="st"> </span><span class="cf">function</span>(title, value, <span class="dt">color =</span> <span class="st">&quot;#ef476f&quot;</span>){</span>
+<span id="cb315-5"><a href="shiny-output.html#cb315-5"></a>  <span class="kw">list</span>(<span class="dt">title =</span> title, <span class="dt">value =</span> value, <span class="dt">color =</span> color)</span>
+<span id="cb315-6"><a href="shiny-output.html#cb315-6"></a>}</span></code></pre></div>
 </div>
 <div id="shiny-output-html" class="section level2" number="15.4">
 <h2><span class="header-section-number">15.4</span> Generate Output HTML</h2>
 <p>The <code>boxxyOutput</code> function, like all such functions (<code>plotOutput</code>, <code>uiOutput</code>, etc.) takes an <code>id</code>. This function should return an HTML tag which bears an <code>id</code>, or a <code>data-input-id</code> attribute (more on that later) and a <code>class</code>. The <code>id</code> is to be defined by the user of the function in Shiny just like any other such outputs. For instance, <code>plotOutput</code> creates a <code>&lt;div&gt;</code> the <code>id</code> of which is actually the <code>id</code> used in the <code>plotOutput</code> function.</p>
-<div class="sourceCode" id="cb318"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb318-1"><a href="shiny-output.html#cb318-1"></a><span class="co"># the id is used as id to the element</span></span>
-<span id="cb318-2"><a href="shiny-output.html#cb318-2"></a>shiny<span class="op">::</span><span class="kw">plotOutput</span>(<span class="dt">id =</span> <span class="st">&quot;myPlotId&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb319"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb319-1"><a href="shiny-output.html#cb319-1"></a><span class="kw">&lt;div</span> </span>
-<span id="cb319-2"><a href="shiny-output.html#cb319-2"></a><span class="ot">  id=</span><span class="st">&quot;myPlotId&quot;</span> </span>
-<span id="cb319-3"><a href="shiny-output.html#cb319-3"></a><span class="ot">  class=</span><span class="st">&quot;shiny-plot-output&quot;</span> </span>
-<span id="cb319-4"><a href="shiny-output.html#cb319-4"></a><span class="ot">  style=</span><span class="st">&quot;width: 100% ; height: 400px&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb319-5"><a href="shiny-output.html#cb319-5"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb316"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb316-1"><a href="shiny-output.html#cb316-1"></a><span class="co"># the id is used as id to the element</span></span>
+<span id="cb316-2"><a href="shiny-output.html#cb316-2"></a>shiny<span class="op">::</span><span class="kw">plotOutput</span>(<span class="dt">id =</span> <span class="st">&quot;myPlotId&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb317"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb317-1"><a href="shiny-output.html#cb317-1"></a><span class="kw">&lt;div</span> </span>
+<span id="cb317-2"><a href="shiny-output.html#cb317-2"></a><span class="ot">  id=</span><span class="st">&quot;myPlotId&quot;</span> </span>
+<span id="cb317-3"><a href="shiny-output.html#cb317-3"></a><span class="ot">  class=</span><span class="st">&quot;shiny-plot-output&quot;</span> </span>
+<span id="cb317-4"><a href="shiny-output.html#cb317-4"></a><span class="ot">  style=</span><span class="st">&quot;width: 100% ; height: 400px&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb317-5"><a href="shiny-output.html#cb317-5"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
 <p>The <code>class</code> is used JavaScript-side to “find” the outputs in the DOM (document object model) and generate the output. The function <code>boxxyOutput</code> could thus be as shown below, the <code>id</code> is passed along to the <code>&lt;div&gt;</code> which is created with a <code>boxxy</code> class that will be used in the output binding to find that element and generate the output within that very <code>&lt;div&gt;</code> using data that will be passed from the server.</p>
-<div class="sourceCode" id="cb320"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb320-1"><a href="shiny-output.html#cb320-1"></a>boxxyOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
-<span id="cb320-2"><a href="shiny-output.html#cb320-2"></a>  <span class="co"># the HTML output</span></span>
-<span id="cb320-3"><a href="shiny-output.html#cb320-3"></a>  shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">div</span>(</span>
-<span id="cb320-4"><a href="shiny-output.html#cb320-4"></a>    <span class="dt">id =</span> id, <span class="dt">class =</span> <span class="st">&quot;boxxy&quot;</span></span>
-<span id="cb320-5"><a href="shiny-output.html#cb320-5"></a>  )</span>
-<span id="cb320-6"><a href="shiny-output.html#cb320-6"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb318"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb318-1"><a href="shiny-output.html#cb318-1"></a>boxxyOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
+<span id="cb318-2"><a href="shiny-output.html#cb318-2"></a>  <span class="co"># the HTML output</span></span>
+<span id="cb318-3"><a href="shiny-output.html#cb318-3"></a>  shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">div</span>(</span>
+<span id="cb318-4"><a href="shiny-output.html#cb318-4"></a>    <span class="dt">id =</span> id, <span class="dt">class =</span> <span class="st">&quot;boxxy&quot;</span></span>
+<span id="cb318-5"><a href="shiny-output.html#cb318-5"></a>  )</span>
+<span id="cb318-6"><a href="shiny-output.html#cb318-6"></a>}</span></code></pre></div>
 <div class="rmdnote">
 <p>
 Make sure you use unique class names so they are not accidentally overridden by the user.
 </p>
 </div>
 <p>As shown previously the box should include a title and an animated value. These could be generated entirely in JavaScript but it’s actually easier to create placeholders with htmltools tags, we generate dynamic ids for those so they can easily be referenced later on in JavaScript: <code>id-boxxy-value</code> for the value and <code>id-boxxy-title</code> for the title.</p>
-<div class="sourceCode" id="cb321"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb321-1"><a href="shiny-output.html#cb321-1"></a>boxxyOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
-<span id="cb321-2"><a href="shiny-output.html#cb321-2"></a>  <span class="co"># the HTML output</span></span>
-<span id="cb321-3"><a href="shiny-output.html#cb321-3"></a>  shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">div</span>(</span>
-<span id="cb321-4"><a href="shiny-output.html#cb321-4"></a>    <span class="dt">id =</span> id, <span class="dt">class =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
-<span id="cb321-5"><a href="shiny-output.html#cb321-5"></a>    <span class="kw">h1</span>(</span>
-<span id="cb321-6"><a href="shiny-output.html#cb321-6"></a>      <span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-value&quot;</span>, id), </span>
-<span id="cb321-7"><a href="shiny-output.html#cb321-7"></a>      <span class="dt">class =</span> <span class="st">&quot;boxxy-value&quot;</span></span>
-<span id="cb321-8"><a href="shiny-output.html#cb321-8"></a>    ),</span>
-<span id="cb321-9"><a href="shiny-output.html#cb321-9"></a>    <span class="kw">p</span>(</span>
-<span id="cb321-10"><a href="shiny-output.html#cb321-10"></a>      <span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-title&quot;</span>, id), </span>
-<span id="cb321-11"><a href="shiny-output.html#cb321-11"></a>      <span class="dt">class =</span> <span class="st">&quot;boxxy-title&quot;</span></span>
-<span id="cb321-12"><a href="shiny-output.html#cb321-12"></a>    )</span>
-<span id="cb321-13"><a href="shiny-output.html#cb321-13"></a>  )</span>
-<span id="cb321-14"><a href="shiny-output.html#cb321-14"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb319"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb319-1"><a href="shiny-output.html#cb319-1"></a>boxxyOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
+<span id="cb319-2"><a href="shiny-output.html#cb319-2"></a>  <span class="co"># the HTML output</span></span>
+<span id="cb319-3"><a href="shiny-output.html#cb319-3"></a>  shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">div</span>(</span>
+<span id="cb319-4"><a href="shiny-output.html#cb319-4"></a>    <span class="dt">id =</span> id, <span class="dt">class =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
+<span id="cb319-5"><a href="shiny-output.html#cb319-5"></a>    <span class="kw">h1</span>(</span>
+<span id="cb319-6"><a href="shiny-output.html#cb319-6"></a>      <span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-value&quot;</span>, id), </span>
+<span id="cb319-7"><a href="shiny-output.html#cb319-7"></a>      <span class="dt">class =</span> <span class="st">&quot;boxxy-value&quot;</span></span>
+<span id="cb319-8"><a href="shiny-output.html#cb319-8"></a>    ),</span>
+<span id="cb319-9"><a href="shiny-output.html#cb319-9"></a>    <span class="kw">p</span>(</span>
+<span id="cb319-10"><a href="shiny-output.html#cb319-10"></a>      <span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-title&quot;</span>, id), </span>
+<span id="cb319-11"><a href="shiny-output.html#cb319-11"></a>      <span class="dt">class =</span> <span class="st">&quot;boxxy-title&quot;</span></span>
+<span id="cb319-12"><a href="shiny-output.html#cb319-12"></a>    )</span>
+<span id="cb319-13"><a href="shiny-output.html#cb319-13"></a>  )</span>
+<span id="cb319-14"><a href="shiny-output.html#cb319-14"></a>}</span></code></pre></div>
 <p>Finally, we also used classes in the output so every element it comprises can be styled with ease.</p>
-<div class="sourceCode" id="cb322"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb322-1"><a href="shiny-output.html#cb322-1"></a><span class="fu">.boxxy</span>{</span>
-<span id="cb322-2"><a href="shiny-output.html#cb322-2"></a>  <span class="kw">text-align</span>: <span class="dv">center</span><span class="op">;</span></span>
-<span id="cb322-3"><a href="shiny-output.html#cb322-3"></a>  <span class="kw">border-left</span>: <span class="dv">6</span><span class="dt">px</span> <span class="dv">solid</span> <span class="cn">#073b4c</span><span class="op">;</span></span>
-<span id="cb322-4"><a href="shiny-output.html#cb322-4"></a>  <span class="kw">padding</span>: <span class="dv">1</span><span class="dt">em</span><span class="op">;</span></span>
-<span id="cb322-5"><a href="shiny-output.html#cb322-5"></a>}</span>
-<span id="cb322-6"><a href="shiny-output.html#cb322-6"></a></span>
-<span id="cb322-7"><a href="shiny-output.html#cb322-7"></a><span class="fu">.boxxy-title</span>{</span>
-<span id="cb322-8"><a href="shiny-output.html#cb322-8"></a>  <span class="kw">text-transform</span>: <span class="dv">uppercase</span><span class="op">;</span></span>
-<span id="cb322-9"><a href="shiny-output.html#cb322-9"></a>}</span>
-<span id="cb322-10"><a href="shiny-output.html#cb322-10"></a></span>
-<span id="cb322-11"><a href="shiny-output.html#cb322-11"></a><span class="fu">.boxxy-value</span>{</span>
-<span id="cb322-12"><a href="shiny-output.html#cb322-12"></a>  <span class="kw">font-size</span>: <span class="dv">3</span><span class="dt">em</span><span class="op">;</span></span>
-<span id="cb322-13"><a href="shiny-output.html#cb322-13"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb320"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb320-1"><a href="shiny-output.html#cb320-1"></a><span class="fu">.boxxy</span>{</span>
+<span id="cb320-2"><a href="shiny-output.html#cb320-2"></a>  <span class="kw">text-align</span>: <span class="dv">center</span><span class="op">;</span></span>
+<span id="cb320-3"><a href="shiny-output.html#cb320-3"></a>  <span class="kw">border-left</span>: <span class="dv">6</span><span class="dt">px</span> <span class="dv">solid</span> <span class="cn">#073b4c</span><span class="op">;</span></span>
+<span id="cb320-4"><a href="shiny-output.html#cb320-4"></a>  <span class="kw">padding</span>: <span class="dv">1</span><span class="dt">em</span><span class="op">;</span></span>
+<span id="cb320-5"><a href="shiny-output.html#cb320-5"></a>}</span>
+<span id="cb320-6"><a href="shiny-output.html#cb320-6"></a></span>
+<span id="cb320-7"><a href="shiny-output.html#cb320-7"></a><span class="fu">.boxxy-title</span>{</span>
+<span id="cb320-8"><a href="shiny-output.html#cb320-8"></a>  <span class="kw">text-transform</span>: <span class="dv">uppercase</span><span class="op">;</span></span>
+<span id="cb320-9"><a href="shiny-output.html#cb320-9"></a>}</span>
+<span id="cb320-10"><a href="shiny-output.html#cb320-10"></a></span>
+<span id="cb320-11"><a href="shiny-output.html#cb320-11"></a><span class="fu">.boxxy-value</span>{</span>
+<span id="cb320-12"><a href="shiny-output.html#cb320-12"></a>  <span class="kw">font-size</span>: <span class="dv">3</span><span class="dt">em</span><span class="op">;</span></span>
+<span id="cb320-13"><a href="shiny-output.html#cb320-13"></a>}</span></code></pre></div>
 <p>The dependencies should be added to the above, since this function must be placed in the UI for anything to work the dependencies can piggyback on the output element. This works using the htmltools package. The function <code>htmltools::htmlDependency</code> is used to create a dependency that is then attached with <code>htmltools::attachDependencies</code>. While the former creates an object that shiny can understand and translate into <code>&lt;script&gt;</code> or <code>&lt;style&gt;</code> tags, the former attaches them to the output object and ensures dependencies are not imported multiple times (e.g.: when <code>boxxyOutput</code> is used more than once).</p>
 <p>Notice the use of <code>normalizePath</code> to retrieve the full path to the <code>assets</code> directory as this will not work with a relative path (e.g.: <code>./assets</code>). The dependencies consist of the three files previously created and necessary to generate the output: <code>countup.js</code> the dependency that was downloaded as well as <code>binding.js</code> and <code>styles.css</code>.</p>
-<div class="sourceCode" id="cb323"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb323-1"><a href="shiny-output.html#cb323-1"></a>boxxyOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
-<span id="cb323-2"><a href="shiny-output.html#cb323-2"></a>  el &lt;-<span class="st"> </span>tags<span class="op">$</span><span class="kw">div</span>(</span>
-<span id="cb323-3"><a href="shiny-output.html#cb323-3"></a>    <span class="dt">id =</span> id, <span class="dt">class =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
-<span id="cb323-4"><a href="shiny-output.html#cb323-4"></a>    <span class="kw">h1</span>(</span>
-<span id="cb323-5"><a href="shiny-output.html#cb323-5"></a>      <span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-counter&quot;</span>, id), </span>
-<span id="cb323-6"><a href="shiny-output.html#cb323-6"></a>      <span class="dt">class =</span> <span class="st">&quot;boxxy-value&quot;</span></span>
-<span id="cb323-7"><a href="shiny-output.html#cb323-7"></a>    ),</span>
-<span id="cb323-8"><a href="shiny-output.html#cb323-8"></a>    <span class="kw">p</span>(</span>
-<span id="cb323-9"><a href="shiny-output.html#cb323-9"></a>      <span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-title&quot;</span>, id), </span>
-<span id="cb323-10"><a href="shiny-output.html#cb323-10"></a>      <span class="dt">class =</span> <span class="st">&quot;boxxy-title&quot;</span></span>
-<span id="cb323-11"><a href="shiny-output.html#cb323-11"></a>    )</span>
-<span id="cb323-12"><a href="shiny-output.html#cb323-12"></a>  )</span>
-<span id="cb323-13"><a href="shiny-output.html#cb323-13"></a></span>
-<span id="cb323-14"><a href="shiny-output.html#cb323-14"></a>  <span class="co"># get full path</span></span>
-<span id="cb323-15"><a href="shiny-output.html#cb323-15"></a>  path &lt;-<span class="st"> </span><span class="kw">normalizePath</span>(<span class="st">&quot;assets&quot;</span>)</span>
-<span id="cb323-16"><a href="shiny-output.html#cb323-16"></a></span>
-<span id="cb323-17"><a href="shiny-output.html#cb323-17"></a>  deps &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb323-18"><a href="shiny-output.html#cb323-18"></a>    htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
-<span id="cb323-19"><a href="shiny-output.html#cb323-19"></a>      <span class="dt">name =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
-<span id="cb323-20"><a href="shiny-output.html#cb323-20"></a>      <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
-<span id="cb323-21"><a href="shiny-output.html#cb323-21"></a>      <span class="dt">src =</span> <span class="kw">c</span>(<span class="dt">file =</span> path),</span>
-<span id="cb323-22"><a href="shiny-output.html#cb323-22"></a>      <span class="dt">script =</span> <span class="kw">c</span>(<span class="st">&quot;countup.js&quot;</span>, <span class="st">&quot;binding.js&quot;</span>),</span>
-<span id="cb323-23"><a href="shiny-output.html#cb323-23"></a>      <span class="dt">stylesheet =</span> <span class="st">&quot;styles.css&quot;</span></span>
-<span id="cb323-24"><a href="shiny-output.html#cb323-24"></a>    )</span>
-<span id="cb323-25"><a href="shiny-output.html#cb323-25"></a>  )</span>
-<span id="cb323-26"><a href="shiny-output.html#cb323-26"></a></span>
-<span id="cb323-27"><a href="shiny-output.html#cb323-27"></a>  htmltools<span class="op">::</span><span class="kw">attachDependencies</span>(el, deps)</span>
-<span id="cb323-28"><a href="shiny-output.html#cb323-28"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb321"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb321-1"><a href="shiny-output.html#cb321-1"></a>boxxyOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
+<span id="cb321-2"><a href="shiny-output.html#cb321-2"></a>  el &lt;-<span class="st"> </span>tags<span class="op">$</span><span class="kw">div</span>(</span>
+<span id="cb321-3"><a href="shiny-output.html#cb321-3"></a>    <span class="dt">id =</span> id, <span class="dt">class =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
+<span id="cb321-4"><a href="shiny-output.html#cb321-4"></a>    <span class="kw">h1</span>(</span>
+<span id="cb321-5"><a href="shiny-output.html#cb321-5"></a>      <span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-counter&quot;</span>, id), </span>
+<span id="cb321-6"><a href="shiny-output.html#cb321-6"></a>      <span class="dt">class =</span> <span class="st">&quot;boxxy-value&quot;</span></span>
+<span id="cb321-7"><a href="shiny-output.html#cb321-7"></a>    ),</span>
+<span id="cb321-8"><a href="shiny-output.html#cb321-8"></a>    <span class="kw">p</span>(</span>
+<span id="cb321-9"><a href="shiny-output.html#cb321-9"></a>      <span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-title&quot;</span>, id), </span>
+<span id="cb321-10"><a href="shiny-output.html#cb321-10"></a>      <span class="dt">class =</span> <span class="st">&quot;boxxy-title&quot;</span></span>
+<span id="cb321-11"><a href="shiny-output.html#cb321-11"></a>    )</span>
+<span id="cb321-12"><a href="shiny-output.html#cb321-12"></a>  )</span>
+<span id="cb321-13"><a href="shiny-output.html#cb321-13"></a></span>
+<span id="cb321-14"><a href="shiny-output.html#cb321-14"></a>  <span class="co"># get full path</span></span>
+<span id="cb321-15"><a href="shiny-output.html#cb321-15"></a>  path &lt;-<span class="st"> </span><span class="kw">normalizePath</span>(<span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb321-16"><a href="shiny-output.html#cb321-16"></a></span>
+<span id="cb321-17"><a href="shiny-output.html#cb321-17"></a>  deps &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb321-18"><a href="shiny-output.html#cb321-18"></a>    htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
+<span id="cb321-19"><a href="shiny-output.html#cb321-19"></a>      <span class="dt">name =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
+<span id="cb321-20"><a href="shiny-output.html#cb321-20"></a>      <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
+<span id="cb321-21"><a href="shiny-output.html#cb321-21"></a>      <span class="dt">src =</span> <span class="kw">c</span>(<span class="dt">file =</span> path),</span>
+<span id="cb321-22"><a href="shiny-output.html#cb321-22"></a>      <span class="dt">script =</span> <span class="kw">c</span>(<span class="st">&quot;countup.js&quot;</span>, <span class="st">&quot;binding.js&quot;</span>),</span>
+<span id="cb321-23"><a href="shiny-output.html#cb321-23"></a>      <span class="dt">stylesheet =</span> <span class="st">&quot;styles.css&quot;</span></span>
+<span id="cb321-24"><a href="shiny-output.html#cb321-24"></a>    )</span>
+<span id="cb321-25"><a href="shiny-output.html#cb321-25"></a>  )</span>
+<span id="cb321-26"><a href="shiny-output.html#cb321-26"></a></span>
+<span id="cb321-27"><a href="shiny-output.html#cb321-27"></a>  htmltools<span class="op">::</span><span class="kw">attachDependencies</span>(el, deps)</span>
+<span id="cb321-28"><a href="shiny-output.html#cb321-28"></a>}</span></code></pre></div>
 <p>Running the function reveals the HTML it generates at the exception of the dependencies which htmltools does not print to the console.</p>
-<div class="sourceCode" id="cb324"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb324-1"><a href="shiny-output.html#cb324-1"></a><span class="kw">boxxyOutput</span>(<span class="st">&quot;myID&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb325"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb325-1"><a href="shiny-output.html#cb325-1"></a><span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&quot;myID&quot;</span><span class="ot"> class=</span><span class="st">&quot;boxxy&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb325-2"><a href="shiny-output.html#cb325-2"></a>  <span class="kw">&lt;h1</span><span class="ot"> id=</span><span class="st">&quot;myID-boxxy-counter&quot;</span><span class="ot"> class=</span><span class="st">&quot;boxxy-value&quot;</span><span class="kw">&gt;&lt;/h1&gt;</span></span>
-<span id="cb325-3"><a href="shiny-output.html#cb325-3"></a>  <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;myID-boxxy-title&quot;</span><span class="ot"> class=</span><span class="st">&quot;boxxy-title&quot;</span><span class="kw">&gt;&lt;/p&gt;</span></span>
-<span id="cb325-4"><a href="shiny-output.html#cb325-4"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb322"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb322-1"><a href="shiny-output.html#cb322-1"></a><span class="kw">boxxyOutput</span>(<span class="st">&quot;myID&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb323"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb323-1"><a href="shiny-output.html#cb323-1"></a><span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&quot;myID&quot;</span><span class="ot"> class=</span><span class="st">&quot;boxxy&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb323-2"><a href="shiny-output.html#cb323-2"></a>  <span class="kw">&lt;h1</span><span class="ot"> id=</span><span class="st">&quot;myID-boxxy-counter&quot;</span><span class="ot"> class=</span><span class="st">&quot;boxxy-value&quot;</span><span class="kw">&gt;&lt;/h1&gt;</span></span>
+<span id="cb323-3"><a href="shiny-output.html#cb323-3"></a>  <span class="kw">&lt;p</span><span class="ot"> id=</span><span class="st">&quot;myID-boxxy-title&quot;</span><span class="ot"> class=</span><span class="st">&quot;boxxy-title&quot;</span><span class="kw">&gt;&lt;/p&gt;</span></span>
+<span id="cb323-4"><a href="shiny-output.html#cb323-4"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
 </div>
 <div id="shiny-output-renderer" class="section level2" number="15.5">
 <h2><span class="header-section-number">15.5</span> Output Renderer</h2>
 <p>The function <code>renderBoxxy</code> should accept an expression, like other such <code>render*</code> function. For instance in the example below the <code>renderPlot</code> function does accept an expression which uses, amongst other functions, <code>plot</code>.</p>
-<div class="sourceCode" id="cb326"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb326-1"><a href="shiny-output.html#cb326-1"></a>output<span class="op">$</span>myPlot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb326-2"><a href="shiny-output.html#cb326-2"></a>  <span class="co"># this is an expression</span></span>
-<span id="cb326-3"><a href="shiny-output.html#cb326-3"></a>  cars <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb326-4"><a href="shiny-output.html#cb326-4"></a><span class="st">    </span><span class="kw">head</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb326-5"><a href="shiny-output.html#cb326-5"></a><span class="st">    </span><span class="kw">plot</span>()</span>
-<span id="cb326-6"><a href="shiny-output.html#cb326-6"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb324"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb324-1"><a href="shiny-output.html#cb324-1"></a>output<span class="op">$</span>myPlot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb324-2"><a href="shiny-output.html#cb324-2"></a>  <span class="co"># this is an expression</span></span>
+<span id="cb324-3"><a href="shiny-output.html#cb324-3"></a>  cars <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb324-4"><a href="shiny-output.html#cb324-4"></a><span class="st">    </span><span class="kw">head</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb324-5"><a href="shiny-output.html#cb324-5"></a><span class="st">    </span><span class="kw">plot</span>()</span>
+<span id="cb324-6"><a href="shiny-output.html#cb324-6"></a>})</span></code></pre></div>
 <p>The function <code>renderBoxxy</code> takes an expression and other arguments that are passed to <code>shiny::exprToFunction</code> this does pretty much what it says on the tin: it returns a function from an expression (unless that expression is a function, in which case it returns the expression). This function must be further wrapped in another as render functions must return functions.</p>
-<div class="sourceCode" id="cb327"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb327-1"><a href="shiny-output.html#cb327-1"></a>renderBoxxy &lt;-<span class="st"> </span><span class="cf">function</span>(expr, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), </span>
-<span id="cb327-2"><a href="shiny-output.html#cb327-2"></a>  <span class="dt">quoted =</span> <span class="ot">FALSE</span>) {</span>
-<span id="cb327-3"><a href="shiny-output.html#cb327-3"></a>  <span class="co"># Convert the expression + environment into a function</span></span>
-<span id="cb327-4"><a href="shiny-output.html#cb327-4"></a>  func &lt;-<span class="st"> </span>shiny<span class="op">::</span><span class="kw">exprToFunction</span>(expr, env, quoted)</span>
-<span id="cb327-5"><a href="shiny-output.html#cb327-5"></a></span>
-<span id="cb327-6"><a href="shiny-output.html#cb327-6"></a>  <span class="cf">function</span>(){</span>
-<span id="cb327-7"><a href="shiny-output.html#cb327-7"></a>    <span class="kw">func</span>()</span>
-<span id="cb327-8"><a href="shiny-output.html#cb327-8"></a>  }</span>
-<span id="cb327-9"><a href="shiny-output.html#cb327-9"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb325"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb325-1"><a href="shiny-output.html#cb325-1"></a>renderBoxxy &lt;-<span class="st"> </span><span class="cf">function</span>(expr, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), </span>
+<span id="cb325-2"><a href="shiny-output.html#cb325-2"></a>  <span class="dt">quoted =</span> <span class="ot">FALSE</span>) {</span>
+<span id="cb325-3"><a href="shiny-output.html#cb325-3"></a>  <span class="co"># Convert the expression + environment into a function</span></span>
+<span id="cb325-4"><a href="shiny-output.html#cb325-4"></a>  func &lt;-<span class="st"> </span>shiny<span class="op">::</span><span class="kw">exprToFunction</span>(expr, env, quoted)</span>
+<span id="cb325-5"><a href="shiny-output.html#cb325-5"></a></span>
+<span id="cb325-6"><a href="shiny-output.html#cb325-6"></a>  <span class="cf">function</span>(){</span>
+<span id="cb325-7"><a href="shiny-output.html#cb325-7"></a>    <span class="kw">func</span>()</span>
+<span id="cb325-8"><a href="shiny-output.html#cb325-8"></a>  }</span>
+<span id="cb325-9"><a href="shiny-output.html#cb325-9"></a>}</span></code></pre></div>
 </div>
 <div id="shiny-output-binding" class="section level2" number="15.6">
 <h2><span class="header-section-number">15.6</span> JavaScript Output Binding</h2>
 <p>Here we create an “output binding,” it tells Shiny how to find the component and how to interact with it. An output binding is initialised from <code>Shiny.OutputBinding</code>. Below we initialise a new binding.</p>
-<div class="sourceCode" id="cb328"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb328-1"><a href="shiny-output.html#cb328-1"></a><span class="co">// custom.js</span></span>
-<span id="cb328-2"><a href="shiny-output.html#cb328-2"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb326"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb326-1"><a href="shiny-output.html#cb326-1"></a><span class="co">// custom.js</span></span>
+<span id="cb326-2"><a href="shiny-output.html#cb326-2"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span></code></pre></div>
 <p>Then, this must be “extended” by specifying a number of methods, a very necessary one being <code>find</code>. It is used to look for the output HTML element in the document (<code>scope</code>), and return them as an array (<code>HTMLcollection</code>). Other methods all take an <code>el</code> argument; that value will always be an element that was returned from <code>find</code>. A very straightforward way to accomplish this is to use jQuery’s find method to identify elements with the <code>boxxy</code> class used in <code>boxxyOutput</code>. You are by no means forced to use a CSS class to identify the elements but there is no reason not to.</p>
-<div class="sourceCode" id="cb329"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb329-1"><a href="shiny-output.html#cb329-1"></a><span class="co">// custom.js</span></span>
-<span id="cb329-2"><a href="shiny-output.html#cb329-2"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
-<span id="cb329-3"><a href="shiny-output.html#cb329-3"></a></span>
-<span id="cb329-4"><a href="shiny-output.html#cb329-4"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
-<span id="cb329-5"><a href="shiny-output.html#cb329-5"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
-<span id="cb329-6"><a href="shiny-output.html#cb329-6"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
-<span id="cb329-7"><a href="shiny-output.html#cb329-7"></a>  <span class="op">}</span></span>
-<span id="cb329-8"><a href="shiny-output.html#cb329-8"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb327"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb327-1"><a href="shiny-output.html#cb327-1"></a><span class="co">// custom.js</span></span>
+<span id="cb327-2"><a href="shiny-output.html#cb327-2"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
+<span id="cb327-3"><a href="shiny-output.html#cb327-3"></a></span>
+<span id="cb327-4"><a href="shiny-output.html#cb327-4"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb327-5"><a href="shiny-output.html#cb327-5"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
+<span id="cb327-6"><a href="shiny-output.html#cb327-6"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
+<span id="cb327-7"><a href="shiny-output.html#cb327-7"></a>  <span class="op">}</span></span>
+<span id="cb327-8"><a href="shiny-output.html#cb327-8"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 <p>One might then want to use the <code>getId</code> method which returns the <code>id</code> of the element, by default, as can be seen in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js">source code</a> (below), the binding returns the id as the <code>data-input-id</code> attribute and if that is falsy it returns the element’s <code>id</code>.</p>
-<div class="sourceCode" id="cb330"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb330-1"><a href="shiny-output.html#cb330-1"></a><span class="co">// getId default</span></span>
-<span id="cb330-2"><a href="shiny-output.html#cb330-2"></a><span class="kw">this</span>.<span class="at">getId</span> <span class="op">=</span> <span class="kw">function</span>(el) <span class="op">{</span></span>
-<span id="cb330-3"><a href="shiny-output.html#cb330-3"></a>  <span class="cf">return</span> el[<span class="st">&#39;data-input-id&#39;</span>] <span class="op">||</span> <span class="va">el</span>.<span class="at">id</span><span class="op">;</span></span>
-<span id="cb330-4"><a href="shiny-output.html#cb330-4"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb328"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb328-1"><a href="shiny-output.html#cb328-1"></a><span class="co">// getId default</span></span>
+<span id="cb328-2"><a href="shiny-output.html#cb328-2"></a><span class="kw">this</span>.<span class="at">getId</span> <span class="op">=</span> <span class="kw">function</span>(el) <span class="op">{</span></span>
+<span id="cb328-3"><a href="shiny-output.html#cb328-3"></a>  <span class="cf">return</span> el[<span class="st">&#39;data-input-id&#39;</span>] <span class="op">||</span> <span class="va">el</span>.<span class="at">id</span><span class="op">;</span></span>
+<span id="cb328-4"><a href="shiny-output.html#cb328-4"></a><span class="op">}</span></span></code></pre></div>
 <p>Since boxxy uses the element id the default will work and this can be skipped entirely.</p>
 <p>Next, one needs to implement the <code>renderValue</code> function which is the very function that generates the output based on data used in <code>boxxy</code> and sent to the front-end with <code>renderBoxxy</code>. The <code>renderValue</code> method accepts two arguments, first <code>el</code> the element where the output should be generated, this is effectively the output of <code>boxxyOutput</code> which the binding found using <code>find</code>, the second argument is <code>data</code> which is the data passed to <code>boxxy</code> and serialised via <code>renderBoxxy</code>.</p>
 <div class="rmdnote">
@@ -657,6 +658,29 @@ The <code>renderValue</code> is in effect very similar if not identical to the J
 <li>In R <code>sprintf("%s-boxxy-title", id)</code></li>
 <li>In JavaScript <code>el.id + '-boxxy-title'</code></li>
 </ul>
+<div class="sourceCode" id="cb329"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb329-1"><a href="shiny-output.html#cb329-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
+<span id="cb329-2"><a href="shiny-output.html#cb329-2"></a></span>
+<span id="cb329-3"><a href="shiny-output.html#cb329-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb329-4"><a href="shiny-output.html#cb329-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
+<span id="cb329-5"><a href="shiny-output.html#cb329-5"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
+<span id="cb329-6"><a href="shiny-output.html#cb329-6"></a>  <span class="op">},</span></span>
+<span id="cb329-7"><a href="shiny-output.html#cb329-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
+<span id="cb329-8"><a href="shiny-output.html#cb329-8"></a></span>
+<span id="cb329-9"><a href="shiny-output.html#cb329-9"></a>    <span class="co">// insert the title</span></span>
+<span id="cb329-10"><a href="shiny-output.html#cb329-10"></a>    <span class="kw">let</span> title_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span><span class="op">;</span></span>
+<span id="cb329-11"><a href="shiny-output.html#cb329-11"></a>    <span class="va">document</span>.<span class="at">getElementById</span>(title_id).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">title</span></span>
+<span id="cb329-12"><a href="shiny-output.html#cb329-12"></a>  <span class="op">}</span></span>
+<span id="cb329-13"><a href="shiny-output.html#cb329-13"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+</div>
+<div id="shiny-output-boxxy-value" class="section level3" number="15.6.2">
+<h3><span class="header-section-number">15.6.2</span> Boxxy Value</h3>
+<p>Though the custom output could be limited to a static value generated in a fashion similar to how the title is placed, we opted for a more fancy animated value using countUp.js.</p>
+<p>Initialise a new counter, specifying the id of the element where it should be created, then as second argument the starting value from which the counter should start and finally the value to count up to. Note that there is a fourth argument to pass a JSON of options which we do not use here.</p>
+<div class="sourceCode" id="cb330"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb330-1"><a href="shiny-output.html#cb330-1"></a><span class="co">// place counter in elementId</span></span>
+<span id="cb330-2"><a href="shiny-output.html#cb330-2"></a><span class="co">// start at 0 and count up to 123</span></span>
+<span id="cb330-3"><a href="shiny-output.html#cb330-3"></a><span class="kw">const</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(<span class="st">&#39;elementId&#39;</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">123</span>)<span class="op">;</span></span>
+<span id="cb330-4"><a href="shiny-output.html#cb330-4"></a><span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span></code></pre></div>
+<p>The counter has to be generated in the <code>&lt;h1&gt;</code> placeholder bearing the <code>id-boxxy-value</code>, while the value to count up to is stored in <code>data.value</code> meaning the counter can be initialised with <code>new CountUp(el.id + '-boxxy-value', 0, data.value);</code>.</p>
 <div class="sourceCode" id="cb331"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb331-1"><a href="shiny-output.html#cb331-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
 <span id="cb331-2"><a href="shiny-output.html#cb331-2"></a></span>
 <span id="cb331-3"><a href="shiny-output.html#cb331-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
@@ -668,18 +692,45 @@ The <code>renderValue</code> is in effect very similar if not identical to the J
 <span id="cb331-9"><a href="shiny-output.html#cb331-9"></a>    <span class="co">// insert the title</span></span>
 <span id="cb331-10"><a href="shiny-output.html#cb331-10"></a>    <span class="kw">let</span> title_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span><span class="op">;</span></span>
 <span id="cb331-11"><a href="shiny-output.html#cb331-11"></a>    <span class="va">document</span>.<span class="at">getElementById</span>(title_id).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">title</span></span>
-<span id="cb331-12"><a href="shiny-output.html#cb331-12"></a>  <span class="op">}</span></span>
-<span id="cb331-13"><a href="shiny-output.html#cb331-13"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<span id="cb331-12"><a href="shiny-output.html#cb331-12"></a></span>
+<span id="cb331-13"><a href="shiny-output.html#cb331-13"></a>    <span class="co">// counter start at 0</span></span>
+<span id="cb331-14"><a href="shiny-output.html#cb331-14"></a>    <span class="kw">let</span> counter_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">;</span></span>
+<span id="cb331-15"><a href="shiny-output.html#cb331-15"></a>    <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(counter_id<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="va">data</span>.<span class="at">value</span>)<span class="op">;</span></span>
+<span id="cb331-16"><a href="shiny-output.html#cb331-16"></a>    <span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span>
+<span id="cb331-17"><a href="shiny-output.html#cb331-17"></a>  <span class="op">}</span></span>
+<span id="cb331-18"><a href="shiny-output.html#cb331-18"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 </div>
-<div id="shiny-output-boxxy-value" class="section level3" number="15.6.2">
-<h3><span class="header-section-number">15.6.2</span> Boxxy Value</h3>
-<p>Though the custom output could be limited to a static value generated in a fashion similar to how the title is placed, we opted for a more fancy animated value using countUp.js.</p>
-<p>Initialise a new counter, specifying the id of the element where it should be created, then as second argument the starting value from which the counter should start and finally the value to count up to. Note that there is a fourth argument to pass a JSON of options which we do not use here.</p>
-<div class="sourceCode" id="cb332"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb332-1"><a href="shiny-output.html#cb332-1"></a><span class="co">// place counter in elementId</span></span>
-<span id="cb332-2"><a href="shiny-output.html#cb332-2"></a><span class="co">// start at 0 and count up to 123</span></span>
-<span id="cb332-3"><a href="shiny-output.html#cb332-3"></a><span class="kw">const</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(<span class="st">&#39;elementId&#39;</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">123</span>)<span class="op">;</span></span>
-<span id="cb332-4"><a href="shiny-output.html#cb332-4"></a><span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span></code></pre></div>
-<p>The counter has to be generated in the <code>&lt;h1&gt;</code> placeholder bearing the <code>id-boxxy-value</code>, while the value to count up to is stored in <code>data.value</code> meaning the counter can be initialised with <code>new CountUp(el.id + '-boxxy-value', 0, data.value);</code>.</p>
+<div id="shiny-output-boxxy-bg-color" class="section level3" number="15.6.3">
+<h3><span class="header-section-number">15.6.3</span> Boxxy Background Color</h3>
+<p>Then we can set the background color that was passed to <code>boxxy</code> (<code>data.color</code>).</p>
+<div class="sourceCode" id="cb332"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb332-1"><a href="shiny-output.html#cb332-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
+<span id="cb332-2"><a href="shiny-output.html#cb332-2"></a></span>
+<span id="cb332-3"><a href="shiny-output.html#cb332-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb332-4"><a href="shiny-output.html#cb332-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
+<span id="cb332-5"><a href="shiny-output.html#cb332-5"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
+<span id="cb332-6"><a href="shiny-output.html#cb332-6"></a>  <span class="op">},</span></span>
+<span id="cb332-7"><a href="shiny-output.html#cb332-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
+<span id="cb332-8"><a href="shiny-output.html#cb332-8"></a></span>
+<span id="cb332-9"><a href="shiny-output.html#cb332-9"></a>    <span class="co">// insert the title</span></span>
+<span id="cb332-10"><a href="shiny-output.html#cb332-10"></a>    <span class="kw">let</span> title_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span><span class="op">;</span></span>
+<span id="cb332-11"><a href="shiny-output.html#cb332-11"></a>    <span class="va">document</span>.<span class="at">getElementById</span>(title_id).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">title</span></span>
+<span id="cb332-12"><a href="shiny-output.html#cb332-12"></a></span>
+<span id="cb332-13"><a href="shiny-output.html#cb332-13"></a>    <span class="co">// counter start at 0</span></span>
+<span id="cb332-14"><a href="shiny-output.html#cb332-14"></a>    <span class="kw">let</span> counter_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">;</span></span>
+<span id="cb332-15"><a href="shiny-output.html#cb332-15"></a>    <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(counter_id<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="va">data</span>.<span class="at">value</span>)<span class="op">;</span></span>
+<span id="cb332-16"><a href="shiny-output.html#cb332-16"></a>    <span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span>
+<span id="cb332-17"><a href="shiny-output.html#cb332-17"></a></span>
+<span id="cb332-18"><a href="shiny-output.html#cb332-18"></a>    <span class="co">// background color </span></span>
+<span id="cb332-19"><a href="shiny-output.html#cb332-19"></a>    <span class="va">el</span>.<span class="va">style</span>.<span class="at">backgroundColor</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">color</span><span class="op">;</span></span>
+<span id="cb332-20"><a href="shiny-output.html#cb332-20"></a>  <span class="op">}</span></span>
+<span id="cb332-21"><a href="shiny-output.html#cb332-21"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+</div>
+<div id="shiny-output-register" class="section level3" number="15.6.4">
+<h3><span class="header-section-number">15.6.4</span> Register the Output Binding</h3>
+<p>Finally, the output binding must be registered with shiny. Note that it uses a unique string identifier, the <a href="https://shiny.rstudio.com/articles/building-outputs.html">documentation</a> states:</p>
+<blockquote>
+<p>At the moment it is unused but future features may depend on it.</p>
+</blockquote>
 <div class="sourceCode" id="cb333"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb333-1"><a href="shiny-output.html#cb333-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
 <span id="cb333-2"><a href="shiny-output.html#cb333-2"></a></span>
 <span id="cb333-3"><a href="shiny-output.html#cb333-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
@@ -696,145 +747,95 @@ The <code>renderValue</code> is in effect very similar if not identical to the J
 <span id="cb333-14"><a href="shiny-output.html#cb333-14"></a>    <span class="kw">let</span> counter_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">;</span></span>
 <span id="cb333-15"><a href="shiny-output.html#cb333-15"></a>    <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(counter_id<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="va">data</span>.<span class="at">value</span>)<span class="op">;</span></span>
 <span id="cb333-16"><a href="shiny-output.html#cb333-16"></a>    <span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span>
-<span id="cb333-17"><a href="shiny-output.html#cb333-17"></a>  <span class="op">}</span></span>
-<span id="cb333-18"><a href="shiny-output.html#cb333-18"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
-</div>
-<div id="shiny-output-boxxy-bg-color" class="section level3" number="15.6.3">
-<h3><span class="header-section-number">15.6.3</span> Boxxy Background Color</h3>
-<p>Then we can set the background color that was passed to <code>boxxy</code> (<code>data.color</code>).</p>
-<div class="sourceCode" id="cb334"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb334-1"><a href="shiny-output.html#cb334-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
-<span id="cb334-2"><a href="shiny-output.html#cb334-2"></a></span>
-<span id="cb334-3"><a href="shiny-output.html#cb334-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
-<span id="cb334-4"><a href="shiny-output.html#cb334-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
-<span id="cb334-5"><a href="shiny-output.html#cb334-5"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
-<span id="cb334-6"><a href="shiny-output.html#cb334-6"></a>  <span class="op">},</span></span>
-<span id="cb334-7"><a href="shiny-output.html#cb334-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
-<span id="cb334-8"><a href="shiny-output.html#cb334-8"></a></span>
-<span id="cb334-9"><a href="shiny-output.html#cb334-9"></a>    <span class="co">// insert the title</span></span>
-<span id="cb334-10"><a href="shiny-output.html#cb334-10"></a>    <span class="kw">let</span> title_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span><span class="op">;</span></span>
-<span id="cb334-11"><a href="shiny-output.html#cb334-11"></a>    <span class="va">document</span>.<span class="at">getElementById</span>(title_id).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">title</span></span>
-<span id="cb334-12"><a href="shiny-output.html#cb334-12"></a></span>
-<span id="cb334-13"><a href="shiny-output.html#cb334-13"></a>    <span class="co">// counter start at 0</span></span>
-<span id="cb334-14"><a href="shiny-output.html#cb334-14"></a>    <span class="kw">let</span> counter_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">;</span></span>
-<span id="cb334-15"><a href="shiny-output.html#cb334-15"></a>    <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(counter_id<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="va">data</span>.<span class="at">value</span>)<span class="op">;</span></span>
-<span id="cb334-16"><a href="shiny-output.html#cb334-16"></a>    <span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span>
-<span id="cb334-17"><a href="shiny-output.html#cb334-17"></a></span>
-<span id="cb334-18"><a href="shiny-output.html#cb334-18"></a>    <span class="co">// background color </span></span>
-<span id="cb334-19"><a href="shiny-output.html#cb334-19"></a>    <span class="va">el</span>.<span class="va">style</span>.<span class="at">backgroundColor</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">color</span><span class="op">;</span></span>
-<span id="cb334-20"><a href="shiny-output.html#cb334-20"></a>  <span class="op">}</span></span>
-<span id="cb334-21"><a href="shiny-output.html#cb334-21"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
-</div>
-<div id="shiny-output-register" class="section level3" number="15.6.4">
-<h3><span class="header-section-number">15.6.4</span> Register the Output Binding</h3>
-<p>Finally, the output binding must be registered with shiny. Note that it uses a unique string identifier, the <a href="https://shiny.rstudio.com/articles/building-outputs.html">documentation</a> states:</p>
-<blockquote>
-<p>At the moment it is unused but future features may depend on it.</p>
-</blockquote>
-<div class="sourceCode" id="cb335"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb335-1"><a href="shiny-output.html#cb335-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
-<span id="cb335-2"><a href="shiny-output.html#cb335-2"></a></span>
-<span id="cb335-3"><a href="shiny-output.html#cb335-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
-<span id="cb335-4"><a href="shiny-output.html#cb335-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
-<span id="cb335-5"><a href="shiny-output.html#cb335-5"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
-<span id="cb335-6"><a href="shiny-output.html#cb335-6"></a>  <span class="op">},</span></span>
-<span id="cb335-7"><a href="shiny-output.html#cb335-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
-<span id="cb335-8"><a href="shiny-output.html#cb335-8"></a></span>
-<span id="cb335-9"><a href="shiny-output.html#cb335-9"></a>    <span class="co">// insert the title</span></span>
-<span id="cb335-10"><a href="shiny-output.html#cb335-10"></a>    <span class="kw">let</span> title_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span><span class="op">;</span></span>
-<span id="cb335-11"><a href="shiny-output.html#cb335-11"></a>    <span class="va">document</span>.<span class="at">getElementById</span>(title_id).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">title</span></span>
-<span id="cb335-12"><a href="shiny-output.html#cb335-12"></a></span>
-<span id="cb335-13"><a href="shiny-output.html#cb335-13"></a>    <span class="co">// counter start at 0</span></span>
-<span id="cb335-14"><a href="shiny-output.html#cb335-14"></a>    <span class="kw">let</span> counter_id <span class="op">=</span> <span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">;</span></span>
-<span id="cb335-15"><a href="shiny-output.html#cb335-15"></a>    <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(counter_id<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="va">data</span>.<span class="at">value</span>)<span class="op">;</span></span>
-<span id="cb335-16"><a href="shiny-output.html#cb335-16"></a>    <span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span>
-<span id="cb335-17"><a href="shiny-output.html#cb335-17"></a></span>
-<span id="cb335-18"><a href="shiny-output.html#cb335-18"></a>    <span class="co">// background color </span></span>
-<span id="cb335-19"><a href="shiny-output.html#cb335-19"></a>    <span class="va">el</span>.<span class="va">style</span>.<span class="at">backgroundColor</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">color</span><span class="op">;</span></span>
-<span id="cb335-20"><a href="shiny-output.html#cb335-20"></a>  <span class="op">}</span></span>
-<span id="cb335-21"><a href="shiny-output.html#cb335-21"></a><span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb335-22"><a href="shiny-output.html#cb335-22"></a></span>
-<span id="cb335-23"><a href="shiny-output.html#cb335-23"></a><span class="co">// register</span></span>
-<span id="cb335-24"><a href="shiny-output.html#cb335-24"></a><span class="va">Shiny</span>.<span class="va">outputBindings</span>.<span class="at">register</span>(boxxyBinding<span class="op">,</span> <span class="st">&quot;john.boxxy&quot;</span>)<span class="op">;</span></span></code></pre></div>
+<span id="cb333-17"><a href="shiny-output.html#cb333-17"></a></span>
+<span id="cb333-18"><a href="shiny-output.html#cb333-18"></a>    <span class="co">// background color </span></span>
+<span id="cb333-19"><a href="shiny-output.html#cb333-19"></a>    <span class="va">el</span>.<span class="va">style</span>.<span class="at">backgroundColor</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">color</span><span class="op">;</span></span>
+<span id="cb333-20"><a href="shiny-output.html#cb333-20"></a>  <span class="op">}</span></span>
+<span id="cb333-21"><a href="shiny-output.html#cb333-21"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb333-22"><a href="shiny-output.html#cb333-22"></a></span>
+<span id="cb333-23"><a href="shiny-output.html#cb333-23"></a><span class="co">// register</span></span>
+<span id="cb333-24"><a href="shiny-output.html#cb333-24"></a><span class="va">Shiny</span>.<span class="va">outputBindings</span>.<span class="at">register</span>(boxxyBinding<span class="op">,</span> <span class="st">&quot;john.boxxy&quot;</span>)<span class="op">;</span></span></code></pre></div>
 <p>Ensure that string uniquely identifies the binding to avoid future clash with other such bindings.</p>
 </div>
 </div>
 <div id="shiny-output-usage" class="section level2" number="15.7">
 <h2><span class="header-section-number">15.7</span> Boxxy Usage</h2>
 <p>With all of this in place one can use boxxy in a shiny application.</p>
-<div class="sourceCode" id="cb336"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb336-1"><a href="shiny-output.html#cb336-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb336-2"><a href="shiny-output.html#cb336-2"></a></span>
-<span id="cb336-3"><a href="shiny-output.html#cb336-3"></a>boxxy &lt;-<span class="st"> </span><span class="cf">function</span>(title, value, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>){</span>
-<span id="cb336-4"><a href="shiny-output.html#cb336-4"></a>  <span class="kw">list</span>(<span class="dt">title =</span> title, <span class="dt">value =</span> value, <span class="dt">color =</span> color)</span>
-<span id="cb336-5"><a href="shiny-output.html#cb336-5"></a>}</span>
-<span id="cb336-6"><a href="shiny-output.html#cb336-6"></a></span>
-<span id="cb336-7"><a href="shiny-output.html#cb336-7"></a>boxxyOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
-<span id="cb336-8"><a href="shiny-output.html#cb336-8"></a>  el &lt;-<span class="st"> </span>shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">div</span>(</span>
-<span id="cb336-9"><a href="shiny-output.html#cb336-9"></a>    <span class="dt">id =</span> id, <span class="dt">class =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
-<span id="cb336-10"><a href="shiny-output.html#cb336-10"></a>    <span class="kw">h1</span>(<span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-value&quot;</span>, id), <span class="dt">class =</span> <span class="st">&quot;boxxy-value&quot;</span>),</span>
-<span id="cb336-11"><a href="shiny-output.html#cb336-11"></a>    <span class="kw">p</span>(<span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-title&quot;</span>, id), <span class="dt">class =</span> <span class="st">&quot;boxxy-title&quot;</span>)</span>
-<span id="cb336-12"><a href="shiny-output.html#cb336-12"></a>  )</span>
-<span id="cb336-13"><a href="shiny-output.html#cb336-13"></a></span>
-<span id="cb336-14"><a href="shiny-output.html#cb336-14"></a>  path &lt;-<span class="st"> </span><span class="kw">normalizePath</span>(<span class="st">&quot;assets&quot;</span>)</span>
-<span id="cb336-15"><a href="shiny-output.html#cb336-15"></a></span>
-<span id="cb336-16"><a href="shiny-output.html#cb336-16"></a>  deps &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb336-17"><a href="shiny-output.html#cb336-17"></a>    htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
-<span id="cb336-18"><a href="shiny-output.html#cb336-18"></a>      <span class="dt">name =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
-<span id="cb336-19"><a href="shiny-output.html#cb336-19"></a>      <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
-<span id="cb336-20"><a href="shiny-output.html#cb336-20"></a>      <span class="dt">src =</span> <span class="kw">c</span>(<span class="dt">file =</span> path),</span>
-<span id="cb336-21"><a href="shiny-output.html#cb336-21"></a>      <span class="dt">script =</span> <span class="kw">c</span>(<span class="st">&quot;countup.js&quot;</span>, <span class="st">&quot;binding.js&quot;</span>),</span>
-<span id="cb336-22"><a href="shiny-output.html#cb336-22"></a>      <span class="dt">stylesheet =</span> <span class="st">&quot;styles.css&quot;</span></span>
-<span id="cb336-23"><a href="shiny-output.html#cb336-23"></a>    )</span>
-<span id="cb336-24"><a href="shiny-output.html#cb336-24"></a>  )</span>
-<span id="cb336-25"><a href="shiny-output.html#cb336-25"></a></span>
-<span id="cb336-26"><a href="shiny-output.html#cb336-26"></a>  htmltools<span class="op">::</span><span class="kw">attachDependencies</span>(el, deps)</span>
-<span id="cb336-27"><a href="shiny-output.html#cb336-27"></a>}</span>
-<span id="cb336-28"><a href="shiny-output.html#cb336-28"></a></span>
-<span id="cb336-29"><a href="shiny-output.html#cb336-29"></a>renderBoxxy &lt;-<span class="st"> </span><span class="cf">function</span>(expr, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), </span>
-<span id="cb336-30"><a href="shiny-output.html#cb336-30"></a>  <span class="dt">quoted =</span> <span class="ot">FALSE</span>) {</span>
-<span id="cb336-31"><a href="shiny-output.html#cb336-31"></a>  <span class="co"># Convert the expression + environment into a function</span></span>
-<span id="cb336-32"><a href="shiny-output.html#cb336-32"></a>  func &lt;-<span class="st"> </span>shiny<span class="op">::</span><span class="kw">exprToFunction</span>(expr, env, quoted)</span>
-<span id="cb336-33"><a href="shiny-output.html#cb336-33"></a></span>
-<span id="cb336-34"><a href="shiny-output.html#cb336-34"></a>  <span class="cf">function</span>(){</span>
-<span id="cb336-35"><a href="shiny-output.html#cb336-35"></a>    <span class="kw">func</span>()</span>
-<span id="cb336-36"><a href="shiny-output.html#cb336-36"></a>  }</span>
-<span id="cb336-37"><a href="shiny-output.html#cb336-37"></a>}</span>
-<span id="cb336-38"><a href="shiny-output.html#cb336-38"></a></span>
-<span id="cb336-39"><a href="shiny-output.html#cb336-39"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb336-40"><a href="shiny-output.html#cb336-40"></a>  <span class="kw">h2</span>(<span class="st">&quot;Custom outputs&quot;</span>),</span>
-<span id="cb336-41"><a href="shiny-output.html#cb336-41"></a>  <span class="kw">fluidRow</span>(</span>
-<span id="cb336-42"><a href="shiny-output.html#cb336-42"></a>    <span class="kw">column</span>(</span>
-<span id="cb336-43"><a href="shiny-output.html#cb336-43"></a>      <span class="dv">3</span>, <span class="kw">boxxyOutput</span>(<span class="st">&quot;countries&quot;</span>)</span>
-<span id="cb336-44"><a href="shiny-output.html#cb336-44"></a>    ),</span>
-<span id="cb336-45"><a href="shiny-output.html#cb336-45"></a>    <span class="kw">column</span>(</span>
-<span id="cb336-46"><a href="shiny-output.html#cb336-46"></a>      <span class="dv">3</span>, <span class="kw">boxxyOutput</span>(<span class="st">&quot;employees&quot;</span>)</span>
-<span id="cb336-47"><a href="shiny-output.html#cb336-47"></a>    ),</span>
-<span id="cb336-48"><a href="shiny-output.html#cb336-48"></a>    <span class="kw">column</span>(</span>
-<span id="cb336-49"><a href="shiny-output.html#cb336-49"></a>      <span class="dv">3</span>, <span class="kw">boxxyOutput</span>(<span class="st">&quot;customers&quot;</span>)</span>
-<span id="cb336-50"><a href="shiny-output.html#cb336-50"></a>    ),</span>
-<span id="cb336-51"><a href="shiny-output.html#cb336-51"></a>    <span class="kw">column</span>(</span>
-<span id="cb336-52"><a href="shiny-output.html#cb336-52"></a>      <span class="dv">3</span>, <span class="kw">boxxyOutput</span>(<span class="st">&quot;subs&quot;</span>)</span>
-<span id="cb336-53"><a href="shiny-output.html#cb336-53"></a>    )</span>
-<span id="cb336-54"><a href="shiny-output.html#cb336-54"></a>  )</span>
-<span id="cb336-55"><a href="shiny-output.html#cb336-55"></a>)</span>
-<span id="cb336-56"><a href="shiny-output.html#cb336-56"></a></span>
-<span id="cb336-57"><a href="shiny-output.html#cb336-57"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb336-58"><a href="shiny-output.html#cb336-58"></a>  output<span class="op">$</span>countries &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
-<span id="cb336-59"><a href="shiny-output.html#cb336-59"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Countries&quot;</span>, <span class="dv">95</span>, <span class="dt">color =</span> <span class="st">&quot;#ef476f&quot;</span>)</span>
-<span id="cb336-60"><a href="shiny-output.html#cb336-60"></a>  })</span>
-<span id="cb336-61"><a href="shiny-output.html#cb336-61"></a></span>
-<span id="cb336-62"><a href="shiny-output.html#cb336-62"></a>  output<span class="op">$</span>employees &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
-<span id="cb336-63"><a href="shiny-output.html#cb336-63"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Thing&quot;</span>, <span class="dv">650</span>, <span class="dt">color =</span> <span class="st">&quot;#06d6a0&quot;</span>)</span>
-<span id="cb336-64"><a href="shiny-output.html#cb336-64"></a>  })</span>
-<span id="cb336-65"><a href="shiny-output.html#cb336-65"></a></span>
-<span id="cb336-66"><a href="shiny-output.html#cb336-66"></a>  output<span class="op">$</span>customers &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
-<span id="cb336-67"><a href="shiny-output.html#cb336-67"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Customers&quot;</span>, <span class="dv">13592</span>, <span class="dt">color =</span> <span class="st">&quot;#118ab2&quot;</span>)</span>
-<span id="cb336-68"><a href="shiny-output.html#cb336-68"></a>  })</span>
-<span id="cb336-69"><a href="shiny-output.html#cb336-69"></a></span>
-<span id="cb336-70"><a href="shiny-output.html#cb336-70"></a>  output<span class="op">$</span>subs &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
-<span id="cb336-71"><a href="shiny-output.html#cb336-71"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Subscriptions&quot;</span>, <span class="dv">16719</span>, <span class="dt">color =</span> <span class="st">&quot;#ffd166&quot;</span>)</span>
-<span id="cb336-72"><a href="shiny-output.html#cb336-72"></a>  })</span>
-<span id="cb336-73"><a href="shiny-output.html#cb336-73"></a>}</span>
-<span id="cb336-74"><a href="shiny-output.html#cb336-74"></a></span>
-<span id="cb336-75"><a href="shiny-output.html#cb336-75"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb334"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb334-1"><a href="shiny-output.html#cb334-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb334-2"><a href="shiny-output.html#cb334-2"></a></span>
+<span id="cb334-3"><a href="shiny-output.html#cb334-3"></a>boxxy &lt;-<span class="st"> </span><span class="cf">function</span>(title, value, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>){</span>
+<span id="cb334-4"><a href="shiny-output.html#cb334-4"></a>  <span class="kw">list</span>(<span class="dt">title =</span> title, <span class="dt">value =</span> value, <span class="dt">color =</span> color)</span>
+<span id="cb334-5"><a href="shiny-output.html#cb334-5"></a>}</span>
+<span id="cb334-6"><a href="shiny-output.html#cb334-6"></a></span>
+<span id="cb334-7"><a href="shiny-output.html#cb334-7"></a>boxxyOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
+<span id="cb334-8"><a href="shiny-output.html#cb334-8"></a>  el &lt;-<span class="st"> </span>shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">div</span>(</span>
+<span id="cb334-9"><a href="shiny-output.html#cb334-9"></a>    <span class="dt">id =</span> id, <span class="dt">class =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
+<span id="cb334-10"><a href="shiny-output.html#cb334-10"></a>    <span class="kw">h1</span>(<span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-value&quot;</span>, id), <span class="dt">class =</span> <span class="st">&quot;boxxy-value&quot;</span>),</span>
+<span id="cb334-11"><a href="shiny-output.html#cb334-11"></a>    <span class="kw">p</span>(<span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-title&quot;</span>, id), <span class="dt">class =</span> <span class="st">&quot;boxxy-title&quot;</span>)</span>
+<span id="cb334-12"><a href="shiny-output.html#cb334-12"></a>  )</span>
+<span id="cb334-13"><a href="shiny-output.html#cb334-13"></a></span>
+<span id="cb334-14"><a href="shiny-output.html#cb334-14"></a>  path &lt;-<span class="st"> </span><span class="kw">normalizePath</span>(<span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb334-15"><a href="shiny-output.html#cb334-15"></a></span>
+<span id="cb334-16"><a href="shiny-output.html#cb334-16"></a>  deps &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb334-17"><a href="shiny-output.html#cb334-17"></a>    htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
+<span id="cb334-18"><a href="shiny-output.html#cb334-18"></a>      <span class="dt">name =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
+<span id="cb334-19"><a href="shiny-output.html#cb334-19"></a>      <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
+<span id="cb334-20"><a href="shiny-output.html#cb334-20"></a>      <span class="dt">src =</span> <span class="kw">c</span>(<span class="dt">file =</span> path),</span>
+<span id="cb334-21"><a href="shiny-output.html#cb334-21"></a>      <span class="dt">script =</span> <span class="kw">c</span>(<span class="st">&quot;countup.js&quot;</span>, <span class="st">&quot;binding.js&quot;</span>),</span>
+<span id="cb334-22"><a href="shiny-output.html#cb334-22"></a>      <span class="dt">stylesheet =</span> <span class="st">&quot;styles.css&quot;</span></span>
+<span id="cb334-23"><a href="shiny-output.html#cb334-23"></a>    )</span>
+<span id="cb334-24"><a href="shiny-output.html#cb334-24"></a>  )</span>
+<span id="cb334-25"><a href="shiny-output.html#cb334-25"></a></span>
+<span id="cb334-26"><a href="shiny-output.html#cb334-26"></a>  htmltools<span class="op">::</span><span class="kw">attachDependencies</span>(el, deps)</span>
+<span id="cb334-27"><a href="shiny-output.html#cb334-27"></a>}</span>
+<span id="cb334-28"><a href="shiny-output.html#cb334-28"></a></span>
+<span id="cb334-29"><a href="shiny-output.html#cb334-29"></a>renderBoxxy &lt;-<span class="st"> </span><span class="cf">function</span>(expr, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), </span>
+<span id="cb334-30"><a href="shiny-output.html#cb334-30"></a>  <span class="dt">quoted =</span> <span class="ot">FALSE</span>) {</span>
+<span id="cb334-31"><a href="shiny-output.html#cb334-31"></a>  <span class="co"># Convert the expression + environment into a function</span></span>
+<span id="cb334-32"><a href="shiny-output.html#cb334-32"></a>  func &lt;-<span class="st"> </span>shiny<span class="op">::</span><span class="kw">exprToFunction</span>(expr, env, quoted)</span>
+<span id="cb334-33"><a href="shiny-output.html#cb334-33"></a></span>
+<span id="cb334-34"><a href="shiny-output.html#cb334-34"></a>  <span class="cf">function</span>(){</span>
+<span id="cb334-35"><a href="shiny-output.html#cb334-35"></a>    <span class="kw">func</span>()</span>
+<span id="cb334-36"><a href="shiny-output.html#cb334-36"></a>  }</span>
+<span id="cb334-37"><a href="shiny-output.html#cb334-37"></a>}</span>
+<span id="cb334-38"><a href="shiny-output.html#cb334-38"></a></span>
+<span id="cb334-39"><a href="shiny-output.html#cb334-39"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb334-40"><a href="shiny-output.html#cb334-40"></a>  <span class="kw">h2</span>(<span class="st">&quot;Custom outputs&quot;</span>),</span>
+<span id="cb334-41"><a href="shiny-output.html#cb334-41"></a>  <span class="kw">fluidRow</span>(</span>
+<span id="cb334-42"><a href="shiny-output.html#cb334-42"></a>    <span class="kw">column</span>(</span>
+<span id="cb334-43"><a href="shiny-output.html#cb334-43"></a>      <span class="dv">3</span>, <span class="kw">boxxyOutput</span>(<span class="st">&quot;countries&quot;</span>)</span>
+<span id="cb334-44"><a href="shiny-output.html#cb334-44"></a>    ),</span>
+<span id="cb334-45"><a href="shiny-output.html#cb334-45"></a>    <span class="kw">column</span>(</span>
+<span id="cb334-46"><a href="shiny-output.html#cb334-46"></a>      <span class="dv">3</span>, <span class="kw">boxxyOutput</span>(<span class="st">&quot;employees&quot;</span>)</span>
+<span id="cb334-47"><a href="shiny-output.html#cb334-47"></a>    ),</span>
+<span id="cb334-48"><a href="shiny-output.html#cb334-48"></a>    <span class="kw">column</span>(</span>
+<span id="cb334-49"><a href="shiny-output.html#cb334-49"></a>      <span class="dv">3</span>, <span class="kw">boxxyOutput</span>(<span class="st">&quot;customers&quot;</span>)</span>
+<span id="cb334-50"><a href="shiny-output.html#cb334-50"></a>    ),</span>
+<span id="cb334-51"><a href="shiny-output.html#cb334-51"></a>    <span class="kw">column</span>(</span>
+<span id="cb334-52"><a href="shiny-output.html#cb334-52"></a>      <span class="dv">3</span>, <span class="kw">boxxyOutput</span>(<span class="st">&quot;subs&quot;</span>)</span>
+<span id="cb334-53"><a href="shiny-output.html#cb334-53"></a>    )</span>
+<span id="cb334-54"><a href="shiny-output.html#cb334-54"></a>  )</span>
+<span id="cb334-55"><a href="shiny-output.html#cb334-55"></a>)</span>
+<span id="cb334-56"><a href="shiny-output.html#cb334-56"></a></span>
+<span id="cb334-57"><a href="shiny-output.html#cb334-57"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb334-58"><a href="shiny-output.html#cb334-58"></a>  output<span class="op">$</span>countries &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
+<span id="cb334-59"><a href="shiny-output.html#cb334-59"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Countries&quot;</span>, <span class="dv">95</span>, <span class="dt">color =</span> <span class="st">&quot;#ef476f&quot;</span>)</span>
+<span id="cb334-60"><a href="shiny-output.html#cb334-60"></a>  })</span>
+<span id="cb334-61"><a href="shiny-output.html#cb334-61"></a></span>
+<span id="cb334-62"><a href="shiny-output.html#cb334-62"></a>  output<span class="op">$</span>employees &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
+<span id="cb334-63"><a href="shiny-output.html#cb334-63"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Thing&quot;</span>, <span class="dv">650</span>, <span class="dt">color =</span> <span class="st">&quot;#06d6a0&quot;</span>)</span>
+<span id="cb334-64"><a href="shiny-output.html#cb334-64"></a>  })</span>
+<span id="cb334-65"><a href="shiny-output.html#cb334-65"></a></span>
+<span id="cb334-66"><a href="shiny-output.html#cb334-66"></a>  output<span class="op">$</span>customers &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
+<span id="cb334-67"><a href="shiny-output.html#cb334-67"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Customers&quot;</span>, <span class="dv">13592</span>, <span class="dt">color =</span> <span class="st">&quot;#118ab2&quot;</span>)</span>
+<span id="cb334-68"><a href="shiny-output.html#cb334-68"></a>  })</span>
+<span id="cb334-69"><a href="shiny-output.html#cb334-69"></a></span>
+<span id="cb334-70"><a href="shiny-output.html#cb334-70"></a>  output<span class="op">$</span>subs &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
+<span id="cb334-71"><a href="shiny-output.html#cb334-71"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Subscriptions&quot;</span>, <span class="dv">16719</span>, <span class="dt">color =</span> <span class="st">&quot;#ffd166&quot;</span>)</span>
+<span id="cb334-72"><a href="shiny-output.html#cb334-72"></a>  })</span>
+<span id="cb334-73"><a href="shiny-output.html#cb334-73"></a>}</span>
+<span id="cb334-74"><a href="shiny-output.html#cb334-74"></a></span>
+<span id="cb334-75"><a href="shiny-output.html#cb334-75"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div class="figure">
 <img src="images/custom-output-boxxy.png" alt="" />
 <p class="caption">Shiny application with boxxy</p>
@@ -844,70 +845,70 @@ The <code>renderValue</code> is in effect very similar if not identical to the J
 <h2><span class="header-section-number">15.8</span> Injecting Dependencies</h2>
 <p>We could consider making the animation of the value rendered with <code>boxxy</code> optional, some users may not want to use it. You might already imagine how a new argument and a few if statements could very easily do the job, but how would one handle the dependency? Surely if users do not want to make use of the animation the CountUp.js dependency should also be excluded so as to keep the output as light as possible.</p>
 <p>The dependency is currently attached in the <code>boxxyOutput</code> function which does not take any argument, it could but it would make for rather messy and confusing interface as whatever additional argument that indicates whether the numbers should be animated would have be specified twice, once in the <code>boxxyOutput</code> function so it does not import the dependency as well as in the <code>boxxy</code> function in order to serialise that parameter so the JavaScript binding does not run the animation function.</p>
-<div class="sourceCode" id="cb337"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb337-1"><a href="shiny-output.html#cb337-1"></a><span class="co"># pseudo code</span></span>
-<span id="cb337-2"><a href="shiny-output.html#cb337-2"></a><span class="co"># do not do this</span></span>
-<span id="cb337-3"><a href="shiny-output.html#cb337-3"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb337-4"><a href="shiny-output.html#cb337-4"></a></span>
-<span id="cb337-5"><a href="shiny-output.html#cb337-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb337-6"><a href="shiny-output.html#cb337-6"></a>  <span class="kw">boxxyOutput</span>(</span>
-<span id="cb337-7"><a href="shiny-output.html#cb337-7"></a>    <span class="st">&quot;countries&quot;</span>, </span>
-<span id="cb337-8"><a href="shiny-output.html#cb337-8"></a>    <span class="co"># do not import dependency</span></span>
-<span id="cb337-9"><a href="shiny-output.html#cb337-9"></a>    <span class="dt">animate =</span> <span class="ot">FALSE</span></span>
-<span id="cb337-10"><a href="shiny-output.html#cb337-10"></a>  )</span>
-<span id="cb337-11"><a href="shiny-output.html#cb337-11"></a>)</span>
-<span id="cb337-12"><a href="shiny-output.html#cb337-12"></a></span>
-<span id="cb337-13"><a href="shiny-output.html#cb337-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb337-14"><a href="shiny-output.html#cb337-14"></a>  output<span class="op">$</span>countries &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
-<span id="cb337-15"><a href="shiny-output.html#cb337-15"></a>    <span class="co"># do not animate the numbers</span></span>
-<span id="cb337-16"><a href="shiny-output.html#cb337-16"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Countries&quot;</span>, <span class="dv">95</span>, <span class="dt">animate =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb337-17"><a href="shiny-output.html#cb337-17"></a>  })</span>
-<span id="cb337-18"><a href="shiny-output.html#cb337-18"></a>}</span>
-<span id="cb337-19"><a href="shiny-output.html#cb337-19"></a></span>
-<span id="cb337-20"><a href="shiny-output.html#cb337-20"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb335"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb335-1"><a href="shiny-output.html#cb335-1"></a><span class="co"># pseudo code</span></span>
+<span id="cb335-2"><a href="shiny-output.html#cb335-2"></a><span class="co"># do not do this</span></span>
+<span id="cb335-3"><a href="shiny-output.html#cb335-3"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb335-4"><a href="shiny-output.html#cb335-4"></a></span>
+<span id="cb335-5"><a href="shiny-output.html#cb335-5"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb335-6"><a href="shiny-output.html#cb335-6"></a>  <span class="kw">boxxyOutput</span>(</span>
+<span id="cb335-7"><a href="shiny-output.html#cb335-7"></a>    <span class="st">&quot;countries&quot;</span>, </span>
+<span id="cb335-8"><a href="shiny-output.html#cb335-8"></a>    <span class="co"># do not import dependency</span></span>
+<span id="cb335-9"><a href="shiny-output.html#cb335-9"></a>    <span class="dt">animate =</span> <span class="ot">FALSE</span></span>
+<span id="cb335-10"><a href="shiny-output.html#cb335-10"></a>  )</span>
+<span id="cb335-11"><a href="shiny-output.html#cb335-11"></a>)</span>
+<span id="cb335-12"><a href="shiny-output.html#cb335-12"></a></span>
+<span id="cb335-13"><a href="shiny-output.html#cb335-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb335-14"><a href="shiny-output.html#cb335-14"></a>  output<span class="op">$</span>countries &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
+<span id="cb335-15"><a href="shiny-output.html#cb335-15"></a>    <span class="co"># do not animate the numbers</span></span>
+<span id="cb335-16"><a href="shiny-output.html#cb335-16"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Countries&quot;</span>, <span class="dv">95</span>, <span class="dt">animate =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb335-17"><a href="shiny-output.html#cb335-17"></a>  })</span>
+<span id="cb335-18"><a href="shiny-output.html#cb335-18"></a>}</span>
+<span id="cb335-19"><a href="shiny-output.html#cb335-19"></a></span>
+<span id="cb335-20"><a href="shiny-output.html#cb335-20"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>Thankfully there is a better way, combining htmltools and shiny to insert the dependency dynamically from JavaScript.</p>
 <p>The <code>boxxy</code> function needs to take an additional argument <code>animate</code> which is passed to the output list. This will be used in the <code>render</code> function (and JavaScript binding) to dynamically render the dependency.</p>
-<div class="sourceCode" id="cb338"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb338-1"><a href="shiny-output.html#cb338-1"></a>boxxy &lt;-<span class="st"> </span><span class="cf">function</span>(title, value, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">aniamte =</span> <span class="ot">TRUE</span>){</span>
-<span id="cb338-2"><a href="shiny-output.html#cb338-2"></a>  <span class="kw">list</span>(<span class="dt">title =</span> title, <span class="dt">value =</span> value, <span class="dt">color =</span> color, <span class="dt">animate =</span> animate)</span>
-<span id="cb338-3"><a href="shiny-output.html#cb338-3"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb336"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb336-1"><a href="shiny-output.html#cb336-1"></a>boxxy &lt;-<span class="st"> </span><span class="cf">function</span>(title, value, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">aniamte =</span> <span class="ot">TRUE</span>){</span>
+<span id="cb336-2"><a href="shiny-output.html#cb336-2"></a>  <span class="kw">list</span>(<span class="dt">title =</span> title, <span class="dt">value =</span> value, <span class="dt">color =</span> color, <span class="dt">animate =</span> animate)</span>
+<span id="cb336-3"><a href="shiny-output.html#cb336-3"></a>}</span></code></pre></div>
 <p>The <code>boxxyOutput</code> function can be slightly simplified, it currently attaches the <code>countup.js</code> dependency which needs to be removed.</p>
-<div class="sourceCode" id="cb339"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb339-1"><a href="shiny-output.html#cb339-1"></a>boxxyOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
-<span id="cb339-2"><a href="shiny-output.html#cb339-2"></a>  el &lt;-<span class="st"> </span>shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">div</span>(</span>
-<span id="cb339-3"><a href="shiny-output.html#cb339-3"></a>    <span class="dt">id =</span> id, <span class="dt">class =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
-<span id="cb339-4"><a href="shiny-output.html#cb339-4"></a>    <span class="kw">h1</span>(<span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-value&quot;</span>, id), <span class="dt">class =</span> <span class="st">&quot;boxxy-value&quot;</span>),</span>
-<span id="cb339-5"><a href="shiny-output.html#cb339-5"></a>    <span class="kw">p</span>(<span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-title&quot;</span>, id), <span class="dt">class =</span> <span class="st">&quot;boxxy-title&quot;</span>)</span>
-<span id="cb339-6"><a href="shiny-output.html#cb339-6"></a>  )</span>
-<span id="cb339-7"><a href="shiny-output.html#cb339-7"></a></span>
-<span id="cb339-8"><a href="shiny-output.html#cb339-8"></a>  path &lt;-<span class="st"> </span><span class="kw">normalizePath</span>(<span class="st">&quot;assets&quot;</span>)</span>
-<span id="cb339-9"><a href="shiny-output.html#cb339-9"></a></span>
-<span id="cb339-10"><a href="shiny-output.html#cb339-10"></a>  <span class="co"># only attach binding.js</span></span>
-<span id="cb339-11"><a href="shiny-output.html#cb339-11"></a>  deps &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb339-12"><a href="shiny-output.html#cb339-12"></a>    htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
-<span id="cb339-13"><a href="shiny-output.html#cb339-13"></a>      <span class="dt">name =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
-<span id="cb339-14"><a href="shiny-output.html#cb339-14"></a>      <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
-<span id="cb339-15"><a href="shiny-output.html#cb339-15"></a>      <span class="dt">src =</span> <span class="kw">c</span>(<span class="dt">file =</span> path),</span>
-<span id="cb339-16"><a href="shiny-output.html#cb339-16"></a>      <span class="dt">script =</span> <span class="kw">c</span>(<span class="st">&quot;binding.js&quot;</span>),</span>
-<span id="cb339-17"><a href="shiny-output.html#cb339-17"></a>      <span class="dt">stylesheet =</span> <span class="st">&quot;styles.css&quot;</span></span>
-<span id="cb339-18"><a href="shiny-output.html#cb339-18"></a>    )</span>
-<span id="cb339-19"><a href="shiny-output.html#cb339-19"></a>  )</span>
-<span id="cb339-20"><a href="shiny-output.html#cb339-20"></a></span>
-<span id="cb339-21"><a href="shiny-output.html#cb339-21"></a>  htmltools<span class="op">::</span><span class="kw">attachDependencies</span>(el, deps)</span>
-<span id="cb339-22"><a href="shiny-output.html#cb339-22"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb337"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb337-1"><a href="shiny-output.html#cb337-1"></a>boxxyOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
+<span id="cb337-2"><a href="shiny-output.html#cb337-2"></a>  el &lt;-<span class="st"> </span>shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">div</span>(</span>
+<span id="cb337-3"><a href="shiny-output.html#cb337-3"></a>    <span class="dt">id =</span> id, <span class="dt">class =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
+<span id="cb337-4"><a href="shiny-output.html#cb337-4"></a>    <span class="kw">h1</span>(<span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-value&quot;</span>, id), <span class="dt">class =</span> <span class="st">&quot;boxxy-value&quot;</span>),</span>
+<span id="cb337-5"><a href="shiny-output.html#cb337-5"></a>    <span class="kw">p</span>(<span class="dt">id =</span> <span class="kw">sprintf</span>(<span class="st">&quot;%s-boxxy-title&quot;</span>, id), <span class="dt">class =</span> <span class="st">&quot;boxxy-title&quot;</span>)</span>
+<span id="cb337-6"><a href="shiny-output.html#cb337-6"></a>  )</span>
+<span id="cb337-7"><a href="shiny-output.html#cb337-7"></a></span>
+<span id="cb337-8"><a href="shiny-output.html#cb337-8"></a>  path &lt;-<span class="st"> </span><span class="kw">normalizePath</span>(<span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb337-9"><a href="shiny-output.html#cb337-9"></a></span>
+<span id="cb337-10"><a href="shiny-output.html#cb337-10"></a>  <span class="co"># only attach binding.js</span></span>
+<span id="cb337-11"><a href="shiny-output.html#cb337-11"></a>  deps &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb337-12"><a href="shiny-output.html#cb337-12"></a>    htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
+<span id="cb337-13"><a href="shiny-output.html#cb337-13"></a>      <span class="dt">name =</span> <span class="st">&quot;boxxy&quot;</span>,</span>
+<span id="cb337-14"><a href="shiny-output.html#cb337-14"></a>      <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
+<span id="cb337-15"><a href="shiny-output.html#cb337-15"></a>      <span class="dt">src =</span> <span class="kw">c</span>(<span class="dt">file =</span> path),</span>
+<span id="cb337-16"><a href="shiny-output.html#cb337-16"></a>      <span class="dt">script =</span> <span class="kw">c</span>(<span class="st">&quot;binding.js&quot;</span>),</span>
+<span id="cb337-17"><a href="shiny-output.html#cb337-17"></a>      <span class="dt">stylesheet =</span> <span class="st">&quot;styles.css&quot;</span></span>
+<span id="cb337-18"><a href="shiny-output.html#cb337-18"></a>    )</span>
+<span id="cb337-19"><a href="shiny-output.html#cb337-19"></a>  )</span>
+<span id="cb337-20"><a href="shiny-output.html#cb337-20"></a></span>
+<span id="cb337-21"><a href="shiny-output.html#cb337-21"></a>  htmltools<span class="op">::</span><span class="kw">attachDependencies</span>(el, deps)</span>
+<span id="cb337-22"><a href="shiny-output.html#cb337-22"></a>}</span></code></pre></div>
 <p>The <code>renderBoxxy</code> function sees quite some modifications, while before it was technically only returning a function that itself returned the output of <code>boxxy</code> (<code>func() == boxxy()</code>). Here we want to capture the output of <code>boxxy</code> to check whether the <code>animate</code> element is <code>TRUE</code> and if so add the dependency.</p>
-<div class="sourceCode" id="cb340"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb340-1"><a href="shiny-output.html#cb340-1"></a>renderBoxxy &lt;-<span class="st"> </span><span class="cf">function</span>(expr, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), </span>
-<span id="cb340-2"><a href="shiny-output.html#cb340-2"></a>  <span class="dt">quoted =</span> <span class="ot">FALSE</span>) {</span>
-<span id="cb340-3"><a href="shiny-output.html#cb340-3"></a>  <span class="co"># Convert the expression + environment into a function</span></span>
-<span id="cb340-4"><a href="shiny-output.html#cb340-4"></a>  func &lt;-<span class="st"> </span>shiny<span class="op">::</span><span class="kw">exprToFunction</span>(expr, env, quoted)</span>
-<span id="cb340-5"><a href="shiny-output.html#cb340-5"></a></span>
-<span id="cb340-6"><a href="shiny-output.html#cb340-6"></a>  <span class="cf">function</span>(){</span>
-<span id="cb340-7"><a href="shiny-output.html#cb340-7"></a>    val &lt;-<span class="st"> </span><span class="kw">func</span>()</span>
-<span id="cb340-8"><a href="shiny-output.html#cb340-8"></a></span>
-<span id="cb340-9"><a href="shiny-output.html#cb340-9"></a>    <span class="cf">if</span>(val<span class="op">$</span>animate){</span>
-<span id="cb340-10"><a href="shiny-output.html#cb340-10"></a>      <span class="co"># add dependency</span></span>
-<span id="cb340-11"><a href="shiny-output.html#cb340-11"></a>    }</span>
-<span id="cb340-12"><a href="shiny-output.html#cb340-12"></a></span>
-<span id="cb340-13"><a href="shiny-output.html#cb340-13"></a>    <span class="kw">return</span>(val)</span>
-<span id="cb340-14"><a href="shiny-output.html#cb340-14"></a>  }</span>
-<span id="cb340-15"><a href="shiny-output.html#cb340-15"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb338"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb338-1"><a href="shiny-output.html#cb338-1"></a>renderBoxxy &lt;-<span class="st"> </span><span class="cf">function</span>(expr, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), </span>
+<span id="cb338-2"><a href="shiny-output.html#cb338-2"></a>  <span class="dt">quoted =</span> <span class="ot">FALSE</span>) {</span>
+<span id="cb338-3"><a href="shiny-output.html#cb338-3"></a>  <span class="co"># Convert the expression + environment into a function</span></span>
+<span id="cb338-4"><a href="shiny-output.html#cb338-4"></a>  func &lt;-<span class="st"> </span>shiny<span class="op">::</span><span class="kw">exprToFunction</span>(expr, env, quoted)</span>
+<span id="cb338-5"><a href="shiny-output.html#cb338-5"></a></span>
+<span id="cb338-6"><a href="shiny-output.html#cb338-6"></a>  <span class="cf">function</span>(){</span>
+<span id="cb338-7"><a href="shiny-output.html#cb338-7"></a>    val &lt;-<span class="st"> </span><span class="kw">func</span>()</span>
+<span id="cb338-8"><a href="shiny-output.html#cb338-8"></a></span>
+<span id="cb338-9"><a href="shiny-output.html#cb338-9"></a>    <span class="cf">if</span>(val<span class="op">$</span>animate){</span>
+<span id="cb338-10"><a href="shiny-output.html#cb338-10"></a>      <span class="co"># add dependency</span></span>
+<span id="cb338-11"><a href="shiny-output.html#cb338-11"></a>    }</span>
+<span id="cb338-12"><a href="shiny-output.html#cb338-12"></a></span>
+<span id="cb338-13"><a href="shiny-output.html#cb338-13"></a>    <span class="kw">return</span>(val)</span>
+<span id="cb338-14"><a href="shiny-output.html#cb338-14"></a>  }</span>
+<span id="cb338-15"><a href="shiny-output.html#cb338-15"></a>}</span></code></pre></div>
 <p>Within the <code>if</code> statement the dependency can be created with the htmltools as done for the binding. Ensure the names of the dependencies are unique as shiny internally uses it to differentiate between them, if they bear the same name shiny assumes they are the same and will only render one of them.</p>
 <div class="rmdnote">
 <p>
@@ -915,129 +916,129 @@ Make sure dependencies bear different names or shiny thinks it’s the same and 
 </p>
 </div>
 <p>The dependency generated with htmltools is then passed to the <code>shiny::createWebDependency</code> function which internally uses <code>shiny::addResourcePath</code> to serve the dependency. This is necessary here as, at this stage, the countup dependency is not actually rendered, below we merely add it to the list of options that serialised to JSON. Indeed this will actually be injected JavaScript-side, therefore the front-end needs to be able to access this file, hence it is served.</p>
-<div class="sourceCode" id="cb341"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb341-1"><a href="shiny-output.html#cb341-1"></a>renderBoxxy &lt;-<span class="st"> </span><span class="cf">function</span>(expr, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), <span class="dt">quoted =</span> <span class="ot">FALSE</span>) {</span>
-<span id="cb341-2"><a href="shiny-output.html#cb341-2"></a>  <span class="co"># Convert the expression + environment into a function</span></span>
-<span id="cb341-3"><a href="shiny-output.html#cb341-3"></a>  func &lt;-<span class="st"> </span>shiny<span class="op">::</span><span class="kw">exprToFunction</span>(expr, env, quoted)</span>
-<span id="cb341-4"><a href="shiny-output.html#cb341-4"></a></span>
-<span id="cb341-5"><a href="shiny-output.html#cb341-5"></a>  <span class="cf">function</span>(){</span>
-<span id="cb341-6"><a href="shiny-output.html#cb341-6"></a>    <span class="co"># evaluate to output list</span></span>
-<span id="cb341-7"><a href="shiny-output.html#cb341-7"></a>    val &lt;-<span class="st"> </span><span class="kw">func</span>()</span>
-<span id="cb341-8"><a href="shiny-output.html#cb341-8"></a></span>
-<span id="cb341-9"><a href="shiny-output.html#cb341-9"></a>    <span class="co"># add dependency</span></span>
-<span id="cb341-10"><a href="shiny-output.html#cb341-10"></a>    <span class="cf">if</span>(val<span class="op">$</span>animate){</span>
-<span id="cb341-11"><a href="shiny-output.html#cb341-11"></a>      path &lt;-<span class="st"> </span><span class="kw">normalizePath</span>(<span class="st">&quot;assets&quot;</span>)</span>
-<span id="cb341-12"><a href="shiny-output.html#cb341-12"></a></span>
-<span id="cb341-13"><a href="shiny-output.html#cb341-13"></a>      deps &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
-<span id="cb341-14"><a href="shiny-output.html#cb341-14"></a>        <span class="dt">name =</span> <span class="st">&quot;countup&quot;</span>, <span class="co"># change name</span></span>
-<span id="cb341-15"><a href="shiny-output.html#cb341-15"></a>        <span class="dt">version =</span> <span class="st">&quot;1.8.2&quot;</span>,</span>
-<span id="cb341-16"><a href="shiny-output.html#cb341-16"></a>        <span class="dt">src =</span> <span class="kw">c</span>(<span class="dt">file =</span> path),</span>
-<span id="cb341-17"><a href="shiny-output.html#cb341-17"></a>        <span class="dt">script =</span> <span class="kw">c</span>(<span class="st">&quot;countup.js&quot;</span>) <span class="co"># only countup</span></span>
-<span id="cb341-18"><a href="shiny-output.html#cb341-18"></a>      )</span>
-<span id="cb341-19"><a href="shiny-output.html#cb341-19"></a></span>
-<span id="cb341-20"><a href="shiny-output.html#cb341-20"></a>      <span class="co"># serve dependency </span></span>
-<span id="cb341-21"><a href="shiny-output.html#cb341-21"></a>      val<span class="op">$</span>deps &lt;-<span class="st"> </span><span class="kw">list</span>(shiny<span class="op">::</span><span class="kw">createWebDependency</span>(deps))</span>
-<span id="cb341-22"><a href="shiny-output.html#cb341-22"></a>    }</span>
-<span id="cb341-23"><a href="shiny-output.html#cb341-23"></a></span>
-<span id="cb341-24"><a href="shiny-output.html#cb341-24"></a>    <span class="kw">return</span>(val)</span>
-<span id="cb341-25"><a href="shiny-output.html#cb341-25"></a>  }</span>
-<span id="cb341-26"><a href="shiny-output.html#cb341-26"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb339"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb339-1"><a href="shiny-output.html#cb339-1"></a>renderBoxxy &lt;-<span class="st"> </span><span class="cf">function</span>(expr, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), <span class="dt">quoted =</span> <span class="ot">FALSE</span>) {</span>
+<span id="cb339-2"><a href="shiny-output.html#cb339-2"></a>  <span class="co"># Convert the expression + environment into a function</span></span>
+<span id="cb339-3"><a href="shiny-output.html#cb339-3"></a>  func &lt;-<span class="st"> </span>shiny<span class="op">::</span><span class="kw">exprToFunction</span>(expr, env, quoted)</span>
+<span id="cb339-4"><a href="shiny-output.html#cb339-4"></a></span>
+<span id="cb339-5"><a href="shiny-output.html#cb339-5"></a>  <span class="cf">function</span>(){</span>
+<span id="cb339-6"><a href="shiny-output.html#cb339-6"></a>    <span class="co"># evaluate to output list</span></span>
+<span id="cb339-7"><a href="shiny-output.html#cb339-7"></a>    val &lt;-<span class="st"> </span><span class="kw">func</span>()</span>
+<span id="cb339-8"><a href="shiny-output.html#cb339-8"></a></span>
+<span id="cb339-9"><a href="shiny-output.html#cb339-9"></a>    <span class="co"># add dependency</span></span>
+<span id="cb339-10"><a href="shiny-output.html#cb339-10"></a>    <span class="cf">if</span>(val<span class="op">$</span>animate){</span>
+<span id="cb339-11"><a href="shiny-output.html#cb339-11"></a>      path &lt;-<span class="st"> </span><span class="kw">normalizePath</span>(<span class="st">&quot;assets&quot;</span>)</span>
+<span id="cb339-12"><a href="shiny-output.html#cb339-12"></a></span>
+<span id="cb339-13"><a href="shiny-output.html#cb339-13"></a>      deps &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
+<span id="cb339-14"><a href="shiny-output.html#cb339-14"></a>        <span class="dt">name =</span> <span class="st">&quot;countup&quot;</span>, <span class="co"># change name</span></span>
+<span id="cb339-15"><a href="shiny-output.html#cb339-15"></a>        <span class="dt">version =</span> <span class="st">&quot;1.8.2&quot;</span>,</span>
+<span id="cb339-16"><a href="shiny-output.html#cb339-16"></a>        <span class="dt">src =</span> <span class="kw">c</span>(<span class="dt">file =</span> path),</span>
+<span id="cb339-17"><a href="shiny-output.html#cb339-17"></a>        <span class="dt">script =</span> <span class="kw">c</span>(<span class="st">&quot;countup.js&quot;</span>) <span class="co"># only countup</span></span>
+<span id="cb339-18"><a href="shiny-output.html#cb339-18"></a>      )</span>
+<span id="cb339-19"><a href="shiny-output.html#cb339-19"></a></span>
+<span id="cb339-20"><a href="shiny-output.html#cb339-20"></a>      <span class="co"># serve dependency </span></span>
+<span id="cb339-21"><a href="shiny-output.html#cb339-21"></a>      val<span class="op">$</span>deps &lt;-<span class="st"> </span><span class="kw">list</span>(shiny<span class="op">::</span><span class="kw">createWebDependency</span>(deps))</span>
+<span id="cb339-22"><a href="shiny-output.html#cb339-22"></a>    }</span>
+<span id="cb339-23"><a href="shiny-output.html#cb339-23"></a></span>
+<span id="cb339-24"><a href="shiny-output.html#cb339-24"></a>    <span class="kw">return</span>(val)</span>
+<span id="cb339-25"><a href="shiny-output.html#cb339-25"></a>  }</span>
+<span id="cb339-26"><a href="shiny-output.html#cb339-26"></a>}</span></code></pre></div>
 <p>Thus far the dependency is dynamically included in the R object that is serialised to JSON but it is not yet actually imported in the document, this happens in the JavaScript binding.</p>
 <p>The first thing we ought to do is mirror the if statement that was created in the <code>renderBoxxy</code> function, if the numbers should be animated the function can use countup, if not it must insert the text with <code>insertText</code> just like it does for the <code>title</code>.</p>
-<div class="sourceCode" id="cb342"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb342-1"><a href="shiny-output.html#cb342-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
-<span id="cb342-2"><a href="shiny-output.html#cb342-2"></a></span>
-<span id="cb342-3"><a href="shiny-output.html#cb342-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
-<span id="cb342-4"><a href="shiny-output.html#cb342-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
-<span id="cb342-5"><a href="shiny-output.html#cb342-5"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
-<span id="cb342-6"><a href="shiny-output.html#cb342-6"></a>  <span class="op">},</span></span>
-<span id="cb342-7"><a href="shiny-output.html#cb342-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
-<span id="cb342-8"><a href="shiny-output.html#cb342-8"></a></span>
-<span id="cb342-9"><a href="shiny-output.html#cb342-9"></a>    <span class="va">el</span>.<span class="va">style</span>.<span class="at">backgroundColor</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">color</span><span class="op">;</span></span>
-<span id="cb342-10"><a href="shiny-output.html#cb342-10"></a></span>
-<span id="cb342-11"><a href="shiny-output.html#cb342-11"></a>    <span class="cf">if</span>(<span class="va">data</span>.<span class="at">animate</span>)<span class="op">{</span></span>
-<span id="cb342-12"><a href="shiny-output.html#cb342-12"></a>      <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="va">data</span>.<span class="at">value</span>)<span class="op">;</span></span>
-<span id="cb342-13"><a href="shiny-output.html#cb342-13"></a>      <span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span>
-<span id="cb342-14"><a href="shiny-output.html#cb342-14"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb342-15"><a href="shiny-output.html#cb342-15"></a>      <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span>).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">value</span><span class="op">;</span></span>
-<span id="cb342-16"><a href="shiny-output.html#cb342-16"></a>    <span class="op">}</span></span>
-<span id="cb342-17"><a href="shiny-output.html#cb342-17"></a></span>
-<span id="cb342-18"><a href="shiny-output.html#cb342-18"></a>    <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span>).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">title</span><span class="op">;</span></span>
-<span id="cb342-19"><a href="shiny-output.html#cb342-19"></a>  <span class="op">}</span></span>
-<span id="cb342-20"><a href="shiny-output.html#cb342-20"></a><span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb342-21"><a href="shiny-output.html#cb342-21"></a></span>
-<span id="cb342-22"><a href="shiny-output.html#cb342-22"></a><span class="va">Shiny</span>.<span class="va">outputBindings</span>.<span class="at">register</span>(boxxyBinding<span class="op">,</span> <span class="st">&quot;john.boxxy&quot;</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb340"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb340-1"><a href="shiny-output.html#cb340-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
+<span id="cb340-2"><a href="shiny-output.html#cb340-2"></a></span>
+<span id="cb340-3"><a href="shiny-output.html#cb340-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb340-4"><a href="shiny-output.html#cb340-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
+<span id="cb340-5"><a href="shiny-output.html#cb340-5"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
+<span id="cb340-6"><a href="shiny-output.html#cb340-6"></a>  <span class="op">},</span></span>
+<span id="cb340-7"><a href="shiny-output.html#cb340-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
+<span id="cb340-8"><a href="shiny-output.html#cb340-8"></a></span>
+<span id="cb340-9"><a href="shiny-output.html#cb340-9"></a>    <span class="va">el</span>.<span class="va">style</span>.<span class="at">backgroundColor</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">color</span><span class="op">;</span></span>
+<span id="cb340-10"><a href="shiny-output.html#cb340-10"></a></span>
+<span id="cb340-11"><a href="shiny-output.html#cb340-11"></a>    <span class="cf">if</span>(<span class="va">data</span>.<span class="at">animate</span>)<span class="op">{</span></span>
+<span id="cb340-12"><a href="shiny-output.html#cb340-12"></a>      <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="va">data</span>.<span class="at">value</span>)<span class="op">;</span></span>
+<span id="cb340-13"><a href="shiny-output.html#cb340-13"></a>      <span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span>
+<span id="cb340-14"><a href="shiny-output.html#cb340-14"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb340-15"><a href="shiny-output.html#cb340-15"></a>      <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span>).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">value</span><span class="op">;</span></span>
+<span id="cb340-16"><a href="shiny-output.html#cb340-16"></a>    <span class="op">}</span></span>
+<span id="cb340-17"><a href="shiny-output.html#cb340-17"></a></span>
+<span id="cb340-18"><a href="shiny-output.html#cb340-18"></a>    <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span>).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">title</span><span class="op">;</span></span>
+<span id="cb340-19"><a href="shiny-output.html#cb340-19"></a>  <span class="op">}</span></span>
+<span id="cb340-20"><a href="shiny-output.html#cb340-20"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb340-21"><a href="shiny-output.html#cb340-21"></a></span>
+<span id="cb340-22"><a href="shiny-output.html#cb340-22"></a><span class="va">Shiny</span>.<span class="va">outputBindings</span>.<span class="at">register</span>(boxxyBinding<span class="op">,</span> <span class="st">&quot;john.boxxy&quot;</span>)<span class="op">;</span></span></code></pre></div>
 <p>Finally, we can render the dependency, the JavaScript method aptly named <code>renderDependencies</code> will do just that from the list of dependency created in <code>renderBoxxy</code>.</p>
-<div class="sourceCode" id="cb343"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb343-1"><a href="shiny-output.html#cb343-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
-<span id="cb343-2"><a href="shiny-output.html#cb343-2"></a></span>
-<span id="cb343-3"><a href="shiny-output.html#cb343-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
-<span id="cb343-4"><a href="shiny-output.html#cb343-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
-<span id="cb343-5"><a href="shiny-output.html#cb343-5"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
-<span id="cb343-6"><a href="shiny-output.html#cb343-6"></a>  <span class="op">},</span></span>
-<span id="cb343-7"><a href="shiny-output.html#cb343-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
-<span id="cb343-8"><a href="shiny-output.html#cb343-8"></a></span>
-<span id="cb343-9"><a href="shiny-output.html#cb343-9"></a>    <span class="va">el</span>.<span class="va">style</span>.<span class="at">backgroundColor</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">color</span><span class="op">;</span></span>
-<span id="cb343-10"><a href="shiny-output.html#cb343-10"></a></span>
-<span id="cb343-11"><a href="shiny-output.html#cb343-11"></a>    <span class="cf">if</span>(<span class="va">data</span>.<span class="at">animate</span>)<span class="op">{</span></span>
-<span id="cb343-12"><a href="shiny-output.html#cb343-12"></a>      <span class="va">Shiny</span>.<span class="at">renderDependencies</span>(<span class="va">data</span>.<span class="at">deps</span>)<span class="op">;</span> <span class="co">// render dependency</span></span>
-<span id="cb343-13"><a href="shiny-output.html#cb343-13"></a>      <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="va">data</span>.<span class="at">value</span>)<span class="op">;</span></span>
-<span id="cb343-14"><a href="shiny-output.html#cb343-14"></a>      <span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span>
-<span id="cb343-15"><a href="shiny-output.html#cb343-15"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb343-16"><a href="shiny-output.html#cb343-16"></a>      <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span>).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">value</span><span class="op">;</span></span>
-<span id="cb343-17"><a href="shiny-output.html#cb343-17"></a>    <span class="op">}</span></span>
-<span id="cb343-18"><a href="shiny-output.html#cb343-18"></a></span>
-<span id="cb343-19"><a href="shiny-output.html#cb343-19"></a>    <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span>).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">title</span><span class="op">;</span></span>
-<span id="cb343-20"><a href="shiny-output.html#cb343-20"></a>  <span class="op">}</span></span>
-<span id="cb343-21"><a href="shiny-output.html#cb343-21"></a><span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb343-22"><a href="shiny-output.html#cb343-22"></a></span>
-<span id="cb343-23"><a href="shiny-output.html#cb343-23"></a><span class="va">Shiny</span>.<span class="va">outputBindings</span>.<span class="at">register</span>(boxxyBinding<span class="op">,</span> <span class="st">&quot;john.boxxy&quot;</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb341"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb341-1"><a href="shiny-output.html#cb341-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
+<span id="cb341-2"><a href="shiny-output.html#cb341-2"></a></span>
+<span id="cb341-3"><a href="shiny-output.html#cb341-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
+<span id="cb341-4"><a href="shiny-output.html#cb341-4"></a>  <span class="dt">find</span><span class="op">:</span> <span class="kw">function</span>(scope) <span class="op">{</span></span>
+<span id="cb341-5"><a href="shiny-output.html#cb341-5"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
+<span id="cb341-6"><a href="shiny-output.html#cb341-6"></a>  <span class="op">},</span></span>
+<span id="cb341-7"><a href="shiny-output.html#cb341-7"></a>  <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> data) <span class="op">{</span></span>
+<span id="cb341-8"><a href="shiny-output.html#cb341-8"></a></span>
+<span id="cb341-9"><a href="shiny-output.html#cb341-9"></a>    <span class="va">el</span>.<span class="va">style</span>.<span class="at">backgroundColor</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">color</span><span class="op">;</span></span>
+<span id="cb341-10"><a href="shiny-output.html#cb341-10"></a></span>
+<span id="cb341-11"><a href="shiny-output.html#cb341-11"></a>    <span class="cf">if</span>(<span class="va">data</span>.<span class="at">animate</span>)<span class="op">{</span></span>
+<span id="cb341-12"><a href="shiny-output.html#cb341-12"></a>      <span class="va">Shiny</span>.<span class="at">renderDependencies</span>(<span class="va">data</span>.<span class="at">deps</span>)<span class="op">;</span> <span class="co">// render dependency</span></span>
+<span id="cb341-13"><a href="shiny-output.html#cb341-13"></a>      <span class="kw">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="va">data</span>.<span class="at">value</span>)<span class="op">;</span></span>
+<span id="cb341-14"><a href="shiny-output.html#cb341-14"></a>      <span class="va">counter</span>.<span class="at">start</span>()<span class="op">;</span></span>
+<span id="cb341-15"><a href="shiny-output.html#cb341-15"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb341-16"><a href="shiny-output.html#cb341-16"></a>      <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-value&#39;</span>).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">value</span><span class="op">;</span></span>
+<span id="cb341-17"><a href="shiny-output.html#cb341-17"></a>    <span class="op">}</span></span>
+<span id="cb341-18"><a href="shiny-output.html#cb341-18"></a></span>
+<span id="cb341-19"><a href="shiny-output.html#cb341-19"></a>    <span class="va">document</span>.<span class="at">getElementById</span>(<span class="va">el</span>.<span class="at">id</span> <span class="op">+</span> <span class="st">&#39;-boxxy-title&#39;</span>).<span class="at">innerText</span> <span class="op">=</span> <span class="va">data</span>.<span class="at">title</span><span class="op">;</span></span>
+<span id="cb341-20"><a href="shiny-output.html#cb341-20"></a>  <span class="op">}</span></span>
+<span id="cb341-21"><a href="shiny-output.html#cb341-21"></a><span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb341-22"><a href="shiny-output.html#cb341-22"></a></span>
+<span id="cb341-23"><a href="shiny-output.html#cb341-23"></a><span class="va">Shiny</span>.<span class="va">outputBindings</span>.<span class="at">register</span>(boxxyBinding<span class="op">,</span> <span class="st">&quot;john.boxxy&quot;</span>)<span class="op">;</span></span></code></pre></div>
 <p>With those changes made not only is the animation of numbers optional but if users decide to turn off the animation in all <code>boxxy</code> functions the <code>countup.js</code> file will not be included at all.</p>
-<div class="sourceCode" id="cb344"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb344-1"><a href="shiny-output.html#cb344-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb344-2"><a href="shiny-output.html#cb344-2"></a></span>
-<span id="cb344-3"><a href="shiny-output.html#cb344-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb344-4"><a href="shiny-output.html#cb344-4"></a>  <span class="kw">h2</span>(<span class="st">&quot;Custom outputs&quot;</span>),</span>
-<span id="cb344-5"><a href="shiny-output.html#cb344-5"></a>  <span class="kw">fluidRow</span>(</span>
-<span id="cb344-6"><a href="shiny-output.html#cb344-6"></a>    <span class="kw">column</span>(</span>
-<span id="cb344-7"><a href="shiny-output.html#cb344-7"></a>      <span class="dv">3</span>, <span class="kw">boxxyOutput</span>(<span class="st">&quot;countries&quot;</span>)</span>
-<span id="cb344-8"><a href="shiny-output.html#cb344-8"></a>    ),</span>
-<span id="cb344-9"><a href="shiny-output.html#cb344-9"></a>    <span class="kw">column</span>(</span>
-<span id="cb344-10"><a href="shiny-output.html#cb344-10"></a>      <span class="dv">3</span>, <span class="kw">boxxyOutput</span>(<span class="st">&quot;employees&quot;</span>)</span>
-<span id="cb344-11"><a href="shiny-output.html#cb344-11"></a>    )</span>
-<span id="cb344-12"><a href="shiny-output.html#cb344-12"></a>  )</span>
-<span id="cb344-13"><a href="shiny-output.html#cb344-13"></a>)</span>
-<span id="cb344-14"><a href="shiny-output.html#cb344-14"></a></span>
-<span id="cb344-15"><a href="shiny-output.html#cb344-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb344-16"><a href="shiny-output.html#cb344-16"></a>  output<span class="op">$</span>countries &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
-<span id="cb344-17"><a href="shiny-output.html#cb344-17"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Countries&quot;</span>, <span class="dv">176</span>, <span class="dt">animate =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb344-18"><a href="shiny-output.html#cb344-18"></a>  })</span>
-<span id="cb344-19"><a href="shiny-output.html#cb344-19"></a></span>
-<span id="cb344-20"><a href="shiny-output.html#cb344-20"></a>  output<span class="op">$</span>employees &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
-<span id="cb344-21"><a href="shiny-output.html#cb344-21"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Thing&quot;</span>, <span class="dv">67</span>, <span class="dt">animate =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb344-22"><a href="shiny-output.html#cb344-22"></a>  })</span>
-<span id="cb344-23"><a href="shiny-output.html#cb344-23"></a>}</span>
-<span id="cb344-24"><a href="shiny-output.html#cb344-24"></a></span>
-<span id="cb344-25"><a href="shiny-output.html#cb344-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb342-1"><a href="shiny-output.html#cb342-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb342-2"><a href="shiny-output.html#cb342-2"></a></span>
+<span id="cb342-3"><a href="shiny-output.html#cb342-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb342-4"><a href="shiny-output.html#cb342-4"></a>  <span class="kw">h2</span>(<span class="st">&quot;Custom outputs&quot;</span>),</span>
+<span id="cb342-5"><a href="shiny-output.html#cb342-5"></a>  <span class="kw">fluidRow</span>(</span>
+<span id="cb342-6"><a href="shiny-output.html#cb342-6"></a>    <span class="kw">column</span>(</span>
+<span id="cb342-7"><a href="shiny-output.html#cb342-7"></a>      <span class="dv">3</span>, <span class="kw">boxxyOutput</span>(<span class="st">&quot;countries&quot;</span>)</span>
+<span id="cb342-8"><a href="shiny-output.html#cb342-8"></a>    ),</span>
+<span id="cb342-9"><a href="shiny-output.html#cb342-9"></a>    <span class="kw">column</span>(</span>
+<span id="cb342-10"><a href="shiny-output.html#cb342-10"></a>      <span class="dv">3</span>, <span class="kw">boxxyOutput</span>(<span class="st">&quot;employees&quot;</span>)</span>
+<span id="cb342-11"><a href="shiny-output.html#cb342-11"></a>    )</span>
+<span id="cb342-12"><a href="shiny-output.html#cb342-12"></a>  )</span>
+<span id="cb342-13"><a href="shiny-output.html#cb342-13"></a>)</span>
+<span id="cb342-14"><a href="shiny-output.html#cb342-14"></a></span>
+<span id="cb342-15"><a href="shiny-output.html#cb342-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb342-16"><a href="shiny-output.html#cb342-16"></a>  output<span class="op">$</span>countries &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
+<span id="cb342-17"><a href="shiny-output.html#cb342-17"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Countries&quot;</span>, <span class="dv">176</span>, <span class="dt">animate =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb342-18"><a href="shiny-output.html#cb342-18"></a>  })</span>
+<span id="cb342-19"><a href="shiny-output.html#cb342-19"></a></span>
+<span id="cb342-20"><a href="shiny-output.html#cb342-20"></a>  output<span class="op">$</span>employees &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
+<span id="cb342-21"><a href="shiny-output.html#cb342-21"></a>    <span class="kw">boxxy</span>(<span class="st">&quot;Thing&quot;</span>, <span class="dv">67</span>, <span class="dt">animate =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb342-22"><a href="shiny-output.html#cb342-22"></a>  })</span>
+<span id="cb342-23"><a href="shiny-output.html#cb342-23"></a>}</span>
+<span id="cb342-24"><a href="shiny-output.html#cb342-24"></a></span>
+<span id="cb342-25"><a href="shiny-output.html#cb342-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="shiny-output-preprocess" class="section level2" number="15.9">
 <h2><span class="header-section-number">15.9</span> Preprocessing Custom Outputs</h2>
 <p>One aspect that this example did not explore truly explore thus far is the idea that the function <code>boxxy</code> should preprocess the input more in order to be truly justify. Currently <code>boxxy</code> only wraps the arguments in a <code>list</code>, therefore the code below works too.</p>
-<div class="sourceCode" id="cb345"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb345-1"><a href="shiny-output.html#cb345-1"></a><span class="co"># works too</span></span>
-<span id="cb345-2"><a href="shiny-output.html#cb345-2"></a>output<span class="op">$</span>theId &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
-<span id="cb345-3"><a href="shiny-output.html#cb345-3"></a>  <span class="kw">list</span>(<span class="dt">title =</span> <span class="st">&quot;The Title&quot;</span>, <span class="dt">value =</span> <span class="dv">123</span>, <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">animate =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb345-4"><a href="shiny-output.html#cb345-4"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb343"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb343-1"><a href="shiny-output.html#cb343-1"></a><span class="co"># works too</span></span>
+<span id="cb343-2"><a href="shiny-output.html#cb343-2"></a>output<span class="op">$</span>theId &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
+<span id="cb343-3"><a href="shiny-output.html#cb343-3"></a>  <span class="kw">list</span>(<span class="dt">title =</span> <span class="st">&quot;The Title&quot;</span>, <span class="dt">value =</span> <span class="dv">123</span>, <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">animate =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb343-4"><a href="shiny-output.html#cb343-4"></a>})</span></code></pre></div>
 <p>One the things <code>boxxy</code> could do is preprocess the input, below the function takes the sum of <code>value</code> to one pass a vector of any length and changes the default <code>color</code> argument to <code>NULL</code> so it is made dynamic based on the total <code>value</code>.</p>
-<div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb346-1"><a href="shiny-output.html#cb346-1"></a>boxxy &lt;-<span class="st"> </span><span class="cf">function</span>(title, value, <span class="dt">color =</span> <span class="ot">NULL</span>, <span class="dt">animate =</span> <span class="ot">TRUE</span>){</span>
-<span id="cb346-2"><a href="shiny-output.html#cb346-2"></a></span>
-<span id="cb346-3"><a href="shiny-output.html#cb346-3"></a>  <span class="co"># sum the vector</span></span>
-<span id="cb346-4"><a href="shiny-output.html#cb346-4"></a>  value &lt;-<span class="st"> </span><span class="kw">sum</span>(value)</span>
-<span id="cb346-5"><a href="shiny-output.html#cb346-5"></a></span>
-<span id="cb346-6"><a href="shiny-output.html#cb346-6"></a>  <span class="co"># dynamic color</span></span>
-<span id="cb346-7"><a href="shiny-output.html#cb346-7"></a>  <span class="cf">if</span>(<span class="kw">is.null</span>(color))</span>
-<span id="cb346-8"><a href="shiny-output.html#cb346-8"></a>    <span class="cf">if</span>(value <span class="op">&gt;</span><span class="st"> </span><span class="dv">100</span>)</span>
-<span id="cb346-9"><a href="shiny-output.html#cb346-9"></a>      color &lt;-<span class="st"> &quot;#ef476f&quot;</span></span>
-<span id="cb346-10"><a href="shiny-output.html#cb346-10"></a>    <span class="cf">else</span></span>
-<span id="cb346-11"><a href="shiny-output.html#cb346-11"></a>      color &lt;-<span class="st"> &quot;#06d6a0&quot;</span></span>
-<span id="cb346-12"><a href="shiny-output.html#cb346-12"></a></span>
-<span id="cb346-13"><a href="shiny-output.html#cb346-13"></a>  <span class="kw">list</span>(<span class="dt">title =</span> title, <span class="dt">value =</span> value, <span class="dt">color =</span> color, <span class="dt">animate =</span> animate)</span>
-<span id="cb346-14"><a href="shiny-output.html#cb346-14"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb344"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb344-1"><a href="shiny-output.html#cb344-1"></a>boxxy &lt;-<span class="st"> </span><span class="cf">function</span>(title, value, <span class="dt">color =</span> <span class="ot">NULL</span>, <span class="dt">animate =</span> <span class="ot">TRUE</span>){</span>
+<span id="cb344-2"><a href="shiny-output.html#cb344-2"></a></span>
+<span id="cb344-3"><a href="shiny-output.html#cb344-3"></a>  <span class="co"># sum the vector</span></span>
+<span id="cb344-4"><a href="shiny-output.html#cb344-4"></a>  value &lt;-<span class="st"> </span><span class="kw">sum</span>(value)</span>
+<span id="cb344-5"><a href="shiny-output.html#cb344-5"></a></span>
+<span id="cb344-6"><a href="shiny-output.html#cb344-6"></a>  <span class="co"># dynamic color</span></span>
+<span id="cb344-7"><a href="shiny-output.html#cb344-7"></a>  <span class="cf">if</span>(<span class="kw">is.null</span>(color))</span>
+<span id="cb344-8"><a href="shiny-output.html#cb344-8"></a>    <span class="cf">if</span>(value <span class="op">&gt;</span><span class="st"> </span><span class="dv">100</span>)</span>
+<span id="cb344-9"><a href="shiny-output.html#cb344-9"></a>      color &lt;-<span class="st"> &quot;#ef476f&quot;</span></span>
+<span id="cb344-10"><a href="shiny-output.html#cb344-10"></a>    <span class="cf">else</span></span>
+<span id="cb344-11"><a href="shiny-output.html#cb344-11"></a>      color &lt;-<span class="st"> &quot;#06d6a0&quot;</span></span>
+<span id="cb344-12"><a href="shiny-output.html#cb344-12"></a></span>
+<span id="cb344-13"><a href="shiny-output.html#cb344-13"></a>  <span class="kw">list</span>(<span class="dt">title =</span> title, <span class="dt">value =</span> value, <span class="dt">color =</span> color, <span class="dt">animate =</span> animate)</span>
+<span id="cb344-14"><a href="shiny-output.html#cb344-14"></a>}</span></code></pre></div>
 <p>This means boxxy could be used like so: <code>boxxy("Total", c(1,6,9))</code>.</p>
 
 </div>

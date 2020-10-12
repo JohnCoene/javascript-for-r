@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-10-11" />
+<meta name="date" content="2020-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -169,11 +169,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="1.2.1" data-path="intro-overview.html"><a href="intro-overview.html#intro-v8"><i class="fa fa-check"></i><b>1.2.1</b> V8</a></li>
 <li class="chapter" data-level="1.2.2" data-path="intro-overview.html"><a href="intro-overview.html#intro-htmlwidgets"><i class="fa fa-check"></i><b>1.2.2</b> htmlwidgets</a></li>
 <li class="chapter" data-level="1.2.3" data-path="intro-overview.html"><a href="intro-overview.html#intro-shiny"><i class="fa fa-check"></i><b>1.2.3</b> Shiny</a></li>
-<li class="chapter" data-level="1.2.4" data-path="intro-overview.html"><a href="intro-overview.html#intro-bubble"><i class="fa fa-check"></i><b>1.2.4</b> bubble</a></li>
 </ul></li>
 <li class="chapter" data-level="1.3" data-path="intro-overview.html"><a href="intro-overview.html#intro-amiss"><i class="fa fa-check"></i><b>1.3</b> Methods Amiss</a>
 <ul>
-<li class="chapter" data-level="1.3.1" data-path="intro-overview.html"><a href="intro-overview.html#intro-reactr"><i class="fa fa-check"></i><b>1.3.1</b> reactR</a></li>
+<li class="chapter" data-level="1.3.1" data-path="intro-overview.html"><a href="intro-overview.html#intro-reactr-vuer"><i class="fa fa-check"></i><b>1.3.1</b> reactR &amp; vueR</a></li>
 <li class="chapter" data-level="1.3.2" data-path="intro-overview.html"><a href="intro-overview.html#intro-r2d3"><i class="fa fa-check"></i><b>1.3.2</b> r2d3</a></li>
 </ul></li>
 </ul></li>
@@ -242,8 +241,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.4" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data"><i class="fa fa-check"></i><b>7.4</b> Transforming Data</a>
 <ul>
 <li class="chapter" data-level="7.4.1" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-js"><i class="fa fa-check"></i><b>7.4.1</b> Using JavaScript</a></li>
-<li class="chapter" data-level="7.4.2" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-r"><i class="fa fa-check"></i><b>7.4.2</b> Using R</a></li>
-<li class="chapter" data-level="7.4.3" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-conclusion"><i class="fa fa-check"></i><b>7.4.3</b> Pros &amp; Cons</a></li>
+<li class="chapter" data-level="7.4.2" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-modify"><i class="fa fa-check"></i><b>7.4.2</b> Modify Serialiser</a></li>
+<li class="chapter" data-level="7.4.3" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-replace"><i class="fa fa-check"></i><b>7.4.3</b> Replace Serialiser</a></li>
+<li class="chapter" data-level="7.4.4" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-modify-data"><i class="fa fa-check"></i><b>7.4.4</b> Modify the Data</a></li>
+<li class="chapter" data-level="7.4.5" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-transform-data-conclusion"><i class="fa fa-check"></i><b>7.4.5</b> Pros &amp; Cons</a></li>
 </ul></li>
 <li class="chapter" data-level="7.5" data-path="widgets-full.html"><a href="widgets-full.html#widgets-full-on-print"><i class="fa fa-check"></i><b>7.5</b> On Print Method</a></li>
 </ul></li>
@@ -449,120 +450,120 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The gio package built thus far revolves around the <code>gio</code> function which expects a dataframe with three columns named <code>e</code>, <code>i</code>, and <code>v</code>, which is not great practice; there are great reasons why very few functions do that.</p>
 <p>First, it is unlikely that one comes across a dataset with such names in the real world thus users of the package will likely need to rename the columns of the dataset in order to use gio making the package rather unwieldy. Second, this makes understanding and approaching the gio package more complicated, it will not be evident by looking at the examples, and usage of gio.</p>
 <p>Instead <code>gio</code> should accept the dataframe as first argument and then the relevant columns to extract. This can be implemented in many ways ranging from arguments that accept the column names as strings to reproducing ggplot2’s <code>aes</code> function. Below we settle for a solution probably lying somewhere in between: using non-standard evaluation to provide arguments that accept the bare name of the columns.</p>
-<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="widgets-final.html#cb225-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, source, target, value, ..., </span>
-<span id="cb225-2"><a href="widgets-final.html#cb225-2"></a>  <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
-<span id="cb225-3"><a href="widgets-final.html#cb225-3"></a></span>
-<span id="cb225-4"><a href="widgets-final.html#cb225-4"></a>  <span class="co"># defaults to NULL</span></span>
-<span id="cb225-5"><a href="widgets-final.html#cb225-5"></a>  group &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb225-6"><a href="widgets-final.html#cb225-6"></a></span>
-<span id="cb225-7"><a href="widgets-final.html#cb225-7"></a>  <span class="cf">if</span> (crosstalk<span class="op">::</span><span class="kw">is.SharedData</span>(data)) {</span>
-<span id="cb225-8"><a href="widgets-final.html#cb225-8"></a>    group &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">groupName</span>()</span>
-<span id="cb225-9"><a href="widgets-final.html#cb225-9"></a>    data &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">origData</span>()</span>
-<span id="cb225-10"><a href="widgets-final.html#cb225-10"></a>  }</span>
-<span id="cb225-11"><a href="widgets-final.html#cb225-11"></a></span>
-<span id="cb225-12"><a href="widgets-final.html#cb225-12"></a>  data &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(</span>
-<span id="cb225-13"><a href="widgets-final.html#cb225-13"></a>    data,</span>
-<span id="cb225-14"><a href="widgets-final.html#cb225-14"></a>    <span class="dt">i =</span> {{ source }},</span>
-<span id="cb225-15"><a href="widgets-final.html#cb225-15"></a>    <span class="dt">e =</span> {{ target }},</span>
-<span id="cb225-16"><a href="widgets-final.html#cb225-16"></a>    <span class="dt">v =</span> {{ value }}</span>
-<span id="cb225-17"><a href="widgets-final.html#cb225-17"></a>  )</span>
-<span id="cb225-18"><a href="widgets-final.html#cb225-18"></a></span>
-<span id="cb225-19"><a href="widgets-final.html#cb225-19"></a>  <span class="co"># forward options using x</span></span>
-<span id="cb225-20"><a href="widgets-final.html#cb225-20"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb225-21"><a href="widgets-final.html#cb225-21"></a>    <span class="dt">configs =</span> <span class="kw">list</span>(...),</span>
-<span id="cb225-22"><a href="widgets-final.html#cb225-22"></a>    <span class="dt">data =</span> data,</span>
-<span id="cb225-23"><a href="widgets-final.html#cb225-23"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
-<span id="cb225-24"><a href="widgets-final.html#cb225-24"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(<span class="dt">group =</span> group)</span>
-<span id="cb225-25"><a href="widgets-final.html#cb225-25"></a>  )</span>
-<span id="cb225-26"><a href="widgets-final.html#cb225-26"></a></span>
-<span id="cb225-27"><a href="widgets-final.html#cb225-27"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_ARGS&#39;</span>) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">dataframe =</span> <span class="st">&quot;rows&quot;</span>)</span>
-<span id="cb225-28"><a href="widgets-final.html#cb225-28"></a></span>
-<span id="cb225-29"><a href="widgets-final.html#cb225-29"></a>  <span class="co"># create widget</span></span>
-<span id="cb225-30"><a href="widgets-final.html#cb225-30"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
-<span id="cb225-31"><a href="widgets-final.html#cb225-31"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
-<span id="cb225-32"><a href="widgets-final.html#cb225-32"></a>    x,</span>
-<span id="cb225-33"><a href="widgets-final.html#cb225-33"></a>    <span class="dt">width =</span> width,</span>
-<span id="cb225-34"><a href="widgets-final.html#cb225-34"></a>    <span class="dt">height =</span> height,</span>
-<span id="cb225-35"><a href="widgets-final.html#cb225-35"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
-<span id="cb225-36"><a href="widgets-final.html#cb225-36"></a>    <span class="dt">elementId =</span> elementId,</span>
-<span id="cb225-37"><a href="widgets-final.html#cb225-37"></a>    <span class="dt">sizingPolicy =</span> htmlwidgets<span class="op">::</span><span class="kw">sizingPolicy</span>(</span>
-<span id="cb225-38"><a href="widgets-final.html#cb225-38"></a>      <span class="dt">padding =</span> <span class="dv">0</span>,</span>
-<span id="cb225-39"><a href="widgets-final.html#cb225-39"></a>      <span class="dt">browser.fill =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb225-40"><a href="widgets-final.html#cb225-40"></a>      <span class="dt">defaultWidth =</span> <span class="st">&quot;100%&quot;</span></span>
-<span id="cb225-41"><a href="widgets-final.html#cb225-41"></a>    ),</span>
-<span id="cb225-42"><a href="widgets-final.html#cb225-42"></a>    <span class="dt">preRenderHook =</span> render_gio,</span>
-<span id="cb225-43"><a href="widgets-final.html#cb225-43"></a>    <span class="dt">dependencies =</span> crosstalk<span class="op">::</span><span class="kw">crosstalkLibs</span>()</span>
-<span id="cb225-44"><a href="widgets-final.html#cb225-44"></a>  )</span>
-<span id="cb225-45"><a href="widgets-final.html#cb225-45"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="widgets-final.html#cb223-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, source, target, value, ..., </span>
+<span id="cb223-2"><a href="widgets-final.html#cb223-2"></a>  <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
+<span id="cb223-3"><a href="widgets-final.html#cb223-3"></a></span>
+<span id="cb223-4"><a href="widgets-final.html#cb223-4"></a>  <span class="co"># defaults to NULL</span></span>
+<span id="cb223-5"><a href="widgets-final.html#cb223-5"></a>  group &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb223-6"><a href="widgets-final.html#cb223-6"></a></span>
+<span id="cb223-7"><a href="widgets-final.html#cb223-7"></a>  <span class="cf">if</span> (crosstalk<span class="op">::</span><span class="kw">is.SharedData</span>(data)) {</span>
+<span id="cb223-8"><a href="widgets-final.html#cb223-8"></a>    group &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">groupName</span>()</span>
+<span id="cb223-9"><a href="widgets-final.html#cb223-9"></a>    data &lt;-<span class="st"> </span>data<span class="op">$</span><span class="kw">origData</span>()</span>
+<span id="cb223-10"><a href="widgets-final.html#cb223-10"></a>  }</span>
+<span id="cb223-11"><a href="widgets-final.html#cb223-11"></a></span>
+<span id="cb223-12"><a href="widgets-final.html#cb223-12"></a>  data &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(</span>
+<span id="cb223-13"><a href="widgets-final.html#cb223-13"></a>    data,</span>
+<span id="cb223-14"><a href="widgets-final.html#cb223-14"></a>    <span class="dt">i =</span> {{ source }},</span>
+<span id="cb223-15"><a href="widgets-final.html#cb223-15"></a>    <span class="dt">e =</span> {{ target }},</span>
+<span id="cb223-16"><a href="widgets-final.html#cb223-16"></a>    <span class="dt">v =</span> {{ value }}</span>
+<span id="cb223-17"><a href="widgets-final.html#cb223-17"></a>  )</span>
+<span id="cb223-18"><a href="widgets-final.html#cb223-18"></a></span>
+<span id="cb223-19"><a href="widgets-final.html#cb223-19"></a>  <span class="co"># forward options using x</span></span>
+<span id="cb223-20"><a href="widgets-final.html#cb223-20"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb223-21"><a href="widgets-final.html#cb223-21"></a>    <span class="dt">configs =</span> <span class="kw">list</span>(...),</span>
+<span id="cb223-22"><a href="widgets-final.html#cb223-22"></a>    <span class="dt">data =</span> data,</span>
+<span id="cb223-23"><a href="widgets-final.html#cb223-23"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
+<span id="cb223-24"><a href="widgets-final.html#cb223-24"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(<span class="dt">group =</span> group)</span>
+<span id="cb223-25"><a href="widgets-final.html#cb223-25"></a>  )</span>
+<span id="cb223-26"><a href="widgets-final.html#cb223-26"></a></span>
+<span id="cb223-27"><a href="widgets-final.html#cb223-27"></a>  <span class="kw">attr</span>(x, <span class="st">&#39;TOJSON_ARGS&#39;</span>) &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">dataframe =</span> <span class="st">&quot;rows&quot;</span>)</span>
+<span id="cb223-28"><a href="widgets-final.html#cb223-28"></a></span>
+<span id="cb223-29"><a href="widgets-final.html#cb223-29"></a>  <span class="co"># create widget</span></span>
+<span id="cb223-30"><a href="widgets-final.html#cb223-30"></a>  htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</span>
+<span id="cb223-31"><a href="widgets-final.html#cb223-31"></a>    <span class="dt">name =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb223-32"><a href="widgets-final.html#cb223-32"></a>    x,</span>
+<span id="cb223-33"><a href="widgets-final.html#cb223-33"></a>    <span class="dt">width =</span> width,</span>
+<span id="cb223-34"><a href="widgets-final.html#cb223-34"></a>    <span class="dt">height =</span> height,</span>
+<span id="cb223-35"><a href="widgets-final.html#cb223-35"></a>    <span class="dt">package =</span> <span class="st">&#39;gio&#39;</span>,</span>
+<span id="cb223-36"><a href="widgets-final.html#cb223-36"></a>    <span class="dt">elementId =</span> elementId,</span>
+<span id="cb223-37"><a href="widgets-final.html#cb223-37"></a>    <span class="dt">sizingPolicy =</span> htmlwidgets<span class="op">::</span><span class="kw">sizingPolicy</span>(</span>
+<span id="cb223-38"><a href="widgets-final.html#cb223-38"></a>      <span class="dt">padding =</span> <span class="dv">0</span>,</span>
+<span id="cb223-39"><a href="widgets-final.html#cb223-39"></a>      <span class="dt">browser.fill =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb223-40"><a href="widgets-final.html#cb223-40"></a>      <span class="dt">defaultWidth =</span> <span class="st">&quot;100%&quot;</span></span>
+<span id="cb223-41"><a href="widgets-final.html#cb223-41"></a>    ),</span>
+<span id="cb223-42"><a href="widgets-final.html#cb223-42"></a>    <span class="dt">preRenderHook =</span> render_gio,</span>
+<span id="cb223-43"><a href="widgets-final.html#cb223-43"></a>    <span class="dt">dependencies =</span> crosstalk<span class="op">::</span><span class="kw">crosstalkLibs</span>()</span>
+<span id="cb223-44"><a href="widgets-final.html#cb223-44"></a>  )</span>
+<span id="cb223-45"><a href="widgets-final.html#cb223-45"></a>}</span></code></pre></div>
 <p>The above changes allows documentating the input that <code>gio</code> accepts more clearly with roxygen2 and also makes its usage more transparent: it is now clear to users what data is required to create a visualisation and they are free to use dataframes of their choice.</p>
-<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="widgets-final.html#cb226-1"></a><span class="co"># mock up data</span></span>
-<span id="cb226-2"><a href="widgets-final.html#cb226-2"></a>countries &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;US&quot;</span>, <span class="st">&quot;BE&quot;</span>, <span class="st">&quot;FR&quot;</span>, <span class="st">&quot;DE&quot;</span>)</span>
-<span id="cb226-3"><a href="widgets-final.html#cb226-3"></a>df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
-<span id="cb226-4"><a href="widgets-final.html#cb226-4"></a>  <span class="dt">from =</span> countries,</span>
-<span id="cb226-5"><a href="widgets-final.html#cb226-5"></a>  <span class="dt">to =</span> <span class="kw">rev</span>(countries),</span>
-<span id="cb226-6"><a href="widgets-final.html#cb226-6"></a>  <span class="dt">traded =</span> <span class="kw">runif</span>(<span class="dv">4</span>)</span>
-<span id="cb226-7"><a href="widgets-final.html#cb226-7"></a>)</span>
-<span id="cb226-8"><a href="widgets-final.html#cb226-8"></a></span>
-<span id="cb226-9"><a href="widgets-final.html#cb226-9"></a><span class="co"># use gio</span></span>
-<span id="cb226-10"><a href="widgets-final.html#cb226-10"></a><span class="kw">gio</span>(df, <span class="dt">source =</span> from, <span class="dt">target =</span> to, <span class="dt">value =</span> traded)</span></code></pre></div>
+<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb224-1"><a href="widgets-final.html#cb224-1"></a><span class="co"># mock up data</span></span>
+<span id="cb224-2"><a href="widgets-final.html#cb224-2"></a>countries &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;US&quot;</span>, <span class="st">&quot;BE&quot;</span>, <span class="st">&quot;FR&quot;</span>, <span class="st">&quot;DE&quot;</span>)</span>
+<span id="cb224-3"><a href="widgets-final.html#cb224-3"></a>df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb224-4"><a href="widgets-final.html#cb224-4"></a>  <span class="dt">from =</span> countries,</span>
+<span id="cb224-5"><a href="widgets-final.html#cb224-5"></a>  <span class="dt">to =</span> <span class="kw">rev</span>(countries),</span>
+<span id="cb224-6"><a href="widgets-final.html#cb224-6"></a>  <span class="dt">traded =</span> <span class="kw">runif</span>(<span class="dv">4</span>)</span>
+<span id="cb224-7"><a href="widgets-final.html#cb224-7"></a>)</span>
+<span id="cb224-8"><a href="widgets-final.html#cb224-8"></a></span>
+<span id="cb224-9"><a href="widgets-final.html#cb224-9"></a><span class="co"># use gio</span></span>
+<span id="cb224-10"><a href="widgets-final.html#cb224-10"></a><span class="kw">gio</span>(df, <span class="dt">source =</span> from, <span class="dt">target =</span> to, <span class="dt">value =</span> traded)</span></code></pre></div>
 <p>This small change makes the package a great deal easier to use and understand as <code>source</code>, and <code>target</code> are vastly clearer to understand than <code>e</code> and <code>i</code>.</p>
 </div>
 <div id="widgets-final-options" class="section level2" number="10.2">
 <h2><span class="header-section-number">10.2</span> Plethora of Options</h2>
 <p>Some JavaScript libraries can be extensive and come with thousands of options that can make the port to R rather bulky, never hesitate to make use of the three dots construct (<code>...</code>) to make these accessible yet saving you from having to hard-code thousands of arguments.</p>
 <p>For instance gio.js accepts a JSON of options to further customise the globe. One could port all of these manually, or allow users to specify those configurations via the three-dot construct.</p>
-<div class="sourceCode" id="cb227"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb227-1"><a href="widgets-final.html#cb227-1"></a><span class="kw">var</span> configs <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb227-2"><a href="widgets-final.html#cb227-2"></a>  <span class="dt">control</span><span class="op">:</span> <span class="op">{</span></span>
-<span id="cb227-3"><a href="widgets-final.html#cb227-3"></a>    <span class="dt">stats</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
-<span id="cb227-4"><a href="widgets-final.html#cb227-4"></a>    <span class="dt">disableUnmentioned</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
-<span id="cb227-5"><a href="widgets-final.html#cb227-5"></a>    <span class="dt">lightenMentioned</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
-<span id="cb227-6"><a href="widgets-final.html#cb227-6"></a>    <span class="dt">inOnly</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
-<span id="cb227-7"><a href="widgets-final.html#cb227-7"></a>    <span class="dt">outOnly</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
-<span id="cb227-8"><a href="widgets-final.html#cb227-8"></a>    <span class="dt">initCountry</span><span class="op">:</span> <span class="st">&quot;CN&quot;</span><span class="op">,</span></span>
-<span id="cb227-9"><a href="widgets-final.html#cb227-9"></a>    <span class="dt">halo</span><span class="op">:</span> <span class="kw">true</span></span>
-<span id="cb227-10"><a href="widgets-final.html#cb227-10"></a>  <span class="op">},</span></span>
-<span id="cb227-11"><a href="widgets-final.html#cb227-11"></a>  <span class="dt">color</span><span class="op">:</span> <span class="op">{</span></span>
-<span id="cb227-12"><a href="widgets-final.html#cb227-12"></a>    <span class="dt">surface</span><span class="op">:</span> <span class="bn">0xFFFFFF</span><span class="op">,</span></span>
-<span id="cb227-13"><a href="widgets-final.html#cb227-13"></a>    <span class="dt">selected</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span></span>
-<span id="cb227-14"><a href="widgets-final.html#cb227-14"></a>    <span class="kw">in</span><span class="op">:</span> <span class="bn">0x154492</span><span class="op">,</span></span>
-<span id="cb227-15"><a href="widgets-final.html#cb227-15"></a>    <span class="dt">out</span><span class="op">:</span> <span class="bn">0xDD380C</span><span class="op">,</span></span>
-<span id="cb227-16"><a href="widgets-final.html#cb227-16"></a>    <span class="dt">halo</span><span class="op">:</span> <span class="bn">0xFFFFFF</span><span class="op">,</span></span>
-<span id="cb227-17"><a href="widgets-final.html#cb227-17"></a>    <span class="dt">background</span><span class="op">:</span> <span class="kw">null</span></span>
-<span id="cb227-18"><a href="widgets-final.html#cb227-18"></a>  <span class="op">},</span></span>
-<span id="cb227-19"><a href="widgets-final.html#cb227-19"></a>  <span class="dt">brightness</span><span class="op">:</span> <span class="op">{</span></span>
-<span id="cb227-20"><a href="widgets-final.html#cb227-20"></a>    <span class="dt">ocean</span><span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span></span>
-<span id="cb227-21"><a href="widgets-final.html#cb227-21"></a>    <span class="dt">mentioned</span><span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span></span>
-<span id="cb227-22"><a href="widgets-final.html#cb227-22"></a>    <span class="dt">related</span><span class="op">:</span> <span class="fl">0.5</span></span>
-<span id="cb227-23"><a href="widgets-final.html#cb227-23"></a>  <span class="op">}</span></span>
-<span id="cb227-24"><a href="widgets-final.html#cb227-24"></a><span class="op">}</span></span>
-<span id="cb227-25"><a href="widgets-final.html#cb227-25"></a></span>
-<span id="cb227-26"><a href="widgets-final.html#cb227-26"></a>controller <span class="op">=</span> <span class="kw">new</span> <span class="va">Gio</span>.<span class="at">controller</span>(el<span class="op">,</span> configs)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb225"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb225-1"><a href="widgets-final.html#cb225-1"></a><span class="kw">var</span> configs <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb225-2"><a href="widgets-final.html#cb225-2"></a>  <span class="dt">control</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb225-3"><a href="widgets-final.html#cb225-3"></a>    <span class="dt">stats</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb225-4"><a href="widgets-final.html#cb225-4"></a>    <span class="dt">disableUnmentioned</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb225-5"><a href="widgets-final.html#cb225-5"></a>    <span class="dt">lightenMentioned</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb225-6"><a href="widgets-final.html#cb225-6"></a>    <span class="dt">inOnly</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb225-7"><a href="widgets-final.html#cb225-7"></a>    <span class="dt">outOnly</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb225-8"><a href="widgets-final.html#cb225-8"></a>    <span class="dt">initCountry</span><span class="op">:</span> <span class="st">&quot;CN&quot;</span><span class="op">,</span></span>
+<span id="cb225-9"><a href="widgets-final.html#cb225-9"></a>    <span class="dt">halo</span><span class="op">:</span> <span class="kw">true</span></span>
+<span id="cb225-10"><a href="widgets-final.html#cb225-10"></a>  <span class="op">},</span></span>
+<span id="cb225-11"><a href="widgets-final.html#cb225-11"></a>  <span class="dt">color</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb225-12"><a href="widgets-final.html#cb225-12"></a>    <span class="dt">surface</span><span class="op">:</span> <span class="bn">0xFFFFFF</span><span class="op">,</span></span>
+<span id="cb225-13"><a href="widgets-final.html#cb225-13"></a>    <span class="dt">selected</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span></span>
+<span id="cb225-14"><a href="widgets-final.html#cb225-14"></a>    <span class="kw">in</span><span class="op">:</span> <span class="bn">0x154492</span><span class="op">,</span></span>
+<span id="cb225-15"><a href="widgets-final.html#cb225-15"></a>    <span class="dt">out</span><span class="op">:</span> <span class="bn">0xDD380C</span><span class="op">,</span></span>
+<span id="cb225-16"><a href="widgets-final.html#cb225-16"></a>    <span class="dt">halo</span><span class="op">:</span> <span class="bn">0xFFFFFF</span><span class="op">,</span></span>
+<span id="cb225-17"><a href="widgets-final.html#cb225-17"></a>    <span class="dt">background</span><span class="op">:</span> <span class="kw">null</span></span>
+<span id="cb225-18"><a href="widgets-final.html#cb225-18"></a>  <span class="op">},</span></span>
+<span id="cb225-19"><a href="widgets-final.html#cb225-19"></a>  <span class="dt">brightness</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb225-20"><a href="widgets-final.html#cb225-20"></a>    <span class="dt">ocean</span><span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span></span>
+<span id="cb225-21"><a href="widgets-final.html#cb225-21"></a>    <span class="dt">mentioned</span><span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span></span>
+<span id="cb225-22"><a href="widgets-final.html#cb225-22"></a>    <span class="dt">related</span><span class="op">:</span> <span class="fl">0.5</span></span>
+<span id="cb225-23"><a href="widgets-final.html#cb225-23"></a>  <span class="op">}</span></span>
+<span id="cb225-24"><a href="widgets-final.html#cb225-24"></a><span class="op">}</span></span>
+<span id="cb225-25"><a href="widgets-final.html#cb225-25"></a></span>
+<span id="cb225-26"><a href="widgets-final.html#cb225-26"></a>controller <span class="op">=</span> <span class="kw">new</span> <span class="va">Gio</span>.<span class="at">controller</span>(el<span class="op">,</span> configs)<span class="op">;</span></span></code></pre></div>
 <p>The three dots can be added to the <code>gio</code> function which internally captures them in a <code>list</code> named <code>configs</code> so it can be easily referenced in JavaScript.</p>
-<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="widgets-final.html#cb228-1"></a><span class="co"># add ...three dots</span></span>
-<span id="cb228-2"><a href="widgets-final.html#cb228-2"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, source, target, value, ..., </span>
-<span id="cb228-3"><a href="widgets-final.html#cb228-3"></a>  <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
-<span id="cb228-4"><a href="widgets-final.html#cb228-4"></a></span>
-<span id="cb228-5"><a href="widgets-final.html#cb228-5"></a>  <span class="co"># ... start of the function</span></span>
-<span id="cb228-6"><a href="widgets-final.html#cb228-6"></a></span>
-<span id="cb228-7"><a href="widgets-final.html#cb228-7"></a>  <span class="co"># forward options using x</span></span>
-<span id="cb228-8"><a href="widgets-final.html#cb228-8"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb228-9"><a href="widgets-final.html#cb228-9"></a>    <span class="dt">configs =</span> <span class="kw">list</span>(...), <span class="co"># pass to configs</span></span>
-<span id="cb228-10"><a href="widgets-final.html#cb228-10"></a>    <span class="dt">data =</span> data,</span>
-<span id="cb228-11"><a href="widgets-final.html#cb228-11"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
-<span id="cb228-12"><a href="widgets-final.html#cb228-12"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(<span class="dt">group =</span> group)</span>
-<span id="cb228-13"><a href="widgets-final.html#cb228-13"></a>  )</span>
-<span id="cb228-14"><a href="widgets-final.html#cb228-14"></a></span>
-<span id="cb228-15"><a href="widgets-final.html#cb228-15"></a>  <span class="co"># ... end of the function</span></span>
-<span id="cb228-16"><a href="widgets-final.html#cb228-16"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="widgets-final.html#cb226-1"></a><span class="co"># add ...three dots</span></span>
+<span id="cb226-2"><a href="widgets-final.html#cb226-2"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, source, target, value, ..., </span>
+<span id="cb226-3"><a href="widgets-final.html#cb226-3"></a>  <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
+<span id="cb226-4"><a href="widgets-final.html#cb226-4"></a></span>
+<span id="cb226-5"><a href="widgets-final.html#cb226-5"></a>  <span class="co"># ... start of the function</span></span>
+<span id="cb226-6"><a href="widgets-final.html#cb226-6"></a></span>
+<span id="cb226-7"><a href="widgets-final.html#cb226-7"></a>  <span class="co"># forward options using x</span></span>
+<span id="cb226-8"><a href="widgets-final.html#cb226-8"></a>  x =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb226-9"><a href="widgets-final.html#cb226-9"></a>    <span class="dt">configs =</span> <span class="kw">list</span>(...), <span class="co"># pass to configs</span></span>
+<span id="cb226-10"><a href="widgets-final.html#cb226-10"></a>    <span class="dt">data =</span> data,</span>
+<span id="cb226-11"><a href="widgets-final.html#cb226-11"></a>    <span class="dt">style =</span> <span class="st">&quot;default&quot;</span>,</span>
+<span id="cb226-12"><a href="widgets-final.html#cb226-12"></a>    <span class="dt">crosstalk =</span> <span class="kw">list</span>(<span class="dt">group =</span> group)</span>
+<span id="cb226-13"><a href="widgets-final.html#cb226-13"></a>  )</span>
+<span id="cb226-14"><a href="widgets-final.html#cb226-14"></a></span>
+<span id="cb226-15"><a href="widgets-final.html#cb226-15"></a>  <span class="co"># ... end of the function</span></span>
+<span id="cb226-16"><a href="widgets-final.html#cb226-16"></a>}</span></code></pre></div>
 <p>In JavaScript, use the <code>configs</code> when initialising the visualisation.</p>
-<div class="sourceCode" id="cb229"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb229-1"><a href="widgets-final.html#cb229-1"></a><span class="co">// use x.configs</span></span>
-<span id="cb229-2"><a href="widgets-final.html#cb229-2"></a>controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(el<span class="op">,</span> <span class="va">x</span>.<span class="at">configs</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb227"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb227-1"><a href="widgets-final.html#cb227-1"></a><span class="co">// use x.configs</span></span>
+<span id="cb227-2"><a href="widgets-final.html#cb227-2"></a>controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(el<span class="op">,</span> <span class="va">x</span>.<span class="at">configs</span>)<span class="op">;</span></span></code></pre></div>
 <p>Below those configuration options are now used to set the initially selected country to the United States and change the colour of the selected country to red.</p>
-<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="widgets-final.html#cb230-1"></a><span class="kw">gio</span>(</span>
-<span id="cb230-2"><a href="widgets-final.html#cb230-2"></a>  df, from, to, traded, </span>
-<span id="cb230-3"><a href="widgets-final.html#cb230-3"></a>  <span class="dt">control =</span> <span class="kw">list</span>(<span class="dt">initCountry =</span> <span class="st">&#39;US&#39;</span>), </span>
-<span id="cb230-4"><a href="widgets-final.html#cb230-4"></a>  <span class="dt">color =</span> <span class="kw">list</span>(<span class="dt">selected =</span> <span class="st">&#39;#ff4d4d&#39;</span>)</span>
-<span id="cb230-5"><a href="widgets-final.html#cb230-5"></a>) </span></code></pre></div>
+<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="widgets-final.html#cb228-1"></a><span class="kw">gio</span>(</span>
+<span id="cb228-2"><a href="widgets-final.html#cb228-2"></a>  df, from, to, traded, </span>
+<span id="cb228-3"><a href="widgets-final.html#cb228-3"></a>  <span class="dt">control =</span> <span class="kw">list</span>(<span class="dt">initCountry =</span> <span class="st">&#39;US&#39;</span>), </span>
+<span id="cb228-4"><a href="widgets-final.html#cb228-4"></a>  <span class="dt">color =</span> <span class="kw">list</span>(<span class="dt">selected =</span> <span class="st">&#39;#ff4d4d&#39;</span>)</span>
+<span id="cb228-5"><a href="widgets-final.html#cb228-5"></a>) </span></code></pre></div>
 <p><img src="images/crosstalk-three-dots.png" /></p>
 </div>
 <div id="widgets-final-interface" class="section level2" number="10.3">
