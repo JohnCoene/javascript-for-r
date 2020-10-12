@@ -268,15 +268,15 @@ jsonlite::toJSON(arcs, dataframe = "columns")
 jsonlite::toJSON(arcs, dataframe = "rows")
 ```
 
-As mentioned previously, convention has it that rectangular data (data frames) are serialised row-wise. This is likely to be a recurring problem.
+As mentioned previously, convention has it that rectangular data (data frames) are serialised row-wise. This is likely to be a recurring problem for many widgets.
 
 ## Transforming Data {#widgets-full-transform-data}
 
-There are multiple ways to transform the data and ensure the serialised JSON is as the JavaScript library expects it to be. 
+There are multiple ways to transform the data and ensure the serialised JSON is as the JavaScript library expects it to be. The following sections explore those various methods before settling on a specific one for the gio package.
 
 ### Using JavaScript {#widgets-full-transform-data-js}
 
-JavaScript can be used to transform the data, leaving the serialiser as-is to reshape the data in the client. The HTMLwidget JavaScript library (already imported by default) exports an object which provides a method, `dataframeToD3`, to transform the data from long to wide. 
+JavaScript can be used to transform the data, thereby leaving the serialiser as-is only to reshape it in the client. The HTMLwidget JavaScript library (already imported by default) exports an object which provides a method, `dataframeToD3`, to transform the data from long to wide. 
 
 ```js
 // gio.js
@@ -292,9 +292,9 @@ renderValue: function(x) {
 }
 ```
 
-### Using R {#widgets-full-transform-data-r}
+### Modify Serialiser {#widgets-full-transform-data-modify}
 
-Instead of serialising the data a certain way then correct in JavaScript as demonstrated previously, one can also modify, or even replace, htmlwidgets' default serialiser. Speaking of which, below is the default serializer used by htmlwidgets.
+Instead of serialising the data a certain way then correct it in JavaScript as demonstrated previously, one can also modify, or even replace, htmlwidgets' default serialiser. Speaking of which, below is the default serializer used by htmlwidgets.
 
 ```r
 function (x, ..., dataframe = "columns", null = "null", 
@@ -346,6 +346,10 @@ attr(cars, "hello") <- "world" # set
 attr(cars, "hello") # get 
 ```
 
+Other arguments can be placed in the same list, they will ultimately reach the serialiser to modify its output.
+
+### Replace Serialiser {#widgets-full-transform-data-replace}
+
 Otherwise the serializer can also be replaced in its entirety, also by setting an attribute, `TOJSON_FUNC`, to the `x` object. Below the serialiser is changed to jsonify [@R-jsonify] which by default serialises data frames to wide, unlike htmlwidgets' serialiser, thereby also fixing the issue.
 
 
@@ -378,7 +382,9 @@ gio_serialiser <- function(x){
 }
 ```
 
-Alternatively, one can also leave all serialisers unchanged and instead format the data in R prior to the serialisation, changing the dataframe to a row-wise list.
+### Modify the Data {#widgets-full-transform-data-modify-data}
+
+Alternatively, one can also leave all serialisers-related options unchanged and instead format the data in R prior to the serialisation, changing the dataframe to a row-wise list.
 
 ```r
 x = list(
@@ -386,9 +392,11 @@ x = list(
 )
 ```
 
+The above would make it such that the serialiser no longer has to interpret how the data should be serialised (row-wise or column-wise), the data now being a list will be serialised correctly.
+
 ### Pros & Cons {#widgets-full-transform-data-conclusion}
 
-There are pros and cons to each methods. The preferable method is probably to only alter the argument(s) where needed, this is the method used in the remainder of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Moreover htmlwidgets' serialiser extends jsonlite to allow converting JavaScript code which will come in handy later on. Transforming the data in JavaScript has one drawback, `HTMLWidgets.dataframeToD3` cannot be applied to the entire `x` object, it will only work on the subsets that hold the column-wise data (`x.data`) which tends to lead to clunky code as one uses said function in various places.
+There are pros and cons to each methods. The preferable method is probably to __only alter the default serialiser__ where needed, this is the method used in the remainder of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Moreover htmlwidgets' serialiser extends jsonlite to allow converting JavaScript code which will come in handy later on. Transforming the data in JavaScript has one drawback, `HTMLWidgets.dataframeToD3` cannot be applied to the entire `x` object, it will only work on the subsets that hold the column-wise data (`x.data`) which tends to lead to clunky code as one uses said function in various places.
 
 ![Gio output with correct serialisation](images/gio-data.png)
 
