@@ -1,6 +1,71 @@
 # A Complete Integration {#shiny-complete}
 
-Thus far, this part of the book has covered both ways data travels between JavaScript and R in Shiny. However, the alerts displayed in the previous chapter are rather hideous and, though demonstrates how both languages can work together within shiny, comes short of illustrating how to make use of external libraries or how to package such code. In brief, the previous chapter is an interesting exercise but unlikely to be used in the real world. This chapter is different.
+Thus far, this part of the book has covered both ways data travels between JavaScript and R in Shiny. However, the alerts displayed in the previous chapter are rather hideous and, though demonstrates how both languages can work together within shiny, comes short of illustrating how to make use of external libraries, how to package such code, and fails to introduces some very nice features. In brief, the previous chapter is an interesting exercise but unlikely to be used in the real world while this chapter makes for a more compelling example.
+
+We shall introduce a rather fascinating JavaScript library that enables machine learning models in web browsers: [ml5.js](https://learn.ml5js.org/). The library is very extensive and includes a multitude of models to deal with sound, image, text, and more. In this chapter one of those models is implemented, an image classifier using [mobileNet](https://arxiv.org/abs/1704.04861) but the method shown can be extended to include any other model.
+
+This is not a gimmick, running a model this way means it runs in the client (web browsers), and not on the shiny server leaving it free to compute anything else and serve other concurrent users. It's blazingly fast, it's unfortunate that JavaScript is often thought to be slow, on the contrary. Finally, it's simple, the JavaScript API provided is dead simple, it's impressive how ml5.js exposes complex models with such a simple API.
+
+## Discover {#shiny-complete-discover}
+
+As for all projects that involve external libraries, the very first thing to do is to scan the documentation to understand how it is used. The documentation of ml5.js is exemplary, filled with examples and crystal clear, [it gives the following example](https://learn.ml5js.org/#/reference/image-classifier) for the image classifier. 
+
+```js
+// Initialize the Image Classifier method with MobileNet
+const classifier = ml5.imageClassifier('MobileNet', modelLoaded);
+
+// When the model is loaded
+function modelLoaded() {
+  console.log('Model Loaded!');
+}
+
+// Make a prediction with a selected image
+classifier.classify(document.getElementById('image'), (err, results) => {
+  console.log(results);
+});
+```
+
+First, the image classifier is initialised from the `ml5` object with the `imageClassifier` method. This method takes two arguments, the name of the pre-trained model to use (`MobileNet`) and a callback function that is run when the model is loaded. The the `classify` method from the `classifier` is used with, again, two arguments: 1) the DOM element that contains the image (`<img />`) and a callback function.
+
+Now we can jump to the next section to think how this can be implemented in Shiny.
+
+## Setup {#shiny-complete-setup}
+
+In shiny, we would provide a dropdown menu to choose from pre-selected images and upon selection the selected image is displayed in the UI, the model runs and then sends the results to the R server which prints them in the UI.
+
+```{r, echo=FALSE}
+DiagrammeR::grViz("
+digraph {
+  graph [rankdir = TB]
+
+  subgraph cluster_0 {
+    node [shape=box]
+    select [label='selectInput()']
+    img [label='<img>']
+    res[label='model results']
+    model[label='classify()']
+    color=gold
+  }
+
+  subgraph cluster_1 {
+    node [shape=box]
+    renderImg[label='renderUI()']
+    renderResults[label='renderPrint()']
+    label = 'Server'
+    color=royalBlue
+  }
+
+  select -> renderImg
+  renderImg -> img
+  select -> model
+  img -> model
+  model -> renderResults
+  renderResults -> res
+
+}
+", width="100%", height=250)
+```
+
 
 Let's exploit an external library to improve upon the work done so far: [jBox](https://github.com/StephanWagner/jBox) allows displaying "notices," similar to the vanilla JavaScript alerts, but much better looking and with additional functionalities.
 
