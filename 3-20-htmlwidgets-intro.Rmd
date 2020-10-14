@@ -53,3 +53,37 @@ The DT package [@R-DT] is a wrapper for the [DataTables](https://datatables.net/
 ```{r}
 DT::datatable(cars)
 ```
+
+DT has grown very popular amongst shiny developers as it allows capturing server-side many of the users' interactions with the table such as the selected row.
+
+```r
+library(DT)
+library(shiny)
+
+ui <- fluidPage(
+  fluidRow(
+    column(8, DTOutput("myTable")),
+    column(
+      4,
+      h4("Indices of selected rows"), 
+      verbatimTextOutput("selected")
+    )
+  )
+)
+
+server <- function(input, output) {
+
+  output$myTable <- renderDT({
+    datatable(mtcars)
+  })
+
+  output$selected <- renderPrint({
+    input$myTable_rows_selected
+  })
+
+}
+
+shinyApp(ui, server)
+```
+
+![](images/DT-example.png)
