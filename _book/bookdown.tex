@@ -201,7 +201,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2020-10-13}
+\date{2020-10-14}
 
 \begin{document}
 \maketitle
@@ -1502,10 +1502,68 @@ The DT package \citep{R-DT} is a wrapper for the \href{https://datatables.net/}{
 
 \includegraphics{bookdown_files/figure-latex/unnamed-chunk-28-1.png}
 
+DT has grown very popular amongst shiny developers as it allows capturing server-side many of the users' interactions with the table such as the selected row.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(DT)}
+\KeywordTok{library}\NormalTok{(shiny)}
+
+\NormalTok{ui <{-}}\StringTok{ }\KeywordTok{fluidPage}\NormalTok{(}
+  \KeywordTok{fluidRow}\NormalTok{(}
+    \KeywordTok{column}\NormalTok{(}\DecValTok{8}\NormalTok{, }\KeywordTok{DTOutput}\NormalTok{(}\StringTok{"myTable"}\NormalTok{)),}
+    \KeywordTok{column}\NormalTok{(}
+      \DecValTok{4}\NormalTok{,}
+      \KeywordTok{h4}\NormalTok{(}\StringTok{"Indices of selected rows"}\NormalTok{), }
+      \KeywordTok{verbatimTextOutput}\NormalTok{(}\StringTok{"selected"}\NormalTok{)}
+\NormalTok{    )}
+\NormalTok{  )}
+\NormalTok{)}
+
+\NormalTok{server <{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output) \{}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{myTable <{-}}\StringTok{ }\KeywordTok{renderDT}\NormalTok{(\{}
+    \KeywordTok{datatable}\NormalTok{(mtcars)}
+\NormalTok{  \})}
+
+\NormalTok{  output}\OperatorTok{$}\NormalTok{selected <{-}}\StringTok{ }\KeywordTok{renderPrint}\NormalTok{(\{}
+\NormalTok{    input}\OperatorTok{$}\NormalTok{myTable\_rows\_selected}
+\NormalTok{  \})}
+
+\NormalTok{\}}
+
+\KeywordTok{shinyApp}\NormalTok{(ui, server)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{images/DT-example.png}
+
 \hypertarget{widgets-basics}{%
 \chapter{Basics of Building Widgets}\label{widgets-basics}}
 
-Having explored existing packages that build on top of the htmlwidgets package gives some idea of the end product we learn to build but it does not give insights about where to start and much of how it works probably remains somewhat magical.
+Having explored existing packages that build on top of the htmlwidgets package gives some idea of the end product but much of how it works and where to start probably remains somewhat mysterious.
+
+\hypertarget{widgets-basics-study}{%
+\section{Read \& Study}\label{widgets-basics-study}}
+
+Once you have found an interesting library that you would like to use from R, the very first step when building a widget is to thoroughly study the JavaScript library one wants to integrate. Often one will overlook this step only to pay it back dearly later on.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Start where the documentation tells you to start, often a ``hello world'' example, or a get-started section. This will already give you a good sense of how this library functions, the expected data format, and more.
+\item
+  Second it's good to head to the ``installation'' part of the documentation to know more about the library's dependencies, see whether it is modularised or available in a single bundle, etc.
+\item
+  Look at examples in more depth, you've likely already taken a look at some but observe the source code of those in more details. One cue to know if the library will be more or less complex to integrate with R is whether the various snippets of code that generate the examples are similar or drastically different: commonalities make for easier abstractions and ultimately simpler R code and packages. Some libraries will ultimately be easier to integrate than others.
+\item
+  At this stage you should have some idea of what it will take to bring the library to R, and though you likely have some idea of what are the functions and methods that comprise the library from the examples you should look at the ``API,'' or proper ``documentation'' of the API to grasp exactly what is available.
+\item
+  Finally, before starting the R work, it is advised to properly experience using the library as it was intended: with JavaScript and HTML. This will further give a sense of which part of the API are great and which not so much. This is useful to know because you will get to improve or mirror this API in R when you develop the widget for it.
+\end{enumerate}
+
+This is likely a section you will want to come back to at the end of this part as you browse for libraries to integrate in your workflow.
 
 \hypertarget{widgets-basics-candidates}{%
 \section{Candidate Libraries}\label{widgets-basics-candidates}}
@@ -1658,6 +1716,8 @@ Hopefully this reveals the repeating structure such libraries tend to follow as 
 Imagine there is no such package as htmlwidgets to help create interactive visualisations from R: how would one attempt to go about it?
 
 As observed, an interactive visualisation using JavaScript will be contained within an HTML document, therefore it would probably have to be created first. Secondly, the visualisation that is yet to be created likely relies on external libraries, these would need to be imported in the document. The document should also include an HTML element (e.g.: \texttt{\textless{}div\textgreater{}}) to host said visualisation. Then data would have to be serialised in R and embedded into the document where it should be read by JavaScript code that uses it to create the visualisation. Finally all should be managed to work seamlessly across R markdown, shiny, and other environments.
+
+This gives the following basic diagram, it will be broken down further in the next chapter as the first widget is build.
 
 \includegraphics{bookdown_files/figure-latex/unnamed-chunk-29-1.png}
 
@@ -3903,7 +3963,7 @@ The \texttt{gio} function also has to extract the group to which the dataset bel
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "SharedData21bdb785"
+## [1] "SharedDatad1f8d45b"
 \end{verbatim}
 
 \begin{Shaded}
@@ -8787,7 +8847,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Tue Oct 13 2020 20:21:14 GMT+0200 (Central European Summer Time)"
+## [1] "Wed Oct 14 2020 16:38:01 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 \begin{Shaded}
@@ -8797,7 +8857,7 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 \end{Shaded}
 
 \begin{verbatim}
-## [1] "Tue Oct 13 2020 20:21:14 GMT+0200 (Central European Summer Time)"
+## [1] "Wed Oct 14 2020 16:38:01 GMT+0200 (Central European Summer Time)"
 \end{verbatim}
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
@@ -9334,7 +9394,7 @@ We can then build and load the package to it in action.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] -45.79
+## [1] 20.38
 \end{verbatim}
 
 \begin{Shaded}
