@@ -6,6 +6,8 @@ We shall introduce a rather fascinating JavaScript library that enables machine 
 
 This is not a gimmick, running a model this way means it runs in the client (web browsers), and not on the shiny server leaving it free to compute anything else and serve other concurrent users. It's blazingly fast, it's unfortunate that JavaScript is often thought to be slow, on the contrary. Finally, it's simple, the JavaScript API provided is dead simple, it's impressive how ml5.js exposes complex models with such a simple API.
 
+We start by exploring ml5.js, then plan the shiny application that will make use of it, and finally we wrap our work in the form of an R package.
+
 ## Discover {#shiny-complete-discover}
 
 As for all projects that involve external libraries, the very first thing to do is to scan the documentation to understand how it is used. The documentation of ml5.js is exemplary, filled with examples and crystal clear, [it gives the following example](https://learn.ml5js.org/#/reference/image-classifier) for the image classifier. 
@@ -31,18 +33,20 @@ Now we can jump to the next section to think how this can be implemented in Shin
 
 ## Setup {#shiny-complete-setup}
 
-In shiny, we would provide a dropdown menu to choose from pre-selected images and upon selection the selected image is displayed in the UI, the model runs and then sends the results to the R server which prints them in the UI.
+In shiny, we would provide a dropdown menu to choose from pre-selected images and upon selection the server renders the selected image, the model then runs and then sends the results to the R server which prints them in the UI.
 
 ```{r, echo=FALSE}
 DiagrammeR::grViz("
 digraph {
-  graph [rankdir = TB]
+
+  graph [rankdir = LR]
 
   subgraph cluster_0 {
     node [shape=box]
-    select [label='selectInput()']
+    select [label='selectInput(img)']
+    btn [label='actionButton(classify)']
     img [label='<img>']
-    res[label='model results']
+    res[label='textOutput(results)']
     model[label='classify()']
     color=gold
   }
@@ -51,20 +55,46 @@ digraph {
     node [shape=box]
     renderImg[label='renderUI()']
     renderResults[label='renderPrint()']
+    obs [label='observeEvent(classify)']
     label = 'Server'
     color=royalBlue
   }
 
   select -> renderImg
   renderImg -> img
-  select -> model
+  btn -> obs
+  obs -> model
   img -> model
   model -> renderResults
   renderResults -> res
 
 }
-", width="100%", height=250)
+", width="100%", height=450)
 ```
+
+This makes for what is probably a signature of shiny: a huge amount of bi-directional communication between the server and client as shiny makes the most of the websocket. Some of the readers with more advanced knowledge in JavaScript will find ways to avoid the use of the server in places to do more in the client, either way works.
+
+## Dependencies {#shiny-complete-dependencies}
+
+The ml5.js framework and all its components are bundled in a single JavaScript file.
+
+```html
+<script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
+```
+
+We will create an `html_dependency` object using the `htmlDependency` function from the `htmltools` package. If confused, go back to the first part of the book on shiny prerequisites where it is explained in greater detail. We have two options at our disposal, either used the CDN (as shown in the previous code chunk), or download the file. We will start by making use of the CDN, later when we build a package for this functionality we shall download it to provide the users of the package a choice between using the local file or the CDN.
+
+```{r}
+dependency <- htmltools::htmlDependency(
+  name = "ml5",
+  version = "0.4.3",
+  src = "https://unpkg.com/ml5@0.4.3/dist/",
+  script = "ml5.min.js"
+)
+```
+
+## Images
+
 
 
 Let's exploit an external library to improve upon the work done so far: [jBox](https://github.com/StephanWagner/jBox) allows displaying "notices," similar to the vanilla JavaScript alerts, but much better looking and with additional functionalities.
