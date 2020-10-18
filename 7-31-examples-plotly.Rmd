@@ -1,4 +1,6 @@
-# Excercise - Ploty {#widgets-ex-plotly}
+# (PART) Examples {-}
+
+# Ploty {#widgets-ex-plotly}
 
 **This chapter is likely to go away, I don't think it's necessary**
 
