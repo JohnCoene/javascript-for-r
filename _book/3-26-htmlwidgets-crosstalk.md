@@ -27,7 +27,14 @@ bscols(
 )
 ```
 
-![Crosstalk Example](images/crosstalk.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/crosstalk} 
+
+}
+
+\caption{Crosstalk example}(\#fig:unnamed-chunk-3)
+\end{figure}
 
 Basic usage of crosstalk datasets in shiny is also straightforward since it accepts reactive expressions to create shared datasets. "Note that it takes the expression itself (`expression`) not the output of the expression (`expression()`), the crosstalk documentation explains it best:
 
@@ -71,9 +78,10 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-<div class="rmdnote">
-<p>When working with shiny create the shared dataset in the server function or some things that follow might not work as expected.</p>
-</div>
+\begin{rmdnote}
+When working with shiny create the shared dataset in the server function
+or some things that follow might not work as expected.
+\end{rmdnote}
 
 One can also use the `data` method on the crosstalk object in reactive expressions, which allows accessing the Javascript selection where crosstalk is not directly supported, like below in a custom UI block. Note that the argument `withSelection` is set to `TRUE` in order to retrieve the selection state of the rows. 
 
@@ -110,7 +118,14 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-![Shiny with crosstalk](images/crosstalk-shiny.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/crosstalk-shiny} 
+
+}
+
+\caption{Shiny with crosstalk}(\#fig:unnamed-chunk-5)
+\end{figure}
 
 Using crosstalk with shiny one can also change the selection server-side with the `selection` method, passing it the keys to select.
 
@@ -156,8 +171,8 @@ Other than tabular data, crosstalk will require the widget to have the necessary
 
 As will be discovered later when support for crosstalk is brought to gio, very little changes on the R side. As might be expected, crosstalk enables communication between widgets via JavaScript, hence much of what must be adapted by widgets developers happens in JavaScript too.
 
-<!--html_preserve--><div id="htmlwidget-ec3d3455cdfaaba30256" style="width:100%;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ec3d3455cdfaaba30256">{"x":{"diagram":"\ndigraph G {\n\n  graph [compound=true rankdir = LR]\n  node [shape=record fontsize=10];\n\n  # r stuff\n  subgraph cluster_1 { \n    \"Widget 1\" \"Widget 2\";\n    label = \"JavaScript\";\n    color=gold;\n  }\n\n  # js\n  subgraph cluster_0 {\n    node [width = 0.9]\n    Dataframe \"Shared Dataset\"; \n    label=\"R\";\n    color=royalBlue;\n  }\n\n  \"Dataframe\" -> \"Shared Dataset\";\n  \"Widget 1\" -> \"Widget 2\" [dir=both color=dimGray];\n\n  # connect subgraphs\n  \"Shared Dataset\" -> \"Widget 1\" [lhead=cluster_1 ltail=cluster_0];\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><!--/html_preserve-->
+
+\begin{center}\includegraphics[width=1\linewidth]{3-26-htmlwidgets-crosstalk_files/figure-latex/unnamed-chunk-6-1} 
 
 Indeed the bi-directional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. 
 
@@ -175,13 +190,21 @@ sd_cars <- SharedData$new(cars[1:2,])
 You can therefore _mentally represent_ the above shared dataset as the table, note the emphasis, internally crosstalk does not actually add a column to the dataset: it leaves it as-is.
 
 
-|key | speed| dist|
-|:---|-----:|----:|
-|1   |     4|    2|
-|2   |     4|   10|
-|3   |     7|    4|
-|4   |     7|   22|
-|5   |     8|   16|
+\begin{tabular}{l|r|r}
+\hline
+key & speed & dist\\
+\hline
+1 & 4 & 2\\
+\hline
+2 & 4 & 10\\
+\hline
+3 & 7 & 4\\
+\hline
+4 & 7 & 22\\
+\hline
+5 & 8 & 16\\
+\hline
+\end{tabular}
 
 The keys assigned can be retrieve with the `key` method on the shared dataset itself.
 
@@ -212,12 +235,12 @@ In JavaScript, a widget "receives" the keys of selected and filtered data points
 
 Internally crosstalk knows what to share across widgets with `group`s groups share `key`s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other. 
 
-<!--html_preserve--><div id="htmlwidget-8955a6d8f58909223241" style="width:100%;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-8955a6d8f58909223241">{"x":{"diagram":"\ndigraph G {\n\n  subgraph cluster_g1 {\n    node [shape=record fontsize=7]\n    d1 [label=\"Dataset\"]\n    d3 [label=\"Dataset\"]\n    k1 [label=\"Keys\"]\n    label=\"Group 1\"\n    fontsize=9\n    color=royalBlue\n  }\n\n  subgraph cluster_g2 {\n    node [shape=record fontsize=7]\n    d2 [label=\"Dataset\"] \n    k2 [label=\"Keys\"]\n    label=\"Group 2\"\n    fontsize=9\n    color=royalBlue\n  }\n\n  node [shape=record fontsize=7 color=gold]\n  w1 [label=\"widget 1\"]\n  w2 [label=\"widget 2\"]\n  w3 [label=\"widget 3\"]\n  w4 [label=\"widget 4\"]\n  w5 [label=\"widget 5\"]\n\n  w1 -> k1 [dir=both arrowsize=.5]\n  w2 -> k1 [dir=both arrowsize=.5]\n  w3 -> k2 [dir=both arrowsize=.5]\n  w4 -> k2 [dir=both arrowsize=.5]\n  w5 -> k2 [dir=both arrowsize=.5]\n\n  d2 -> k2 [arrowsize=.5]\n  d1 -> k1 [arrowsize=.5]\n  d3 -> k1 [arrowsize=.5]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><!--/html_preserve-->
 
-<div class="rmdnote">
-<p>Crosstalk groups share keys.</p>
-</div>
+\begin{center}\includegraphics[width=1\linewidth]{3-26-htmlwidgets-crosstalk_files/figure-latex/unnamed-chunk-11-1} 
+
+\begin{rmdnote}
+Crosstalk groups share keys.
+\end{rmdnote}
 
 Therefore, the code below creates two shared datasets that are linked and share keys as they fall in the same `group` despite the fact that they are separate R objects.
 
@@ -279,7 +302,7 @@ The `gio` function also has to extract the group to which the dataset belongs, t
 ```r
 # groupName
 shared_arcs$groupName()
-#> [1] "SharedDatacc0a3bff"
+#> [1] "SharedData3a611abc"
 
 # keys
 shared_arcs$key()
@@ -332,9 +355,11 @@ gio <- function(data, width = NULL, height = NULL,
 }
 ```
 
-<div class="rmdnote">
-<p>One could improve upon this section by using creating methods on the <code>gio</code> function, it would make for cleaner code but this is outside the scope of this book.</p>
-</div>
+\begin{rmdnote}
+One could improve upon this section by using creating methods on the
+\texttt{gio} function, it would make for cleaner code but this is
+outside the scope of this book.
+\end{rmdnote}
 
 ## JavaScript code {#linking-widgets-js}
 
@@ -532,12 +557,19 @@ bscols(
 )
 ```
 
-![Gio with DT using crosstalk](images/crosstalk-gio-1.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/crosstalk-gio-1} 
+
+}
+
+\caption{Gio with DT using crosstalk}(\#fig:unnamed-chunk-18)
+\end{figure}
 
 Thankfully we can use the `group` argument in order to create edges and nodes that share keys and produce a more sensible link between widgets. 
 
-<!--html_preserve--><div id="htmlwidget-e8edb953072a5a49e663" style="width:100%;height:415.296px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e8edb953072a5a49e663">{"x":{"diagram":"\ndigraph {\n\n  graph[rankdir = TB]\n\n  subgraph cluster_0 {\n    label=\"sharedGroup\"\n    node [shape=record fontsize=10];\n    edges_sd nodes_sd\n    keys [color=royalBlue]\n    color=dimGray\n  }\n\n  node [shape=record fontsize=10 color=gold];\n  gio plotly\n\n  edges_sd -> keys [arrowsize=.5];\n  nodes_sd -> keys [arrowsize=.5];\n\n  gio -> keys [dir=both arrowsize=.5];\n  plotly -> keys [dir=both arrowsize=.5 constraint=false];\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><!--/html_preserve-->
+
+\begin{center}\includegraphics[width=1\linewidth]{3-26-htmlwidgets-crosstalk_files/figure-latex/unnamed-chunk-19-1} 
 
 Below we create two shared datasets with the same group name, one for the edges and another for the nodes and use one for the gio visualisation and the other for the plotly graph.
 
@@ -573,5 +605,11 @@ bscols(
 )
 ```
 
-![Gio plotly using crosstalk and groups](images/crosstalk-gio-2.png)
+\begin{figure}[t]
 
+{\centering \includegraphics[width=1\linewidth]{images/crosstalk-gio-2} 
+
+}
+
+\caption{Gio and plotly using crosstalk and groups}(\#fig:unnamed-chunk-20)
+\end{figure}

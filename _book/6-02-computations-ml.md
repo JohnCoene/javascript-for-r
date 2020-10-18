@@ -175,7 +175,7 @@ model_cars <- ml_simple_lm(cars$speed, cars$dist)
 model_random <- ml_simple_lm(1:10, runif(10))
 
 predict(model_random, 15)
-#> [1] 10.11191
+#> [1] 3.364908
 predict(model_cars, 15)
 #> [1] 10.76742
 ```

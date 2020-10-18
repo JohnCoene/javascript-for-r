@@ -71,7 +71,14 @@ arcs <- jsonlite::fromJSON(
 gio(arcs)
 ```
 
-![Gio with no sizing management](images/gio-size-issue.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-size-issue} 
+
+}
+
+\caption{Gio with no sizing management}(\#fig:unnamed-chunk-1)
+\end{figure}
 
 When this is not specified htmlwidgets sets the width of the visualisation to 400 pixels.
 
@@ -112,7 +119,14 @@ htmlwidgets::createWidget(
 )
 ```
 
-![Gio with sizing policy](images/gio-fit.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-fit} 
+
+}
+
+\caption{Gio with sizing policy}(\#fig:unnamed-chunk-2)
+\end{figure}
 
 ## Resizing {#widgets-adv-resizing}
 
@@ -126,7 +140,14 @@ resize: function(width, height) {
 ...
 ```
 
-![Gio resized](images/gio-small.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-small} 
+
+}
+
+\caption{Gio resized}(\#fig:unnamed-chunk-3)
+\end{figure}
 
 To give the reader a better idea of what these tend to look like below are the ways plotly, highcharts, and chart.js do it.
 
@@ -215,9 +236,9 @@ htmlwidgets::JS("var x = 3;")
 
 This can be useful where the library requires the use of callback functions for instance.
 
-<div class="rmdnote">
-<p>Replacing the serialiser will break this feature.</p>
-</div>
+\begin{rmdnote}
+Replacing the serialiser will break this feature.
+\end{rmdnote}
 
 ## Prepend & Append Content {#widgets-adv-prepend-append}
 
@@ -236,13 +257,20 @@ gio(arcs) %>%
   gio_title("Gio.js htmlwidget!")
 ```
 
-![Gio output with a title](images/gio-title.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-title} 
+
+}
+
+\caption{Gio output with title}(\#fig:unnamed-chunk-7)
+\end{figure}
 
 While the `prependContent` function places the content above the visualisation, the `appendContent` function places it below, as they accept any valid htmltools or shiny tag they can also be used for conditional CSS styling for instance. 
 
-<div class="rmdnote">
-<p><code>prependContent</code> and <code>appendContent</code> do not work in shiny.</p>
-</div>
+\begin{rmdnote}
+\texttt{prependContent} and \texttt{appendContent} do not work in shiny.
+\end{rmdnote}
 
 ## Dependencies {#widgets-adv-dependencies}
 
@@ -250,7 +278,14 @@ Thus far, this book has only covered one of two ways dependencies can be include
 
 The Google Chrome network tab shows information on resources downloaded by the browser (including dependencies) including how long it takes. It is advisable to take a look at it to ensure no dependency drags load time.
 
-![Google Chrome network tab](images/htmlwidgets-performances.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/htmlwidgets-performances} 
+
+}
+
+\caption{Google Chrome network tab}(\#fig:unnamed-chunk-9)
+\end{figure}
 
 To demonstrate, we will add a function in gio to optionally include [stats.js](https://github.com/mrdoob/stats.js/), a JavaScript performance monitor which displays information such as the number of frames per second (FPS) rendered, or the number of milliseconds needed to render the visualisation. Gio.js natively supports stats.js but the dependency needs to be imported and that option needs to be enabled on the `controller` as shown in the [documentation](https://giojs.org/html/docs/interfaceStats.html).
 
@@ -386,7 +421,14 @@ arcs %>%
   gio_stats()
 ```
 
-![Gio with stats output](images/stats.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/stats} 
+
+}
+
+\caption{Gio with stats output}(\#fig:unnamed-chunk-10)
+\end{figure}
 
 In brief, it is better to only place the hard dependencies in the `.yml` file; dependencies that are absolutely necessary to producing the visualisation and use dynamic dependencies where ever possible. Perhaps one can think of it as the difference between `Imports` and `Suggests` in an R package `DESCRIPTION` file.
 

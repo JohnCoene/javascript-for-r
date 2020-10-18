@@ -103,7 +103,14 @@ $(document).on('shiny:idle', function(event) {
 
 The application will then display the gif when the server is busy running computations.
 
-![Shiny with a busy indicator](images/shiny-events.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/shiny-events} 
+
+}
+
+\caption{Shiny with a busy indicator}(\#fig:unnamed-chunk-1)
+\end{figure}
 
 ## Table Buttons {#shiny-tips-table-btn}
 
@@ -257,7 +264,14 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-![DT with custom input](images/dt-button.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/dt-button} 
+
+}
+
+\caption{DT with custom inputs}(\#fig:unnamed-chunk-2)
+\end{figure}
 
 ## jQuery {#shiny-tips-jQuery}
 

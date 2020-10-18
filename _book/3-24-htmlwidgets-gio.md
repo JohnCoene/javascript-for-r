@@ -30,7 +30,14 @@ Then again, the first order of business when looking to integrate a library is t
 </html>
 ```
 
-![Example of Gio.js visualisation](images/gio-example.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-example} 
+
+}
+
+\caption{Gio.js example}(\#fig:unnamed-chunk-1)
+\end{figure}
 
 Gio.js has itself a dependency, [three.js](https://threejs.org/), which needs to be imported before gio.js, other than that not much differs from libraries previously explored in this chapter.
 
@@ -154,7 +161,14 @@ devtools::load_all()
 gio(message = "This required but not used")
 ```
 
-![Output without data](images/gio-init.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-init} 
+
+}
+
+\caption{Gio output without data}(\#fig:unnamed-chunk-2)
+\end{figure}
 
 Not too shabby given how little work was put into this! Before we move on let us optimise something. In the JavaScript code we retrieve the `container` using `el.id` but this in effect is very inefficient: `el` is identical to `container`.
 
@@ -407,7 +421,14 @@ The above would make it such that the serialiser no longer has to interpret how 
 
 There are pros and cons to each methods. The preferable method is probably to __only alter the default serialiser__ where needed, this is the method used in the remainder of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Moreover htmlwidgets' serialiser extends jsonlite to allow converting JavaScript code which will come in handy later on. Transforming the data in JavaScript has one drawback, `HTMLWidgets.dataframeToD3` cannot be applied to the entire `x` object, it will only work on the subsets that hold the column-wise data (`x.data`) which tends to lead to clunky code as one uses said function in various places.
 
-![Gio output with correct serialisation](images/gio-data.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-data} 
+
+}
+
+\caption{Gio output with correct serialisation}(\#fig:unnamed-chunk-6)
+\end{figure}
 
 ## On Print Method {#widgets-full-on-print}
 
@@ -467,7 +488,14 @@ g2 <- gio_style(g1, "juicyCake")
 g2
 ```
 
-![Gio with a new style](images/gio-style.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-style} 
+
+}
+
+\caption{Gio with a new theme}(\#fig:unnamed-chunk-7)
+\end{figure}
 
 This is great but can be greatly improved upon with the magrittr pipe [@R-magrittr], it would allow easily passing the output of each function to the next to obtain an API akin to that of plotly or highcharter.
 

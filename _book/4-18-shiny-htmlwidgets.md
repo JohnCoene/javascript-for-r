@@ -98,7 +98,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-![Gio input data](images/gio-shiny-input-no-handler.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-input-no-handler} 
+
+}
+
+\caption{Gio with input data}(\#fig:unnamed-chunk-2)
+\end{figure}
 
 One thing to note before moving on, the data is sent from the client to the server whether the inputs are used or not, though this likely will not negatively impact gio it can reduce performances if the callback function is triggered too frequently. For instance an input value set when the user hovers a scatter plot might lead to the event being fired very frequently and too much data being sent to the server, slowing things down and providing a poor experience.
 
@@ -193,7 +200,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-![Gio input data transformed to a data frame](images/gio-input-handler.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-input-handler} 
+
+}
+
+\caption{Gio input data transformed to a data frame}(\#fig:unnamed-chunk-3)
+\end{figure}
 
 ## R to Widgets {#shiny-widgets-r-to-widgets}
 
@@ -245,7 +259,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-![Gio shiny error](images/gio-shiny-error.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-error} 
+
+}
+
+\caption{Gio issue in shiny}(\#fig:unnamed-chunk-4)
+\end{figure}
 
 A solution to this is to ensure the container (`el`) is empty before generating the visualisation. Incidentally this can be executed with a JavaScript method previously used in this book: `innerHTML`.
 
@@ -594,7 +615,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-![Gio with clear data proxy](images/gio-shiny-clear.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-clear} 
+
+}
+
+\caption{Gio with clear data proxy}(\#fig:unnamed-chunk-6)
+\end{figure}
 
 ## Update the Widget {#shiny-widgets-update}
 
@@ -666,4 +694,11 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-![Gio with dynamic style](images/gio-shiny-style.png)
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-style} 
+
+}
+
+\caption{Gio with dynamic style}(\#fig:unnamed-chunk-7)
+\end{figure}

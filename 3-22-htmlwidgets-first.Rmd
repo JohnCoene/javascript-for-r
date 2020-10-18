@@ -35,7 +35,9 @@ It might be hard to believe, but at this stage one already has a fully functioni
 play(message = "This is a widget!")
 ```
 
-![First HTML widget](images/playground-1.png)
+```{r, echo=FALSE, fig.cap='First widget'}
+knitr::include_graphics("images/playground-1.png")
+```
 
 This displays the message in the RStudio "Viewer," or the your default browser which indicates that the function does indeed create an HTML output. One can use the ![](images/open-in-browser.png) button located in the top right of the RStudio "Viewer" to open the message in web browser which can prove very useful to look under the hood of the widgets for debugging.
 
@@ -198,7 +200,9 @@ el.innerText = x.message;
 
 We place `console.log` to print the content of `x` in the console, reload the package with `devtools::load_all` and use the function `play` again then explore the console from the browser (inspect and go to the "console" tab).
 
-![Console tab output](images/playground-console-x.png)
+```{r, echo=FALSE, fig.cap='Console tab output'}
+knitr::include_graphics("images/playground-console-x.png")
+```
 
 This displays the JSON object containing the message: it looks eerily similar to the list that was created in R (`x = list(message = "This is a widget!")`). What one should take away from this is that data that needs to be communicated from R to the JavaScript function should be placed in the R list `x`. This list is serialised to JSON and placed in the HTML output in a `script` tag with a `data-for` attribute that indicates which widget the data is destined for. This effectively enables htmlwidgets to match the serialised data with the output elements: data in `<script data-for='viz'>` is to be used to create a visualisation in `<div id='viz'>`.
 
@@ -214,7 +218,9 @@ console.log(el);
 el.innerText = x.message;
 ```
 
-![Console tab output](images/playground-console-el.png)
+```{r, echo=FALSE, fig.cap='Console tab output element'}
+knitr::include_graphics("images/playground-console-el.png")
+```
 
 This displays the HTML element created by htmlwidgets that is meant to hold the visualisation, or in this case, the message. If you are familiar with JavaScript, this is the element that would be returned by `document.getElementById`. This object allows manipulating the element in pretty much any way imaginable, change its position, its colour, its size, or, as done here, to insert some text within it. What's more one can access attributes of the object just like a JSON array. Therefore one can log the `id` of the element.
 
@@ -238,7 +244,9 @@ After changing the `play.js` file as above, and re-loading the package, one can 
 play("<h1>Using HTML!</h1>")
 ```
 
-![Widget output](images/playground-h1.png)
+```{r, echo=FALSE, fig.cap='First widget output'}
+knitr::include_graphics("images/playground-h1.png")
+```
 
 That makes for a great improvement which opens the door to many possibilities. However, the interface this provides is unintuitive. Albeit similar, R users are more familiar with shiny and htmltools [@R-htmltools] tags than HTML tags, e.g.: `<h1></h1>` translates to `h1()` in R. The package should allow users to use those instead of forcing them to collapse HTML content in a string. Fortunately, there is a very easy way to obtain the HTML from those functions: convert it to a character string.
 
@@ -266,6 +274,8 @@ Reloading the package with `devtools::load_all` lets one use shiny tags as the m
 play(shiny::h2("Chocolate is a colour", style = "color:chocolate;"))
 ```
 
-![Using shiny tags](images/playground-color.png)
+```{r, echo=FALSE, fig.cap='First widget using shiny tags'}
+knitr::include_graphics("images/playground-color.png")
+```
 
 This hopefully provides some understanding of how htmlwidgets work internally and thereby helps building such packages. To recapitulate, an HTML document is created in which div is placed and given a certain id, this id is also used in a script tag that contains JSON data passed from R so that a JavaScript function we define can read that data in and use it to generate a visual output in a div. However, as much as this section covered, the topic of JavaScript dependencies was not touched, this is approached in the following section where we build another, more interesting widget, which uses an external dependency.
