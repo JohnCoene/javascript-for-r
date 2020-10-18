@@ -50,10 +50,14 @@ Looking at the code presented in the "Get Started" guide reveals just how conven
 </html>
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/candidate-plotly.png" alt="Plotly example" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-1)Plotly example</p>
-</div>
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/candidate-plotly} 
+
+}
+
+\caption{Plotly example}(\#fig:candidate-plotly)
+\end{figure}
 
 Now let's look at how another popular library does it.
 
@@ -94,10 +98,14 @@ Now let's look at how another popular library does it.
 </html>
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/candidate-highcharts.png" alt="Highcharts example" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-2)Highcharts example</p>
-</div>
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/candidate-highcharts} 
+
+}
+
+\caption{Highcharts example}(\#fig:candidate-highcharts)
+\end{figure}
 
 The above is very similar to what plotly.js requires: import libraries, create a `<div>` where to put the visualisation, and, to create the chart, run a function which also takes the id of the div where to place the chart and a JSON of options defining the actual chart, including the data.
 
@@ -137,10 +145,14 @@ The above is very similar to what plotly.js requires: import libraries, create a
 </html>
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/candidate-chartjs.png" alt="Chart.js example" width="100%" />
-<p class="caption">(\#fig:unnamed-chunk-3)Chart.js example</p>
-</div>
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/candidate-chartjs} 
+
+}
+
+\caption{Chart.js example}(\#fig:candidate-chartjs)
+\end{figure}
 
 We again observe a very similar structure as with previous libraries. The library is imported, instead of a `div` chart.js uses a `canvas`, and the visualisation is also created from a single function which takes the canvas as first argument and a JSON of options as second.
 
@@ -154,7 +166,7 @@ As observed, an interactive visualisation using JavaScript will be contained wit
 
 This gives the following basic diagram, it will be broken down further in the next chapter as the first widget is build.
 
-<!--html_preserve--><div id="htmlwidget-c06daa313f31a8b0abf2" style="width:100%;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c06daa313f31a8b0abf2">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR]\n\n  subgraph cluster_0 {\n    node [shape=box]\n    \"HTML element\"\n    \"JSON\"\n    \"JavaScript\"\n    \"Dependencies\"\n    label=\"HTML\"\n    color=gold\n  }\n\n  subgraph cluster_1 {\n    node [shape=box]\n    \"Data\"\n    \"Chart options\"\n    label = \"R environment\"\n    color=royalBlue\n  }\n\n  \"Data\" -> \"JSON\" \n  \"Chart options\" -> \"JSON\" [label=\"serialise\" constraint=false]\n  \"JSON\" -> \"JavaScript\"\n  \"JavaScript\" -> \"HTML element\"\n  \"Dependencies\" -> \"JavaScript\"\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><!--/html_preserve-->
+
+\begin{center}\includegraphics[width=1\linewidth]{3-21-htmlwidgets-basics_files/figure-latex/unnamed-chunk-1-1} 
 
 Thankfully the htmlwidgets package is there to handle most of this. Nonetheless, it is important to understand that these operations are undertaken (to some degree) by htmlwidgets.

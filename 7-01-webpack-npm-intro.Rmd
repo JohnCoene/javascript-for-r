@@ -1,0 +1,17 @@
+# (PART) Webpack and NPM {-}
+
+Thus far all of the JavaScript code written in this book was placed directly in the file that was imported in the front-end. While this works absolutely fine for the smaller projects it is bound to lead to huge headaches for the larger ones.
+
+It's the same problem one faces when writing R code. While a small script of 300 lines of code will do the job a large script of 10,000 lines causes problems and eventually becomes unmanageable. Therefore when tackling larger projects the R programmer will turn to solutions that enforce a certain file structure and provides utilities to easily manage those files. Some of these solutions may include the drake package [@R-drake], or the targets package [@R-targets] both provide tools to manage workflow and pipelines. Another method often used is to build the project as an R package, thereby enforcing a structure, reproducibility, unit tests, and more.
+
+The above mentioned issues are also a concern in JavaScript though here one has to be concerned with other things as well. JavaScript, like R is a constantly evolving language but while R code written on version `4.0.0` will likely run absolutely fine on version `3.0.0` it is not the case for JavaScript. As the language evolves and changes web browsers have to keep up to support any new features the language provides. Therefore JavaScript code that is written on the latest version may not run on all browsers, also consider that even if the latest version of Chrome and Firefox tend to support the latest JavaScript version users who visit your shiny applications or use your htmlwidgets may not have the latest version installed.
+
+In JavaScript, code (mis)management might be exacerbated by the fact that it often relies on other files such as CSS, JSON, images, and more. Making it even more difficult to build robust projects. Move an image or remove a CSS file and an entire JavaScript project can be broken.
+
+Also, in JavaScript code size matters: the smaller the file the faster it will load in the browser. This is achieved with a process called "minification," which consists in remove all unnecessary characters such as spaces from a JavaScript file to obtain a "minified" version of it that fits on a single line and which is smaller in size. This involves yet another process as humans cannot read or write minified code: try removing all line breaks and spaces from your R scripts if you think otherwise.
+
+Finally, while an R package enforces a certain structure since R is rather strict, JavaScript does not come with such restrictions off the shelf. It's therefore even more tempting for the developer to take shortcuts and make a mess of their projects. 
+
+Combine all of the above and software that involves JavaScript can quickly become messy and unreasonable, thankfully some tools have been invented over the years to help the JavaScript do all of these. These technologies each differ from one another somewhat, they each have their pros and cons, but all have the same goal: making JavaScript projects more manageable.
+
+[Grunt](https://gruntjs.com/) describes itself as a "the JavaScript task runner," and will carry minification, compilation, unit testing, linting, and more. There is also [Parcel](https://parceljs.org/) a web application bundler that will minify, bundle, (and more) JavaScript code. However, the one we shall use in the book is [webpack](https://webpack.js.org/), rest assured that along with Grunt it is one of the most popular.

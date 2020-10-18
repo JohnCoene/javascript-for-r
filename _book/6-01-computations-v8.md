@@ -106,9 +106,9 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 
 ```r
 engine$eval("new Date();") # using eval
-#> [1] "Sun Oct 18 2020 18:36:52 GMT+0200 (Central European Summer Time)"
+#> [1] "Sun Oct 18 2020 18:34:45 GMT+0200 (Central European Summer Time)"
 engine$call("Date", Sys.Date()) # using call
-#> [1] "Sun Oct 18 2020 18:36:52 GMT+0200 (Central European Summer Time)"
+#> [1] "Sun Oct 18 2020 18:34:45 GMT+0200 (Central European Summer Time)"
 ```
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with `engine$console()` you can then exit the console by typing `exit` or hitting the <kbd>ESC</kbd> key.
