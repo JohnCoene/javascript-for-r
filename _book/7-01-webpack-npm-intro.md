@@ -50,7 +50,9 @@ Minification is the process of removing all of the "syntactic sugar" that is unn
 let number=41;function hello(e){let l=number+1;console.log(l)}
 ```
 
-## Bundling {#webpack-structure}
+Note that the minified files of a library tend to end in `.min.js` though minified code can very well be placed in a `.js` file.
+
+## Bundling & Modules {#webpack-structure}
 
 Managing the structure of JavaScript projects can be tricky. One does not want to place 2,000 lines of code in a single line but splitting JavaScript code across file is difficult.
 
@@ -65,7 +67,7 @@ In JavaScript one does not have the luxury of writing code across different file
 
 While this may be fine for two or three files it quickly goes out of hand as one has to remember to import those in the correct order, in the above example variables declared in `main.js` cannot be used in `utils.js`, unless we change the order of the import.
 
-It's therefore essential to use tools that allow writing JavaScript in different files, manage the dependencies between these files, then "bundle" those correctly into one or more files destined to be imported in the browser.
+It's therefore essential to use tools that allow splitting JavaScript programs into modules (to write programs in different files), manage the dependencies between these files, then "bundle" those correctly into one or more files destined to be imported in the browser.
 
 ## Decoupling {#webpack-decouple}
 
@@ -78,4 +80,8 @@ This may appear like a lot to manage, thankfully we can use the aforementioned w
 
 Another new piece of software that one needs to be introduced to is Node's Package Manager, here henceforth referred to as NPM. As indicated by the name it's a package manager for Node.js, or translated for the R user it's Node.js version of CRAN. One first major difference is that while CRAN performs very rigorous and strict check on any package submitted NPM does not, one can publish almost anything.
 
-It has nonetheless greatly changed the way one manages dependencies in JavaScript. Notice how every dependency that were used in this book thus far had to be either imported from the CDN or downloaded manually. 
+Notice how every dependency that were used in this book thus far had to be either found through a CDN or manually downloaded, only to be then imported in the final document. Again, this is useful for the smaller projects but may become a hindrance when multiple dependencies have to be managed and updated.
+
+NPM has completely changed how dependencies can be managed and imported in a project. It is designed for Node.js code but many (if not all) libraries that are meant to run in web browser publish the packages on NPM.
+
+NPM, combined with the decoupling, and bundling covered in previous sections, enables to manage dependencies much more sensibly, and efficiently. So one does not have to import an entire library only to use but a few functions, thereby further reducing the size of the final bundle of JavaScript files.
