@@ -1,6 +1,6 @@
 # (PART) Webpack and NPM {-}
 
-## Managing JavaScript {#webpack-intro}
+# Managing JavaScript {#webpack-intro}
 
 Thus far all of the JavaScript code written in this book was placed directly in the file that was imported in the front-end. While this works absolutely fine for the smaller projects it is bound to lead to huge headaches for the larger ones.
 
