@@ -1,4 +1,4 @@
-# (PART) Webpack and NPM {-}
+# (PART) Robust JavaScript {-}
 
 # Managing JavaScript {#webpack-intro}
 
