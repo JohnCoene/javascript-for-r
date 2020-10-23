@@ -2,6 +2,8 @@
 
 In this chapter we discover how to feature webpack and NPM in a very simple shiny project, the idea is not to build a complex application, only to discover how one might go about bringing them into an R project and observe some of their benefits.
 
+There is a lot of depth to NPM and webpack, we only touch the surface here so we can obtain a basic setup for a shiny application. We'll eventually go into slightly more details as this part of the book progress but it will by no means fully explore the realm of webpack. It's always a good idea to take a look at the [official documentation](https://webpack.js.org/) in order to get a better picture of the technology.
+
 We see later how another R package can greatly ease much of what we're about to uncover here, but before we do so it's essential we have a good understanding of how it works.
 
 ## Installation {#webpack-intro-install}
@@ -53,7 +55,7 @@ scoop install nodejs
 
 If you are on another OS or Linux distro check the official, very concise [guide](https://nodejs.org/en/download/package-manager/) to install from various package managers.
 
-## Setup {#webpack-intro-setup}
+## Setup the app {#webpack-intro-setup}
 
 Let us first put together a simple shiny application that which will serve as a basis for including webpack and npm. Create a new directory and place a file called `app.R` containing a very simple application.
 
@@ -68,3 +70,79 @@ server <- function(...) {}
 
 shinyApp(ui, server)
 ```
+
+## Initialise NPM {#webpack-intro-init-npm}
+
+With a simple application one can initialise NPM. This could be translated into the equivalent of starting a new project in R. This is done from the command line, _from the root of the directory_ that you want to use as project.
+
+An npm project can be initialised with the command `npm init`, which when run prompts the user with a few questions, such as the name of the project, the license to use, etc. These have little importance for what we do here but will matter if you decide to publish the package on NPM. One can also pass the "yes" flag to the function in order to skip those questions: `npm init -y`.
+
+This creates a `package.json` file which is loosely equivalent to the `DESCRIPTION` of an R package, it includes information on the dependencies of the project, the version of the project, and more.
+
+We will revisit this file later in the chapter, at this ensure you have run `npm init`, with or without the flag.
+
+## Installing NPM packages {#webpack-intro-install-pkgs}
+
+Unless the R programmer uses packages such as renv [@R-renv] or packrat [@R-packrat] then packages are installed globally on the machine, running `install.packages("dplyr")` installs a single version of dplyr across the entire machine. Because CRAN is strict and its packages subsequently stable it tends not to be too much of an issue. However, NPM performs very little checks on packages that are submitted, therefore the developer has to be more careful about dependencies as these may change more abruptly (breaking changes). It thus makes sense that NPM, out-of-the-box, comes with better encapsulation of projects than R: installing packages globally is thus _not recommended,_ npm projects (`npm init`) in a way come with their own renv/packrat. 
+
+Installing Node packages also takes place at the command line with the `install` command followed by the name of the package to install, e.g.: `npm install nameOfPackage`. 
+
+As mentioned it is rarely a good idea to install packages globally at the exception of very few packages such as command line applications used across the application. As an example the [docsify-cli](https://docsify.js.org/) package for documentation generation can safely be installed globally as it is used from the command line across projects: `npm install docsify-cli -g`.
+
+The two other scopes are only slightly different but that difference is rather important. NPM allows distinguishing between packages that are needed to develop the project and packages that are needed in the final product being build. R does not make this distinction but it could perhaps be somewhat useful, for instance throughout the book we used the usethis package to develop the package from setting up the project to adding packages to DESCRIPTION file, and more. Perhaps one would like to make this a "developer" dependency so that other developer that pull the package have usethis installed and readily available. The advantage is that dependency is not included in the final product, that is, in this example usethis is not required to use the package built and therefore is not installed by the user.
+
+As stated in the previous chapter file size matters in JavaScript therefore ensuring these types of dependencies are not included in the final JavaScript file. With NPM this can be done by using the `--save-dev` flag, e.g.: `npm install webpack --save-dev` to install webpack. This is incidentally how it will be eventually installed as it is needed to prepare the final product (minify, bundle, etc.) but is not a dependency of that final bundled file.
+
+Finally, there are the "true" dependencies, those that are needed in the output we're creating. For instance were we to rebuild the gio widget with NPM we could install it with `npm install giojs --save` because this dependency will be required in the output file we produce.
+
+Before moving on to the next section let us install webpack and its command line interface as developer dependencies.
+
+```bash
+npm install webpack webpack-cli --save-dev
+```
+
+Notice that this updated the `package.json` file, created the `package-lock.json` file as well as a `node_modules` directory to obtain the following structure.
+
+```
+.
+├── app.R
+├── node_modules
+├── package-lock.json
+└── package.json
+```
+
+The directory `node_modules` actually holds all the dependencies, it will grow in size as you add dependencies, it's important that this directory is not pushed to whatever version control system you happen use (Github, Bitbucket, Gitlab). 
+
+```{block, type='rmdnote'}
+Do not commit `node_modules` to git
+```
+
+The dependencies are any way not needed as one can pull the project without the `node_modules` then from the root of the project run `npm install` as-is without package names to install the dependencies that are present in the `package.json`. This file was indeed update to include `webpack` and `webpack-cli` as `devDependencies`, at the bottom of the file.
+
+```json
+{
+  "name": "name-of-your-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^5.2.0",
+    "webpack-cli": "^4.1.0"
+  }
+}
+```
+
+The `package-lock.json` file is automatically generated and _should not be edited manually,_ it describes the exact tree of all the dependencies. If you installed a package by mistake you can uninstall it with `npm uninstall nameOfPage`.
+
+## Structure {#webpack-intro-structure}
+
+
+## Configure {#webpack-intro-conf}
+
+At this stage one has a project that contains `app.R`, was initialised with NPM, and where webpack was installed.
