@@ -113,14 +113,10 @@ input:checked + .slider:before {
 
 The above CSS should be placed in the previously created `assets/styles.css` file.
 
-\begin{figure}[t]
-
-{\centering \includegraphics[width=1\linewidth]{images/checkbox-switch} 
-
-}
-
-\caption{Checkbox and styled switch input}(\#fig:checkbox-switch)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/checkbox-switch.png" alt="Checkbox and styled switch input" width="100%" />
+<p class="caption">(\#fig:checkbox-switch)Checkbox and styled switch input</p>
+</div>
 
 ## Generate Input HTML {#shiny-input-html}
 
@@ -272,9 +268,9 @@ $.extend(switchInput, {
 
 The value the `checked` prop is boolean, `true` if checked and `false` if unchecked.
 
-\begin{rmdnote}
-Ensure the \texttt{getValue} method actually \texttt{return}s the value.
-\end{rmdnote}
+<div class="rmdnote">
+<p>Ensure the <code>getValue</code> method actually <code>return</code>s the value.</p>
+</div>
 
 ### Set Input Value {#shiny-input-set-value}
 
@@ -357,10 +353,9 @@ $.extend(switchInput, {
 
 Note that in the `subscribe` method we listen for `change`s on the input, hence the `setValue` also uses jQuery's `change` method; it ensures this event is fired and that shiny will subsequently pick it up. 
 
-\begin{rmdnote}
-Make sure the \texttt{setValue} method triggers the event observed in
-\texttt{subscribe}
-\end{rmdnote}
+<div class="rmdnote">
+<p>Make sure the <code>setValue</code> method triggers the event observed in <code>subscribe</code></p>
+</div>
 
 ### Input Rate Policy {#shiny-input-rate-policy}
 
@@ -498,14 +493,10 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
-
-{\centering \includegraphics[width=1\linewidth]{images/switch-example} 
-
-}
-
-\caption{Switch input example}(\#fig:switch-example)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/switch-example.png" alt="Switch input example" width="100%" />
+<p class="caption">(\#fig:switch-example)Switch input example</p>
+</div>
 
 ## Update Input {#shiny-input-update}
 
@@ -554,8 +545,8 @@ The diagram below attempts to summarize the various elements that were put toget
 
 It all starts from the `switchInput` function which generates the HTML defining the switch input and its initial state. In the `subscribe` method, an event listener checks for changes on this HTML element (`$(el).on('change', ...)`), every time it changes (check/uncheck) it fires the shiny `callback` which sends the value of the input obtained from `getValue` through the websocket. When the value of the input is changed from the server this value travels through the websocket to the front-end where `receiveMessage` uses `setValue` to programmatically change the check box which incidentally triggers the change event and back we go.
 
-
-\begin{center}\includegraphics[width=1\linewidth]{4-16-shiny-input_files/figure-latex/unnamed-chunk-3-1} 
+<!--html_preserve--><div id="htmlwidget-b35fa2daef0b963645e5" style="width:100%;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b35fa2daef0b963645e5">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR]\n  node [shape=record fontsize=12];\n\n  subgraph cluster_r {\n    node [color=royalBlue];\n    \"update_switch_input\"\n    \"switchInput\"\n    \"Input list\"\n\n    label = \"R server\"\n  }\n\n  subgraph cluster_js {\n    node [color=gold];\n    \"receiveMessage\"\n    \"setValue\"\n    \"HTML input\"\n    \"subscribe\"\n    \"getValue\"\n\n    label = \"Front-end\"\n  }\n\n  edge [fontsize=10]\n  \"update_switch_input\" -> \"receiveMessage\" [xlabel=\"websocket\"]\n  \"receiveMessage\" -> \"setValue\" [label=\"value\"]\n  \"switchInput\" -> \"HTML input\" \n  \"setValue\" -> \"HTML input\" [label=\"value\"]\n  \"HTML input\" -> \"subscribe\" [label=\"event listener\"]\n  \"subscribe\" -> \"getValue\" [label=\"callback\"]\n  \"getValue\" -> \"Input list\" [label=\"websocket\"]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><!--/html_preserve-->
 
 ## Exercise {#shiny-input-excercise}
 
