@@ -20,6 +20,13 @@ Combine all of the above and software that involves JavaScript can quickly becom
 
 [Grunt](https://gruntjs.com/) describes itself as a "the JavaScript task runner," and will carry minification, compilation, unit testing, linting, and more. There is also [Parcel](https://parceljs.org/) a web application bundler that will minify, bundle, (and more) JavaScript code. However, the one we shall use in this part of the book is [webpack](https://webpack.js.org/), as it is very similar to Grunt and is one of the most popular.
 
+## Example {#webpack-example}
+
+There are admittedly few R packages that make use of such technology though it must be said that many could greatly benefit from it. Given its size and complexity a package such as shiny, however, could probably not do without.
+
+Shiny makes use of Grunt, the source code that comprises all of the JavaScript required to run the front-end (inputs, outpus, modals, etc.) is in the `srcjs` directory which can be seen on [official Github repository](https://github.com/rstudio/shiny). This folder includes a multitude of JavaScript files the name of which indicates the code they encompass; `input_binding_checkbox.js`, `modal.js`, etc.
+
+These files are processed by Grunt which, based on the `Gruntfile.js` configuration file in the `tools` directory, into different bundles that go in the `inst` folder of the package.
 
 ## Transpiling {#webpack-browser}
 

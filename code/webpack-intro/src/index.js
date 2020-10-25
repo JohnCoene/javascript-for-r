@@ -1,1 +1,1 @@
-require('./secret.js');
+import './input.js';
