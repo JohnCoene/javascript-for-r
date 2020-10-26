@@ -1,6 +1,6 @@
 # Custom Outputs {#shiny-output}
 
-In this chapter we create a custom shiny output, in practical terms this creates custom `render*` and `*Output` functions to use in Shiny. This will be demonstrated by creating something akin to the `valueBox` available in the shinydashboard [@R-shinydashboard] package. While similar to what shinydashboard provides this box will 1) be fully customisable and 2) available in any shiny application 3) have additional functionalities. 
+In this chapter, we create a custom shiny output; in practical terms, this creates custom `render*` and `*Output` functions to use in Shiny. This will be demonstrated by creating something akin to the `valueBox` available in the shinydashboard [@R-shinydashboard] package. While similar to what shinydashboard provides this box will 1) be fully customisable and 2) available in any shiny application 3) have additional functionalities. 
 
 The `valueBox` equivalent we shall build in this chapter is named "boxxy," and allows creating simple but colourful value boxes with animated numbers (by counting up to it) using [countUp.js](https://github.com/inorganik/countUp.js).
 
@@ -31,7 +31,7 @@ At the core, this consists in creating three functions; `boxxy`, `renderBoxxy` a
 
 The first function, `boxxy` will accept arguments that help define what is in the box. This function is generally useful to preprocess any of the arguments that are meant to produce the custom output. The `boxxyOutput` function essentially creates the scaffold of the HTML output (e.g.: `<div>`) as well as the dependencies. The `render*` function is perhaps more peculiar it should accept an expression and return a function.
 
-Previous work with shiny and JavaScript covered in this book had no dedicated "output" element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: `usejBox`). However, since this is not the case here the dependencies can be attached together with the output.
+Previous work with shiny and JavaScript covered in this book had no dedicated "output" element that were placed in the shiny UI. Therefore one had to use a function solely dedicated to importing the dependencies (e.g.: `usejBox`). However, since this is not the case here, the dependencies can be attached together with the output.
 
 Finally, the two R functions are "bound" JavaScript-side with an "output binding" that renders the data from the `render*` function with its `*output`.
 
@@ -80,7 +80,7 @@ This should produce the following directory structure.
 
 ## Output R Function {#shiny-output-r-fun}
 
-The `boxxy` function takes three arguments, a `title`, a `value` that will be animated and the background `color` to use for the box. The function, at this stage at least, does not preprocess the arguments and simply returns them as a named `list`.
+The `boxxy` function takes three arguments, a `title`, a `value` that will be animated and the background `color` to use for the box. The function, at this stage at least, does not preprocess the arguments and returns them as a named `list`.
 
 ```r
 # app.R
@@ -123,7 +123,7 @@ boxxyOutput <- function(id){
 <p>Make sure you use unique class names so they are not accidentally overridden by the user.</p>
 </div>
 
-As shown previously the box should include a title and an animated value. These could be generated entirely in JavaScript but it's actually easier to create placeholders with htmltools tags, we generate dynamic ids for those so they can easily be referenced later on in JavaScript: `id-boxxy-value` for the value and `id-boxxy-title` for the title.
+As shown the box should include a title and an animated value. These could be generated entirely in JavaScript but it's actually easier to create placeholders with htmltools tags, we generate dynamic ids for those so they can easily be referenced later on in JavaScript: `id-boxxy-value` for the value and `id-boxxy-title` for the title.
 
 ```r
 boxxyOutput <- function(id){
@@ -244,7 +244,7 @@ Here we create an "output binding," it tells Shiny how to find the component and
 var boxxyBinding = new Shiny.OutputBinding();
 ```
 
-Then, this must be "extended" by specifying a number of methods, a very necessary one being `find`. It is used to look for the output HTML element in the document (`scope`), and return them as an array (`HTMLcollection`). Other methods all take an `el` argument; that value will always be an element that was returned from `find`. A very straightforward way to accomplish this is to use jQuery’s find method to identify elements with the `boxxy` class used in `boxxyOutput`. You are by no means forced to use a CSS class to identify the elements but there is no reason not to.
+Then, this must be "extended" by specifying a number of methods, an essential one being `find`. It is used to look for the output HTML element in the document (`scope`), and return them as an array (`HTMLcollection`). Other methods all take an `el` argument; that value will always be an element that was returned from `find`. A very straightforward way to accomplish this is to use jQuery’s find method to identify elements with the `boxxy` class used in `boxxyOutput`. You are by no means forced to use a CSS class to identify the elements but there is no reason not to.
 
 ```js
 // custom.js
@@ -257,7 +257,7 @@ $.extend(boxxyBinding, {
 });
 ```
 
-One might then want to use the `getId` method which returns the `id` of the element, by default, as can be seen in the [source code](https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js) (below), the binding returns the id as the `data-input-id` attribute and if that is falsy it returns the element's `id`.
+One might then want to use the `getId` method which returns the `id` of the element, by default, as can be seen in the [source code](https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js) (below), the binding returns the id as the `data-input-id` attribute, and if that is falsy it returns the element's `id`.
 
 ```js
 // getId default
@@ -268,7 +268,7 @@ this.getId = function(el) {
 
 Since boxxy uses the element id the default will work and this can be skipped entirely. 
 
-Next, one needs to implement the `renderValue` function which is the very function that generates the output based on data used in `boxxy` and sent to the front-end with `renderBoxxy`. The `renderValue` method accepts two arguments, first `el` the element where the output should be generated, this is effectively the output of `boxxyOutput` which the binding found using `find`, the second argument is `data` which is the data passed to `boxxy` and serialised via `renderBoxxy`. 
+Next, one needs to implement the `renderValue` function which is the same function that generates the output based on data used in `boxxy` and sent to the front-end with `renderBoxxy`. The `renderValue` method accepts two arguments, first `el` the element where the output should be generated, this is effectively the output of `boxxyOutput` which the binding found using `find`, the second argument is `data` which is the data passed to `boxxy` and serialised via `renderBoxxy`. 
 
 <div class="rmdnote">
 <p>The <code>renderValue</code> is in effect very similar if not identical to the JavaScript function of the same name involved in creating htmlwidgets.</p>
@@ -276,7 +276,7 @@ Next, one needs to implement the `renderValue` function which is the very functi
 
 ### Boxxy Title {#shiny-output-boxxy-title}
 
-Let's now tackle the first of the three core aspect of the boxxy output: the title. The `title` should be placed in the previously created placeholder which bears the `id-boxxy-title`; exactly as was done with htmlwidgets previously we insert title (`data.title`) in the element with `innerText`. The dynamically generated id for the title is built in the same way it is in R, by concatenating the `id` with `-boxxy-title`
+Let us now tackle the first of the three core aspect of the boxxy output: the title. The `title` should be placed in the previously created placeholder which bears the `id-boxxy-title`; precisely as was done with htmlwidgets previously we insert title (`data.title`) in the element with `innerText`. The dynamically generated id for the title is built in the same way it is in R, by concatenating the `id` with `-boxxy-title`
 
 - In R `sprintf("%s-boxxy-title", id)`
 - In JavaScript `el.id + '-boxxy-title'`
@@ -485,9 +485,9 @@ shinyApp(ui, server)
 
 ## Injecting Dependencies {#shiny-output-inject}
 
-We could consider making the animation of the value rendered with `boxxy` optional, some users may not want to use it. You might already imagine how a new argument and a few if statements could very easily do the job, but how would one handle the dependency? Surely if users do not want to make use of the animation the CountUp.js dependency should also be excluded so as to keep the output as light as possible.
+We could consider making the animation of the value rendered with `boxxy` optional; some users may not want to use it. You might already imagine how a new argument and a few if statements could very quickly do the job, but how would one handle the dependency? Indeed if users do not want to make use of the animation, the CountUp.js dependency should also be excluded so as to keep the output as light as possible.
 
-The dependency is currently attached in the `boxxyOutput` function which does not take any argument, it could but it would make for rather messy and confusing interface as whatever additional argument that indicates whether the numbers should be animated would have be specified twice, once in the `boxxyOutput` function so it does not import the dependency as well as in the `boxxy` function in order to serialise that parameter so the JavaScript binding does not run the animation function.
+The dependency is currently attached in the `boxxyOutput` function which does not take any argument, it could, but it would make for the rather messy and confusing interface as whatever additional argument that indicates whether the numbers should be animated would have to be specified twice, once in the `boxxyOutput` function, so it does not import the dependency as well as in the `boxxy` function in order to serialise that parameter, so the JavaScript binding does not run the animation function.
 
 ```r
 # pseudo code
@@ -514,7 +514,7 @@ shinyApp(ui, server)
 
 Thankfully there is a better way, combining htmltools and shiny to insert the dependency dynamically from JavaScript.
 
-The `boxxy` function needs to take an additional argument `animate` which is passed to the output list. This will be used in the `render` function (and JavaScript binding) to dynamically render the dependency.
+The `boxxy` function needs to take an additional argument `animate` which is passed to the output list. This will be used in the `render` function (and JavaScript binding) to render the dependency dynamically.
 
 ```r
 boxxy <- function(title, value, color = "black", aniamte = TRUE){
@@ -549,7 +549,7 @@ boxxyOutput <- function(id){
 }
 ```
 
-The `renderBoxxy` function sees quite some modifications, while before it was technically only returning a function that itself returned the output of `boxxy` (`func() == boxxy()`). Here we want to capture the output of `boxxy` to check whether the `animate` element is `TRUE` and if so add the dependency.
+The `renderBoxxy` function sees quite some modifications, while before it was technically only returning a function that itself returned the output of `boxxy` (`func() == boxxy()`). Here we want to capture the output of `boxxy` to check whether the `animate` element is `TRUE` and if so, add the dependency.
 
 ```r
 renderBoxxy <- function(expr, env = parent.frame(), 
@@ -569,13 +569,13 @@ renderBoxxy <- function(expr, env = parent.frame(),
 }
 ```
 
-Within the `if` statement the dependency can be created with the htmltools as done for the binding. Ensure the names of the dependencies are unique as shiny internally uses it to differentiate between them, if they bear the same name shiny assumes they are the same and will only render one of them.
+Within the `if` statement, the dependency can be created with the htmltools as done for the binding. Ensure the names of the dependencies are unique as shiny internally uses it to differentiate between them if they bear the same name shiny assumes they are the same and will only render one of them.
 
 <div class="rmdnote">
 <p>Make sure dependencies bear different names or shiny thinks it’s the same and only renders one of them.</p>
 </div>
 
-The dependency generated with htmltools is then passed to the `shiny::createWebDependency` function which internally uses `shiny::addResourcePath` to serve the dependency. This is necessary here as, at this stage, the countup dependency is not actually rendered, below we merely add it to the list of options that serialised to JSON. Indeed this will actually be injected JavaScript-side, therefore the front-end needs to be able to access this file, hence it is served.
+The dependency generated with htmltools is then passed to the `shiny::createWebDependency` function, which internally uses `shiny::addResourcePath` to serve the dependency. This is necessary here as, at this stage, the countup dependency is not actually rendered; below we merely add it to the list of options that serialised to JSON. Indeed this will actually be injected JavaScript-side. Therefore the front-end needs to be able to access this file, hence it is served.
 
 ```r
 renderBoxxy <- function(expr, env = parent.frame(), quoted = FALSE) {
@@ -606,9 +606,9 @@ renderBoxxy <- function(expr, env = parent.frame(), quoted = FALSE) {
 }
 ```
 
-Thus far the dependency is dynamically included in the R object that is serialised to JSON but it is not yet actually imported in the document, this happens in the JavaScript binding.
+Thus far, the dependency is dynamically included in the R object that is serialised to JSON, but it is not yet actually imported in the document, this happens in the JavaScript binding.
 
-The first thing we ought to do is mirror the if statement that was created in the `renderBoxxy` function, if the numbers should be animated the function can use countup, if not it must insert the text with `insertText` just like it does for the `title`.
+The first thing we ought to do is mirror the if statement that was created in the `renderBoxxy` function if the numbers should be animated, the function can use countup, if not it must insert the text with `insertText` just like it does for the `title`.
 
 ```js
 var boxxyBinding = new Shiny.OutputBinding();
@@ -663,7 +663,7 @@ $.extend(boxxyBinding, {
 Shiny.outputBindings.register(boxxyBinding, "john.boxxy");
 ```
 
-With those changes made not only is the animation of numbers optional but if users decide to turn off the animation in all `boxxy` functions the `countup.js` file will not be included at all.
+With those changes made not only is the animation of numbers optional but if users decide to turn off the animation in all `boxxy` functions, the `countup.js` file will not be included at all.
 
 ```r
 library(shiny)
@@ -695,7 +695,7 @@ shinyApp(ui, server)
 
 ## Preprocessing Custom Outputs {#shiny-output-preprocess}
 
-One aspect that this example did not explore truly explore thus far is the idea that the function `boxxy` should preprocess the input more in order to be truly justify. Currently `boxxy` only wraps the arguments in a `list`, therefore the code below works too. 
+One aspect that this example did not explore truly explore thus far is the idea that the function `boxxy` should preprocess the input more in order to be truly justified. Currently `boxxy` only wraps the arguments in a `list`. Therefore the code below works too. 
 
 ```r
 # works too

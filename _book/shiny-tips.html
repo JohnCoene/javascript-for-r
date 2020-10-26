@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-10-25" />
+<meta name="date" content="2020-10-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -488,11 +488,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="shiny-tips" class="section level1" number="13">
 <h1><span class="header-section-number">Chapter 13</span> Tips &amp; Tricks</h1>
-<p>While previous chapters on working with Shiny made use of external libraries and built packages that brought new functionalities previously not available in shiny, one does not have to go to this length to take advantage of the learnings contained in those pages. Moreover there are a few interesting things that have not yet been explored.</p>
+<p>While previous chapters on working with Shiny made use of external libraries and built packages that brought new functionalities previously not available in shiny, one does not have to go to this length to take advantage of the learnings contained in those pages. Moreover, there are a few exciting things that have not yet been explored.</p>
 <div id="shiny-tips-events" class="section level2" number="13.1">
 <h2><span class="header-section-number">13.1</span> Shiny Events</h2>
-<p>There is a wee bit of documentation tucked away on the <a href="https://shiny.rstudio.com/articles/js-events.html">shiny website</a> that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when shiny connects, when an element become visible, and more. To demonstrate how to use those events and how handy they can be we will create a notification which appears to indicate that the server is busy running computations. This could be as fancy as ever but for simplicity’s sake we limit the demonstration to showing and hiding a gif.</p>
-<p>First, we create the directories and necessary files, and to indicate the server is busy we’ll be using a gif that is rather well-known in the R community. Note that we will be using some CSS, hence the <code>style.css</code> file.</p>
+<p>There is a wee bit of documentation tucked away on the <a href="https://shiny.rstudio.com/articles/js-events.html">shiny website</a> that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when shiny connects, when an element become visible, and more. To demonstrate how to use those events and how handy they can be, we will create a notification which appears to indicate that the server is busy running computations. This could be as fancy as ever, but for simplicity’s sake, we limit the demonstration to showing and hiding a gif.</p>
+<p>First, we create the directories and necessary files, and to indicate the server is busy. We’ll be using a gif that is rather well-known in the R community. Note that we will be using some CSS, hence the <code>style.css</code> file.</p>
 <div class="sourceCode" id="cb238"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb238-1"><a href="shiny-tips.html#cb238-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
 <span id="cb238-2"><a href="shiny-tips.html#cb238-2"></a><span class="kw">file.create</span>(<span class="st">&quot;www/script.js&quot;</span>)</span>
 <span id="cb238-3"><a href="shiny-tips.html#cb238-3"></a><span class="kw">file.create</span>(<span class="st">&quot;www/style.css&quot;</span>)</span>
@@ -532,7 +532,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb239-26"><a href="shiny-tips.html#cb239-26"></a>}</span>
 <span id="cb239-27"><a href="shiny-tips.html#cb239-27"></a></span>
 <span id="cb239-28"><a href="shiny-tips.html#cb239-28"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>The gif should only be visible when the server is busy, unlike now. Whether it is visible will be controlled in JavaScript so this should be initialised as hidden using CSS. The code below hides the gif with <code>visibility: hidden</code>, and repositions it, floating on top of the rest of the content in the top right of the page, the <code>z-index</code> ensures the gif appears on top of other elements.</p>
+<p>The gif should only be visible when the server is busy, unlike now. Whether it is visible will be controlled in JavaScript, so this should be initialised as hidden using CSS. The code below hides the gif with <code>visibility: hidden</code>, and repositions it, floating on top of the rest of the content in the top right of the page, the <code>z-index</code> ensures the gif appears on top of other elements.</p>
 <div class="sourceCode" id="cb240"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb240-1"><a href="shiny-tips.html#cb240-1"></a><span class="co">/* style.css */</span></span>
 <span id="cb240-2"><a href="shiny-tips.html#cb240-2"></a><span class="pp">#loading</span>{</span>
 <span id="cb240-3"><a href="shiny-tips.html#cb240-3"></a>  <span class="kw">top</span>: <span class="dv">20</span><span class="dt">px</span><span class="op">;</span></span>
@@ -542,7 +542,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb240-7"><a href="shiny-tips.html#cb240-7"></a>  <span class="kw">position</span>: <span class="dv">absolute</span><span class="op">;</span></span>
 <span id="cb240-8"><a href="shiny-tips.html#cb240-8"></a>  <span class="kw">visibility</span>: <span class="dv">hidden</span><span class="op">;</span></span>
 <span id="cb240-9"><a href="shiny-tips.html#cb240-9"></a>}</span></code></pre></div>
-<p>We can then use the shiny events to dynamically show and hide the gif when the server is busy. Below we observe the event <code>shiny:busy</code> on the entire page (<code>document</code>), when the event is triggered the gif is retrieved using its <code>id</code> and then made visible by changing its CSS <code>visibility</code> property to <code>visible</code>.</p>
+<p>We can then use the shiny events to dynamically show and hide the gif when the server is busy. Below we observe the event <code>shiny:busy</code> on the entire page (<code>document</code>) when the event is triggered the gif is retrieved using its <code>id</code> and then made visible by changing its CSS <code>visibility</code> property to <code>visible</code>.</p>
 <div class="sourceCode" id="cb241"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb241-1"><a href="shiny-tips.html#cb241-1"></a><span class="co">// script.js</span></span>
 <span id="cb241-2"><a href="shiny-tips.html#cb241-2"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:busy&#39;</span><span class="op">,</span> <span class="kw">function</span>(event) <span class="op">{</span></span>
 <span id="cb241-3"><a href="shiny-tips.html#cb241-3"></a>  <span class="co">// retrieve the gif</span></span>
@@ -577,7 +577,7 @@ FIGURE 13.1: Shiny with a busy indicator
 </div>
 <div id="shiny-tips-table-btn" class="section level2" number="13.2">
 <h2><span class="header-section-number">13.2</span> Table Buttons</h2>
-<p>For instance, using what was learned previously one can place buttons inside a shiny table and observe server-side which is clicked. Starting with a basic application that only includes a table to which we ultimately want to add a column containing a button on each row. Here we achieve this by having each button set a different value (e.g.: an id) to an input using <code>shiny.setInputValue</code> but one could very well create different input names for each button.</p>
+<p>For instance, using what was learned previously, one can place buttons inside a shiny table and observe server-side, which is clicked. Starting with a basic application that only includes a table to which we ultimately want to add a column containing a button on each row. Here we achieve this by having each button set a different value (e.g. an id) to an input using <code>shiny.setInputValue</code>, but one could very well create different input names for each button.</p>
 <div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="shiny-tips.html#cb243-1"></a><span class="kw">library</span>(DT)</span>
 <span id="cb243-2"><a href="shiny-tips.html#cb243-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb243-3"><a href="shiny-tips.html#cb243-3"></a></span>
@@ -630,7 +630,7 @@ FIGURE 13.1: Shiny with a busy indicator
 <span id="cb244-26"><a href="shiny-tips.html#cb244-26"></a>}</span>
 <span id="cb244-27"><a href="shiny-tips.html#cb244-27"></a></span>
 <span id="cb244-28"><a href="shiny-tips.html#cb244-28"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>Next we create the buttons for each row and set the JavaScript functions previously created as the <code>onClick</code> attributes. The JavaScript code passed to the <code>onClick</code> attribute will be executed every time the button is clicked.</p>
+<p>Next, we create the buttons for each row and set the JavaScript functions previously created as the <code>onClick</code> attributes. The JavaScript code passed to the <code>onClick</code> attribute will be executed every time the button is clicked.</p>
 <div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="shiny-tips.html#cb245-1"></a><span class="kw">library</span>(DT)</span>
 <span id="cb245-2"><a href="shiny-tips.html#cb245-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb245-3"><a href="shiny-tips.html#cb245-3"></a></span>
@@ -719,11 +719,11 @@ FIGURE 13.2: DT with custom inputs
 </div>
 <div id="shiny-tips-jQuery" class="section level2" number="13.3">
 <h2><span class="header-section-number">13.3</span> jQuery</h2>
-<p>The shiny framework itself makes use and thus imports the <a href="https://jquery.com/">jQuery</a> JavaScript library, a library that provides a convenient API to make a lot of things easier, including animations.</p>
+<p>The shiny framework itself makes use and thus imports the <a href="https://jquery.com/">jQuery</a> JavaScript library, a library that provides a convenient API to make many things easier, including animations.</p>
 <p>As an example, we could use jQuery’s <code>show</code>, <code>hide</code>, or <code>toggle</code> functions to show or hide an HTML element at the press of a button.</p>
 <div class="sourceCode" id="cb247"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb247-1"><a href="shiny-tips.html#cb247-1"></a><span class="co">// example of jQuery animation</span></span>
 <span id="cb247-2"><a href="shiny-tips.html#cb247-2"></a><span class="at">$</span>(<span class="st">&#39;#id&#39;</span>).<span class="at">toggle</span>()<span class="op">;</span></span></code></pre></div>
-<p>Because jQuery is already imported there is no need to do so, on the contrary, importing it again will impact load time and might clash with the pre-existing version. Below we create a shiny application containing a message handler to toggle (show or hide element depending on its state) at the click of a button.</p>
+<p>Because jQuery is already imported, there is no need to do so, on the contrary, importing it again will impact load time and might clash with the pre-existing version. Below we create a shiny application containing a message handler to toggle (show or hide element depending on its state) at the click of a button.</p>
 <div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb248-1"><a href="shiny-tips.html#cb248-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb248-2"><a href="shiny-tips.html#cb248-2"></a></span>
 <span id="cb248-3"><a href="shiny-tips.html#cb248-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
@@ -774,7 +774,7 @@ FIGURE 13.2: DT with custom inputs
 <span id="cb249-23"><a href="shiny-tips.html#cb249-23"></a>}</span>
 <span id="cb249-24"><a href="shiny-tips.html#cb249-24"></a></span>
 <span id="cb249-25"><a href="shiny-tips.html#cb249-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>This is something where, again, R is leveraged in order to make it easier on the shiny developer but it must be said that it suffers from some inefficiency: the message travels from the browser (button click) to the R server where it is sent back to the browser and triggers <code>toggle</code>. It could indeed very well be rewritten in JavaScript entirely, this is however outside the scope of this book.</p>
+<p>This is something where, again, R is leveraged in order to make it easier on the shiny developer, but it must be said that it suffers from some inefficiency: the message travels from the browser (button click) to the R server where it is sent back to the browser and triggers <code>toggle</code>. It could indeed very well be rewritten in JavaScript entirely, this is, however, outside the scope of this book.</p>
 
 </div>
 </div>

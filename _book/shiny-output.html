@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-10-25" />
+<meta name="date" content="2020-10-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -488,7 +488,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="shiny-output" class="section level1" number="14">
 <h1><span class="header-section-number">Chapter 14</span> Custom Outputs</h1>
-<p>In this chapter we create a custom shiny output, in practical terms this creates custom <code>render*</code> and <code>*Output</code> functions to use in Shiny. This will be demonstrated by creating something akin to the <code>valueBox</code> available in the shinydashboard <span class="citation">(Chang and Borges Ribeiro <a href="#ref-R-shinydashboard" role="doc-biblioref">2018</a>)</span> package. While similar to what shinydashboard provides this box will 1) be fully customisable and 2) available in any shiny application 3) have additional functionalities.</p>
+<p>In this chapter, we create a custom shiny output; in practical terms, this creates custom <code>render*</code> and <code>*Output</code> functions to use in Shiny. This will be demonstrated by creating something akin to the <code>valueBox</code> available in the shinydashboard <span class="citation">(Chang and Borges Ribeiro <a href="#ref-R-shinydashboard" role="doc-biblioref">2018</a>)</span> package. While similar to what shinydashboard provides this box will 1) be fully customisable and 2) available in any shiny application 3) have additional functionalities.</p>
 <p>The <code>valueBox</code> equivalent we shall build in this chapter is named “boxxy,” and allows creating simple but colourful value boxes with animated numbers (by counting up to it) using <a href="https://github.com/inorganik/countUp.js">countUp.js</a>.</p>
 <div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="shiny-output.html#cb250-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb250-2"><a href="shiny-output.html#cb250-2"></a></span>
@@ -513,7 +513,7 @@ FIGURE 14.1: Custom output example
 <h2><span class="header-section-number">14.1</span> Inner-workings</h2>
 <p>At the core, this consists in creating three functions; <code>boxxy</code>, <code>renderBoxxy</code> and <code>boxxyOutput</code> (analogous to <code>plot</code>, <code>renderPlot</code>, <code>plotOutput</code>) which are linked by an “output binding” in JavaScript.</p>
 <p>The first function, <code>boxxy</code> will accept arguments that help define what is in the box. This function is generally useful to preprocess any of the arguments that are meant to produce the custom output. The <code>boxxyOutput</code> function essentially creates the scaffold of the HTML output (e.g.: <code>&lt;div&gt;</code>) as well as the dependencies. The <code>render*</code> function is perhaps more peculiar it should accept an expression and return a function.</p>
-<p>Previous work with shiny and JavaScript covered in this book had no dedicated “output” element that were placed in the shiny UI, therefore one had to use a function solely dedicated to importing the dependencies (e.g.: <code>usejBox</code>). However, since this is not the case here the dependencies can be attached together with the output.</p>
+<p>Previous work with shiny and JavaScript covered in this book had no dedicated “output” element that were placed in the shiny UI. Therefore one had to use a function solely dedicated to importing the dependencies (e.g.: <code>usejBox</code>). However, since this is not the case here, the dependencies can be attached together with the output.</p>
 <p>Finally, the two R functions are “bound” JavaScript-side with an “output binding” that renders the data from the <code>render*</code> function with its <code>*output</code>.</p>
 </div>
 <div id="shiny-output-setup" class="section level2" number="14.2">
@@ -555,7 +555,7 @@ FIGURE 14.1: Custom output example
 </div>
 <div id="shiny-output-r-fun" class="section level2" number="14.3">
 <h2><span class="header-section-number">14.3</span> Output R Function</h2>
-<p>The <code>boxxy</code> function takes three arguments, a <code>title</code>, a <code>value</code> that will be animated and the background <code>color</code> to use for the box. The function, at this stage at least, does not preprocess the arguments and simply returns them as a named <code>list</code>.</p>
+<p>The <code>boxxy</code> function takes three arguments, a <code>title</code>, a <code>value</code> that will be animated and the background <code>color</code> to use for the box. The function, at this stage at least, does not preprocess the arguments and returns them as a named <code>list</code>.</p>
 <div class="sourceCode" id="cb253"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb253-1"><a href="shiny-output.html#cb253-1"></a><span class="co"># app.R</span></span>
 <span id="cb253-2"><a href="shiny-output.html#cb253-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb253-3"><a href="shiny-output.html#cb253-3"></a></span>
@@ -585,7 +585,7 @@ FIGURE 14.1: Custom output example
 Make sure you use unique class names so they are not accidentally overridden by the user.
 </p>
 </div>
-<p>As shown previously the box should include a title and an animated value. These could be generated entirely in JavaScript but it’s actually easier to create placeholders with htmltools tags, we generate dynamic ids for those so they can easily be referenced later on in JavaScript: <code>id-boxxy-value</code> for the value and <code>id-boxxy-title</code> for the title.</p>
+<p>As shown the box should include a title and an animated value. These could be generated entirely in JavaScript but it’s actually easier to create placeholders with htmltools tags, we generate dynamic ids for those so they can easily be referenced later on in JavaScript: <code>id-boxxy-value</code> for the value and <code>id-boxxy-title</code> for the title.</p>
 <div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb257-1"><a href="shiny-output.html#cb257-1"></a>boxxyOutput &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
 <span id="cb257-2"><a href="shiny-output.html#cb257-2"></a>  <span class="co"># the HTML output</span></span>
 <span id="cb257-3"><a href="shiny-output.html#cb257-3"></a>  shiny<span class="op">::</span>tags<span class="op">$</span><span class="kw">div</span>(</span>
@@ -676,7 +676,7 @@ Make sure you use unique class names so they are not accidentally overridden by 
 <p>Here we create an “output binding,” it tells Shiny how to find the component and how to interact with it. An output binding is initialised from <code>Shiny.OutputBinding</code>. Below we initialise a new binding.</p>
 <div class="sourceCode" id="cb264"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb264-1"><a href="shiny-output.html#cb264-1"></a><span class="co">// custom.js</span></span>
 <span id="cb264-2"><a href="shiny-output.html#cb264-2"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span></code></pre></div>
-<p>Then, this must be “extended” by specifying a number of methods, a very necessary one being <code>find</code>. It is used to look for the output HTML element in the document (<code>scope</code>), and return them as an array (<code>HTMLcollection</code>). Other methods all take an <code>el</code> argument; that value will always be an element that was returned from <code>find</code>. A very straightforward way to accomplish this is to use jQuery’s find method to identify elements with the <code>boxxy</code> class used in <code>boxxyOutput</code>. You are by no means forced to use a CSS class to identify the elements but there is no reason not to.</p>
+<p>Then, this must be “extended” by specifying a number of methods, an essential one being <code>find</code>. It is used to look for the output HTML element in the document (<code>scope</code>), and return them as an array (<code>HTMLcollection</code>). Other methods all take an <code>el</code> argument; that value will always be an element that was returned from <code>find</code>. A very straightforward way to accomplish this is to use jQuery’s find method to identify elements with the <code>boxxy</code> class used in <code>boxxyOutput</code>. You are by no means forced to use a CSS class to identify the elements but there is no reason not to.</p>
 <div class="sourceCode" id="cb265"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb265-1"><a href="shiny-output.html#cb265-1"></a><span class="co">// custom.js</span></span>
 <span id="cb265-2"><a href="shiny-output.html#cb265-2"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
 <span id="cb265-3"><a href="shiny-output.html#cb265-3"></a></span>
@@ -685,13 +685,13 @@ Make sure you use unique class names so they are not accidentally overridden by 
 <span id="cb265-6"><a href="shiny-output.html#cb265-6"></a>    <span class="cf">return</span> <span class="at">$</span>(scope).<span class="at">find</span>(<span class="st">&quot;.boxxy&quot;</span>)<span class="op">;</span></span>
 <span id="cb265-7"><a href="shiny-output.html#cb265-7"></a>  <span class="op">}</span></span>
 <span id="cb265-8"><a href="shiny-output.html#cb265-8"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
-<p>One might then want to use the <code>getId</code> method which returns the <code>id</code> of the element, by default, as can be seen in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js">source code</a> (below), the binding returns the id as the <code>data-input-id</code> attribute and if that is falsy it returns the element’s <code>id</code>.</p>
+<p>One might then want to use the <code>getId</code> method which returns the <code>id</code> of the element, by default, as can be seen in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/output_binding.js">source code</a> (below), the binding returns the id as the <code>data-input-id</code> attribute, and if that is falsy it returns the element’s <code>id</code>.</p>
 <div class="sourceCode" id="cb266"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb266-1"><a href="shiny-output.html#cb266-1"></a><span class="co">// getId default</span></span>
 <span id="cb266-2"><a href="shiny-output.html#cb266-2"></a><span class="kw">this</span>.<span class="at">getId</span> <span class="op">=</span> <span class="kw">function</span>(el) <span class="op">{</span></span>
 <span id="cb266-3"><a href="shiny-output.html#cb266-3"></a>  <span class="cf">return</span> el[<span class="st">&#39;data-input-id&#39;</span>] <span class="op">||</span> <span class="va">el</span>.<span class="at">id</span><span class="op">;</span></span>
 <span id="cb266-4"><a href="shiny-output.html#cb266-4"></a><span class="op">}</span></span></code></pre></div>
 <p>Since boxxy uses the element id the default will work and this can be skipped entirely.</p>
-<p>Next, one needs to implement the <code>renderValue</code> function which is the very function that generates the output based on data used in <code>boxxy</code> and sent to the front-end with <code>renderBoxxy</code>. The <code>renderValue</code> method accepts two arguments, first <code>el</code> the element where the output should be generated, this is effectively the output of <code>boxxyOutput</code> which the binding found using <code>find</code>, the second argument is <code>data</code> which is the data passed to <code>boxxy</code> and serialised via <code>renderBoxxy</code>.</p>
+<p>Next, one needs to implement the <code>renderValue</code> function which is the same function that generates the output based on data used in <code>boxxy</code> and sent to the front-end with <code>renderBoxxy</code>. The <code>renderValue</code> method accepts two arguments, first <code>el</code> the element where the output should be generated, this is effectively the output of <code>boxxyOutput</code> which the binding found using <code>find</code>, the second argument is <code>data</code> which is the data passed to <code>boxxy</code> and serialised via <code>renderBoxxy</code>.</p>
 <div class="rmdnote">
 <p>
 The <code>renderValue</code> is in effect very similar if not identical to the JavaScript function of the same name involved in creating htmlwidgets.
@@ -699,7 +699,7 @@ The <code>renderValue</code> is in effect very similar if not identical to the J
 </div>
 <div id="shiny-output-boxxy-title" class="section level3" number="14.6.1">
 <h3><span class="header-section-number">14.6.1</span> Boxxy Title</h3>
-<p>Let’s now tackle the first of the three core aspect of the boxxy output: the title. The <code>title</code> should be placed in the previously created placeholder which bears the <code>id-boxxy-title</code>; exactly as was done with htmlwidgets previously we insert title (<code>data.title</code>) in the element with <code>innerText</code>. The dynamically generated id for the title is built in the same way it is in R, by concatenating the <code>id</code> with <code>-boxxy-title</code></p>
+<p>Let us now tackle the first of the three core aspect of the boxxy output: the title. The <code>title</code> should be placed in the previously created placeholder which bears the <code>id-boxxy-title</code>; precisely as was done with htmlwidgets previously we insert title (<code>data.title</code>) in the element with <code>innerText</code>. The dynamically generated id for the title is built in the same way it is in R, by concatenating the <code>id</code> with <code>-boxxy-title</code></p>
 <ul>
 <li>In R <code>sprintf("%s-boxxy-title", id)</code></li>
 <li>In JavaScript <code>el.id + '-boxxy-title'</code></li>
@@ -891,8 +891,8 @@ FIGURE 14.2: Shiny application with boxxy
 </div>
 <div id="shiny-output-inject" class="section level2" number="14.8">
 <h2><span class="header-section-number">14.8</span> Injecting Dependencies</h2>
-<p>We could consider making the animation of the value rendered with <code>boxxy</code> optional, some users may not want to use it. You might already imagine how a new argument and a few if statements could very easily do the job, but how would one handle the dependency? Surely if users do not want to make use of the animation the CountUp.js dependency should also be excluded so as to keep the output as light as possible.</p>
-<p>The dependency is currently attached in the <code>boxxyOutput</code> function which does not take any argument, it could but it would make for rather messy and confusing interface as whatever additional argument that indicates whether the numbers should be animated would have be specified twice, once in the <code>boxxyOutput</code> function so it does not import the dependency as well as in the <code>boxxy</code> function in order to serialise that parameter so the JavaScript binding does not run the animation function.</p>
+<p>We could consider making the animation of the value rendered with <code>boxxy</code> optional; some users may not want to use it. You might already imagine how a new argument and a few if statements could very quickly do the job, but how would one handle the dependency? Indeed if users do not want to make use of the animation, the CountUp.js dependency should also be excluded so as to keep the output as light as possible.</p>
+<p>The dependency is currently attached in the <code>boxxyOutput</code> function which does not take any argument, it could, but it would make for the rather messy and confusing interface as whatever additional argument that indicates whether the numbers should be animated would have to be specified twice, once in the <code>boxxyOutput</code> function, so it does not import the dependency as well as in the <code>boxxy</code> function in order to serialise that parameter, so the JavaScript binding does not run the animation function.</p>
 <div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb273-1"><a href="shiny-output.html#cb273-1"></a><span class="co"># pseudo code</span></span>
 <span id="cb273-2"><a href="shiny-output.html#cb273-2"></a><span class="co"># do not do this</span></span>
 <span id="cb273-3"><a href="shiny-output.html#cb273-3"></a><span class="kw">library</span>(shiny)</span>
@@ -914,7 +914,7 @@ FIGURE 14.2: Shiny application with boxxy
 <span id="cb273-19"><a href="shiny-output.html#cb273-19"></a></span>
 <span id="cb273-20"><a href="shiny-output.html#cb273-20"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>Thankfully there is a better way, combining htmltools and shiny to insert the dependency dynamically from JavaScript.</p>
-<p>The <code>boxxy</code> function needs to take an additional argument <code>animate</code> which is passed to the output list. This will be used in the <code>render</code> function (and JavaScript binding) to dynamically render the dependency.</p>
+<p>The <code>boxxy</code> function needs to take an additional argument <code>animate</code> which is passed to the output list. This will be used in the <code>render</code> function (and JavaScript binding) to render the dependency dynamically.</p>
 <div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb274-1"><a href="shiny-output.html#cb274-1"></a>boxxy &lt;-<span class="st"> </span><span class="cf">function</span>(title, value, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">aniamte =</span> <span class="ot">TRUE</span>){</span>
 <span id="cb274-2"><a href="shiny-output.html#cb274-2"></a>  <span class="kw">list</span>(<span class="dt">title =</span> title, <span class="dt">value =</span> value, <span class="dt">color =</span> color, <span class="dt">animate =</span> animate)</span>
 <span id="cb274-3"><a href="shiny-output.html#cb274-3"></a>}</span></code></pre></div>
@@ -941,7 +941,7 @@ FIGURE 14.2: Shiny application with boxxy
 <span id="cb275-20"><a href="shiny-output.html#cb275-20"></a></span>
 <span id="cb275-21"><a href="shiny-output.html#cb275-21"></a>  htmltools<span class="op">::</span><span class="kw">attachDependencies</span>(el, deps)</span>
 <span id="cb275-22"><a href="shiny-output.html#cb275-22"></a>}</span></code></pre></div>
-<p>The <code>renderBoxxy</code> function sees quite some modifications, while before it was technically only returning a function that itself returned the output of <code>boxxy</code> (<code>func() == boxxy()</code>). Here we want to capture the output of <code>boxxy</code> to check whether the <code>animate</code> element is <code>TRUE</code> and if so add the dependency.</p>
+<p>The <code>renderBoxxy</code> function sees quite some modifications, while before it was technically only returning a function that itself returned the output of <code>boxxy</code> (<code>func() == boxxy()</code>). Here we want to capture the output of <code>boxxy</code> to check whether the <code>animate</code> element is <code>TRUE</code> and if so, add the dependency.</p>
 <div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb276-1"><a href="shiny-output.html#cb276-1"></a>renderBoxxy &lt;-<span class="st"> </span><span class="cf">function</span>(expr, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), </span>
 <span id="cb276-2"><a href="shiny-output.html#cb276-2"></a>  <span class="dt">quoted =</span> <span class="ot">FALSE</span>) {</span>
 <span id="cb276-3"><a href="shiny-output.html#cb276-3"></a>  <span class="co"># Convert the expression + environment into a function</span></span>
@@ -957,13 +957,13 @@ FIGURE 14.2: Shiny application with boxxy
 <span id="cb276-13"><a href="shiny-output.html#cb276-13"></a>    <span class="kw">return</span>(val)</span>
 <span id="cb276-14"><a href="shiny-output.html#cb276-14"></a>  }</span>
 <span id="cb276-15"><a href="shiny-output.html#cb276-15"></a>}</span></code></pre></div>
-<p>Within the <code>if</code> statement the dependency can be created with the htmltools as done for the binding. Ensure the names of the dependencies are unique as shiny internally uses it to differentiate between them, if they bear the same name shiny assumes they are the same and will only render one of them.</p>
+<p>Within the <code>if</code> statement, the dependency can be created with the htmltools as done for the binding. Ensure the names of the dependencies are unique as shiny internally uses it to differentiate between them if they bear the same name shiny assumes they are the same and will only render one of them.</p>
 <div class="rmdnote">
 <p>
 Make sure dependencies bear different names or shiny thinks it’s the same and only renders one of them.
 </p>
 </div>
-<p>The dependency generated with htmltools is then passed to the <code>shiny::createWebDependency</code> function which internally uses <code>shiny::addResourcePath</code> to serve the dependency. This is necessary here as, at this stage, the countup dependency is not actually rendered, below we merely add it to the list of options that serialised to JSON. Indeed this will actually be injected JavaScript-side, therefore the front-end needs to be able to access this file, hence it is served.</p>
+<p>The dependency generated with htmltools is then passed to the <code>shiny::createWebDependency</code> function, which internally uses <code>shiny::addResourcePath</code> to serve the dependency. This is necessary here as, at this stage, the countup dependency is not actually rendered; below we merely add it to the list of options that serialised to JSON. Indeed this will actually be injected JavaScript-side. Therefore the front-end needs to be able to access this file, hence it is served.</p>
 <div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb277-1"><a href="shiny-output.html#cb277-1"></a>renderBoxxy &lt;-<span class="st"> </span><span class="cf">function</span>(expr, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), <span class="dt">quoted =</span> <span class="ot">FALSE</span>) {</span>
 <span id="cb277-2"><a href="shiny-output.html#cb277-2"></a>  <span class="co"># Convert the expression + environment into a function</span></span>
 <span id="cb277-3"><a href="shiny-output.html#cb277-3"></a>  func &lt;-<span class="st"> </span>shiny<span class="op">::</span><span class="kw">exprToFunction</span>(expr, env, quoted)</span>
@@ -990,8 +990,8 @@ Make sure dependencies bear different names or shiny thinks it’s the same and 
 <span id="cb277-24"><a href="shiny-output.html#cb277-24"></a>    <span class="kw">return</span>(val)</span>
 <span id="cb277-25"><a href="shiny-output.html#cb277-25"></a>  }</span>
 <span id="cb277-26"><a href="shiny-output.html#cb277-26"></a>}</span></code></pre></div>
-<p>Thus far the dependency is dynamically included in the R object that is serialised to JSON but it is not yet actually imported in the document, this happens in the JavaScript binding.</p>
-<p>The first thing we ought to do is mirror the if statement that was created in the <code>renderBoxxy</code> function, if the numbers should be animated the function can use countup, if not it must insert the text with <code>insertText</code> just like it does for the <code>title</code>.</p>
+<p>Thus far, the dependency is dynamically included in the R object that is serialised to JSON, but it is not yet actually imported in the document, this happens in the JavaScript binding.</p>
+<p>The first thing we ought to do is mirror the if statement that was created in the <code>renderBoxxy</code> function if the numbers should be animated, the function can use countup, if not it must insert the text with <code>insertText</code> just like it does for the <code>title</code>.</p>
 <div class="sourceCode" id="cb278"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb278-1"><a href="shiny-output.html#cb278-1"></a><span class="kw">var</span> boxxyBinding <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">OutputBinding</span>()<span class="op">;</span></span>
 <span id="cb278-2"><a href="shiny-output.html#cb278-2"></a></span>
 <span id="cb278-3"><a href="shiny-output.html#cb278-3"></a><span class="va">$</span>.<span class="at">extend</span>(boxxyBinding<span class="op">,</span> <span class="op">{</span></span>
@@ -1038,7 +1038,7 @@ Make sure dependencies bear different names or shiny thinks it’s the same and 
 <span id="cb279-21"><a href="shiny-output.html#cb279-21"></a><span class="op">}</span>)<span class="op">;</span></span>
 <span id="cb279-22"><a href="shiny-output.html#cb279-22"></a></span>
 <span id="cb279-23"><a href="shiny-output.html#cb279-23"></a><span class="va">Shiny</span>.<span class="va">outputBindings</span>.<span class="at">register</span>(boxxyBinding<span class="op">,</span> <span class="st">&quot;john.boxxy&quot;</span>)<span class="op">;</span></span></code></pre></div>
-<p>With those changes made not only is the animation of numbers optional but if users decide to turn off the animation in all <code>boxxy</code> functions the <code>countup.js</code> file will not be included at all.</p>
+<p>With those changes made not only is the animation of numbers optional but if users decide to turn off the animation in all <code>boxxy</code> functions, the <code>countup.js</code> file will not be included at all.</p>
 <div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="shiny-output.html#cb280-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb280-2"><a href="shiny-output.html#cb280-2"></a></span>
 <span id="cb280-3"><a href="shiny-output.html#cb280-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
@@ -1067,7 +1067,7 @@ Make sure dependencies bear different names or shiny thinks it’s the same and 
 </div>
 <div id="shiny-output-preprocess" class="section level2" number="14.9">
 <h2><span class="header-section-number">14.9</span> Preprocessing Custom Outputs</h2>
-<p>One aspect that this example did not explore truly explore thus far is the idea that the function <code>boxxy</code> should preprocess the input more in order to be truly justify. Currently <code>boxxy</code> only wraps the arguments in a <code>list</code>, therefore the code below works too.</p>
+<p>One aspect that this example did not explore truly explore thus far is the idea that the function <code>boxxy</code> should preprocess the input more in order to be truly justified. Currently <code>boxxy</code> only wraps the arguments in a <code>list</code>. Therefore the code below works too.</p>
 <div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="shiny-output.html#cb281-1"></a><span class="co"># works too</span></span>
 <span id="cb281-2"><a href="shiny-output.html#cb281-2"></a>output<span class="op">$</span>theId &lt;-<span class="st"> </span><span class="kw">renderBoxxy</span>({</span>
 <span id="cb281-3"><a href="shiny-output.html#cb281-3"></a>  <span class="kw">list</span>(<span class="dt">title =</span> <span class="st">&quot;The Title&quot;</span>, <span class="dt">value =</span> <span class="dv">123</span>, <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">animate =</span> <span class="ot">TRUE</span>)</span>

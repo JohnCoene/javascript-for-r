@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-10-25" />
+<meta name="date" content="2020-10-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -488,14 +488,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="shiny-intro" class="section level1" number="11">
 <h1><span class="header-section-number">Chapter 11</span> Bidirectional Communication</h1>
-<p>Shiny is the web framework of choice for the R programming language. Since JavaScript and Shiny both run in web browsers it follows that they can run alongside one another as one can include JavaScript in such applications. Yet, often disregarded is the ability for Shiny’s R server to communicate to the front-end and vice versa. This collection of chapters aims to show precisely how this works. In this first part, we brush up on the essentials so we understand how to include JavaScript in shiny applications.</p>
-<p>Then again, the goal is not to write a lot of convoluted JavaScript, on the contrary, with little knowledge of the language the aim is to write as little as possible but demonstrate to the reader that it is often enough to greatly improve the user experience of shiny applications.</p>
+<p>Shiny is the web framework of choice for the R programming language. Since JavaScript and Shiny both run in web browsers it follows that they can run alongside one another as one can include JavaScript in such applications. However, often disregarded is the ability for Shiny’s R server to communicate to the front-end and vice versa. This collection of chapters aims to show precisely how this works. In this first part, we brush up on the essentials, so we understand how to include JavaScript in shiny applications.</p>
+<p>Then again, the goal is not to write a lot of convoluted JavaScript, on the contrary, with little knowledge of the language the aim is to write as little as possible but demonstrate to the reader that it is often enough to vastly improve the user experience of shiny applications.</p>
 <div id="shiny-intro-websocket" class="section level2" number="11.1">
 <h2><span class="header-section-number">11.1</span> Websocket &amp; Shiny</h2>
-<p>Shiny applications have two components the user interface (UI) and the server function. These two components communicate via a websocket: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server this connection is managed by shiny using the httpuv <span class="citation">(Cheng and Chang <a href="#ref-R-httpuv" role="doc-biblioref">2020</a>)</span> and websocket <span class="citation">(Chang, Cheng, Dipert, et al. <a href="#ref-R-websocket" role="doc-biblioref">2020</a>)</span> packages, while in clients connecting to the server this connection is managed with JavaScript.</p>
+<p>Shiny applications have two components the user interface (UI) and the server function. These two components communicate via a WebSocket: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server this connection is managed by shiny using the httpuv <span class="citation">(Cheng and Chang <a href="#ref-R-httpuv" role="doc-biblioref">2020</a>)</span> and WebSocket <span class="citation">(Chang, Cheng, Dipert, et al. <a href="#ref-R-websocket" role="doc-biblioref">2020</a>)</span> packages, while in clients connecting to the server this connection is managed with JavaScript.</p>
 <div id="htmlwidget-6558291fcab5cb0bf4f6" style="width:100%;height:576px;" class="grViz html-widget"></div>
 <script type="application/json" data-for="htmlwidget-6558291fcab5cb0bf4f6">{"x":{"diagram":"\ndigraph{\n  node [shape=record fontsize=10];\n\n  w1 [label=Websocket];\n  w2 [label=Websocket];\n  w3 [label=Websocket];\n  w4 [label=Websocket];\n\n  b1 [label=\"Browser\" color=gold];\n  b2 [label=\"Browser\" color=gold];\n  b3 [label=\"Browser\" color=gold];\n  b4 [label=\"Browser\" color=gold];\n\n  s [label=\"R server\" color=royalBlue];\n\n  s -> w1 -> b1 [dir=both color=dimGray arrowsize=.3];\n  s -> w2 -> b2 [dir=both color=dimGray arrowsize=.3];\n  s -> w3 -> b3 [dir=both color=dimGray arrowsize=.3];\n  s -> w4 -> b4 [dir=both color=dimGray arrowsize=.3];\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
-<p>With that in mind we can put together a shiny applications which though simple exploits bi-directional communication. The application takes a text input, sends the value of the input to the R server which sends it back to the UI.</p>
+<p>With that in mind, we can put together a shiny application which though simple exploits bi-directional communication. The application takes a text input, sends the value of the input to the R server which sends it back to the UI.</p>
 <div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb194-1"><a href="shiny-intro.html#cb194-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb194-2"><a href="shiny-intro.html#cb194-2"></a></span>
 <span id="cb194-3"><a href="shiny-intro.html#cb194-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
@@ -517,12 +517,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="shiny-intro-example" class="section level2" number="11.2">
 <h2><span class="header-section-number">11.2</span> Alerts, an example</h2>
-<p>Let’s exploit an external library to demonstrate how this works: <a href="https://github.com/StephanWagner/jBox">jBox</a> allows displaying “notices,” similar to vanilla JavaScript alerts, but much better looking and with additional functionalities.</p>
-<p>The grand scheme is to build an application that displays a notification at the click of an <code>actionButton</code> and “tells” the server when that notification is closed. Though the introduction of this book includes best practices on how to include dependencies and JavaScript files much of that will be disregarded in this section (and only in this section) so it does not get in the way of explaining bidirectional communication through the websocket in shiny.</p>
-<p>Moreover, the jBox library comes with numerous features to display tooltips, modals, notices, and more, which would make for too long a chapter; only notices shall be covered here. Let’s first take a look at the code that generates a jBox notice.</p>
+<p>Let us exploit an external library to demonstrate how this works: <a href="https://github.com/StephanWagner/jBox">jBox</a> allows displaying “notices,” similar to vanilla JavaScript alerts but much better looking and with additional functionalities.</p>
+<p>The grand scheme is to build an application that displays a notification at the click of an <code>actionButton</code> and “tells” the server when it is closed. Though the introduction of this book includes best practices on how to include dependencies and JavaScript files much of that will be disregarded in this section (and only in this section). That is only so it does not get in the way of explaining bidirectional communication through the WebSocket in shiny.</p>
+<p>Moreover, the jBox library comes with numerous features to display tooltips, modals, notices, and more, which would make for too long a chapter; only notices shall be covered here. Let us first take a look at the code that generates a jBox notice.</p>
 <div id="shiny-intro-explore" class="section level3" number="11.2.1">
 <h3><span class="header-section-number">11.2.1</span> Explore</h3>
-<p>Below we build an extremely basic example that features jBox in HTML, it includes the dependencies and a short script that displays a notification when the page is loaded.</p>
+<p>Below we build an elementary example that features jBox in HTML; it includes the dependencies and a short script that displays a notification when the page is loaded.</p>
 <div class="sourceCode" id="cb195"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb195-1"><a href="shiny-intro.html#cb195-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
 <span id="cb195-2"><a href="shiny-intro.html#cb195-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
 <span id="cb195-3"><a href="shiny-intro.html#cb195-3"></a><span class="kw">&lt;head&gt;</span></span>
@@ -546,7 +546,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb195-21"><a href="shiny-intro.html#cb195-21"></a>  <span class="kw">&lt;/script&gt;</span></span>
 <span id="cb195-22"><a href="shiny-intro.html#cb195-22"></a><span class="kw">&lt;/body&gt;</span></span>
 <span id="cb195-23"><a href="shiny-intro.html#cb195-23"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
-<p>The very first thing one should do is to recreate this basic example in shiny so that when the app is loaded the notification appear, we will make this work with the bidirectional websocket communication afterwards. The “j” in jBox stands for jQuery which is already a dependency of shiny itself, there is therefore no need to import it, on the contrary one should not in order to avoid clashes.</p>
+<p>The very first thing one should do is to recreate this basic example in shiny so that when the app is loaded the notification appear, we will make this work with the bidirectional WebSocket communication afterwards. The “j” in jBox stands for jQuery which is already a dependency of shiny itself, there is, therefore, no need to import it, on the contrary one should not in order to avoid clashes.</p>
 <div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="shiny-intro.html#cb196-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb196-2"><a href="shiny-intro.html#cb196-2"></a></span>
 <span id="cb196-3"><a href="shiny-intro.html#cb196-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
@@ -581,7 +581,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 FIGURE 11.1: A basic jBox notice
 </p>
 </div>
-<p>The application above essentially reproduces the basic HTML example that was shared; the dependencies are imported and a script displays a notification. Since all of that takes place in the front-end the body of the server function is empty.</p>
+<p>The application above essentially reproduces the basic HTML example that was shared; the dependencies are imported, and a script displays a notification. Since all of that takes place in the front-end, the body of the server function is empty.</p>
 </div>
 <div id="shiny-intro-r-to-js" class="section level3" number="11.2.2">
 <h3><span class="header-section-number">11.2.2</span> From R to JavaScript</h3>
@@ -594,8 +594,8 @@ FIGURE 11.1: A basic jBox notice
 <span id="cb197-4"><a href="shiny-intro.html#cb197-4"></a>    <span class="dt">type =</span> <span class="st">&quot;send-notice&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Hi there!&quot;</span></span>
 <span id="cb197-5"><a href="shiny-intro.html#cb197-5"></a>  )</span>
 <span id="cb197-6"><a href="shiny-intro.html#cb197-6"></a>}</span></code></pre></div>
-<p>So while the above sends the message to JavaScript through the websocket nothing is yet to be done with that message once it arrives in the client. We can add a “handler” for the identifier we defined (<code>send-notice</code>) which will do something with the message we sent from the server. This is done with the <code>addCustomMessageHandler</code> method from the <code>Shiny</code> object where the first argument is the identifier and the second is the function that handles the message, a function that takes a single argument: the data sent from the server.</p>
-<p>Below we add the handler for messages of type <code>send-notice</code>, the handler itself is a function that accepts the messages that was sent from the server and uses it to generate the notice via jBox.</p>
+<p>So while the above sends the message to JavaScript through the WebSocket, nothing is yet to be done with that message once it arrives in the client. We can add a “handler” for the identifier we defined (<code>send-notice</code>) which will do something with the message we sent from the server. This is done with the <code>addCustomMessageHandler</code> method from the <code>Shiny</code> object where the first argument is the identifier and the second is the function that handles the message, a function that takes a single argument: the data sent from the server.</p>
+<p>Below we add the handler for messages of type <code>send-notice</code>, the handler itself is a function that accepts the messages that were sent from the server and uses it to generate the notice via jBox.</p>
 <div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="shiny-intro.html#cb198-1"></a>tags<span class="op">$</span><span class="kw">script</span>(</span>
 <span id="cb198-2"><a href="shiny-intro.html#cb198-2"></a>  <span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
 <span id="cb198-3"><a href="shiny-intro.html#cb198-3"></a><span class="st">    type = &#39;send-notice&#39;, function(message) {</span></span>
@@ -655,16 +655,16 @@ FIGURE 11.2: [A notice triggered by the server
 <p>In the application above, notice the path that the message follows: it goes from the client (user input) to the server (<code>observeEvent</code>) which sends (<code>sendCustomMessage</code>) it back to the client.</p>
 <div id="htmlwidget-0ec891ae58751dc088b9" style="width:100%;height:576px;" class="grViz html-widget"></div>
 <script type="application/json" data-for="htmlwidget-0ec891ae58751dc088b9">{"x":{"diagram":"\ndigraph{\n  graph [rankdir=LR]\n  node [shape=record fontsize=10];\n\n  subgraph cluster_0 {\n    textInput\n    handler [label=\"message handler\"]\n    notice [label = \"show notice\"]\n    label=\"Client\"\n    color=gold\n  }\n\n  subgraph cluster_1 {\n    send[label=\"sendCustomMessage\"]\n    label=\"Server\"\n    color=royalBlue\n  }\n\n  textInput -> send [label=\"value\"];\n  send -> handler [label=\"message\"];\n  handler -> notice;\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
-<p>This might be considered suboptimal by some as it is not necessary to use the server as intermediary (in this example at least). Though there is some truth to this the above will work perfectly fine—and the aim here is to make JavaScript work with R—not alongside it, the websocket is very efficient and this will not have much overhead at all.</p>
+<p>This might be considered suboptimal by some as it is not necessary to use the server as an intermediary (in this example at least). Though there is some truth to this the above will work perfectly fine—and the aim here is to make JavaScript work with R—not alongside it, the WebSocket is very efficient, and this will not have much overhead at all.</p>
 </div>
 <div id="shiny-intro-serialise" class="section level3" number="11.2.3">
 <h3><span class="header-section-number">11.2.3</span> Serialisation</h3>
-<p>Let’s delve deeper into the data that is sent from the server to the front-end to understand how we can further customise the notice displayed, e.g.: change the colour.</p>
+<p>Let us delve deeper into the data that is sent from the server to the front-end to understand how we can further customise the notice displayed, e.g. change the colour.</p>
 <div class="sourceCode" id="cb200"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb200-1"><a href="shiny-intro.html#cb200-1"></a><span class="kw">new</span> <span class="at">jBox</span>(<span class="st">&#39;Notice&#39;</span><span class="op">,</span> <span class="op">{</span></span>
 <span id="cb200-2"><a href="shiny-intro.html#cb200-2"></a>  <span class="dt">content</span><span class="op">:</span> <span class="st">&#39;Hurray! A notice!&#39;</span><span class="op">,</span></span>
 <span id="cb200-3"><a href="shiny-intro.html#cb200-3"></a>  <span class="dt">color</span><span class="op">:</span> <span class="st">&#39;red&#39;</span></span>
 <span id="cb200-4"><a href="shiny-intro.html#cb200-4"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
-<p>The jBox notice is configured using a JSON object containing the options that define said notice to display (example above), including but not limited to the message. The most straightforward way to make all those options accessible to the server is to construct that list of options server-side before sending it to the the front-end. For instance the JSON of options displayed above would look like the R list below.</p>
+<p>The jBox notice is configured using a JSON object containing the options that define said notice to display (example above), including but not limited to the message. The most straightforward way to make all those options accessible to the server is to construct that list of options server-side before sending it to the front-end. For instance, the JSON of options displayed above would look like the R list below.</p>
 <div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="shiny-intro.html#cb201-1"></a>options &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
 <span id="cb201-2"><a href="shiny-intro.html#cb201-2"></a>  <span class="dt">content =</span> <span class="st">&#39;Hurray! A notice!&#39;</span>,</span>
 <span id="cb201-3"><a href="shiny-intro.html#cb201-3"></a>  <span class="dt">color =</span> <span class="st">&#39;red&#39;</span></span>
@@ -720,8 +720,8 @@ FIGURE 11.3: Customised jBox notice
 </div>
 <div id="shiny-intro-js2r" class="section level3" number="11.2.4">
 <h3><span class="header-section-number">11.2.4</span> JavaScript to R</h3>
-<p>Thus far we have covered how to pass data from the R server to JavaScript in order to display a notification but we have yet to make the data travel the other way: from JavaScript to R. In this example we would like to send data from JavaScript to R when the notice is closed (either by itself or the user).</p>
-<p>One very common way that such feedback is enabled in JavaScript is through events and callback functions which are triggered upon an action being performed by the user (like the click of a button) or when other interesting things happen in the code. jBox provides numerous such <a href="https://stephanwagner.me/jBox/options#events">events</a> so functions can be used when a modal is created or when a notice is closed for instance.</p>
+<p>Thus far we have covered how to pass data from the R server to JavaScript in order to display a notification, but we have yet to make the data travel the other way: from JavaScript to R. In this example we would like to send data from JavaScript to R when the notice is closed (either by itself or the user).</p>
+<p>One ubiquitous way that such feedback is enabled in JavaScript is through events and callback functions which are triggered upon an action being performed by the user (like the click of a button) or when other interesting things happen in the code. jBox provides numerous such <a href="https://stephanwagner.me/jBox/options#events">events</a> so functions can be used when a modal is created or when a notice is closed, for instance.</p>
 <p>The concept of the callback function is not totally foreign to R albeit rarely used. For instance, shiny comes with this feature, <code>shiny::onStop</code> and <code>shiny::onStart</code>. These allow having functions run when the application starts or exits, very useful to clean up and close database connections when the app exits.</p>
 <div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb203-1"><a href="shiny-intro.html#cb203-1"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
 <span id="cb203-2"><a href="shiny-intro.html#cb203-2"></a>  shiny<span class="op">::</span><span class="kw">onStop</span>(</span>
@@ -739,7 +739,7 @@ FIGURE 11.3: Customised jBox notice
 <span id="cb204-5"><a href="shiny-intro.html#cb204-5"></a>    <span class="va">console</span>.<span class="at">log</span>(<span class="st">&#39;Alert is closed&#39;</span>)<span class="op">;</span></span>
 <span id="cb204-6"><a href="shiny-intro.html#cb204-6"></a>  <span class="op">}</span></span>
 <span id="cb204-7"><a href="shiny-intro.html#cb204-7"></a><span class="op">}</span></span></code></pre></div>
-<p>This raises one issue, one cannot truly serialise to executable code. The attempt below serialises the function to a string that <em>will not</em> be evaluated in JavaScript, just like <code>"function(x){ x + 1 }"</code> is not evaluated in R: it’s not a function, it’s a string.</p>
+<p>This raises one issue; one cannot truly serialise to executable code. The attempt below serialises the function to a string that <em>will not</em> be evaluated in JavaScript, just like <code>"function(x){ x + 1 }"</code> is not evaluated in R: it is not a function, it is a string.</p>
 <div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="shiny-intro.html#cb205-1"></a><span class="co"># try to serialise an R function</span></span>
 <span id="cb205-2"><a href="shiny-intro.html#cb205-2"></a>jsonlite<span class="op">::</span><span class="kw">toJSON</span>(<span class="st">&quot;function(x){x + 1}&quot;</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb205-3"><a href="shiny-intro.html#cb205-3"></a><span class="co">#&gt; &quot;function(x){x + 1}&quot;</span></span></code></pre></div>
@@ -752,15 +752,15 @@ FIGURE 11.3: Customised jBox notice
 <span id="cb206-6"><a href="shiny-intro.html#cb206-6"></a><span class="st">    }</span></span>
 <span id="cb206-7"><a href="shiny-intro.html#cb206-7"></a><span class="st">    new jBox(&#39;Notice&#39;, message);</span></span>
 <span id="cb206-8"><a href="shiny-intro.html#cb206-8"></a><span class="st">});&quot;</span>)</span></code></pre></div>
-<p>Placing a function inside a JSON object is common in JavaScript, in contrast with R where though it works is rarely if ever done (reference class/R6 are somewhat similar). The above JavaScript code to append the callback function could look something like the snippet below in R.</p>
+<p>Placing a function inside a JSON object is expected in JavaScript, in contrast with R where though it works is rarely if ever done (reference class/R6 are somewhat similar). The above JavaScript code to append the callback function could look something like the snippet below in R.</p>
 <div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="shiny-intro.html#cb207-1"></a>message &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">content =</span> <span class="st">&quot;hello&quot;</span>)</span>
 <span id="cb207-2"><a href="shiny-intro.html#cb207-2"></a>message<span class="op">$</span>onClose &lt;-<span class="st"> </span><span class="cf">function</span>(msg){</span>
 <span id="cb207-3"><a href="shiny-intro.html#cb207-3"></a>  <span class="kw">print</span>(msg)</span>
 <span id="cb207-4"><a href="shiny-intro.html#cb207-4"></a>}</span>
 <span id="cb207-5"><a href="shiny-intro.html#cb207-5"></a>message<span class="op">$</span><span class="kw">onClose</span>(<span class="st">&quot;Closing!&quot;</span>)</span>
 <span id="cb207-6"><a href="shiny-intro.html#cb207-6"></a><span class="co">#&gt; [1] &quot;Closing!&quot;</span></span></code></pre></div>
-<p>This explains how the event is used in jBox (and many other libraries) but the body of the callback used previously is empty and therefore will not do anything: we need it to send data back to the R server so it can be notified when the notice is closed.</p>
-<p>This can be done by defining a simplified shiny input. While the book will eventually cover fully-fledged shiny inputs that can be registered, updated, and more, there is also a simplified version of the latter which allows sending reactive input values to the server where it can be used just like any other inputs (<code>input$id</code>). The value of the input can be defined using the <code>setInputValue</code> method which takes the <code>id</code> of the input and the <code>value</code> to give it.</p>
+<p>This explains how the event is used in jBox (and many other libraries), but the body of the callback used previously is empty and therefore will not do anything: we need it to send data back to the R server so it can be notified when the notice is closed.</p>
+<p>This can be done by defining a simplified shiny input. While the book will eventually cover fully-fledged shiny inputs that can be registered, updated, and more, there is also a simplified version of the latter which allows sending reactive input values to the server where it can be used just like any other inputs (<code>input$id</code>). The value of the input can be defined using the <code>setInputValue</code> method, which takes the <code>id</code> of the input and the <code>value</code> to give it.</p>
 <p>Below place <code>Shiny.setInputValue('notice_close', true)</code> in the body of the function so the input <code>input$notice_close</code> will be set to <code>TRUE</code> when the notice closes.</p>
 <div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="shiny-intro.html#cb208-1"></a>tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
 <span id="cb208-2"><a href="shiny-intro.html#cb208-2"></a><span class="st">  type = &#39;send-alert&#39;, function(message) {</span></span>
@@ -770,8 +770,8 @@ FIGURE 11.3: Customised jBox notice
 <span id="cb208-6"><a href="shiny-intro.html#cb208-6"></a><span class="st">    }</span></span>
 <span id="cb208-7"><a href="shiny-intro.html#cb208-7"></a><span class="st">    new jBox(&#39;Notice&#39;, message);</span></span>
 <span id="cb208-8"><a href="shiny-intro.html#cb208-8"></a><span class="st">});&quot;</span>)</span></code></pre></div>
-<p>However Shiny internally optimises how those values are set. First, if the input is set to the same value then Shiny ignores it. This is fine if you are interested in the actual value of the input but will not work as expected if the input is to be used as event. Indeed if you want to use this input in an <code>observe</code>, <code>observeEvent</code>, or <code>eventReactive</code>, you want it to be triggered every time the input changes, regardless of whether that value is the same as before. The second optimisation Shiny does is when the input is set to multiple different values before these have been processed then only the most recent value will actually be sent to the server.</p>
-<p>One can opt-out of these optimisations using the <code>priority: "event"</code> option when setting the input value which is what we shall do here. We are not interested in the actual value of that input <code>TRUE</code>, we want to make sure the server gets notified every time a notification closes and given the optimisations it will not since. The first time the event will be fired the input will be set from <code>NULL</code> to <code>TRUE</code> but every subsequent notification that close will not fired that event since the value will not change (it’s always sending <code>TRUE</code> to the server).</p>
+<p>However, Shiny internally optimises how those values are set. First, if the input is set to the same value, then Shiny ignores it. This is fine if you are interested in the actual value of the input but will not work as expected if the input is to be used as an event. Indeed if you want to use this input in an <code>observe</code>, <code>observeEvent</code>, or <code>eventReactive</code>, you want it to be triggered every time the input changes, regardless of whether that value is the same as before. The second optimisation Shiny does is when the input is set to multiple different values before these have been processed then only the most recent value will actually be sent to the server.</p>
+<p>One can opt-out of these optimisations using the <code>priority: "event"</code> option when setting the input value, which is what we shall do here. We are not interested in the actual value of that input <code>TRUE</code>; we want to make sure the server gets notified every time a notification closes and given the optimisations, it will not since. The first time the event will be fired the input will be set from <code>NULL</code> to <code>TRUE</code> but every subsequent notification that close will not fire that event since the value will not change (it’s always sending <code>TRUE</code> to the server).</p>
 <div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="shiny-intro.html#cb209-1"></a>tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
 <span id="cb209-2"><a href="shiny-intro.html#cb209-2"></a><span class="st">  type = &#39;send-alert&#39;, function(message) {</span></span>
 <span id="cb209-3"><a href="shiny-intro.html#cb209-3"></a><span class="st">    // append callback</span></span>
@@ -780,7 +780,7 @@ FIGURE 11.3: Customised jBox notice
 <span id="cb209-6"><a href="shiny-intro.html#cb209-6"></a><span class="st">    }</span></span>
 <span id="cb209-7"><a href="shiny-intro.html#cb209-7"></a><span class="st">    new jBox(&#39;Notice&#39;, message);</span></span>
 <span id="cb209-8"><a href="shiny-intro.html#cb209-8"></a><span class="st">});&quot;</span>)</span></code></pre></div>
-<p>That done it can be incorporated into the application built thus far. Something interesting could be done server-side but to keep things brief and simple we merely print the value of the input to the R console.</p>
+<p>That done it can be incorporated into the application built thus far. Something interesting could be done server-side but to keep things brief and straightforward, we merely print the value of the input to the R console.</p>
 <div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="shiny-intro.html#cb210-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb210-2"><a href="shiny-intro.html#cb210-2"></a></span>
 <span id="cb210-3"><a href="shiny-intro.html#cb210-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
@@ -841,7 +841,7 @@ FIGURE 11.3: Customised jBox notice
 FIGURE 11.4: jBox final application
 </p>
 </div>
-<p>In the next chapter we will build another application that makes use of bidirectional communication but also introduces a few more concepts to improve how such communication takes place and allows passing more complex messages from R to JavaScript and vice versa.</p>
+<p>In the next chapter, we will build another application that makes use of bidirectional communication but also introduces a few more concepts to improve how such communication takes place and allows passing more complex messages from R to JavaScript and vice versa.</p>
 
 </div>
 </div>

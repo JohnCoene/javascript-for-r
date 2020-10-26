@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-10-25" />
+<meta name="date" content="2020-10-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -488,11 +488,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="shiny-cookies" class="section level1" number="16">
 <h1><span class="header-section-number">Chapter 16</span> Cookies</h1>
-<p>In this chapter we scout yet another great example of how JavaScript can enhance shiny applications. We use an HTTP cookie, a small piece of data sent from a application and stored in the user’s web browser, to track users returning to a shiny application.</p>
-<p>The application will prompt users to input their name, this will be stored in a cookie so that on their next visit they are welcomed to the app with a personalised message. Cookies are natively supported by web browsers and JavaScript, though we will use a library which greatly eases their handling: <a href="https://github.com/js-cookie/js-cookie">js-cookie</a>.</p>
+<p>In this chapter, we scout yet another excellent example of how JavaScript can enhance shiny applications. We use an HTTP cookie, a small piece of data sent from an application and stored in the user’s web browser, to track users returning to a shiny application.</p>
+<p>The application will prompt users to input their name; this will be stored in a cookie so that on their next visit, they are welcomed to the app with a personalised message. Cookies are natively supported by web browsers and JavaScript, though we will use a library which greatly eases their handling: <a href="https://github.com/js-cookie/js-cookie">js-cookie</a>.</p>
 <div id="shiny-cookies-discover" class="section level2" number="16.1">
 <h2><span class="header-section-number">16.1</span> Discover js-cookie</h2>
-<p>The library is at its core very straightforward, it exports a <code>Cookie</code> object from which one can access the <code>set</code>, <code>get</code>, and <code>remove</code> methods.</p>
+<p>The library is at its core very straightforward; it exports a <code>Cookie</code> object from which one can access the <code>set</code>, <code>get</code>, and <code>remove</code> methods.</p>
 <div class="sourceCode" id="cb307"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb307-1"><a href="shiny-cookies.html#cb307-1"></a><span class="co">// set a cookie</span></span>
 <span id="cb307-2"><a href="shiny-cookies.html#cb307-2"></a><span class="va">Cookies</span>.<span class="at">set</span>(<span class="st">&#39;name&#39;</span><span class="op">,</span> <span class="st">&#39;value&#39;</span>)</span>
 <span id="cb307-3"><a href="shiny-cookies.html#cb307-3"></a></span>
@@ -505,7 +505,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="shiny-cookies-setup" class="section level2" number="16.2">
 <h2><span class="header-section-number">16.2</span> Setup Project</h2>
-<p>Then again, it starts with the creation of a directory where we’ll place a JavaScript file containing the message handlers, we won’t download the dependency and use the CDN instead but feel free to do differently.</p>
+<p>Then again, it starts with the creation of a directory where we’ll place a JavaScript file containing the message handlers; we won’t download the dependency and use the CDN instead but feel free to do differently.</p>
 <div class="sourceCode" id="cb308"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb308-1"><a href="shiny-cookies.html#cb308-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;www&quot;</span>)</span>
 <span id="cb308-2"><a href="shiny-cookies.html#cb308-2"></a><span class="kw">file.create</span>(<span class="st">&quot;www/script.js&quot;</span>)</span></code></pre></div>
 <p>We then lay down the skeleton of the application which features a text input to capture the name of the user, a button to save the cookie in their browsers, another to remove it and finally a dynamic output that will display the personalised message.</p>
@@ -537,7 +537,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="shiny-cookies-javascript" class="section level2" number="16.3">
 <h2><span class="header-section-number">16.3</span> JavaScript Cookies</h2>
-<p>First we define a JavaScript function that retrieves the cookies and sets the result as an input named <code>cookies</code>. The reason we do so is simply because we will have to execute this in multiple places, this will become clearer in just a second.</p>
+<p>First, we define a JavaScript function that retrieves the cookies and sets the result as an input named <code>cookies</code>. The reason we do so is because we will have to execute this in multiple places; this will become clearer in just a second.</p>
 <div class="sourceCode" id="cb310"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb310-1"><a href="shiny-cookies.html#cb310-1"></a><span class="co">// script.js</span></span>
 <span id="cb310-2"><a href="shiny-cookies.html#cb310-2"></a><span class="kw">function</span> <span class="at">getCookies</span>()<span class="op">{</span></span>
 <span id="cb310-3"><a href="shiny-cookies.html#cb310-3"></a>  <span class="kw">var</span> res <span class="op">=</span> <span class="va">Cookies</span>.<span class="at">get</span>()<span class="op">;</span></span>
@@ -554,7 +554,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb311-8"><a href="shiny-cookies.html#cb311-8"></a>  <span class="va">Cookies</span>.<span class="at">remove</span>(<span class="va">msg</span>.<span class="at">name</span>)<span class="op">;</span></span>
 <span id="cb311-9"><a href="shiny-cookies.html#cb311-9"></a>  <span class="at">getCookies</span>()<span class="op">;</span></span>
 <span id="cb311-10"><a href="shiny-cookies.html#cb311-10"></a><span class="op">}</span>)</span></code></pre></div>
-<p>One more thing needs to be implemented JavaScript-side. The point of using the cookie is that when users comes back to the shiny app, even days later, they are presented with the personalised welcome message, this implies that when they open the application the input value is defined. Therefore, <code>getCookies</code> must at launch. One could be tempted to place it at the top of the JavaScript file so that it runs when it is imported but the issue there is that it will run too soon, it will run the shiny input is not yet available and fail to set it. Consequently, we instead observe the <code>shiny:connected</code> event, which is fired when the initial connection to the server is established.</p>
+<p>One more thing needs to be implemented JavaScript-side. The point of using the cookie is that when users come back to the shiny app, even days later, they are presented with the personalised welcome message, this implies that when they open the application, the input value is defined. Therefore, <code>getCookies</code> must at launch. One could be tempted to place it at the top of the JavaScript file so that it runs when it is imported but the issue there is that it will run too soon, it will run the shiny input is not yet available and fail to set it. Consequently, we instead observe the <code>shiny:connected</code> event, which is fired when the initial connection to the server is established.</p>
 <div class="sourceCode" id="cb312"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb312-1"><a href="shiny-cookies.html#cb312-1"></a><span class="co">// script.js</span></span>
 <span id="cb312-2"><a href="shiny-cookies.html#cb312-2"></a><span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:connected&#39;</span><span class="op">,</span> <span class="kw">function</span>(ev)<span class="op">{</span></span>
 <span id="cb312-3"><a href="shiny-cookies.html#cb312-3"></a>  <span class="at">getCookies</span>()<span class="op">;</span></span>
@@ -562,7 +562,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="shiny-cookies-r-code" class="section level2" number="16.4">
 <h2><span class="header-section-number">16.4</span> R Code</h2>
-<p>Then it’s a matter a completing the shiny server which was left empty. We add an <code>observeEvent</code> on the save button where we check that a name has actually been typed in the text box before saving the cookie. There is another similar observer on the remove button. The <code>renderUI</code> expression checks that the cookie has been set and displays a message accordingly.</p>
+<p>Then it’s a matter of completing the shiny server which was left empty. We add an <code>observeEvent</code> on the save button where we check that a name has actually been typed in the text box before saving the cookie. There is another similar observer on the remove button. The <code>renderUI</code> expression checks that the cookie has been set and displays a message accordingly.</p>
 <div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb313-1"><a href="shiny-cookies.html#cb313-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb313-2"><a href="shiny-cookies.html#cb313-2"></a></span>
 <span id="cb313-3"><a href="shiny-cookies.html#cb313-3"></a><span class="kw">addResourcePath</span>(<span class="st">&quot;www&quot;</span>, <span class="st">&quot;www&quot;</span>)</span>
@@ -618,7 +618,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 FIGURE 16.1: Shiny using cookies
 </p>
 </div>
-<p>Run the application and save your name. You can then refresh the application and the welcome message will display your name. You can even kill the server entirely and re-run the app, the welcome message will still display!</p>
+<p>Run the application and save your name. You can then refresh the application, and the welcome message will display your name. You can even kill the server entirely and re-run the app; the welcome message will still display!</p>
 
 </div>
 </div>

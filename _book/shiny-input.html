@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-10-25" />
+<meta name="date" content="2020-10-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -488,9 +488,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="shiny-input" class="section level1" number="15">
 <h1><span class="header-section-number">Chapter 15</span> Custom Inputs</h1>
-<p>Shiny comes with a variety of inputs ranging from buttons to text fields, these inputs send data from the client to the R server. Custom inputs are in fact no different than from shiny’s out-of-the-box inputs, they work in the exact same way and are built on the same system.</p>
-<p>To explain and demonstrate how to build such a custom input we shall build a switch input which is essentially a fancy-looking checkbox that can be toggled on and off.</p>
-<p>Custom shiny inputs very much resemble shiny outputs though they consist of a single R function (e.g.: <code>selectInput</code>) which generates the HTML and attaches necessary dependencies. In fact, when run from the R console such functions will reveal the HTML they generate.</p>
+<p>Shiny comes with a variety of inputs ranging from buttons to text fields; these inputs send data from the client to the R server. Custom inputs are in fact, no different than from shiny’s out-of-the-box inputs, they work in the same way and are built on the same system.</p>
+<p>To explain and demonstrate how to build such a custom input, we shall build a switch input which is essentially a fancy-looking checkbox that can be toggled on and off.</p>
+<p>Custom shiny inputs very much resemble shiny outputs though they consist of a single R function (e.g.: <code>selectInput</code>) which generates the HTML and attaches necessary dependencies. When run from the R console, such functions will reveal the HTML they generate.</p>
 <div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="shiny-input.html#cb283-1"></a>shiny<span class="op">::</span><span class="kw">textInput</span>(<span class="st">&quot;theId&quot;</span>, <span class="st">&quot;The label&quot;</span>)   </span></code></pre></div>
 <div class="sourceCode" id="cb284"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb284-1"><a href="shiny-input.html#cb284-1"></a><span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;form-group shiny-input-container&quot;</span><span class="kw">&gt;</span></span>
 <span id="cb284-2"><a href="shiny-input.html#cb284-2"></a>  <span class="kw">&lt;label</span><span class="ot"> class=</span><span class="st">&quot;control-label&quot;</span><span class="ot"> for=</span><span class="st">&quot;theId&quot;</span><span class="kw">&gt;</span>The label<span class="kw">&lt;/label&gt;</span></span>
@@ -499,7 +499,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The R function is paired with a JavaScript input binding akin to the output binding used in the previous chapter.</p>
 <div id="shiny-input-setup" class="section level2" number="15.1">
 <h2><span class="header-section-number">15.1</span> Setup</h2>
-<p>Let’s set up the necessary files and project structure. Below an asset directory is created along with a JavaScript file where the binding will be placed as well as a CSS file that will style the switch input, an <code>app.R</code> file is also created to hold the R code and application.</p>
+<p>Let us set up the necessary files and project structure. Below an asset directory is created. In it, we place a JavaScript file where the binding will be coded as well as a CSS file that will style the switch input, an <code>app.R</code> file is also created to hold the R code and application.</p>
 <div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="shiny-input.html#cb285-1"></a><span class="co"># create directory for application</span></span>
 <span id="cb285-2"><a href="shiny-input.html#cb285-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;switch/assets&quot;</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb285-3"><a href="shiny-input.html#cb285-3"></a></span>
@@ -583,7 +583,7 @@ FIGURE 15.1: Checkbox and styled switch input
 </div>
 <div id="shiny-input-html" class="section level2" number="15.3">
 <h2><span class="header-section-number">15.3</span> Generate Input HTML</h2>
-<p>Let us start with the R function to be used in the shiny UI. The <code>&lt;input&gt;</code> it generates bears a <code>switchInput</code> class which will be used to identify all switch inputs from JavaScript, this was also done in the custom output. The function accepts an <code>id</code> argument, this is also common across all inputs and outputs as a unique identifier is required in order to retrieve the input JavaScript-side.</p>
+<p>Let us start with the R function to be used in the shiny UI. The <code>&lt;input&gt;</code> it generates bears a <code>switchInput</code> class, which will be used to identify all switch inputs from JavaScript, this was also done in the custom output. The function accepts an <code>id</code> argument; this is also common across all inputs and outputs as a unique identifier is required in order to retrieve the input JavaScript-side.</p>
 <div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="shiny-input.html#cb289-1"></a><span class="co"># app.R</span></span>
 <span id="cb289-2"><a href="shiny-input.html#cb289-2"></a>switchInput &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
 <span id="cb289-3"><a href="shiny-input.html#cb289-3"></a></span>
@@ -669,8 +669,8 @@ FIGURE 15.1: Checkbox and styled switch input
 </ul>
 <div id="shiny-input-find" class="section level3" number="15.4.1">
 <h3><span class="header-section-number">15.4.1</span> Find Inputs</h3>
-<p>The <code>find</code> method looks for all the relevant HTML elements in the document (<code>scope</code>), and returns them as an array. Many other method we are about to implement will accept <code>el</code> as an argument, this will ultimately be one of the elements returned by <code>find</code>.</p>
-<p>Generally the <code>find</code> method is used in conjunction with a <code>class</code>, hence the <code>&lt;input&gt;</code> generated by <code>switchInput</code> bears a class of the same name <code>switchInput</code>.</p>
+<p>The <code>find</code> method looks for all the relevant HTML elements in the document (<code>scope</code>) and returns them as an array. Many other methods we are about to implement will accept <code>el</code> as an argument; this will ultimately be one of the elements returned by <code>find</code>.</p>
+<p>Generally, the <code>find</code> method is used in conjunction with a <code>class</code>; hence the <code>&lt;input&gt;</code> generated by <code>switchInput</code> bears a class of the same name <code>switchInput</code>.</p>
 <div class="sourceCode" id="cb293"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb293-1"><a href="shiny-input.html#cb293-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">InputBinding</span>()<span class="op">;</span></span>
 <span id="cb293-2"><a href="shiny-input.html#cb293-2"></a></span>
 <span id="cb293-3"><a href="shiny-input.html#cb293-3"></a><span class="va">$</span>.<span class="at">extend</span>(switchInput<span class="op">,</span> <span class="op">{</span></span>
@@ -682,15 +682,15 @@ FIGURE 15.1: Checkbox and styled switch input
 </div>
 <div id="shiny-input-get-id" class="section level3" number="15.4.2">
 <h3><span class="header-section-number">15.4.2</span> Get Input Id</h3>
-<p>The <code>getId</code> method is exactly it seems to be, it returns the <code>id</code> of the element. It looks for that id as <code>data-input-id</code> attribute and if that is not found returns the <code>id</code>; this can be observed in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/input_binding.js#L9">source code</a> (below).</p>
+<p>The <code>getId</code> method is exactly what it appears to be; it returns the <code>id</code> of the element. It looks for that id as <code>data-input-id</code> attribute and if that is not found returns the <code>id</code>; this can be observed in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/input_binding.js#L9">source code</a> (below).</p>
 <div class="sourceCode" id="cb294"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb294-1"><a href="shiny-input.html#cb294-1"></a><span class="kw">this</span>.<span class="at">getId</span> <span class="op">=</span> <span class="kw">function</span>(el) <span class="op">{</span></span>
 <span id="cb294-2"><a href="shiny-input.html#cb294-2"></a>  <span class="cf">return</span> el[<span class="st">&#39;data-input-id&#39;</span>] <span class="op">||</span> <span class="va">el</span>.<span class="at">id</span><span class="op">;</span></span>
 <span id="cb294-3"><a href="shiny-input.html#cb294-3"></a><span class="op">};</span></span></code></pre></div>
-<p>Since the default works there is no need to use it for the switch input.</p>
+<p>Since the default works, there is no need to use it for the switch input.</p>
 </div>
 <div id="shiny-input-get-value" class="section level3" number="15.4.3">
 <h3><span class="header-section-number">15.4.3</span> Get Input Value</h3>
-<p>This retrieves the value of the input, this is often the attribute of the same name (<code>value="something"</code>) which can be obtain with the jQuery <code>val()</code> method. The switch is an input of type <code>checkbox</code> and therefore uses the <code>checked</code> prop.</p>
+<p>That retrieves the value of the input; this is often the attribute of the same name (<code>value="something"</code>) which can be obtained with the jQuery <code>val()</code> method. The switch is an input of type <code>checkbox</code> and therefore uses the <code>checked</code> prop.</p>
 <div class="sourceCode" id="cb295"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb295-1"><a href="shiny-input.html#cb295-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">InputBinding</span>()<span class="op">;</span></span>
 <span id="cb295-2"><a href="shiny-input.html#cb295-2"></a></span>
 <span id="cb295-3"><a href="shiny-input.html#cb295-3"></a><span class="va">$</span>.<span class="at">extend</span>(switchInput<span class="op">,</span> <span class="op">{</span></span>
@@ -711,7 +711,7 @@ Ensure the <code>getValue</code> method actually <code>return</code>s the value.
 </div>
 <div id="shiny-input-set-value" class="section level3" number="15.4.4">
 <h3><span class="header-section-number">15.4.4</span> Set Input Value</h3>
-<p>The <code>setValue</code> method sets the value of the input, hence it also accepts the <code>value</code> object: the actual value to which the input should be set. Then again, most inputs will likely use the <code>value</code> attribute which can be set in jQuery with <code>val(newValue)</code> but the checkbox uses the <code>checked</code> prop.</p>
+<p>The <code>setValue</code> method sets the value of the input; hence it also accepts the <code>value</code> object: the actual value to which the input should be set. Then again, most inputs will likely use the <code>value</code> attribute, which can be set in jQuery with <code>val(newValue)</code> but the checkbox uses the <code>checked</code> prop.</p>
 <div class="sourceCode" id="cb296"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb296-1"><a href="shiny-input.html#cb296-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">InputBinding</span>()<span class="op">;</span></span>
 <span id="cb296-2"><a href="shiny-input.html#cb296-2"></a></span>
 <span id="cb296-3"><a href="shiny-input.html#cb296-3"></a><span class="va">$</span>.<span class="at">extend</span>(switchInput<span class="op">,</span> <span class="op">{</span></span>
@@ -725,11 +725,11 @@ Ensure the <code>getValue</code> method actually <code>return</code>s the value.
 <span id="cb296-11"><a href="shiny-input.html#cb296-11"></a>  <span class="dt">setValue</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> value) <span class="op">{</span></span>
 <span id="cb296-12"><a href="shiny-input.html#cb296-12"></a>    <span class="at">$</span>(el).<span class="at">prop</span>(<span class="st">&quot;checked&quot;</span><span class="op">,</span> value).<span class="at">change</span>()<span class="op">;</span></span>
 <span id="cb296-13"><a href="shiny-input.html#cb296-13"></a>  <span class="op">}</span></span></code></pre></div>
-<p>Note the use of the <code>change</code> method which ensures the event is fired, otherwise the input is checked or unchecked but the <code>change</code> event is not fired and this will cause problems later on as we rely on this event.</p>
+<p>Note the use of the <code>change</code> method which ensures the event is fired. Otherwise the input is checked or unchecked, but the <code>change</code> event is not fired, and this will cause problems later on as we rely on this event.</p>
 </div>
 <div id="shiny-input-receive-msg" class="section level3" number="15.4.5">
 <h3><span class="header-section-number">15.4.5</span> Receive Input Messages</h3>
-<p>The <code>setValue</code> method previously defined is only really useful when combined with <code>receiveMessage</code>, the latter handles messages sent to the input, these are generally sent from the server via functions the likes of <code>updateSelectInput</code>. Internally it uses the <code>setValue</code> method to define the value of the input received from the server. Note that the <code>value</code> is therefore a serialised JSON input coming from the R server and can be of any complexity you desire. Below we use it such that expect a simple boolean as the checkbox (switch) can be either on (<code>true</code>) or off (<code>false</code>).</p>
+<p>The <code>setValue</code> method previously defined is only beneficial when combined with <code>receiveMessage</code>, the latter handles messages sent to the input, these are generally sent from the server via functions the likes of <code>updateSelectInput</code>. Internally it uses the <code>setValue</code> method to define the value of the input received from the server. Note that the <code>value</code> is, therefore, a serialised JSON input coming from the R server and can be of any complexity you desire. Below we use it such that expect a simple boolean as the checkbox (switch) can be either on (<code>true</code>) or off (<code>false</code>).</p>
 <div class="sourceCode" id="cb297"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb297-1"><a href="shiny-input.html#cb297-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">InputBinding</span>()<span class="op">;</span></span>
 <span id="cb297-2"><a href="shiny-input.html#cb297-2"></a></span>
 <span id="cb297-3"><a href="shiny-input.html#cb297-3"></a><span class="va">$</span>.<span class="at">extend</span>(switchInput<span class="op">,</span> <span class="op">{</span></span>
@@ -750,7 +750,7 @@ Ensure the <code>getValue</code> method actually <code>return</code>s the value.
 </div>
 <div id="shiny-input-sub-unsub" class="section level3" number="15.4.6">
 <h3><span class="header-section-number">15.4.6</span> Subscribe &amp; Unsubscribe Inputs</h3>
-<p>Finally, a crucial method is <code>subscribe</code>, this is ran when the input is registered (more on that later) and is used to determine when shiny sends new values of the input back to the server. This method also accepts a <code>callback</code> which is the very function that tells shiny to update the value. This callback function accepts a single boolean value which in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/input_binding.js#L18">source code</a> states is used to enable debouncing or throttling. This is covered in the next section on rate policy.</p>
+<p>Finally, a crucial method is <code>subscribe</code>, this is run when the input is registered (more on that later) and is used to determine when shiny sends new values of the input back to the server. This method also accepts a <code>callback</code> which is the same function that tells shiny to update the value. This callback function accepts a single boolean value which in the <a href="https://github.com/rstudio/shiny/blob/master/srcjs/input_binding.js#L18">source code</a> states is used to enable debouncing or throttling. This is covered in the next section on rate policy.</p>
 <p>This method often consists of an event listener that observes changes on the input to send its to the server. In layman terms, when the switch input changes (on to off or vice versa) run the <code>callback</code> function which sends the data to the server.</p>
 <div class="sourceCode" id="cb298"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb298-1"><a href="shiny-input.html#cb298-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">InputBinding</span>()<span class="op">;</span></span>
 <span id="cb298-2"><a href="shiny-input.html#cb298-2"></a></span>
@@ -776,7 +776,7 @@ Ensure the <code>getValue</code> method actually <code>return</code>s the value.
 <span id="cb298-22"><a href="shiny-input.html#cb298-22"></a>    <span class="at">$</span>(el).<span class="at">off</span>(<span class="st">&quot;.switchInput&quot;</span>)<span class="op">;</span></span>
 <span id="cb298-23"><a href="shiny-input.html#cb298-23"></a>  <span class="op">}</span></span>
 <span id="cb298-24"><a href="shiny-input.html#cb298-24"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
-<p>Note that in the <code>subscribe</code> method we listen for <code>change</code>s on the input, hence the <code>setValue</code> also uses jQuery’s <code>change</code> method; it ensures this event is fired and that shiny will subsequently pick it up.</p>
+<p>Note that in the <code>subscribe</code> method we listen for <code>change</code>s on the input; hence the <code>setValue</code> also uses jQuery’s <code>change</code> method; it ensures this event is fired and that shiny will subsequently pick it up.</p>
 <div class="rmdnote">
 <p>
 Make sure the <code>setValue</code> method triggers the event observed in <code>subscribe</code>
@@ -785,7 +785,7 @@ Make sure the <code>setValue</code> method triggers the event observed in <code>
 </div>
 <div id="shiny-input-rate-policy" class="section level3" number="15.4.7">
 <h3><span class="header-section-number">15.4.7</span> Input Rate Policy</h3>
-<p>The rate policy determines how frequently the binding should send new input values back to the server. The <code>getRatePolicy</code> method should return an object that describes that, it is a JSON array with two variable <code>policy</code> and <code>delay</code>.</p>
+<p>The rate policy determines how frequently the binding should send new input values back to the server. The <code>getRatePolicy</code> method should return an object that describes that it is a JSON array with two variable <code>policy</code> and <code>delay</code>.</p>
 <p><strong>direct</strong></p>
 <p>The <code>direct</code> policy tells shiny to sends any new value directly, however often this occurs. Therefore, this policy does not make use of <code>delay</code>.</p>
 <div class="sourceCode" id="cb299"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb299-1"><a href="shiny-input.html#cb299-1"></a><span class="fu">{</span></span>
@@ -803,7 +803,7 @@ Make sure the <code>setValue</code> method triggers the event observed in <code>
 <span id="cb301-2"><a href="shiny-input.html#cb301-2"></a>  <span class="er">policy</span><span class="fu">:</span> <span class="st">&quot;throttle&quot;</span><span class="fu">,</span></span>
 <span id="cb301-3"><a href="shiny-input.html#cb301-3"></a>  <span class="er">delay</span><span class="fu">:</span> <span class="dv">1000</span></span>
 <span id="cb301-4"><a href="shiny-input.html#cb301-4"></a><span class="fu">}</span></span></code></pre></div>
-<p>A switch input is not expected to change frequently but it’s nonetheless good practice to throttle it to ensure the server does not receive too many requests. This will admittedly be more relevant to inputs that see a higher rates of change like text fields which unless debounced send every key stroke to the server.</p>
+<p>A switch input is not expected to change frequently, but it’s nonetheless good practice to throttle it to ensure the server does not receive too many requests. This will admittedly be more relevant to inputs that see a higher rate of change like text fields which unless debounced send every keystroke to the server.</p>
 <div class="sourceCode" id="cb302"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb302-1"><a href="shiny-input.html#cb302-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">InputBinding</span>()<span class="op">;</span></span>
 <span id="cb302-2"><a href="shiny-input.html#cb302-2"></a></span>
 <span id="cb302-3"><a href="shiny-input.html#cb302-3"></a><span class="va">$</span>.<span class="at">extend</span>(switchInput<span class="op">,</span> <span class="op">{</span></span>
@@ -838,7 +838,7 @@ Make sure the <code>setValue</code> method triggers the event observed in <code>
 </div>
 <div id="shiny-input-register" class="section level3" number="15.4.8">
 <h3><span class="header-section-number">15.4.8</span> Registering the Input Binding</h3>
-<p>Finally, like the custom output, the input can be registered with shiny, it too takes a unique identifier as second argument.</p>
+<p>Finally, like the custom output, the input can be registered with shiny, it too takes a unique identifier as a second argument.</p>
 <div class="sourceCode" id="cb303"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb303-1"><a href="shiny-input.html#cb303-1"></a><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">InputBinding</span>()<span class="op">;</span></span>
 <span id="cb303-2"><a href="shiny-input.html#cb303-2"></a></span>
 <span id="cb303-3"><a href="shiny-input.html#cb303-3"></a><span class="va">$</span>.<span class="at">extend</span>(switchInput<span class="op">,</span> <span class="op">{</span></span>
@@ -902,7 +902,7 @@ FIGURE 15.2: Switch input example
 </div>
 <div id="shiny-input-update" class="section level2" number="15.5">
 <h2><span class="header-section-number">15.5</span> Update Input</h2>
-<p>The JavaScript binding was provided with the required methods to receive updates from the server to change the value of the switch input but the R function that sends those updates is yet to be written.</p>
+<p>The JavaScript binding was provided with the required methods to receive updates from the server to change the value of the switch input, but the R function that sends those updates is yet to be written.</p>
 <div class="sourceCode" id="cb305"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb305-1"><a href="shiny-input.html#cb305-1"></a>update_switch_input &lt;-<span class="st"> </span><span class="cf">function</span>(id, value, </span>
 <span id="cb305-2"><a href="shiny-input.html#cb305-2"></a>  <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</span>
 <span id="cb305-3"><a href="shiny-input.html#cb305-3"></a>  session<span class="op">$</span><span class="kw">sendInputMessage</span>(id, value)</span>
@@ -935,14 +935,14 @@ FIGURE 15.2: Switch input example
 <span id="cb306-24"><a href="shiny-input.html#cb306-24"></a></span>
 <span id="cb306-25"><a href="shiny-input.html#cb306-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>The diagram below attempts to summarize the various elements that were put together and used in the last application.</p>
-<p>It all starts from the <code>switchInput</code> function which generates the HTML defining the switch input and its initial state. In the <code>subscribe</code> method, an event listener checks for changes on this HTML element (<code>$(el).on('change', ...)</code>), every time it changes (check/uncheck) it fires the shiny <code>callback</code> which sends the value of the input obtained from <code>getValue</code> through the websocket. When the value of the input is changed from the server this value travels through the websocket to the front-end where <code>receiveMessage</code> uses <code>setValue</code> to programmatically change the check box which incidentally triggers the change event and back we go.</p>
+<p>It all starts from the <code>switchInput</code> function which generates the HTML defining the switch input and its initial state. In the <code>subscribe</code> method, an event listener checks for changes on this HTML element (<code>$(el).on('change', ...)</code>), every time it changes (check/uncheck) it fires the shiny <code>callback</code> which sends the value of the input obtained from <code>getValue</code> through the WebSocket. When the value of the input is changed from the server this value travels through the WebSocket to the front-end where <code>receiveMessage</code> uses <code>setValue</code> to programmatically change the check box which incidentally triggers the change event, and back we go.</p>
 <div id="htmlwidget-b35fa2daef0b963645e5" style="width:100%;height:250px;" class="grViz html-widget"></div>
 <script type="application/json" data-for="htmlwidget-b35fa2daef0b963645e5">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR]\n  node [shape=record fontsize=12];\n\n  subgraph cluster_r {\n    node [color=royalBlue];\n    \"update_switch_input\"\n    \"switchInput\"\n    \"Input list\"\n\n    label = \"R server\"\n  }\n\n  subgraph cluster_js {\n    node [color=gold];\n    \"receiveMessage\"\n    \"setValue\"\n    \"HTML input\"\n    \"subscribe\"\n    \"getValue\"\n\n    label = \"Front-end\"\n  }\n\n  edge [fontsize=10]\n  \"update_switch_input\" -> \"receiveMessage\" [xlabel=\"websocket\"]\n  \"receiveMessage\" -> \"setValue\" [label=\"value\"]\n  \"switchInput\" -> \"HTML input\" \n  \"setValue\" -> \"HTML input\" [label=\"value\"]\n  \"HTML input\" -> \"subscribe\" [label=\"event listener\"]\n  \"subscribe\" -> \"getValue\" [label=\"callback\"]\n  \"getValue\" -> \"Input list\" [label=\"websocket\"]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="shiny-input-excercise" class="section level2" number="15.6">
 <h2><span class="header-section-number">15.6</span> Exercise</h2>
 <ul>
-<li>Add a <code>toggle_switch_input</code> that toggles between states so it turns it off when it’s on and vice versa</li>
+<li>Add a <code>toggle_switch_input</code> function that toggles between states so it turns it off when it’s on and vice versa</li>
 <li>Bring support for <a href="https://getbootstrap.com/docs/3.3/components/#input-groups-basic">Bootstrap 3 text input addon</a></li>
 </ul>
 

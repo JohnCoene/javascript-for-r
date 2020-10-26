@@ -10,7 +10,7 @@ This book starts with a rationale for integrating JavaScript with R and supports
 
 Why blend two languages seemingly so far removed from each other? Well, precisely because they are fundamentally different languages that each have their strengths and weaknesses, combining the two allows making the most of their consolidated advantages and circumvent their respective limitations to produce software altogether better for it. 
 
-Nevertheless, a fair reason to use JavaScript might simply be that the thing one wants to achieve in R has already been realised in JavaScript. Why reinvent the wheel when the solution already exists and that it can be made accessible from R? The R package [lawn](https://github.com/ropensci/lawn) [@R-lawn] by Ropensci integrates [turf.js](http://turfjs.org/), a brilliant library for geo-spatial analysis. JavaScript is by no means required to make those computations, they could be rewritten solely in R but that would be vastly more laborious than wrapping the JavaScript API in R as done by the package lawn.
+Nevertheless, a fair reason to use JavaScript might be that the thing one wants to achieve in R has already been realised in JavaScript. Why reinvent the wheel when the solution already exists and that it can be made accessible from R? The R package [lawn](https://github.com/ropensci/lawn) [@R-lawn] by Ropensci integrates [turf.js](http://turfjs.org/), a brilliant library for geo-spatial analysis. JavaScript is by no means required to make those computations, they could be rewritten solely in R, but that would be vastly more laborious than wrapping the JavaScript API in R as done by the package lawn.
 
 
 ```r
@@ -27,7 +27,7 @@ lawn_count(lawn_data$polygons_count, lawn_data$points_count, "population")
 #> 2              0
 ```
 
-Another great reason is that JavaScript can do things that R cannot, e.g.: run in the browser. Therefore one cannot natively create interactive visualisations with R. [Plotly](https://plotly-r.com/) [@R-plotly] by Carson Sievert packages the [plotly JavaScript library](https://plot.ly/) to let one create interactive visualisations solely from R code.
+Another great reason is that JavaScript can do things that R cannot, e.g., run in the browser. Therefore one cannot natively create interactive visualisations with R. [Plotly](https://plotly-r.com/) [@R-plotly] by Carson Sievert packages the [plotly JavaScript library](https://plot.ly/) to let one create interactive visualisations solely from R code.
 
 
 ```r
@@ -74,13 +74,13 @@ Hopefully this makes a couple of great reasons and alluring examples to entice t
 
 ## Methods {#intro-methods}
 
-Though perhaps not obvious at first, all of the packages used as examples in the previous section interfaced with R very differently. As we'll discover, there many ways in which one can blend JavaScript with R, generally the way to go about it is dictated by the nature of what is to be achieved.
+Though perhaps not evident at first, all of the packages used as examples in the previous section interfaced with R very differently. As we'll discover, there many ways in which one can blend JavaScript with R, generally the way to go about it is dictated by the nature of what is to be achieved.
 
 Let's list the methods available to us to blend JavaScript with R before covering them each in-depth in their own respective chapter later in the book.
 
 ### V8 {#intro-v8}
 
-[V8](https://github.com/jeroen/v8) by Jeroen Ooms is an R interface to Google's JavaScript engine. It will let you run JavaScript code directly from R and get the result back, it even comes with an interactive console. This is the way the lawn package used in a previous example internally interfaces with the turf.js library.
+[V8](https://github.com/jeroen/v8) by Jeroen Ooms is an R interface to Google's JavaScript engine. It will let you run JavaScript code directly from R and get the result back; it even comes with an interactive console. This is the way the lawn package used in a previous example internally interfaces with the turf.js library.
 
 
 ```r
@@ -101,11 +101,11 @@ It is by far the most popular integration out there, at the time of writing this
 
 ### Shiny {#intro-shiny}
 
-The Shiny framework allows creating applications accessible from web browsers where JavaScript natively runs, it follows that JavaScript can run _alongside_ such applications. Often overlooked though, the two can also work _hand-in-hand_ as one can pass data from the R server to the JavaScript front-end and vice versa. This is how the package waiter mentioned previously internally works with R.
+The Shiny framework allows creating applications accessible from web browsers where JavaScript natively runs; it follows that JavaScript can run _alongside_ such applications. Often overlooked though, the two can also work _hand-in-hand_ as one can pass data from the R server to the JavaScript front-end and vice versa. This is how the package waiter mentioned previously internally works with R.
 
 ## Methods Amiss {#intro-amiss}
 
-Note that there are also two other prominent ways one can use JavaScript with R that are not covered in this book. The main reason being that they require great knowledge of specific JavaScript libraries, d3.js and React, and while these are themselves advanced uses of JavaScript, their integration with R via the packages listed below is rather straightforward.
+Note that there are also two other prominent ways one can use JavaScript with R that are not covered in this book. The main reason being that they require significant knowledge of specific JavaScript libraries, d3.js and React, and while these are themselves advanced uses of JavaScript, their integration with R via the packages listed below are relatively straightforward.
 
 ### reactR & vueR {#intro-reactr-vuer}
 

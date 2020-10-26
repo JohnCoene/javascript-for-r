@@ -2,11 +2,11 @@
 
 # The V8 Engine {#v8}
 
-V8 is an R interface to Google's open source JavaScript engine of the same name, it powers Google Chrome, node.js and many other things. It is the last integration of JavaScript with R that is covered in this book. Both the V8 package and the engine it wraps are straightforward yet amazingly powerful.
+V8 is an R interface to Google's open-source JavaScript engine of the same name; it powers Google Chrome, node.js and many other things. It is the last integration of JavaScript with R that is covered in this book. Both the V8 package and the engine it wraps are straightforward yet amazingly powerful.
 
 ## Installation {#v8-installation}
 
-First install the V8 engine itself, instructions to do so are well detailed on [V8's README](https://github.com/jeroen/v8#installation) and below.
+First, install the V8 engine itself, instructions to do so are well detailed on [V8's README](https://github.com/jeroen/v8#installation) and below.
 
 On Debian or Ubuntu use the code below from the terminal to install [libv8](https://v8.dev/).
 
@@ -35,9 +35,9 @@ install.packages("V8")
 
 ## Basics {#v8-basics}
 
-V8 provides a reference class provided via the [R6](https://github.com/r-lib/R6) [@R-R6] package, this pertains to object-oriented programming, hence it might look unconventional to many R users. It's nonetheless easy to grasp. If one wants to learn more about the R6's reference class system Hadley Wickham has a very good chapter on it in his [Advanced R](https://adv-r.hadley.nz/r6.html) book.
+V8 provides a reference class provided via the [R6](https://github.com/r-lib/R6) [@R-R6] package; this pertains to object-oriented programming; hence it might look unconventional to many R users. It's nonetheless easy to grasp. If one wants to learn more about the R6's reference class system, Hadley Wickham has an outstanding chapter on it in his [Advanced R](https://adv-r.hadley.nz/r6.html) book.
 
-Let's explore the basic functionalities of the package. First, load the library and use the function `v8` to instantiate a class, this effectively returns an execution environment, every such environment is independent of another.
+Let us explore the basic functionalities of the package. First, load the library and use the function `v8` to instantiate a class; this effectively returns an execution environment, every such environment is independent of another.
 
 
 ```r
@@ -56,7 +56,7 @@ engine$eval("x")
 #> [1] "7"
 ```
 
-Two observations on the above snippet of code. First, the variable we got back in R is a character vector when it should have been either an integer or a numeric. This is because we used the `eval` method which returns what is printed in the v8 console, `get` is more appropriate; it converts the output to its appropriate R equivalent.
+Two observations worth making on the above snippet of code. First, the variable we got back in R is a character vector when it should have been either an integer or a numeric. This is because we used the `eval` method, which returns what is printed in the v8 console, `get` is more appropriate; it converts the output to its appropriate R equivalent.
 
 
 ```r
@@ -80,7 +80,7 @@ engine$get("vehicles")
 #> 3     7    4
 ```
 
-All of the conversion is handled by V8 internally with jsonlite as demonstrated in the previous chapter. We can confirm that the data frame was converted to a list rowwise; using `JSON.stringify` to display how the object is stored in V8.
+All of the conversion is handled by V8 internally with jsonlite, as demonstrated in the previous chapter. We can confirm that the data frame was converted to a list row-wise; using `JSON.stringify` to display how the object is stored in V8.
 
 
 ```r
@@ -115,9 +115,9 @@ Finally, one can run code interactively rather than as strings by calling the co
 
 ## External Libraries {#v8-external}
 
-V8 is actually quite bare in and of itself, there is for instance no functionalities built-in to read or write files from disk, it thus becomes truly interesting when you can use it JavaScript libraries. We'll demonstrate this using [fuse.js](https://fusejs.io/) a fuzzy-search library. 
+V8 is quite bare in and of itself; there is, for instance, no functionalities built-in to read or write files from disk, it thus becomes truly interesting when you can use it JavaScript libraries. We'll demonstrate this using [fuse.js](https://fusejs.io/) a fuzzy-search library. 
 
-The very first step of integrating any external library is to look at the code, often examples, to grasp an idea of what is to be achieved from R. Below is an example from the official documentation. First, an array of two `books` is defined, this is later used to test the search. Then another array of options is defined, this should at the very least include the key(s) that should be searched, here it is set to search through the title and authors. Then, the fuse object is initialised based on the array of books and the options. Finally, the `search` method is used to retrieve all books, the title or author of which, partially match the term `tion`.
+The very first step of integrating any external library is to look at the code, often examples, to grasp an idea of what is to be achieved from R. Below is an example from the official documentation. First, an array of two `books` is defined; this is later used to test the search. Then another array of options is defined, this should at the very least include the key(s) that should be searched, here it is set to search through the title and authors. Then, the fuse object is initialised based on the array of books and the options. Finally, the `search` method is used to retrieve all books, the title or author of which, partially match the term `tion`.
 
 ```js
 // books to search through
@@ -143,7 +143,7 @@ const fuse = new Fuse(books, options)
 const result = fuse.search('tion')
 ```
 
-With some understanding of what is to be reproduced in R we can import the library with the `source` method which takes a `file` argument that will accept a path or URL to a JavaScript file to source, below we use the handy CDN (Content Delivery Network) so as to avoid downloading a file.
+With some understanding of what is to be reproduced in R, we can import the library with the `source` method which takes a `file` argument that will accept a path or URL to a JavaScript file to source, below we use the handy CDN (Content Delivery Network) to avoid downloading a file.
 
 
 ```r
@@ -169,7 +169,7 @@ You can think of it as using the `script` tag in HTML to source (`src`) said fil
 </html>
 ```
 
-Now onto replicating the array (list) which we want to search through, the `books` object used in a previous example. As already observed this is in essence how V8 stores data frames in the environment. Below we define a data frame of books that looks similar and load it into the engine.
+Now onto replicating the array (list) which we want to search through, the `books` object used in a previous example. As already observed, this is in essence, how V8 stores data frames in the environment. Below we define a data frame of books that looks similar and load it into the engine.
 
 
 ```r
@@ -186,7 +186,7 @@ books <- data.frame(
 engine$assign("books", books)
 ```
 
-Then again we can make sure that the data frame was turned into a rowwise JSON object.
+Then again, we can make sure that the data frame was turned into a row-wise JSON object.
 
 
 ```r
@@ -211,7 +211,7 @@ cat(engine$eval("JSON.stringify(books, null, 2);"))
 #> ]
 ```
 
-Now we can define options for the search, we don't get into the details of fuse.js here as this is not the purpose of this book, you can read more about the options in the [examples section](https://fusejs.io/#Examples) of the site. We can mimic the format of the JSON options shown on the website with a simple list and assign that to a new variable in the engine. Note that we wrap the title in a `list` to ensure it is converted to an array of length 1: `list("title")` should be converted to a `["title"]` array and not a `"title"` scalar.
+Now we can define options for the search; we don't get into the details of fuse.js here as this is not the purpose of this book, you can read more about the options in the [examples section](https://fusejs.io/#Examples) of the site. We can mimic the format of the JSON options shown on the website with a simple list and assign that to a new variable in the engine. Note that we wrap the title in a `list` to ensure it is converted to an array of length 1: `list("title")` should be converted to a `["title"]` array and not a `"title"` scalar.
 
 ```js
 // JavaScript
@@ -232,7 +232,7 @@ options <- list(
 engine$assign("options", options)
 ```
 
-Then we can finish the second step of the online examples, instantiate a fuse.js object with the books and options objects then make a search the result of which is assigned to an object which is retrieved in R with `get`.
+Then we can finish the second step of the online examples, instantiate a fuse.js object with the books and options objects, then do a search, the result of which is assigned to an object which is retrieved in R with `get`.
 
 
 ```r
@@ -254,7 +254,7 @@ engine$call("fuse.search", "sense")
 
 We can also use [npm](https://www.npmjs.com/) packages, though not all will work. Npm is node's Package Manager, or in a sense Node's equivalent of CRAN.
 
-To use npm packages we need [browserify](http://browserify.org/), a node library to bundle all dependencies of an npm package into a single file which can subsequently be imported in V8. Browserify is itself an npm package and there requires node and npm installed. The reason browserify is required is that the JavaScript code written for node is different from that which should be written for web browsers, therefore importing a Javascript file built with node.js in a browser may not work: browserify will translate node.js code (where necessary) into JavaScript code the browser can run.
+To use npm packages we need [browserify](http://browserify.org/), a node library to bundle all dependencies of an npm package into a single file which can subsequently be imported in V8. Browserify is itself an npm package, and therefore requires Node.js to be installed. The reason browserify is required is that the JavaScript code written for Node.js is different from that which should be written for web browsers, therefore importing a Javascript file built with node.js in a browser may not work: browserify will translate node.js code (where necessary) into JavaScript code the browser can run.
 
 You can install browserify globally with the following the `g` flag. Install node.js and type the following the terminal.
 
@@ -262,7 +262,7 @@ You can install browserify globally with the following the `g` flag. Install nod
 npm install -g browserify
 ```
 
-We can now "browserify" an npm package. To demonstrate we will use [ms](https://github.com/zeit/ms) which converts various time formats to milliseconds. First we install the npm package.
+We can now "browserify" an npm package. To demonstrate, we will use [ms](https://github.com/zeit/ms), which converts various time formats to milliseconds. First, we install the npm package.
 
 ```bash
 npm install ms
@@ -275,7 +275,7 @@ echo "global.ms = require('ms');" > in.js
 browserify in.js -o ms.js
 ```
 
-We can now source `ms.js` with v8, before we do so we ought to look at example code to see what has to be reproduced using V8. Luckily the library is very straightforward: it includes a single function for all conversions, e.g.: `ms('2 days')` to convert 2 days in milliseconds.
+We can now source `ms.js` with v8, before we do so we ought to look at example code to see what has to be reproduced using V8. Luckily the library is very straightforward: it includes a single function for all conversions, e.g.: `ms('2 days')` to convert two days in milliseconds.
 
 
 ```r
@@ -297,7 +297,7 @@ ms$call("ms", "2s") # 2 seconds
 
 ## Use in Packages {#v8-pkg}
 
-In this section we detail how one should go about using V8 in an R package, if you are not familiar with package development you can skip ahead. We start by creating a package called "ms" that will hold functionalities we explored in the previous section on npm packages.
+In this section, we detail how one should go about using V8 in an R package if you are not familiar with package development you can skip ahead. We start by creating a package called "ms" that will hold functionalities we explored in the previous section on npm packages.
 
 ```r
 usethis::create_package('ms')
@@ -316,9 +316,9 @@ The package should also include the external library `ms.js` browserified from t
 dir.create("inst")
 ```
 
-As explored, the core of the V8 package is the execution environment(s) that are spawned using the `v8` function. One could perhaps provide a function that returns the object created by `v8` but it would not be convenient: this function would need to be called explicitly by the users of the package and the output of it would need to be passed to every subsequent functions. Thankfully there is a better way.
+As explored, the core of the V8 package is the execution environment(s) that are spawned using the `v8` function. One could perhaps provide a function that returns the object created by `v8`, but it would not be convenient: this function would need to be called explicitly by the users of the package and the output of it would need to be passed to every subsequent function. Thankfully there is a better way.
 
-Instead we can use the function `.onLoad`, to create the execution environment and import the dependency when the package is loaded by the user.
+Instead, we can use the function `.onLoad`, to create the execution environment and import the dependency when the package is loaded by the user.
 
 You can read more about this function in Hadley Wickham's [Advanced R book](http://r-pkgs.had.co.nz/r.html). This is in effect very similar to how the Python integration of R, [reticulate](https://rstudio.github.io/reticulate) [@R-reticulate] is [used in packages](https://rstudio.github.io/reticulate/articles/package.html). This function is often placed in a `zzz.R` file.
 

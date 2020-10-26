@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-10-25" />
+<meta name="date" content="2020-10-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -488,12 +488,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="linking-widgets" class="section level1" number="9">
 <h1><span class="header-section-number">Chapter 9</span> Linking Widgets</h1>
-<p>Widgets can be linked with one another using the crosstalk <span class="citation">(Cheng <a href="#ref-R-crosstalk" role="doc-biblioref">2020</a>)</span> package, a fantastic add-on for htmlwidgets that implements inter-widget interactions, namely selection and filtering. This in effect allows the selection or filtering of data points in one widget to be mirrored in another. This is enabled with the creation of “shared datasets” that can be used across widgets; outputs that share datasets share interactions.</p>
+<p>Widgets can be linked with one another using the crosstalk <span class="citation">(Cheng <a href="#ref-R-crosstalk" role="doc-biblioref">2020</a>)</span> package, a fantastic add-on for htmlwidgets that implements inter-widget interactions, namely selection and filtering. This, in effect, allows the selection or filtering of data points in one widget to be mirrored in another. This is enabled with the creation of “shared datasets” that can be used across widgets; outputs that share datasets share interactions.</p>
 <p>Crosstalk provides a straightforward interface to the users and instead requires effort from developers for their widgets to support shared datasets.</p>
 <div id="linking-widgets-examples" class="section level2" number="9.1">
 <h2><span class="header-section-number">9.1</span> Crosstalk Examples</h2>
-<p>Both the plotly and DT packages support crosstalk, therefore using a shared dataset we can produce a scatter plot with the former and a table with the latter so that selection of data in one is reflected in the other.</p>
-<p>As alluded to earlier on this can be achieved by using a shared dataset which can be created with the <code>SharedData</code> R6 class from the crosstalk package, this dataset is then used as one would use a standard dataframe in plotly and DT. The <code>bscols</code> function is just a helper to create columns from html elements (using bootstrap). It’s ideal for examples but one should not have to use it in Shiny—crosstalk will work without <code>bscols</code>.</p>
+<p>Both the plotly and DT packages support crosstalk, therefore using a shared dataset we can produce a scatter plot with the former and a table with the latter, so that selection of data in one is reflected in the other.</p>
+<p>As alluded to earlier on this can be achieved by using a shared dataset which can be created with the <code>SharedData</code> R6 class from the crosstalk package, this dataset is then used as one would use a standard dataframe in plotly and DT. The <code>bscols</code> function is just a helper to create columns from HTML elements (using bootstrap). It is ideal for examples, but one should not have to use it in Shiny—crosstalk will work without <code>bscols</code>.</p>
 <div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="linking-widgets.html#cb164-1"></a><span class="kw">library</span>(DT)</span>
 <span id="cb164-2"><a href="linking-widgets.html#cb164-2"></a><span class="kw">library</span>(plotly)</span>
 <span id="cb164-3"><a href="linking-widgets.html#cb164-3"></a><span class="kw">library</span>(crosstalk)</span>
@@ -621,22 +621,22 @@ FIGURE 9.2: Shiny with crosstalk
 </div>
 <div id="linking-widgets-req" class="section level2" number="9.2">
 <h2><span class="header-section-number">9.2</span> Crosstalk Requirements</h2>
-<p>Crosstalk is will not work well with every widget and every dataset, in some cases it might not even be a good idea to support it at all.</p>
-<p>Crosstalk works best on rectangular data: dataframes or objects that resemble dataframes like <code>tibble</code> or <code>SpatialPolygonsDataFrame</code>. This is important as crosstalk will treat the data rowwise, where each row is an observation that is ultimately selected, or filtered. If the underlying data is not tabular (e.g.: trees) then one might eventually encounter mismatches between widgets as they go out of sync.</p>
+<p>Crosstalk will not work well with every widget and every dataset, in some cases, it might not even be a good idea to support it at all.</p>
+<p>Crosstalk works best on rectangular data: dataframes or objects that resemble dataframes like <code>tibble</code> or <code>SpatialPolygonsDataFrame</code>. This is important as crosstalk will treat the data rowwise, where each row is an observation that is ultimately selected, or filtered. If the underlying data is not tabular (e.g.: trees), then one might eventually encounter mismatches between widgets as they go out of sync.</p>
 <p>Other than tabular data, crosstalk will require the widget to have the necessary functions or methods to dispatch the selection and filtering that crosstalk enables, that is, the widget must be able to filter as well as highlight and fade selected data points as crosstalk itself does not provide this, neither the JavaScript nor the interface tools.</p>
 </div>
 <div id="linking-widgets-inner-workings" class="section level2" number="9.3">
 <h2><span class="header-section-number">9.3</span> How it Works</h2>
-<p>As will be discovered later when support for crosstalk is brought to gio, very little changes on the R side. As might be expected, crosstalk enables communication between widgets via JavaScript, hence much of what must be adapted by widgets developers happens in JavaScript too.</p>
+<p>As will be discovered later when support for crosstalk is brought to gio, minimal changes on the R side. As might be expected, crosstalk enables the communication between widgets via JavaScript. Hence much of what must be adapted by widgets developers happens in JavaScript too.</p>
 <div id="htmlwidget-aaef65d60f04153c4792" style="width:100%;height:250px;" class="grViz html-widget"></div>
 <script type="application/json" data-for="htmlwidget-aaef65d60f04153c4792">{"x":{"diagram":"\ndigraph G {\n\n  graph [compound=true rankdir = LR]\n  node [shape=record fontsize=10];\n\n  # r stuff\n  subgraph cluster_1 { \n    \"Widget 1\" \"Widget 2\";\n    label = \"JavaScript\";\n    color=gold;\n  }\n\n  # js\n  subgraph cluster_0 {\n    node [width = 0.9]\n    Dataframe \"Shared Dataset\"; \n    label=\"R\";\n    color=royalBlue;\n  }\n\n  \"Dataframe\" -> \"Shared Dataset\";\n  \"Widget 1\" -> \"Widget 2\" [dir=both color=dimGray];\n\n  # connect subgraphs\n  \"Shared Dataset\" -> \"Widget 1\" [lhead=cluster_1 ltail=cluster_0];\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Indeed the bi-directional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser.</p>
 <div id="linking-widgets-keys" class="section level3" number="9.3.1">
 <h3><span class="header-section-number">9.3.1</span> Keys</h3>
-<p>This internally works with <code>key</code>s that are assigned to every row of the dataframe which enable crosstalk to track which are selected or filtered.</p>
-<p>When creating a shared dataset crosstalk will by default use the row names of the data.frame, and if these are not available the <code>SharedData</code> function will create row numbers.</p>
+<p>This internally works with <code>key</code>s that are assigned to every row of the dataframe, which enable crosstalk to track which are selected or filtered.</p>
+<p>When creating shared datasets crosstalk will by default use the row names of the data.frame, and if these are not available, the <code>SharedData</code> function will create row numbers.</p>
 <div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="linking-widgets.html#cb168-1"></a>sd_cars &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(cars[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,])</span></code></pre></div>
-<p>You can therefore <em>mentally represent</em> the above shared dataset as the table, note the emphasis, internally crosstalk does not actually add a column to the dataset: it leaves it as-is.</p>
+<p>You can therefore <em>mentally represent</em> the above-shared dataset as the table, note the emphasis, internally crosstalk does not actually add a column to the dataset: it leaves it as-is.</p>
 <table>
 <thead>
 <tr class="header">
@@ -685,7 +685,7 @@ FIGURE 9.2: Shiny with crosstalk
 </div>
 <div id="linking-widgets-communication-lines" class="section level3" number="9.3.2">
 <h3><span class="header-section-number">9.3.2</span> Communication Lines</h3>
-<p>In a sense, while crosstalk establishes lines of communication to transport <code>key</code>s between widgets, developers of the respective widgets must handle what <code>key</code>s are sent to other widgets and what to do with incoming <code>key</code>s (that are selected or filtered in other widgets). There are two such lines of communication, one for <code>key</code>s of rows to be filtered, meant to narrow down the selection of data points displayed on a widget, and another for selection (what crosstalk refers to as “linked brushing”) to highlight certain data points (fading out other data points).</p>
+<p>In a sense, while crosstalk establishes lines of communication to transport <code>key</code>s between widgets, developers of the respective widgets must handle what <code>key</code>s are sent to other widgets and what to do with incoming <code>key</code>s (that are selected or filtered in other widgets). There are two such lines of communication, one for <code>key</code>s of rows to be filtered, meant to narrow down the selection of data points displayed on a widget, and another for selection (what crosstalk refers to as “linked brushing”) to highlight specific data points (fading out other data points).</p>
 <p>In JavaScript, a widget “receives” the keys of selected and filtered data points and must, when filtering or selection is observed, “send” said selected or filtered keys to other widgets.</p>
 </div>
 <div id="linking-widgets-groups" class="section level3" number="9.3.3">
@@ -698,41 +698,41 @@ FIGURE 9.2: Shiny with crosstalk
 Crosstalk groups share keys.
 </p>
 </div>
-<p>Therefore, the code below creates two shared datasets that are linked and share keys as they fall in the same <code>group</code> despite the fact that they are separate R objects.</p>
+<p>Therefore, the code below creates two shared datasets that are linked and share keys as they fall in the same <code>group</code> even though they are separate R objects.</p>
 <div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="linking-widgets.html#cb171-1"></a>shared_cars &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(mtcars, <span class="dt">group =</span> <span class="st">&quot;cars&quot;</span>)</span>
 <span id="cb171-2"><a href="linking-widgets.html#cb171-2"></a>shared_cars_head &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(<span class="kw">head</span>(mtcars), <span class="dt">group =</span> <span class="st">&quot;cars&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="linking-widgets-gio" class="section level2" number="9.4">
 <h2><span class="header-section-number">9.4</span> Crosstalk with Gio</h2>
-<p>The application of crosstalk to the gio library is somewhat amiss but this makes it rather more instructive as it requires thinking beyond the mere implementation of the crosstalk and is an exercise the reader will likely have to do when incorporating it to other widgets. As mentioned before, in order for crosstalk to be properly implemented a widget must be a able to select, deselect as well as filter and unfilter data points and this is not entirely the case of gio.</p>
-<p>First, gio’s underlying data is somewhat uncommon: it is a network defined only by its edges (the arcs leaving and coming into countries). Second, those edges themselves cannot be selected, as we’ve observed previously what edges are drawn on the globe cannot directly be defined, the selected country can be changed which only by proxy changes the edges shown on the globe. Third, while gio supports changing which country is selected (by clicking on the globe) it does not allow unselecting a country; with gio.js a country is always selected.</p>
-<p>The way crosstalk can work with gio is by setting the keys of the shared dataset to the country ISO codes that gio uses. Since data gio accepts consists of edges this ISO code could correspond to either the source or the target country.</p>
+<p>The application of crosstalk to the gio library is somewhat amiss, but this makes it rather more instructive as it requires thinking beyond the mere implementation of the crosstalk and is an exercise the reader will likely have to do when incorporating it to other widgets. As mentioned before, in order for crosstalk to be properly implemented a widget must be able to select, deselect as well as filter and unfilter data points, and this is not entirely the case of gio.</p>
+<p>First, gio’s underlying data is somewhat uncommon: it is a network defined only by its edges (the arcs leaving and coming into countries). Second, those edges themselves cannot be selected; as we’ve observed previously what edges are drawn on the globe cannot directly be defined, the selected country can be changed which only by proxy changes the edges shown on the globe. Third, while gio supports changing which country is selected (by clicking on the globe) it does not allow unselecting a country; with gio.js a country is always selected.</p>
+<p>The way crosstalk can work with gio is by setting the keys of the shared dataset to the country ISO codes that gio uses. Since data gio accepts consists of edges, this ISO code could correspond to either the source or the target country.</p>
 <div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="linking-widgets.html#cb172-1"></a><span class="co"># keys = target</span></span>
 <span id="cb172-2"><a href="linking-widgets.html#cb172-2"></a>shared_arcs &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(arcs, <span class="dt">key =</span> arcs<span class="op">$</span>e)</span>
 <span id="cb172-3"><a href="linking-widgets.html#cb172-3"></a><span class="co"># keys = source</span></span>
 <span id="cb172-4"><a href="linking-widgets.html#cb172-4"></a>shared_arcs &lt;-<span class="st"> </span>SharedData<span class="op">$</span><span class="kw">new</span>(arcs, <span class="dt">key =</span> arcs<span class="op">$</span>i)</span></code></pre></div>
-<p>This constraint would have to be documented and communicated to the users of the package as otherwise gio’s implementation of crosstalk will not work.</p>
-<p>Were the constraint of having to specify the keys removed the gio package would have to interpret the keys. For instance, the widget would receive a selection, say <code>3</code> indicating that the third edge was selected in another widget, gio, not being able to highlight the edge, would have decide whether to highlight either the country where the edge comes from or the country where the edge goes to. Though this could be implemented it would be vastly more laborious and in fact be more limited as the choice of country to highlight would no longer up to the user.</p>
+<p>This constraint would have to be documented and communicated to the users of the package as otherwise, gio’s implementation of crosstalk will not work.</p>
+<p>Were the constraint of having to specify the keys removed the gio package would have to interpret the keys. For instance, the widget would receive a selection, say <code>3</code> indicating that the third edge was selected in another widget, gio, not being able to highlight the edge, would have to decide whether to highlight either the country where the edge comes from or the country where the edge goes to. Though this could be implemented it would be vastly more laborious and be more limited as the choice of country to highlight would no longer up to the user.</p>
 </div>
 <div id="linking-widgets-r" class="section level2" number="9.5">
 <h2><span class="header-section-number">9.5</span> R code</h2>
 <p>In any event, let us start by making the required changes to the R code first. The only changes that need to be made are in the <code>gio</code> function as it is the only that currently accepts a dataframe and thus may receive a shared dataset.</p>
 <div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="linking-widgets.html#cb173-1"></a><span class="kw">class</span>(shared_arcs)</span>
 <span id="cb173-2"><a href="linking-widgets.html#cb173-2"></a><span class="co">#&gt; [1] &quot;SharedData&quot; &quot;R6&quot;</span></span></code></pre></div>
-<p>Shared datasets are R6 classes and therefore cannot simply be treated as dataframes. The <code>gio</code> function needs to check whether the <code>data</code> object it received is a shared dataset with <code>is.SharedData</code> and if so use its methods to extract data from it, namely:</p>
+<p>Shared datasets are R6 classes and therefore cannot simply be treated as dataframes. The <code>gio</code> function needs to check whether the <code>data</code> object it received is a shared dataset with <code>is.SharedData</code> and if so, use its methods to extract data from it, namely:</p>
 <ul>
 <li>The original dataset with <code>origData</code></li>
 <li>The group to which the dataset belongs with <code>groupName</code></li>
 <li>The keys that were assigned to every row of the dataset with <code>key</code></li>
 </ul>
-<p>The <code>origData</code> method is needed to extract original dataframe from the shared dataset. This is of course necessary as the <code>gio</code> function still needs to obtain and serialise the arcs to display on the globe.</p>
+<p>The <code>origData</code> method is needed to extract original dataframe from the shared dataset. That is of course, necessary as the <code>gio</code> function still needs to obtain and serialise the arcs to display on the globe.</p>
 <div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="linking-widgets.html#cb174-1"></a><span class="co"># original data</span></span>
 <span id="cb174-2"><a href="linking-widgets.html#cb174-2"></a>shared_arcs<span class="op">$</span><span class="kw">origData</span>()</span>
 <span id="cb174-3"><a href="linking-widgets.html#cb174-3"></a><span class="co">#&gt;    e  i       v</span></span>
 <span id="cb174-4"><a href="linking-widgets.html#cb174-4"></a><span class="co">#&gt; 1 CN US 3300000</span></span>
 <span id="cb174-5"><a href="linking-widgets.html#cb174-5"></a><span class="co">#&gt; 2 CN RU   10000</span></span></code></pre></div>
-<p>The <code>gio</code> function also has to extract the group to which the dataset belongs, this will be necessary JavaScript-side to tell crosstalk which group one is working with. Note that it was randomly generated since none were specified when the shared dataset was created.</p>
+<p>The <code>gio</code> function also has to extract the group to which the dataset belongs; this will be necessary JavaScript-side to tell crosstalk which group one is working with. Note that it was randomly generated since none were specified when the shared dataset was created.</p>
 <div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="linking-widgets.html#cb175-1"></a><span class="co"># groupName</span></span>
 <span id="cb175-2"><a href="linking-widgets.html#cb175-2"></a>shared_arcs<span class="op">$</span><span class="kw">groupName</span>()</span>
 <span id="cb175-3"><a href="linking-widgets.html#cb175-3"></a><span class="co">#&gt; [1] &quot;SharedData3fbed3cf&quot;</span></span>
@@ -740,7 +740,7 @@ Crosstalk groups share keys.
 <span id="cb175-5"><a href="linking-widgets.html#cb175-5"></a><span class="co"># keys</span></span>
 <span id="cb175-6"><a href="linking-widgets.html#cb175-6"></a>shared_arcs<span class="op">$</span><span class="kw">key</span>()</span>
 <span id="cb175-7"><a href="linking-widgets.html#cb175-7"></a><span class="co">#&gt; [1] &quot;US&quot; &quot;RU&quot;</span></span></code></pre></div>
-<p>The methods <code>origData</code> and <code>groupName</code> must be used in every widget, the <code>key</code> method may not be of use to every widget, it can be immensely useful if the visualisation library also comes with a key/id system so one can use it internally, gio.js does not and we thus will not be using it. The name of the group is passed to the <code>x</code> object so it is accessible JavaScript-side where it is needed, we also add the JavaScript dependency required to run crosstalk with <code>crosstalkLibs</code>.</p>
+<p>The methods <code>origData</code> and <code>groupName</code> must be used in every widget, the <code>key</code> method may not be of use to every widget, it can be immensely useful if the visualisation library also comes with a key/id system so one can use it internally, gio.js does not, and we thus will not be using it. The name of the group is passed to the <code>x</code> object, so it is accessible JavaScript-side where it is needed, we also add the JavaScript dependency required to run crosstalk with <code>crosstalkLibs</code>.</p>
 <div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="linking-widgets.html#cb176-1"></a>gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, </span>
 <span id="cb176-2"><a href="linking-widgets.html#cb176-2"></a>  <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</span>
 <span id="cb176-3"><a href="linking-widgets.html#cb176-3"></a></span>
@@ -791,13 +791,13 @@ One could improve upon this section by using creating methods on the <code>gio</
 <div id="linking-widgets-js" class="section level2" number="9.6">
 <h2><span class="header-section-number">9.6</span> JavaScript code</h2>
 <p>What is left to do is to adapt the JavaScript code, as a reminder it must accept the keys selected in other widgets and share the selected key with other widgets.</p>
-<p>First we create the selection handler in the <code>factory</code> function, this is done by instantiating a new class from <code>crosstalk.SelectionHandle</code>.</p>
+<p>First, we create the selection handler in the <code>factory</code> function; this is done by instantiating a new class from <code>crosstalk.SelectionHandle</code>.</p>
 <div class="sourceCode" id="cb177"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb177-1"><a href="linking-widgets.html#cb177-1"></a><span class="kw">var</span> sel_handle <span class="op">=</span> <span class="kw">new</span> <span class="va">crosstalk</span>.<span class="at">SelectionHandle</span>()<span class="op">;</span></span></code></pre></div>
 <p>Once the selection handle created it can be used in the <code>renderValue</code> function to set the group that was collected from R.</p>
 <div class="sourceCode" id="cb178"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb178-1"><a href="linking-widgets.html#cb178-1"></a><span class="va">sel_handle</span>.<span class="at">setGroup</span>(<span class="va">x</span>.<span class="va">crosstalk</span>.<span class="at">group</span>)<span class="op">;</span></span></code></pre></div>
 <div id="linking-widgets-send-keys" class="section level3" number="9.6.1">
 <h3><span class="header-section-number">9.6.1</span> Send Selected Keys</h3>
-<p>In order for gio to share the selected country with other widgets it would first have to know which country is selected. This can be achieved with a callback function that gio supports.</p>
+<p>In order for gio to share the selected country with other widgets, it would first have to know which country is selected. This can be achieved with a callback function that gio supports.</p>
 <p>Most JavaScript visualisation libraries will support callbacks or events that are triggered when the user interacts with the visualisation so one can have arbitrary code run when, for example, a user clicks a point on a scatter plot, or when the user clicks the legend of a chart. What these callback functions will be and how they work will entirely depend on the library at hand.</p>
 <p>In gio.js this callback function is fired when a country is selected on the globe, it accepts two objects; one containing data on the country selected and another containing data on the related countries (the arcs coming and leaving the selected country).</p>
 <p>The <a href="https://giojs.org/html/docs/callbackPicked.html">documentation of gio.js</a> gives the following example callback function.</p>
@@ -810,9 +810,9 @@ One could improve upon this section by using creating methods on the <code>gio</
 <span id="cb179-7"><a href="linking-widgets.html#cb179-7"></a><span class="co">// use callback function</span></span>
 <span id="cb179-8"><a href="linking-widgets.html#cb179-8"></a><span class="va">controller</span>.<span class="at">onCountryPicked</span>(callback)<span class="op">;</span></span></code></pre></div>
 <div class="sourceCode" id="cb180"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb180-1"><a href="linking-widgets.html#cb180-1"></a><span class="fu">{</span><span class="er">name</span><span class="fu">:</span> <span class="st">&quot;LIBYA&quot;</span><span class="fu">,</span> <span class="er">lat</span><span class="fu">:</span> <span class="dv">25</span><span class="fu">,</span> <span class="er">lon</span><span class="fu">:</span> <span class="dv">17</span><span class="fu">,</span> <span class="er">center</span><span class="fu">:</span> <span class="er">n</span><span class="fu">,</span> <span class="er">ISOCode</span><span class="fu">:</span> <span class="st">&quot;LY&quot;</span><span class="fu">}</span></span></code></pre></div>
-<p>This defines a function named <code>callback</code> which takes the two aforementioned objects and logs them in the JavaScript console. Then the function is passed to the <code>controller</code> via the <code>onCountryPicked</code> method which will run it every time a country is selected by the user.</p>
-<p>This callback function will be useful to send the <code>key</code>s to other widgets: when a user selects China send the <code>CN</code> key selection via crosstalk.</p>
-<p>As mentioned at the beginning of this section, the keys used with the datasets for gio.js should be country ISO codes, therefore one can consider the variable <code>selectedCountry.ISOCode</code> as selected <code>key</code>. The <code>set</code> method from the selection handle can be used to share the selected key with other widgets. Note that this method expects either a <code>null</code> value or an array, a scalar value will throw an error, hence <code>selectedCountry.ISOCode</code> is wrapped in square brackets.</p>
+<p>This defines a function named <code>callback</code> which takes the two objects as mentioned above and logs them in the JavaScript console. Then the function is passed to the <code>controller</code> via the <code>onCountryPicked</code> method, which will run it every time a country is selected by the user.</p>
+<p>This callback function will be useful to send the <code>key</code>s to other widgets: when a user selects China to send the <code>CN</code> key selection via crosstalk.</p>
+<p>As mentioned at the beginning of this section, the keys used with the datasets for gio.js should be country ISO codes. Therefore one can consider the variable <code>selectedCountry.ISOCode</code> as selected <code>key</code>. The <code>set</code> method from the selection handle can be used to share the selected key with other widgets. Note that this method expects either a <code>null</code> value or an array, a scalar value will throw an error, hence <code>selectedCountry.ISOCode</code> is wrapped in square brackets.</p>
 <div class="sourceCode" id="cb181"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb181-1"><a href="linking-widgets.html#cb181-1"></a><span class="kw">function</span> <span class="at">callback</span> (selectedCountry) <span class="op">{</span></span>
 <span id="cb181-2"><a href="linking-widgets.html#cb181-2"></a>  <span class="va">sel_handle</span>.<span class="at">set</span>([<span class="va">selectedCountry</span>.<span class="at">ISOCode</span>])<span class="op">;</span></span>
 <span id="cb181-3"><a href="linking-widgets.html#cb181-3"></a><span class="op">}</span></span>
@@ -821,8 +821,8 @@ One could improve upon this section by using creating methods on the <code>gio</
 </div>
 <div id="linking-widgets-set-keys" class="section level3" number="9.6.2">
 <h3><span class="header-section-number">9.6.2</span> Set Selected Keys</h3>
-<p>We have implemented the necessary to share the selected country with other widgets but are yet to implemented the opposite; when users select a country in another widget the selected country in gio should change too. Gio does provide a method called <code>switchCountry</code> to programmatically change the selected country.</p>
-<p>This can be achieved by listening to the <code>change</code> event on the selection handle previously created, below it is used to log the object <code>e</code> in order to inspect its properties.</p>
+<p>We have implemented the necessary to share the selected country with other widgets but are yet to implement the opposite; when users select a country in another widget, the selected country in gio should change too. Gio does provide a method called <code>switchCountry</code> to change the selected country programmatically.</p>
+<p>This can be achieved by listening to the <code>change</code> event on the selection handle previously created; below it is used to log the object <code>e</code> in order to inspect its properties.</p>
 <div class="sourceCode" id="cb182"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb182-1"><a href="linking-widgets.html#cb182-1"></a><span class="co">// placed in factory function</span></span>
 <span id="cb182-2"><a href="linking-widgets.html#cb182-2"></a><span class="va">sel_handle</span>.<span class="at">on</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span>(e) <span class="op">{</span></span>
 <span id="cb182-3"><a href="linking-widgets.html#cb182-3"></a>  <span class="va">console</span>.<span class="at">log</span>(e)<span class="op">;</span></span>
@@ -841,7 +841,7 @@ One could improve upon this section by using creating methods on the <code>gio</
 <span id="cb183-12"><a href="linking-widgets.html#cb183-12"></a><span class="fu">}</span></span></code></pre></div>
 <ol style="list-style-type: decimal">
 <li><code>oldValue</code> - the value that was previously selected (if any), this may be useful if the widget wants to calculate differences between the currently and previously selected value.</li>
-<li><code>sender</code> - the selection handle instance that made the change. This is useful to compare against the selection handle of the widget and know whether the change in selection was initiated by this widget or another. It is often used to clear the selection or filtering before applying a new one when the change comes from another widget.</li>
+<li><code>sender</code> - the selection handle instance that made the change. This is useful to compare against the selection handle of the widget and know whether this widget or another initiated the selection change. It is often used to clear the selection or filtering before applying a new one when the change comes from another widget.</li>
 <li><code>value</code> - the array of selected keys.</li>
 </ol>
 <p>Therefore event listener could make use of gio.js’ <code>switchCountry</code>. Note that 1) the selection cannot be cleared with gio.js, a country is always selected, and 2) one can only select one country a time, hence only accepting the first element of the selected keys with <code>e.value[0]</code>.</p>
@@ -923,8 +923,8 @@ One could improve upon this section by using creating methods on the <code>gio</
 </div>
 <div id="linking-widgets-using" class="section level2" number="9.7">
 <h2><span class="header-section-number">9.7</span> Using Crosstalk with Gio</h2>
-<p>Finally, now that gio supports shared dataset we can create a few examples to demonstrate how it can be used.</p>
-<p>The simplest way is probably to convert the edges to a shared dataset specifying either the source (<code>i</code>) or target (<code>e</code>) country codes as keys. However this is unlikely to be used this way out in the real world. In the example below selecting an edge highlights a node which is somewhat confusing.</p>
+<p>Finally, now that gio supports shared datasets, we can create a few examples to demonstrate how it can be used.</p>
+<p>The simplest way is probably to convert the edges to a shared dataset specifying either the source (<code>i</code>) or target (<code>e</code>) country codes as keys. However, this is unlikely to be used this way out in the real world. In the example below, selecting an edge highlights a node which is somewhat confusing.</p>
 <div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="linking-widgets.html#cb186-1"></a><span class="kw">library</span>(DT)</span>
 <span id="cb186-2"><a href="linking-widgets.html#cb186-2"></a><span class="kw">library</span>(gio)</span>
 <span id="cb186-3"><a href="linking-widgets.html#cb186-3"></a><span class="kw">library</span>(crosstalk)</span>

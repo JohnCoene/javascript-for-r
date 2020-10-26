@@ -1,8 +1,8 @@
 # Packer {#packer-overview}
 
-In the previous chapter a simple shiny application using NPM and webpack was put together. Hopefully it hinted at some of the powerful things webpack can do but also revealed a downside: the overhead in merely creating the project. Not only these operations have to be repeated for every project, the projects themselves change: the configuration of webpack used previously will work for other shiny applications but will not for R packages and golem [@R-golem] applications as the output files and how they are used will drastically change.
+In the previous chapter, a simple shiny application using NPM and webpack was put together. Hopefully, it hinted at some of the powerful things webpack can do but also revealed a downside: the overhead in merely creating the project. Not only these operations have to be repeated for every project, the projects themselves change: the configuration of webpack used previously will work for other shiny applications but will not for R packages, and golem [@R-golem] applications as the output files and how they are used will drastically change.
 
-In this chapter we discover the [packer](https://github.com/JohnCoene/packer) [@R-packer] R package which provides many convenience functions to create and manage R projects that make use of webpack and NPM.
+In this chapter, we discover the [packer](https://github.com/JohnCoene/packer) [@R-packer] R package which provides many convenience functions to create and manage R projects that make use of webpack and NPM.
 
 ```r
 install.packages("packer")
@@ -13,12 +13,12 @@ install.packages("packer")
 There are a few principles that the packer package follows strictly.
 
 1. It only aspires to become a specialised usethis for working with JavaScript and R, it takes inspiration from other packages such as htmlwidgets, usethis, and devtools.
-2. It never becomes a dependency to what you create. It's in a sense very much like an NPM "developer" dependency, it's used to develop the project but does not bring any additional overhead to what you're building.
+2. It never becomes a dependency to what you create. It's in a sense very much like an NPM "developer" dependency; it's used to develop the project but does not bring any additional overhead to what you're building.
 3. It should break the mission of webpack which is to build more robust JavaScript code. Therefore packer only builds on top of already strict R projects, namely packages (where golem packages can be used to create shiny applications).
 
 ## Scaffolds {#packer-scaffolds}
 
-Packer is comprised of surprisingly few functions, the most important ones are in the `scaffold` family. The term scaffold was shamelessly taken from the htmlwidgets package which features the function `scaffoldWidget` that was used in this book. The idea of scaffolds in packer are very similar to the `scaffoldWidget` function: it sets up the basic structure for a project.
+Packer is comprised of surprisingly few functions; the most important ones are in the `scaffold` family. The term scaffold was shamelessly taken from the htmlwidgets package which features the function `scaffoldWidget` that was used in this book. The idea of scaffolds in packer is very similar to the `scaffoldWidget` function: it sets up the basic structure for a project.
 
 Whist htmlwidgets only allow creating scaffolds for widgets packer allows creating scaffold various types of projects that involve JavaScript, namely:
 
@@ -28,7 +28,7 @@ Whist htmlwidgets only allow creating scaffolds for widgets packer allows creati
 - Shiny extensions with `scaffold_extension`
 - Golem applications with `scaffold_golem`
 
-This gives a few powerful function that (almost) all of the job of correctly setting up webpack for the project you are working on. These will configure the project as necessary depending on the scaffold you lay down and the context, whether it is a bare package, a golem application, a package with an existing scaffold, etc.
+This gives a few powerful functions that (almost) all of the job of correctly setting up webpack for your project. These will configure the project as necessary depending on the scaffold you lay down and the context, whether it is a basic package, a golem application, a package with an existing scaffold, etc.
 
 With some variation that will be explored in the coming sections, packer's `scaffold` functions generally do the following:
 
@@ -42,7 +42,7 @@ With some variation that will be explored in the coming sections, packer's `scaf
 - Adds relevant dependencies to the `DESCRIPTION`, e.g.: `shiny` when scaffolding an input
 - Finally, opens interesting files to develop the project in the IDE
 
-In the following sections we cover each of the scaffold individually in greater detail.
+In the following sections, we cover each of the scaffolds individually in greater detail.
 
 ## Widgets {#packer-widgets}
 

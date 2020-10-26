@@ -1,6 +1,6 @@
 # Exercise - Machine Learning {#v8-ml}
 
-In this chapter we build a package that, via V8, wraps [ml.js](https://github.com/mljs/ml), a library which brings machine learning to JavaScript. It covers quite a few models, in this chapter we only include one: the linear regression. This is an interesting example because it reveals some proceedings that one is likely to run into when creating packages using V8.
+In this chapter, we build a package that, via V8, wraps [ml.js](https://github.com/mljs/ml), a library which brings machine learning to JavaScript. It covers quite a few models, we only include one: the linear regression. This is an interesting example because it reveals some proceedings that one is likely to run into when creating packages using V8.
 
 ```js
 const x = [0.5, 1, 1.5, 2, 2.5];
@@ -43,7 +43,7 @@ ml <- NULL
 
 ## Simple Regression {#v8-ml-regression}
 
-First model we make available is the ["simple linear regression"](https://github.com/mljs/regression-simple-linear), which consists of a simple function that takes two arrays. We can thus create a function that takes two vectors, `x`, and `y`, and runs the regression.
+The ["simple linear regression"](https://github.com/mljs/regression-simple-linear) consists of a simple function that takes two arrays. We can thus create a function that takes two vectors, `x`, and `y`, and runs the regression.
 
 ```r
 #' @export 
@@ -83,7 +83,7 @@ ml_predict <- function(x){
 }
 ```
 
-We then document and load the functions to then run two regressions in a row and observe the issue. Unlike R the model we created only exists in JavaScript, unlike the `lm`, the function `ml_simple_lm` does not return the model. Therefore, `ml_simple_lm` does not distinguish between models, unlike `predict` which takes the model as first argument and runs the prediction on it.
+We then document and load the functions to run two regressions in a row then and observe the issue. Unlike R the model we created only exists in JavaScript, unlike the `lm`, the function `ml_simple_lm` does not return the model. Therefore, `ml_simple_lm` does not distinguish between models, unlike `predict` which takes the model as the first argument and runs the prediction on it.
 
 This implementation of ml.js is indeed very dangerous.
 
@@ -101,9 +101,9 @@ ml_predict(15)
 ## 10.76742
 ```
 
-The package ml currently under construction should emulate R in that respect, the `ml_simple_lm` should return the model which should be usable with the `predict` function. In order to do we are going to need to track regressions internally in V8 so the `ml_simple_lm` return a proxy of the model that `predict` can use to predict on the intended model.
+The package ml currently under construction should emulate R in that respect; the `ml_simple_lm` should return the model which should be usable with the `predict` function. In order to do we are going to need to track regressions internally in V8 so the `ml_simple_lm` return a proxy of the model that `predict` can use to predict on the intended model.
 
-In order to track and store regressions internally we are going to declare an empty array when the package is loaded.
+In order to track and store regressions internally, we are going to declare an empty array when the package is loaded.
 
 ```r
 # zzz.R
@@ -117,7 +117,7 @@ ml <- NULL
 }
 ```
 
-Then, one can track regressions by creating an R object which is incremented every time `ml_simple_lm` runs, this can be used as variable name in the JavaScript `regressions` array declare in `.onLoad`. This variable name must be stored in the object we intend to return so the `predict` method we will create later on can access the model and run predictions. Finally, in order to declare a new method on the `predict` function we need to return an object bearing a unique class, below we use `mlSimpleRegression`.
+Then, one can track regressions by creating an R object which is incremented every time `ml_simple_lm` runs; this can be used as a variable name in the JavaScript `regressions` array declare in `.onLoad`. This variable name must be stored in the object we intend to return so the `predict` method we will create later on can access the model and run predictions. Finally, in order to declare a new method on the `predict` function, we need to return an object bearing a unique class, below we use `mlSimpleRegression`.
 
 ```r
 counter <- new.env(parent = emptyenv())
