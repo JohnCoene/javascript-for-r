@@ -106,9 +106,9 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
 
 ```r
 engine$eval("new Date();") # using eval
-#> [1] "Sun Oct 18 2020 18:36:52 GMT+0200 (Central European Summer Time)"
+#> [1] "Sun Oct 18 2020 18:34:45 GMT+0200 (Central European Summer Time)"
 engine$call("Date", Sys.Date()) # using call
-#> [1] "Sun Oct 18 2020 18:36:52 GMT+0200 (Central European Summer Time)"
+#> [1] "Sun Oct 18 2020 18:34:45 GMT+0200 (Central European Summer Time)"
 ```
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with `engine$console()` you can then exit the console by typing `exit` or hitting the <kbd>ESC</kbd> key.
@@ -250,11 +250,11 @@ engine$call("fuse.search", "sense")
 #> [1] "d" "c"
 ```
 
-## Npm Packages {#v8-npm}
+## NPM Packages {#v8-npm}
 
-We can also use [npm](https://www.npmjs.com/) packages, though not all will work. Npm is node's Package Manager, or in a sense Node's equivalent of CRAN.
+We can also use [npm](https://www.npmjs.com/) packages, though not all will work. NPM is node's Package Manager, or in a sense Node's equivalent of CRAN.
 
-To use npm packages we need [browserify](http://browserify.org/), a node library to bundle all dependencies of an npm package into a single file which can subsequently be imported in V8. Browserify is itself an npm package, and therefore requires Node.js to be installed. The reason browserify is required is that the JavaScript code written for Node.js is different from that which should be written for web browsers, therefore importing a Javascript file built with node.js in a browser may not work: browserify will translate node.js code (where necessary) into JavaScript code the browser can run.
+To use NPM packages we need [browserify](http://browserify.org/), a node library to bundle all dependencies of an NPM package into a single file which can subsequently be imported in V8. Browserify is itself an NPM package, and therefore requires Node.js to be installed. The reason browserify is required is that the JavaScript code written for Node.js is different from that which should be written for web browsers, therefore importing a Javascript file built with node.js in a browser may not work: browserify will translate node.js code (where necessary) into JavaScript code the browser can run.
 
 You can install browserify globally with the following the `g` flag. Install node.js and type the following the terminal.
 
@@ -297,7 +297,7 @@ ms$call("ms", "2s") # 2 seconds
 
 ## Use in Packages {#v8-pkg}
 
-In this section, we detail how one should go about using V8 in an R package if you are not familiar with package development you can skip ahead. We start by creating a package called "ms" that will hold functionalities we explored in the previous section on npm packages.
+In this section, we detail how one should go about using V8 in an R package if you are not familiar with package development you can skip ahead. We start by creating a package called "ms" that will hold functionalities we explored in the previous section on NPM packages.
 
 ```r
 usethis::create_package('ms')
@@ -310,7 +310,7 @@ The package is going to rely on V8 so it needs to be added under `Imports` in th
 usethis::use_package("V8")
 ```
 
-The package should also include the external library `ms.js` browserified from the npm package which should be placed it in the `inst` directory. Create it and place the `ms.js` file within the latter.
+The package should also include the external library `ms.js` browserified from the NPM package which should be placed it in the `inst` directory. Create it and place the `ms.js` file within the latter.
 
 ```r
 dir.create("inst")

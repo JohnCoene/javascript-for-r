@@ -8,9 +8,11 @@ There is a lot of depth to NPM and webpack; we only touch upon the surface here 
 
 As Node's Package Manager, a working installation of node.js is required: NPM ships with it. A bit like R in a sense where the package manager also comes with the language, install R, and you can install packages from CRAN with `install.packages`. The same applies here, install Node and you can install NPM packages from the command line.
 
-<div class="rmdnote">
-<p>We are only going to use Node.js <em>indirectly</em>, some of its functionalities and its package manager. This is not about building Node applications.</p>
-</div>
+\begin{rmdnote}
+We are only going to use Node.js \emph{indirectly}, some of its
+functionalities and its package manager. This is not about building Node
+applications.
+\end{rmdnote}
 
 Below are some directions on how to install node.js, in the event this does not work or you encounter issues please refer to the [official website](https://nodejs.org/en/).
 
@@ -38,7 +40,6 @@ sudo apt install nodejs
 Download and install the official [executable](https://nodejs.org/en/download/) or use [chocolatey](https://chocolatey.org/).
 
 ```
-# for full install with npm
 cinst nodejs.install
 ```
 
@@ -74,7 +75,7 @@ With a simple application, one can initialise NPM. This could be translated into
 
 Whereas in R we previously used the usethis package to create packages with `create_package` or projects with `create_project`, NPM does not create the initial empty directory where the project will be created; you have to create the directory first then initialise a new project.
 
-An npm project can be initialised with the command `npm init`, which when run prompts the user with a few questions, such as the name of the project, the license to use, etc. These have little importance for what we do here but will matter if you decide to publish the package on NPM. One can also pass the "yes" flag to the function to skip those questions: `npm init -y`.
+An NPM project can be initialised with the command `npm init`, which when run prompts the user with a few questions, such as the name of the project, the license to use, etc. These have little importance for what we do here but will matter if you decide to publish the package on NPM. One can also pass the "yes" flag to the function to skip those questions: `npm init -y`.
 
 This creates a `package.json` file which is loosely equivalent to the `DESCRIPTION` of an R package; it includes information on the dependencies of the project, the version of the project, and more.
 
@@ -116,9 +117,10 @@ Notice that this updated the `package.json` file, created the `package-lock.json
 
 The directory `node_modules` actually holds all the dependencies, it will grow in size as you add more, it's important that this directory is not pushed to whatever version control system you happen use (Github, Bitbucket, Gitlab). 
 
-<div class="rmdnote">
-<p>Exclude the <code>node_modules</code> directory from your version control (Git or otherwise)</p>
-</div>
+\begin{rmdnote}
+Exclude the \texttt{node\_modules} directory from your version control
+(Git or otherwise)
+\end{rmdnote}
 
 The dependencies are anyway not needed as one can pull the project without the `node_modules` then from the root of the project run `npm install` to install the dependencies that are listed in the `package.json` file. We can indeed observe that this file was updated to include `webpack` and `webpack-cli` as `devDependencies`, at the bottom of the file.
 
@@ -212,11 +214,11 @@ So running `npm run build` produces the output file from the entry point file. H
 
 We will improve upon the previous section so we can run webpack on two different modes; one for production and one for development.
 
-Since the output of webpack is any number of files bundled into one, it can make debugging more complicated as it makes it more difficult to trace back the source of an error or warning. When files `a.js`, `b.js`, and `c.js` are bundled into `dist/main.js`, the stack trace will point to errors in `dist/main.js` which is not helpful as the developer needs to know in which original file the bug lies. 
+Since the output of webpack is any number of files bundled into one, it can make debugging more difficult to trace back the source of an error or warning. When files `a.js`, `b.js`, and `c.js` are bundled into `dist/main.js`, the stack trace will point to errors in `dist/main.js` which is not helpful as the developer needs to know in which original file the bug lies. 
 
 Therefore webpack comes with a "development" mode that allows including the "source map" which maps the compiled code to the source files. This way, when an error or warning is raised JavaScript is able to point to the original line that causes it.
 
-There are again many different ways to set this up in the configuration file as the source map can be placed in the bundled file itself, in another, and more. However, the easiest is probably to specify the mode using webpack's CLI tool. The source maps are again optional as these make the output larger and one wants to keep this output as small as possible for it to load faster in web browsers. Those will thus only be used while developing the project to trace back errors and warnings but will not be included in the final output for production.
+There are again many different ways to set this up in the configuration file as the source map can be placed in the bundled file itself, in another file, and more. However, the easiest way is probably to specify the mode using webpack's CLI tool. The source maps are optional as these make the output larger and one wants to keep this output as small as possible for it to load as fast as possible in web browsers. Those will thus only be used while developing the project to trace back errors and warnings but will not be included in the final output for production.
 
 Below we modify the scripts placed in the `package.json` file so two different scripts can be run: one for development and another for production.
 
@@ -260,13 +262,21 @@ server <- function(...) {}
 shinyApp(ui, server)
 ```
 
-Running the above should present the `alert()` that was placed in the `index.js` source file.
+Running the above launches the app which presents the `alert()` that was placed in the `index.js` source file.
 
-This makes for a great start but is not precisely interesting; in the following section, we elaborate on this basic configuration to make better use of webpack's feature and produce something much more fun.
+This makes for a great start but is not precisely interesting; in the following sections, we elaborate on this basic configuration to make better use of webpack's feature and produce something much more fun.
 
 ## Internal Dependencies {#webpack-intro-internal-dependencies}
 
-Let's install a dependency and make use of it in our shiny application. We'll install [mousetrap](https://github.com/ccampbell/mousetrap) a library to handle key-strokes. We're going to use it to hide the UI of the shiny application behind a secret password; it will only be revealed when the secret phrase has been typed. This can be done by observing a specific set of key-strokes with mousetrap and set a shiny input value when a particular sequence is typed. Though it is certainly not a  real-world example, it is educational and quite a bit of fun.
+Let's install a dependency and make use of it in our shiny application. 
+
+We'll install [mousetrap](https://github.com/ccampbell/mousetrap) a library to handle key-strokes. We're going to use it to hide the UI of the shiny application behind a secret pass-phrase; it will only be revealed after it has been typed. This can be done by observing a specific set of key-strokes with mousetrap and set a shiny input value when that particular sequence is typed.
+
+\begin{rmdnote}
+This is by no means a safe way to secure an application!
+\end{rmdnote}
+
+Though it is certainly not a  real-world example, it is educational and quite a bit of fun.
 
 The first thing to do is to install the mousetrap dependency, as indicated on the [Github README](https://github.com/ccampbell/mousetrap) it can be obtained from NPM.
 
@@ -280,7 +290,7 @@ Note that we use `--save` as mousetrap will need to be included in the output we
 
 If dependencies with webpack have to be installed from NPM it begs the question; what about dependencies that are already included in the project and are not available on NPM.
 
-For instance, this project is intended to work with a shiny application which comes bundled with jQuery, and the shiny JavaScript library. First, the shiny javaScript library is not available on NPM and second installing it would result in duplicating dependencies which hardly sounds like a best practice. Thankfully webpack comes with a simple mechanism to handle these cases; external dependencies can be added to the configuration file under `externals`.
+For instance, this project is intended to work with a shiny application which comes bundled with jQuery, and the shiny JavaScript library. First, the shiny javaScript library is not available on NPM. Second installing it would result in duplicating dependencies which is hardly best practice. Thankfully webpack comes with a simple mechanism to handle these cases; external dependencies can be added to the configuration file under `externals`.
 
 ```js
 module.exports = {
@@ -291,11 +301,11 @@ module.exports = {
 };
 ```
 
-The above will allow import `shiny` in scripts, so let's delve into the import/export mechanism.
+The above will allow importing the `Shiny` object in scripts, which is needed to set the input value with `Shiny.setInputValue`; hence `Shiny` must be accessible in webpack. Let us delve into the import/export mechanism.
 
 ## Import & Export {#webpack-intro-import-export}
 
-To demonstrate how webpack enables modularising code, we will modularise the code and not place everything in the `index.js` file. We create two other files,`secret.js` and `input.js`, the first will contain the pass-phrase and the second will have the code to handle the key strokes via mousetrap and set the shiny input. This will enable using the pass-phrase in multiple places without duplicating code.
+To demonstrate how webpack enables modularising code, we will not place all the code in the `index.js` file. We create two other files,`secret.js` and `input.js`, the first will contain the pass-phrase and the second will have the code to handle the key strokes via mousetrap and set the shiny input. This will enable using the pass-phrase in multiple places without duplicating code.
 
 ```r
 file.create("src/input.js")
@@ -304,32 +314,36 @@ file.create("src/secret.js")
 
 Therefore the entry point `index.js` needs to import `input.js` which itself imports the pass-phrase from `secret.js`.
 
-<!--html_preserve--><div id="htmlwidget-f872118f8ac2fcb673b3" style="width:100%;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-f872118f8ac2fcb673b3">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR compound=true]\n  node [shape=box]\n\n  subgraph cluster0 {\n    shiny [label=\"import shiny\"]\n    label = \"input.js\"\n    color=gold\n  }\n\n  subgraph cluster1 {\n    passphrase [label=\"export var\"]\n    label = \"secret.js\"\n    color=gold\n  }\n\n  shiny -> \"index.js\" [label=\"import module\", ltail=cluster0]\n  passphrase -> shiny [label=\"import variable\", ltail=cluster1, lhead=cluster0]\n  \"externals\" -> shiny [label=\"import shiny\", lhead=cluster0]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><!--/html_preserve-->
 
-Again, there are multiple ways one can use to import and export modules, functions, variables, etc. This book will use the ES6 syntax as [recommended by webpack](https://webpack.js.org/api/module-methods/#es6-recommended). Though this mechanism is present in other languages such as Python (which resembles ES6) it will take some getting used to for R programmers as though this language features some form of import and export differs significantly from what we're about to discover. This is, however, key to using webpack as it is what ultimately enables the creation of modules that make code more robust.
+\begin{center}\includegraphics[width=1\linewidth]{7-02-webpack-npm-discover_files/figure-latex/unnamed-chunk-4-1} 
+
+Again, there are multiple ways one can use to import and export modules, functions, variables, etc. This book will use the ES6 syntax as [recommended by webpack](https://webpack.js.org/api/module-methods/#es6-recommended). Though this mechanism is present in other languages such as Python (where it somewhat resembles ES6) it will take some getting used to for R programmers as though this language features some form of import (`library()`) and export (`@export` roxygen2 tag), this differs significantly from how it works in webpack. This is, however, key to using webpack as it is what ultimately enables the creation of modules that make code more robust.
+
+There are two different kinds of exports and imports possible, "named" and "default." We shall cover them in that order.
 
 ### Named {#webpack-intro-import-export-named}
 
-Let's place the variable `secret` in the `secret.js`. As a reminder, this variable will need to be imported by in another file (`input.js`) where it will be used to check if the pass-phrase typed by the user is correct. Declaring the variable itself does not change, we use the keyword `let` to declare a variable named `secret` that holds the pass-phrase. The issue is that with webpack, this variable will be internal to the file where it is declared. However, we ultimately want to import that variable in another file. To do so, we can place the keyword `export` in front of the declaration to indicate that this variable is exported. This will also work with functions and classes.
+Let's place the variable `secret` in the `secret.js`. As a reminder, this variable will have to be imported by in another file (`input.js`) where it will be used to check if the pass-phrase typed by the user is correct. 
 
-There are also different kinds of exports and imports possible, mainly "named" and "default." Here we use a named export; the `secret.js` file explicitly exports the variable named `secret`.
+Declaring the variable itself does not change, we use the keyword `let` to declare a variable named `secret` that holds the pass-phrase. The issue is that with webpack, this variable will be internal to the file where it is declared. However, we ultimately want to import that variable in another file. To do so, we can place the keyword `export` in front of the declaration to indicate that this variable is exported from the file. Note that this will also work with functions and classes, and other objects.
+
+Placing `export` in front of an object constitutes a _named export_; the `secret.js` file explicitly exports the variable named `secret`.
 
 ```js
 export let secret = 's e c r e t';
 ```
 
-Then this variable can be imported in the `input.js` file. The named export in `secret.js` comes with a corresponding named import in which is used in `input.js` to import the variable named `secret`, this is indicated by the curly braces. Note that again we include the path to the file (`./secret.js`), importing from `secret.js` will fail.
+Then this variable can be imported in the `input.js` file. The named export in `secret.js` comes with a corresponding named import in which is used in `input.js` to import the variable named `secret`, this is indicated by the curly braces. Note that again we include the path to the file (`./secret.js`), importing from `secret.js` without the path will fail.
 
 ```js
 import { secret } from './secret.js';
 ```
 
-The curly braces are used for named imports as multiple such variables or functions can then be imported, e.g.: `import { foo, bar } from './file.js';`.
+The curly braces are used for named imports as multiple such variables or functions can then be imported, e.g. `import { foo, bar } from './file.js';` to import the named exports `foo` and `bar` from `file.js`.
 
 ### Default {#webpack-intro-import-export-default}
 
-An alternative would be to use a default export. A file can have a default export, said default could be a variable, a function, a list, or any number of things but there can only be a single default export per file. Default exports are indicated with by succeeding `export` with `default`.
+An alternative would be to use a default export. A file can have a default export, said default could be a variable, a function, a list, or any number of things but _there can only be a single default export per file_. Default exports are indicated with by succeeding `export` with `default`.
 
 ```js
 // declare
@@ -339,7 +353,7 @@ let secret = 's e c r e t';
 export default secret;
 ```
 
-Rather interestingly, because one can declare multiple variables in a single line and that only a single default can exist the default export and declaration cannot be placed on a single line. Only a single function be declared by line so declaring a function and its default export on a single line is valid.
+Rather interestingly, because one can declare multiple variables in a single line (e.g. `var a,b,c;`) and that only a single default can exist the default export and declaration cannot be placed on a single line. Only a single function be declared by line so declaring a function and its default export on a single line is valid.
 
 ```js
 // invalid
@@ -349,6 +363,12 @@ export default secret = 's e c r e t';
 export default function sayHello() {
   alert("Hello!")
 };
+
+// valid
+var x = 0,
+    y = true;
+
+export default {x, y}
 ```
 
 Importing default exports in other files resembles all too much the syntax of named imports which may lead to confusion: it's essentially the same omitting the curly braces.
@@ -378,9 +398,9 @@ Finally, remember to import `input.js` in the entry point `index.js`.
 import './input.js';
 ```
 
-This can then be bundled with `npm run bundle-prod` which will we look at the entry point (`index.js`) observes that it imports the file `input.js` which itself imports `secret.js`; webpack builds this dependency tree and include all that is needed in the bundle. 
+This can then be bundled with `npm run bundle-prod` which will look at the entry point (`index.js`) observes that it imports the file `input.js` which itself imports `secret.js`; webpack builds this dependency tree and includes all that is needed in the bundle. 
 
-This can be used in the shiny application which we modify, so it listens to the `secret` input set and only when that input is set does it render a plot and a message.
+This can be used in the shiny application, which we modify so it listens to the `secret` input and only when that input is set renders a plot and a message.
 
 ```r
 library(shiny)
@@ -416,9 +436,13 @@ shinyApp(ui, server)
 
 Once the application is launched the user can type the phrase `secret` to see the content of the application.
 
-<div class="figure" style="text-align: center">
-<img src="images/mousetrap.png" alt="Mousetrap example" width="100%" />
-<p class="caption">(\#fig:mousetrap)Mousetrap example</p>
-</div>
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/mousetrap} 
+
+}
+
+\caption{Mousetrap example}(\#fig:mousetrap)
+\end{figure}
 
 That is it for this chapter, as stated multiple times there is far more depth to webpack, but this is outside the scope of this book, instead in the next chapter we discover an easier way to set up such projects and make R and webpack work in a more seamless fashion.
