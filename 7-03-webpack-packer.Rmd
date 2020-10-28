@@ -2,7 +2,7 @@
 
 In the previous chapter, we put together a simple shiny application using NPM and webpack. Hopefully, it hinted at some of the powerful things webpack can do but also revealed a downside: the overhead in merely creating the project. Moreover, the configuration will change depending on what the project is (application, package, etc.).
 
-In this chapter, we discover the [packer](https://github.com/JohnCoene/packer) [@R-packer] R package which provides many convenience functions to create and manage R projects that make use of webpack and NPM.
+In this chapter, we discover the [packer](https://github.com/JohnCoene/packer) [@R-packer] R package, which provides many convenience functions to create and manage R projects that make use of webpack and NPM.
 
 ```r
 install.packages("packer")
@@ -18,9 +18,9 @@ There are a few principles that the packer package follows strictly.
 
 ## Scaffolds {#packer-scaffolds}
 
-Packer is comprised of surprisingly few functions; the most important ones are in the `scaffold` family. The term scaffold was borrowed from the htmlwidgets package, which features the function `scaffoldWidget` that was already used in this book. The idea of scaffolds in packer is very similar to the `scaffoldWidget` function: they set up the basic structure for projects.
+Packer is comprised of surprisingly few functions; the most important ones are in the `scaffold` family. The term scaffold was borrowed from the htmlwidgets package, which features the function `scaffoldWidget` (already used in this book). The idea of scaffolds in packer is very similar to the `scaffoldWidget` function: they set up the basic structure for projects.
 
-Whilst htmlwidgets only allows creating scaffolds for widgets, packer allows creating scaffolds for several things, namely:
+Whilst htmlwidgets only allows creating scaffolds for widgets; packer allows creating scaffolds for several things, namely:
 
 - Widgets with `scaffold_widget`
 - Shiny inputs with `scaffold_input`
@@ -28,7 +28,7 @@ Whilst htmlwidgets only allows creating scaffolds for widgets, packer allows cre
 - Shiny extensions with `scaffold_extension`
 - Golem applications with `scaffold_golem`
 
-This gives a few powerful functions that do (almost) all of the job of correctly setting up webpack. These will build the necessary file structure and configuration depending on the scaffold you lay down and the context (whether it is a basic package, a golem application, a package with an existing scaffold, etc.)
+This gives a few powerful functions that correctly set up webpack. These will build the necessary file structure and configuration depending on the scaffold and the context (whether it is a basic package, a golem application, a package with an existing scaffold, etc.)
 
 ```{block, type='rmdnote'}
 One can use multiple scaffolds in a single package or shiny application.
@@ -38,11 +38,11 @@ Packer goes beyond merely setting up webpack and NPM; it will also create the ne
 
 With some variations that will be explored in the coming sections, packer's `scaffold` functions generally do the following:
 
-- Initialise npm with `npm init -y`
+- Initialise npm with `npm init` and prefills the `package.json` file
 - Install webpack and its CLI with `npm install webpack webpack-cli --save-dev`
 - Creates three webpack configuration files: `webpack.common.js`, `webpack.prod.js`, and `webpack.dev.js`
 - Creates the `srcjs` directory for the JavaScript source code.
-- Creates basic JavaScript files within the `srcjs` directory, e.g.: `index.js`
+- Creates raw JavaScript files within the `srcjs` directory, e.g.: `index.js`
 - Creates the R functions (if necessary)
 - Adds the necessary NPM scripts to `package.json`
 - Adds all relevant files to the `.Rbuildignore` and `.gitignore` files
@@ -229,7 +229,7 @@ $.extend(incrementBinding, {
 Shiny.inputBindings.register(incrementBinding, "increment.incrementBinding");
 ```
 
-The `srcjs/index.js` file was also created; it imports the JavaScript binding detailed above with `import './inputs/increment.js';`. Importantly, by default packer does not bundle all of these files into one; `index.js` is only populated for convenience in the event one would want to change this behaviour. Instead, packer uses `srcjs/inputs/increment.js` as entry point. It will handle multiple entry points, so every input, output, widgets, etc. are bundled separately. This is done so one can import those dynamically.
+The `srcjs/index.js` file was also created; it imports the JavaScript binding detailed above with `import './inputs/increment.js';`. Notably, by default, packer does not bundle all of these files into one; `index.js` is only populated for convenience in the event one would want to change this behaviour. Instead, packer uses `srcjs/inputs/increment.js` as an entry point. It will handle multiple entry points, so every input, output, widgets, etc. are bundled separately. This is done so one can import those dynamically.
 
 ## Bundle {#packer-bundle}
 
@@ -262,6 +262,6 @@ if(interactive())
   shinyApp(ui, server)
 ```
 
-No code was written, yet we have a fully-functional input! We'll leave at this, it's obviously not only meant to create increment buttons, but this sets up a solid base for the developer to customise the code and conveniently create a different input.
+No code was written, yet we have a fully-functional input! We'll leave at this, it's not only meant to create increment buttons, but this sets up a solid base for the developer to customise the code and conveniently create a different input.
 
-It is worth noting that we built a shiny input from within a package, this is meant to be exported and used in shiny applications elsewhere, but were one to run these exact same steps from a golem application packer would adapt the output path so that the input can be used directly in the application.
+It is worth noting that we built a shiny input from within a package, this is meant to be exported and used in shiny applications elsewhere, but were one to run these same steps from a golem application packer would adapt the output path so that the input can be used directly in the application.
