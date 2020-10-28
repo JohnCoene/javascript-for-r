@@ -102,10 +102,9 @@ dependencies:
     script: jquery.peity.min.js
 ```
 
-\begin{rmdnote}
-The order of the dependencies matters, peity.js depends on jQuery hence
-the latter comes first in the \texttt{.yml}.
-\end{rmdnote}
+<div class="rmdnote">
+<p>The order of the dependencies matters, peity.js depends on jQuery hence the latter comes first in the <code>.yml</code>.</p>
+</div>
 
 The order in which one specifies the dependencies matters, just like it does in an HTML file, therefore jQuery is listed first. The `stylesheet` entries were removed as none of these libraries require CSS files. The `src` path points to the directory containing the JavaScript files and stylesheets relative to the `inst` directory of the package; this is akin to using the `system.file` function to return the full path to a file or directory within the package.
 
@@ -310,14 +309,10 @@ browsable(
 
 
 
-\begin{figure}[t]
-
-{\centering \includegraphics[width=1\linewidth]{images/peity-div} 
-
-}
-
-\caption{Peity output with DIV}(\#fig:peity-divs)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/peity-div.png" alt="Peity output with DIV" width="100%" />
+<p class="caption">(\#fig:peity-divs)Peity output with DIV</p>
+</div>
 
 There is nonetheless one remaining issue: peity.js is meant to create inline charts within `<span>` HTML tags but these are created within `<div>` hence each chart appears on a new line.
 
@@ -356,11 +351,7 @@ browsable(
 )
 ```
 
-\begin{figure}[t]
-
-{\centering \includegraphics[width=1\linewidth]{images/peity-span} 
-
-}
-
-\caption{Peity output with SPAN}(\#fig:peity-spans)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/peity-span.png" alt="Peity output with SPAN" width="100%" />
+<p class="caption">(\#fig:peity-spans)Peity output with SPAN</p>
+</div>

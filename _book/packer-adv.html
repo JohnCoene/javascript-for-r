@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-10-27" />
+<meta name="date" content="2020-10-28" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -224,6 +224,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li class="chapter" data-level="3.1" data-path="widgets-intro-intro.html"><a href="widgets-intro-intro.html#widgets-plotly"><i class="fa fa-check"></i><b>3.1</b> Plotly package</a></li>
 <li class="chapter" data-level="3.2" data-path="widgets-intro-intro.html"><a href="widgets-intro-intro.html#widgets-intro-dt"><i class="fa fa-check"></i><b>3.2</b> DT package</a></li>
+<li class="chapter" data-level="3.3" data-path="widgets-intro-intro.html"><a href="widgets-intro-intro.html#widgets-intro-crosstalk"><i class="fa fa-check"></i><b>3.3</b> Crosstalk</a></li>
+<li class="chapter" data-level="3.4" data-path="widgets-intro-intro.html"><a href="widgets-intro-intro.html#widgets-intro-conclude"><i class="fa fa-check"></i><b>3.4</b> Wrap-up</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="widgets-basics.html"><a href="widgets-basics.html"><i class="fa fa-check"></i><b>4</b> Basics of Building Widgets</a>
 <ul>
@@ -496,15 +498,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="packer-adv" class="section level1" number="23">
 <h1><span class="header-section-number">Chapter 23</span> Packer Advanced</h1>
-<p>We’re about to cover slightly more advanced uses of NPM and webpack with R using packer. These involve using an NPM dependency to develop a widget, and use <a href="https://vuejs.org/">Vue.js</a> to power the front-end of a shiny application.</p>
-<p>Those will make for more concrete cases to bring webpack into your workflow, and also enable explaining more advanced topics only thus far briefly touched upon such as transpiling.</p>
+<p>We’re about to cover slightly more advanced uses of NPM and webpack with R using packer. These involve using an NPM dependency to develop a widget and use <a href="https://vuejs.org/">Vue.js</a> to power the front-end of a shiny application.</p>
+<p>Those will make for more concrete cases to bring webpack into your workflow, and also enable explaining more advanced topics only thus far briefly touched upon, such as transpiling.</p>
 <div id="packer-adv-widgets" class="section level2" number="23.1">
 <h2><span class="header-section-number">23.1</span> Widgets</h2>
-<p>The widget scaffold, like all other scaffolds must be run from within the root of a package. To demonstrate we’ll write a widget for the <a href="https://github.com/inorganik/countUp.js/">countup</a> library that allows animating numbers.</p>
+<p>The widget scaffold, like all other scaffolds, must be run from within the root of a package. To demonstrate we’ll write a widget for the <a href="https://github.com/inorganik/countUp.js/">countup</a> library that allows animating numbers.</p>
 <p>First, we create a package which we name <code>counter</code>. You can name the package different but avoid naming it <code>countup</code>. We will later have to install the external dependency also named <code>countup</code> and NPM does not allow a project named X to use a dependency also named X.</p>
-<div class="sourceCode" id="cb427"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb427-1"><a href="packer-adv.html#cb427-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;counter&quot;</span>)</span></code></pre></div>
-<p>From the root of the package we scaffold the widget with <code>scaffold_widget</code>, which prints out some information on what packer exactly does.</p>
-<div class="sourceCode" id="cb428"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb428-1"><a href="packer-adv.html#cb428-1"></a>packer<span class="op">::</span><span class="kw">scaffold_widget</span>(<span class="st">&quot;countup&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb428"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb428-1"><a href="packer-adv.html#cb428-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;counter&quot;</span>)</span></code></pre></div>
+<p>From the root of the package, we scaffold the widget with <code>scaffold_widget</code>, which prints out some information on what packer exactly does.</p>
+<div class="sourceCode" id="cb429"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb429-1"><a href="packer-adv.html#cb429-1"></a>packer<span class="op">::</span><span class="kw">scaffold_widget</span>(<span class="st">&quot;countup&quot;</span>)</span></code></pre></div>
 <pre><code>── Scaffolding widget ──────────────────────────────── countup ── 
 ✔ Bare widget setup
 ✔ Created srcjs directory
@@ -538,93 +540,109 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ── Scaffold built ──
 
 ℹ Run `bundle` to build the JavaScript files</code></pre>
-<p>Importantly, it runs <code>htmlwidgets::scaffoldWidget</code> internally, there is thus no need to run this function. With regard to the widget itself, there is very little difference between what <code>htmlwidgets::scaffoldWidget</code> and <code>packer::scaffold_widget</code>. While, if you remember, the initial scaffold of htmlwidgets includes a simple function to display a message in HTML using <code>innerText</code>. The scaffold produced by packer differs only in that this message is displayed in <code>&lt;h1&gt;</code> HTML tags. That is so it can, from the get-go, demonstrate how to modularise a widget. We’ll cover that in just a minute, before we do so, bundle the JavaScript and run the <code>counter</code> function to observe the output it generates.</p>
-<div class="sourceCode" id="cb430"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb430-1"><a href="packer-adv.html#cb430-1"></a>packer<span class="op">::</span><span class="kw">bundle</span>()</span>
-<span id="cb430-2"><a href="packer-adv.html#cb430-2"></a>devtools<span class="op">::</span><span class="kw">load_all</span>()</span>
-<span id="cb430-3"><a href="packer-adv.html#cb430-3"></a><span class="kw">countup</span>(<span class="st">&quot;Hello widgets!&quot;</span>)</span></code></pre></div>
-<p>This indeed displays the message in <code>&lt;h1&gt;</code> HTML tags. Now onto unpacking the structure generated by packer. We’ll skip the R code to keep this concise as nothing differs from a standard widget on that side. Rather, we’ll focus on the JavaScript code in the <code>srcjs</code> directory. First, in the <code>srcjs/widgets</code> directory one will find the file <code>countup.js</code>, this file contains the code that produces the widget.</p>
+<p>Importantly, it runs <code>htmlwidgets::scaffoldWidget</code> internally, there is thus no need to run this function. About the widget itself, there is very little difference between what <code>htmlwidgets::scaffoldWidget</code> and <code>packer::scaffold_widget</code>. While, if you remember, the initial scaffold of htmlwidgets includes a simple function to display a message in HTML using <code>innerText</code>. The scaffold produced by packer differs only in that this message is displayed in <code>&lt;h1&gt;</code> HTML tags. That is so it can, from the get-go, demonstrate how to modularise a widget. We’ll cover that in just a minute before we do so, bundle the JavaScript and run the <code>counter</code> function to observe the output it generates.</p>
+<div class="sourceCode" id="cb431"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb431-1"><a href="packer-adv.html#cb431-1"></a>packer<span class="op">::</span><span class="kw">bundle</span>()</span>
+<span id="cb431-2"><a href="packer-adv.html#cb431-2"></a>devtools<span class="op">::</span><span class="kw">load_all</span>()</span>
+<span id="cb431-3"><a href="packer-adv.html#cb431-3"></a><span class="kw">countup</span>(<span class="st">&quot;Hello widgets!&quot;</span>)</span></code></pre></div>
+<p>This indeed displays the message in <code>&lt;h1&gt;</code> HTML tags, now onto unpacking the structure generated by packer. We’ll skip the R code to keep this concise as nothing differs from a standard widget on that side. Instead, we’ll focus on the JavaScript code in the <code>srcjs</code> directory. First, in the <code>srcjs/widgets</code> directory, one will find the file <code>countup.js</code>, this file contains the code that produces the widget.</p>
 <p>At the top of the file are the imports. First, it imports <code>widgets</code>, which is an <em>external dependency,</em> second it imports the function <code>asHeader</code> from the <code>header.js</code> file in the <code>modules</code> directory.</p>
-<div class="sourceCode" id="cb431"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb431-1"><a href="packer-adv.html#cb431-1"></a><span class="im">import</span> <span class="st">&#39;widgets&#39;</span><span class="op">;</span></span>
-<span id="cb431-2"><a href="packer-adv.html#cb431-2"></a><span class="im">import</span> <span class="op">{</span> asHeader <span class="op">}</span> <span class="im">from</span> <span class="st">&#39;../modules/header.js&#39;</span><span class="op">;</span> </span>
-<span id="cb431-3"><a href="packer-adv.html#cb431-3"></a></span>
-<span id="cb431-4"><a href="packer-adv.html#cb431-4"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
-<span id="cb431-5"><a href="packer-adv.html#cb431-5"></a></span>
-<span id="cb431-6"><a href="packer-adv.html#cb431-6"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;countup&#39;</span><span class="op">,</span></span>
-<span id="cb431-7"><a href="packer-adv.html#cb431-7"></a></span>
-<span id="cb431-8"><a href="packer-adv.html#cb431-8"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
-<span id="cb431-9"><a href="packer-adv.html#cb431-9"></a></span>
-<span id="cb431-10"><a href="packer-adv.html#cb431-10"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
-<span id="cb431-11"><a href="packer-adv.html#cb431-11"></a></span>
-<span id="cb431-12"><a href="packer-adv.html#cb431-12"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
-<span id="cb431-13"><a href="packer-adv.html#cb431-13"></a></span>
-<span id="cb431-14"><a href="packer-adv.html#cb431-14"></a>    <span class="cf">return</span> <span class="op">{</span></span>
-<span id="cb431-15"><a href="packer-adv.html#cb431-15"></a></span>
-<span id="cb431-16"><a href="packer-adv.html#cb431-16"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb431-17"><a href="packer-adv.html#cb431-17"></a></span>
-<span id="cb431-18"><a href="packer-adv.html#cb431-18"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to render the widget, e.g.</span></span>
-<span id="cb431-19"><a href="packer-adv.html#cb431-19"></a>        <span class="va">el</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="at">asHeader</span>(x)<span class="op">;</span></span>
-<span id="cb431-20"><a href="packer-adv.html#cb431-20"></a></span>
-<span id="cb431-21"><a href="packer-adv.html#cb431-21"></a>      <span class="op">},</span></span>
-<span id="cb431-22"><a href="packer-adv.html#cb431-22"></a></span>
-<span id="cb431-23"><a href="packer-adv.html#cb431-23"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
-<span id="cb431-24"><a href="packer-adv.html#cb431-24"></a></span>
-<span id="cb431-25"><a href="packer-adv.html#cb431-25"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to re-render the widget with a new size</span></span>
-<span id="cb431-26"><a href="packer-adv.html#cb431-26"></a></span>
-<span id="cb431-27"><a href="packer-adv.html#cb431-27"></a>      <span class="op">}</span></span>
-<span id="cb431-28"><a href="packer-adv.html#cb431-28"></a></span>
-<span id="cb431-29"><a href="packer-adv.html#cb431-29"></a>    <span class="op">};</span></span>
-<span id="cb431-30"><a href="packer-adv.html#cb431-30"></a>  <span class="op">}</span></span>
-<span id="cb431-31"><a href="packer-adv.html#cb431-31"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
-<p>The <code>header.js</code> file includes the <code>asHeader</code> function which accepts an <code>x</code> argument that is used to create the <code>&lt;h1&gt;</code> message. This functions is exported.</p>
-<div class="sourceCode" id="cb432"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb432-1"><a href="packer-adv.html#cb432-1"></a><span class="kw">const</span> asHeader <span class="op">=</span> (x) <span class="kw">=&gt;</span> <span class="op">{</span></span>
-<span id="cb432-2"><a href="packer-adv.html#cb432-2"></a>  <span class="cf">return</span> <span class="st">&#39;&lt;h1&gt;&#39;</span> <span class="op">+</span> <span class="va">x</span>.<span class="at">message</span> <span class="op">+</span> <span class="st">&#39;&lt;/h1&gt;&#39;</span><span class="op">;</span></span>
-<span id="cb432-3"><a href="packer-adv.html#cb432-3"></a><span class="op">}</span></span>
-<span id="cb432-4"><a href="packer-adv.html#cb432-4"></a></span>
-<span id="cb432-5"><a href="packer-adv.html#cb432-5"></a><span class="im">export</span> <span class="op">{</span> asHeader <span class="op">};</span></span></code></pre></div>
-<p>We will make changes to the JavaScript so that instead of displaying the message as text, uses the aforementioned countup library to animate a number. The first order of business is to in install countup. Here we use packer to do so, the function call below is identical to running <code>npm install countup --save</code> from the terminal.</p>
-<div class="sourceCode" id="cb433"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb433-1"><a href="packer-adv.html#cb433-1"></a>packer<span class="op">::</span><span class="kw">npm_install</span>(<span class="st">&quot;countup&quot;</span>, <span class="dt">scope =</span> <span class="st">&quot;prod&quot;</span>) </span></code></pre></div>
-<p>We will not need the <code>header.js</code> file, we can delete it and in its stead create another file called <code>count.js</code>. This file will include a function that uses countup to animate the numbers, it should accept 1) the id of the element where countup should be used, and 2) the value that countup should animate. This function called <code>counter</code> is, at the end of the file, exported.</p>
-<div class="sourceCode" id="cb434"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb434-1"><a href="packer-adv.html#cb434-1"></a><span class="im">import</span> <span class="op">{</span> CountUp <span class="op">}</span> <span class="im">from</span> <span class="st">&#39;countup.js&#39;</span><span class="op">;</span></span>
-<span id="cb434-2"><a href="packer-adv.html#cb434-2"></a></span>
-<span id="cb434-3"><a href="packer-adv.html#cb434-3"></a><span class="kw">function</span> <span class="at">counter</span>(id<span class="op">,</span> value)<span class="op">{</span></span>
-<span id="cb434-4"><a href="packer-adv.html#cb434-4"></a>  <span class="kw">var</span> countUp <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(id<span class="op">,</span> value)<span class="op">;</span></span>
-<span id="cb434-5"><a href="packer-adv.html#cb434-5"></a>  <span class="va">countUp</span>.<span class="at">start</span>()<span class="op">;</span></span>
-<span id="cb434-6"><a href="packer-adv.html#cb434-6"></a><span class="op">}</span></span>
-<span id="cb434-7"><a href="packer-adv.html#cb434-7"></a></span>
-<span id="cb434-8"><a href="packer-adv.html#cb434-8"></a><span class="im">export</span> <span class="op">{</span> counter <span class="op">};</span></span></code></pre></div>
-<div class="sourceCode" id="cb435"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb435-1"><a href="packer-adv.html#cb435-1"></a><span class="im">import</span> <span class="st">&#39;widgets&#39;</span><span class="op">;</span></span>
-<span id="cb435-2"><a href="packer-adv.html#cb435-2"></a><span class="im">import</span> <span class="op">{</span> counter <span class="op">}</span> <span class="im">from</span> <span class="st">&#39;../modules/count.js&#39;</span><span class="op">;</span> </span>
-<span id="cb435-3"><a href="packer-adv.html#cb435-3"></a></span>
-<span id="cb435-4"><a href="packer-adv.html#cb435-4"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
-<span id="cb435-5"><a href="packer-adv.html#cb435-5"></a></span>
-<span id="cb435-6"><a href="packer-adv.html#cb435-6"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;countup&#39;</span><span class="op">,</span></span>
+<div class="sourceCode" id="cb432"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb432-1"><a href="packer-adv.html#cb432-1"></a><span class="im">import</span> <span class="st">&#39;widgets&#39;</span><span class="op">;</span></span>
+<span id="cb432-2"><a href="packer-adv.html#cb432-2"></a><span class="im">import</span> <span class="op">{</span> asHeader <span class="op">}</span> <span class="im">from</span> <span class="st">&#39;../modules/header.js&#39;</span><span class="op">;</span> </span>
+<span id="cb432-3"><a href="packer-adv.html#cb432-3"></a></span>
+<span id="cb432-4"><a href="packer-adv.html#cb432-4"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
+<span id="cb432-5"><a href="packer-adv.html#cb432-5"></a></span>
+<span id="cb432-6"><a href="packer-adv.html#cb432-6"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;countup&#39;</span><span class="op">,</span></span>
+<span id="cb432-7"><a href="packer-adv.html#cb432-7"></a></span>
+<span id="cb432-8"><a href="packer-adv.html#cb432-8"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
+<span id="cb432-9"><a href="packer-adv.html#cb432-9"></a></span>
+<span id="cb432-10"><a href="packer-adv.html#cb432-10"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb432-11"><a href="packer-adv.html#cb432-11"></a></span>
+<span id="cb432-12"><a href="packer-adv.html#cb432-12"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
+<span id="cb432-13"><a href="packer-adv.html#cb432-13"></a></span>
+<span id="cb432-14"><a href="packer-adv.html#cb432-14"></a>    <span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb432-15"><a href="packer-adv.html#cb432-15"></a></span>
+<span id="cb432-16"><a href="packer-adv.html#cb432-16"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb432-17"><a href="packer-adv.html#cb432-17"></a></span>
+<span id="cb432-18"><a href="packer-adv.html#cb432-18"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to render the widget, e.g.</span></span>
+<span id="cb432-19"><a href="packer-adv.html#cb432-19"></a>        <span class="va">el</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="at">asHeader</span>(x)<span class="op">;</span></span>
+<span id="cb432-20"><a href="packer-adv.html#cb432-20"></a></span>
+<span id="cb432-21"><a href="packer-adv.html#cb432-21"></a>      <span class="op">},</span></span>
+<span id="cb432-22"><a href="packer-adv.html#cb432-22"></a></span>
+<span id="cb432-23"><a href="packer-adv.html#cb432-23"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb432-24"><a href="packer-adv.html#cb432-24"></a></span>
+<span id="cb432-25"><a href="packer-adv.html#cb432-25"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to re-render the widget with a new size</span></span>
+<span id="cb432-26"><a href="packer-adv.html#cb432-26"></a></span>
+<span id="cb432-27"><a href="packer-adv.html#cb432-27"></a>      <span class="op">}</span></span>
+<span id="cb432-28"><a href="packer-adv.html#cb432-28"></a></span>
+<span id="cb432-29"><a href="packer-adv.html#cb432-29"></a>    <span class="op">};</span></span>
+<span id="cb432-30"><a href="packer-adv.html#cb432-30"></a>  <span class="op">}</span></span>
+<span id="cb432-31"><a href="packer-adv.html#cb432-31"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<p>The <code>header.js</code> file includes the <code>asHeader</code> function which accepts an <code>x</code> argument that is used to create the <code>&lt;h1&gt;</code> message. This function is exported.</p>
+<div class="sourceCode" id="cb433"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb433-1"><a href="packer-adv.html#cb433-1"></a><span class="kw">const</span> asHeader <span class="op">=</span> (x) <span class="kw">=&gt;</span> <span class="op">{</span></span>
+<span id="cb433-2"><a href="packer-adv.html#cb433-2"></a>  <span class="cf">return</span> <span class="st">&#39;&lt;h1&gt;&#39;</span> <span class="op">+</span> <span class="va">x</span>.<span class="at">message</span> <span class="op">+</span> <span class="st">&#39;&lt;/h1&gt;&#39;</span><span class="op">;</span></span>
+<span id="cb433-3"><a href="packer-adv.html#cb433-3"></a><span class="op">}</span></span>
+<span id="cb433-4"><a href="packer-adv.html#cb433-4"></a></span>
+<span id="cb433-5"><a href="packer-adv.html#cb433-5"></a><span class="im">export</span> <span class="op">{</span> asHeader <span class="op">};</span></span></code></pre></div>
+<p>We will make changes to the JavaScript so that instead of displaying the message as text, uses the aforementioned countup library to animate a number. The first order of business is to install countup. Here we use packer to do so, the function call below is identical to running <code>npm install countup --save</code> from the terminal.</p>
+<div class="sourceCode" id="cb434"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb434-1"><a href="packer-adv.html#cb434-1"></a>packer<span class="op">::</span><span class="kw">npm_install</span>(<span class="st">&quot;countup&quot;</span>, <span class="dt">scope =</span> <span class="st">&quot;prod&quot;</span>) </span></code></pre></div>
+<p>We will not need the <code>header.js</code> file, we can delete it and in its stead create another file called <code>count.js</code>. This file will include a function that uses countup to animate the numbers; it should accept 1) the id of the element where countup should be used, and 2) the value that countup should animate. This function called <code>counter</code> is, at the end of the file, exported.</p>
+<div class="sourceCode" id="cb435"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb435-1"><a href="packer-adv.html#cb435-1"></a><span class="im">import</span> <span class="op">{</span> CountUp <span class="op">}</span> <span class="im">from</span> <span class="st">&#39;countup.js&#39;</span><span class="op">;</span></span>
+<span id="cb435-2"><a href="packer-adv.html#cb435-2"></a></span>
+<span id="cb435-3"><a href="packer-adv.html#cb435-3"></a><span class="kw">function</span> <span class="at">counter</span>(id<span class="op">,</span> value)<span class="op">{</span></span>
+<span id="cb435-4"><a href="packer-adv.html#cb435-4"></a>  <span class="kw">var</span> countUp <span class="op">=</span> <span class="kw">new</span> <span class="at">CountUp</span>(id<span class="op">,</span> value)<span class="op">;</span></span>
+<span id="cb435-5"><a href="packer-adv.html#cb435-5"></a>  <span class="va">countUp</span>.<span class="at">start</span>()<span class="op">;</span></span>
+<span id="cb435-6"><a href="packer-adv.html#cb435-6"></a><span class="op">}</span></span>
 <span id="cb435-7"><a href="packer-adv.html#cb435-7"></a></span>
-<span id="cb435-8"><a href="packer-adv.html#cb435-8"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
-<span id="cb435-9"><a href="packer-adv.html#cb435-9"></a></span>
-<span id="cb435-10"><a href="packer-adv.html#cb435-10"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
-<span id="cb435-11"><a href="packer-adv.html#cb435-11"></a></span>
-<span id="cb435-12"><a href="packer-adv.html#cb435-12"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
-<span id="cb435-13"><a href="packer-adv.html#cb435-13"></a></span>
-<span id="cb435-14"><a href="packer-adv.html#cb435-14"></a>    <span class="cf">return</span> <span class="op">{</span></span>
-<span id="cb435-15"><a href="packer-adv.html#cb435-15"></a></span>
-<span id="cb435-16"><a href="packer-adv.html#cb435-16"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
-<span id="cb435-17"><a href="packer-adv.html#cb435-17"></a></span>
-<span id="cb435-18"><a href="packer-adv.html#cb435-18"></a>        <span class="at">counter</span>(<span class="va">el</span>.<span class="at">id</span><span class="op">,</span> <span class="va">x</span>.<span class="at">message</span>)<span class="op">;</span></span>
-<span id="cb435-19"><a href="packer-adv.html#cb435-19"></a></span>
-<span id="cb435-20"><a href="packer-adv.html#cb435-20"></a>      <span class="op">},</span></span>
-<span id="cb435-21"><a href="packer-adv.html#cb435-21"></a></span>
-<span id="cb435-22"><a href="packer-adv.html#cb435-22"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
-<span id="cb435-23"><a href="packer-adv.html#cb435-23"></a></span>
-<span id="cb435-24"><a href="packer-adv.html#cb435-24"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to re-render the widget with a new size</span></span>
-<span id="cb435-25"><a href="packer-adv.html#cb435-25"></a></span>
-<span id="cb435-26"><a href="packer-adv.html#cb435-26"></a>      <span class="op">}</span></span>
-<span id="cb435-27"><a href="packer-adv.html#cb435-27"></a></span>
-<span id="cb435-28"><a href="packer-adv.html#cb435-28"></a>    <span class="op">};</span></span>
-<span id="cb435-29"><a href="packer-adv.html#cb435-29"></a>  <span class="op">}</span></span>
-<span id="cb435-30"><a href="packer-adv.html#cb435-30"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<span id="cb435-8"><a href="packer-adv.html#cb435-8"></a><span class="im">export</span> <span class="op">{</span> counter <span class="op">};</span></span></code></pre></div>
+<p>We need to add the import statement to bring in the <code>counter</code> function and run it in the <code>renderValue</code> method. Packer also added the htmlwidgets external dependency which is imported below with <code>import 'widgets'</code>.</p>
+<p>Because we left the <em>R function</em> <code>countup</code> untouched, we have to use the default <code>message</code> variable it accepts. Ideally, this argument in the R function should be renamed to something more adequate.</p>
+<div class="sourceCode" id="cb436"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb436-1"><a href="packer-adv.html#cb436-1"></a><span class="im">import</span> <span class="st">&#39;widgets&#39;</span><span class="op">;</span></span>
+<span id="cb436-2"><a href="packer-adv.html#cb436-2"></a><span class="im">import</span> <span class="op">{</span> counter <span class="op">}</span> <span class="im">from</span> <span class="st">&#39;../modules/count.js&#39;</span><span class="op">;</span> </span>
+<span id="cb436-3"><a href="packer-adv.html#cb436-3"></a></span>
+<span id="cb436-4"><a href="packer-adv.html#cb436-4"></a><span class="va">HTMLWidgets</span>.<span class="at">widget</span>(<span class="op">{</span></span>
+<span id="cb436-5"><a href="packer-adv.html#cb436-5"></a></span>
+<span id="cb436-6"><a href="packer-adv.html#cb436-6"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">&#39;countup&#39;</span><span class="op">,</span></span>
+<span id="cb436-7"><a href="packer-adv.html#cb436-7"></a></span>
+<span id="cb436-8"><a href="packer-adv.html#cb436-8"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">&#39;output&#39;</span><span class="op">,</span></span>
+<span id="cb436-9"><a href="packer-adv.html#cb436-9"></a></span>
+<span id="cb436-10"><a href="packer-adv.html#cb436-10"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb436-11"><a href="packer-adv.html#cb436-11"></a></span>
+<span id="cb436-12"><a href="packer-adv.html#cb436-12"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
+<span id="cb436-13"><a href="packer-adv.html#cb436-13"></a></span>
+<span id="cb436-14"><a href="packer-adv.html#cb436-14"></a>    <span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb436-15"><a href="packer-adv.html#cb436-15"></a></span>
+<span id="cb436-16"><a href="packer-adv.html#cb436-16"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></span>
+<span id="cb436-17"><a href="packer-adv.html#cb436-17"></a></span>
+<span id="cb436-18"><a href="packer-adv.html#cb436-18"></a>        <span class="at">counter</span>(<span class="va">el</span>.<span class="at">id</span><span class="op">,</span> <span class="va">x</span>.<span class="at">message</span>)<span class="op">;</span></span>
+<span id="cb436-19"><a href="packer-adv.html#cb436-19"></a></span>
+<span id="cb436-20"><a href="packer-adv.html#cb436-20"></a>      <span class="op">},</span></span>
+<span id="cb436-21"><a href="packer-adv.html#cb436-21"></a></span>
+<span id="cb436-22"><a href="packer-adv.html#cb436-22"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) <span class="op">{</span></span>
+<span id="cb436-23"><a href="packer-adv.html#cb436-23"></a></span>
+<span id="cb436-24"><a href="packer-adv.html#cb436-24"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to re-render the widget with a new size</span></span>
+<span id="cb436-25"><a href="packer-adv.html#cb436-25"></a></span>
+<span id="cb436-26"><a href="packer-adv.html#cb436-26"></a>      <span class="op">}</span></span>
+<span id="cb436-27"><a href="packer-adv.html#cb436-27"></a></span>
+<span id="cb436-28"><a href="packer-adv.html#cb436-28"></a>    <span class="op">};</span></span>
+<span id="cb436-29"><a href="packer-adv.html#cb436-29"></a>  <span class="op">}</span></span>
+<span id="cb436-30"><a href="packer-adv.html#cb436-30"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<p>Finally, the JavaScript bundle can be generated with <code>packer::bundle()</code>, install the package or run <code>devtools::load_all()</code>, and test that the widget works!</p>
+<div class="sourceCode" id="cb437"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb437-1"><a href="packer-adv.html#cb437-1"></a><span class="kw">countup</span>(<span class="dv">12345</span>)</span></code></pre></div>
+<p>That hopefully is a compelling example to use NPM and webpack to build widgets. It could even be argued that it is easier to set up; dependencies are much more manageable; nothing has to be manually downloaded; it will be easier to update them in the future, etc.</p>
 </div>
 <div id="packer-adv-shiny-vue" class="section level2" number="23.2">
 <h2><span class="header-section-number">23.2</span> Shiny with Vue</h2>
+<p>In this example, we create a shiny application that uses <a href="https://vuejs.org/">Vue.js</a> in the front-end. If you prefer using <a href="https://reactjs.org/">React</a> know that it is also supported by webpack and packer. Vue is a framework to create user interfaces which, like React, makes much of the front-end work much more straightforward. It reduces the amount of code one has to write, simplifies business logic, enables to easily include more reactivity, and much more.</p>
+<p>Since packer only allows placing scaffolds in R packages the way one can build shiny applications is using the golem package. Golem is an opinionated framework for build applications <em>as R packages.</em> Writing shiny applications as R packages brings many of the advantages that packages have to shiny applications: ease of installation, unit testing, dependency management, etc.</p>
+<div class="sourceCode" id="cb438"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb438-1"><a href="packer-adv.html#cb438-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;golem&quot;</span>)</span></code></pre></div>
+<p>After installing golem from CRAN, we can create an application with the <code>golem::create_golem</code> function.</p>
+<div class="sourceCode" id="cb439"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb439-1"><a href="packer-adv.html#cb439-1"></a>golem<span class="op">::</span><span class="kw">create_golem</span>(<span class="st">&quot;vuer&quot;</span>)</span></code></pre></div>
+<p>From within a golem application one use a scaffold specifically designed for this with <code>scaffold_golem</code>. Note that this does not mean other scaffolds will not work, custom shiny inputs and outputs can also be created with <code>scaffold_input</code>, and <code>scaffold_output</code> respectively. The <code>scaffold_golem</code> function takes two core arguments; <code>vue</code> and <code>react</code>. Setting either of these to <code>TRUE</code> will prepare a scaffold specifically designed to support either Vue or React.</p>
+<p>The reason these arguments exist is because webpack requires further configuration that can be tricky to set up manually. Moreover, Vue supports (but does not require) a <code>.vue</code> files which can hold HTML, JavaScript, and CSS.</p>
+<p>When the <code>vue</code> argument is set to <code>TRUE</code> in <code>scaffold_golem</code>, the function does follow the usual procedure or initialising NPM, creating the various files, and directories, but in addition configures two loaders and the vue plugin.</p>
+<p>Loaders are transformers, they scan for files in the <code>srcjs</code> directory and pre-process them. That allows using, for instance, using the Babel compiler that will transform the latest version of JavaScript into code that every browsers can run. This compiler is very often used, including here to compile Vue code. Since Vue allows placing CSS in <code>.vue</code> files another loader is required; one that will look for CSS and bundle it within the JavaScript file.</p>
+<p>Plugins are a feature of webpack that allow extending its functionalities, there is one for Vue which the function will install and configure for you.</p>
+<div class="sourceCode" id="cb440"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb440-1"><a href="packer-adv.html#cb440-1"></a>packer<span class="op">::</span><span class="kw">scaffold_golem</span>(<span class="dt">vue =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 
 </div>
 </div>

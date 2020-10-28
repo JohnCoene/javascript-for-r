@@ -18,9 +18,9 @@ htmlwidgets::scaffoldWidget("play")
 
 This function puts together the minimalistic structure necessary to implement an HTML widget and opens `play.R`, `play.js` and `play.yaml` in the RStudio IDE or the default text editor. 
 
-\begin{rmdnote}
-You can scaffold multiple widgets in a single package.
-\end{rmdnote}
+<div class="rmdnote">
+<p>You can scaffold multiple widgets in a single package.</p>
+</div>
 
 These files are named after the widget and will form the core of the package. The R file contains core functions of the R API, namely the `play` function which creates the widget itself, and the `render*` and `*output` functions that handle the widget in the shiny server and UI respectively. The `.js` file contains JavaScript functions that generate the visual output. 
 
@@ -35,14 +35,10 @@ It might be hard to believe, but at this stage one already has a fully functioni
 play(message = "This is a widget!")
 ```
 
-\begin{figure}[t]
-
-{\centering \includegraphics[width=1\linewidth]{images/playground-1} 
-
-}
-
-\caption{First widget}(\#fig:playground-1)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/playground-1.png" alt="First widget" width="100%" />
+<p class="caption">(\#fig:playground-1)First widget</p>
+</div>
 
 This displays the message in the RStudio "Viewer," or your default browser; indicating the function does indeed create an HTML output. One can use the ![](images/open-in-browser.png) button located in the top right of the RStudio "Viewer" to open the message in the web browser which can prove very useful to look under the hood of the widgets for debugging.
 
@@ -164,8 +160,8 @@ htmlwidgets::createWidget(
 
 This is so htmlwidgets can internally match the output of `createWidget` to its JavaScript function. At this stage, it is probably fair to take a look at the diagram of what is happening.
 
-
-\begin{center}\includegraphics[width=1\linewidth]{3-22-htmlwidgets-first_files/figure-latex/unnamed-chunk-2-1} 
+<!--html_preserve--><div id="htmlwidget-dec4f3b16ea1e9a23aa3" style="width:100%;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-dec4f3b16ea1e9a23aa3">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR]\n\n  subgraph cluster_1 {\n    node [shape=box]\n    func [label=\"play(id)\"]\n    label = \"R\"\n    color=royalBlue\n  }\n\n  subgraph cluster_0 {\n    node [shape=box]\n    output [label=\"<div class=play id=id>\"]\n    json [label=\"<script data-for=id>\"]\n    js [label=\"JavaScript\"]\n    deps [label=\"dependencies\"]\n    label=\"HTML\"\n    color=gold\n  }\n\n  func -> output [label=\"id and class\"]\n  func -> json [label = \"id\"]\n  json -> js [label=\"import\"]\n  js -> output[label=\"Generate viz\"] \n  deps -> js [label=\"use\"]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><!--/html_preserve-->
 
 The `factory` function returns two functions, `resize`, and `renderValue`. The first is used to resize the output dynamically, it is not relevant to this widget is thus tackled later on. Let us focus on `renderValue`, the function that renders the output. It takes an object `x` from which the "message" variable is used as the text for object `el` (`el.innerText`). The object `x` passed to this function is actually the list of the same name that was built in the R function `play`! While in R one would access the `message` in list `x` with `x$message` in JavaScript to access the `message` in the JSON `x` one writes `x.message`, only changing the dollar sign to a dot. Let us show this perhaps more clearly by printing the content of `x`.
 
@@ -176,20 +172,16 @@ el.innerText = x.message;
 
 We place `console.log` to print the content of `x` in the console, reload the package with `devtools::load_all` and use the function `play` again then explore the console from the browser (inspect and go to the "console" tab).
 
-\begin{figure}[t]
-
-{\centering \includegraphics[width=1\linewidth]{images/playground-console-x} 
-
-}
-
-\caption{Console log JavaScript object}(\#fig:playground-console)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/playground-console-x.png" alt="Console log JavaScript object" width="100%" />
+<p class="caption">(\#fig:playground-console)Console log JavaScript object</p>
+</div>
 
 This displays the JSON object containing the message: it looks eerily similar to the list that was created in R (`x = list(message = "This is a widget!")`). What one should take away from this is that data that needs to be communicated from R to the JavaScript function should be placed in the R list `x`. This list is serialised to JSON and placed in the HTML output in a `script` tag bearing a `data-for` attribute that indicates which widget the data is destined for. This effectively enables htmlwidgets to match the serialised data with the output elements: data in `<script data-for='viz'>` is to be used to create a visualisation in `<div id='viz'>`.
 
-\begin{rmdnote}
-Serialisation will make for an important section in a later chapter.
-\end{rmdnote}
+<div class="rmdnote">
+<p>Serialisation will make for an important section in a later chapter.</p>
+</div>
 
 Before we move on to other things one should also grasp a better understanding of the `el` object, which can also be logged in the console.
 
@@ -199,14 +191,10 @@ console.log(el);
 el.innerText = x.message;
 ```
 
-\begin{figure}[t]
-
-{\centering \includegraphics[width=1\linewidth]{images/playground-console-el} 
-
-}
-
-\caption{Console log HTML element}(\#fig:playground-console-el)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/playground-console-el.png" alt="Console log HTML element" width="100%" />
+<p class="caption">(\#fig:playground-console-el)Console log HTML element</p>
+</div>
 
 This displays the HTML element created by htmlwidgets that is meant to hold the visualisation, or in this case, the message. If you are familiar with JavaScript, this is the element that would be returned by `document.getElementById`. This object allows manipulating the element in pretty much any way imaginable, change its position, its colour, its size, or, as done here, to insert some text within it. What's more one can access attributes of the object just like a JSON array. Therefore one can log the `id` of the element.
 
@@ -230,14 +218,10 @@ After changing the `play.js` file as above, and re-loading the package, one can 
 play("<h1>Using HTML!</h1>")
 ```
 
-\begin{figure}[t]
-
-{\centering \includegraphics[width=1\linewidth]{images/playground-h1} 
-
-}
-
-\caption{First widget output}(\#fig:playground-h1)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/playground-h1.png" alt="First widget output" width="100%" />
+<p class="caption">(\#fig:playground-h1)First widget output</p>
+</div>
 
 That makes for a significant improvement which opens the door to many possibilities. However, the interface this provides is unintuitive. Albeit similar, R users are more familiar with shiny and htmltools [@R-htmltools] tags than HTML tags, e.g.: `<h1></h1>` translates to `h1()` in R. The package should allow users to use those instead of forcing them to collapse HTML content in a string. Fortunately, there is an effortless way to obtain the HTML from those functions: convert it to a character string.
 
@@ -268,13 +252,9 @@ Reloading the package with `devtools::load_all` lets one use shiny tags as the m
 play(shiny::h2("Chocolate is a colour", style = "color:chocolate;"))
 ```
 
-\begin{figure}[t]
-
-{\centering \includegraphics[width=1\linewidth]{images/playground-color} 
-
-}
-
-\caption{First widget using shiny tags}(\#fig:playground-tags)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/playground-color.png" alt="First widget using shiny tags" width="100%" />
+<p class="caption">(\#fig:playground-tags)First widget using shiny tags</p>
+</div>
 
 This hopefully provides some understanding of how htmlwidgets work internally and thereby helps to build such packages. To recapitulate, an HTML document is created in which div is placed and given a specific id; this id is also used in a script tag that contains JSON data passed from R so that a JavaScript function we define can read that data in and use it to generate a visual output in a div. However, as much as this section covered, the topic of JavaScript dependencies was not touched, this is approached in the following section where we build another, more exciting widget, which uses an external dependency.

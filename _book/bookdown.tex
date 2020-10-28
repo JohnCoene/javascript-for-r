@@ -201,7 +201,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2020-10-27}
+\date{2020-10-28}
 
 \begin{document}
 \maketitle
@@ -1513,6 +1513,43 @@ DT has grown very popular amongst shiny developers as it allows capturing server
 
 \caption{DT package example}\label{fig:dt-example}
 \end{figure}
+
+\hypertarget{widgets-intro-crosstalk}{%
+\section{Crosstalk}\label{widgets-intro-crosstalk}}
+
+DT and plotly both fully support the crosstalk package \citep{R-crosstalk}, a package to enable two widgets to communicate. In the example below, we use crosstalk to create a ``shared dataset'' that can be used to create 1) a table with DT, and 2) a scatter plot with plotly. Rows selected in the table are highlighted in the plot and vice versa.
+
+The \texttt{bscols} function is just a convenience function that makes it easy to put the visualisation and table side-by-side.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(DT)}
+\KeywordTok{library}\NormalTok{(plotly)}
+\KeywordTok{library}\NormalTok{(crosstalk)}
+
+\NormalTok{sd <{-}}\StringTok{ }\NormalTok{SharedData}\OperatorTok{$}\KeywordTok{new}\NormalTok{(iris[, }\KeywordTok{c}\NormalTok{(}\StringTok{"Sepal.Length"}\NormalTok{, }\StringTok{"Sepal.Width"}\NormalTok{)])}
+
+\KeywordTok{bscols}\NormalTok{(}
+  \DataTypeTok{device =} \StringTok{"lg"}\NormalTok{,}
+  \KeywordTok{datatable}\NormalTok{(sd, }\DataTypeTok{width =} \StringTok{"100\%"}\NormalTok{),}
+  \KeywordTok{plot\_ly}\NormalTok{(sd, }\DataTypeTok{x =} \OperatorTok{\textasciitilde{}}\NormalTok{Sepal.Length, }\DataTypeTok{y =} \OperatorTok{\textasciitilde{}}\NormalTok{Sepal.Width)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/dt-crosstalk-intro} 
+
+}
+
+\caption{DT and plotly with crosstalk}\label{fig:dt-example-crosstalk}
+\end{figure}
+
+\hypertarget{widgets-intro-conclude}{%
+\section{Wrap-up}\label{widgets-intro-conclude}}
+
+These are only two examples of widgets and how they can work together. But we hope this makes a compelling case for building such software as, in the remaining of this chapter, we learn how to build them, integrate them with crosstalk, shiny, and much more.
 
 \hypertarget{widgets-basics}{%
 \chapter{Basics of Building Widgets}\label{widgets-basics}}
@@ -9770,7 +9807,7 @@ That is it for this chapter, as stated multiple times there is far more depth to
 
 In the previous chapter, we put together a simple shiny application using NPM and webpack. Hopefully, it hinted at some of the powerful things webpack can do but also revealed a downside: the overhead in merely creating the project. Moreover, the configuration will change depending on what the project is (application, package, etc.).
 
-In this chapter, we discover the \href{https://github.com/JohnCoene/packer}{packer} \citep{R-packer} R package which provides many convenience functions to create and manage R projects that make use of webpack and NPM.
+In this chapter, we discover the \href{https://github.com/JohnCoene/packer}{packer} \citep{R-packer} R package, which provides many convenience functions to create and manage R projects that make use of webpack and NPM.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9797,9 +9834,9 @@ There are a few principles that the packer package follows strictly.
 \hypertarget{packer-scaffolds}{%
 \section{Scaffolds}\label{packer-scaffolds}}
 
-Packer is comprised of surprisingly few functions; the most important ones are in the \texttt{scaffold} family. The term scaffold was borrowed from the htmlwidgets package, which features the function \texttt{scaffoldWidget} that was already used in this book. The idea of scaffolds in packer is very similar to the \texttt{scaffoldWidget} function: they set up the basic structure for projects.
+Packer is comprised of surprisingly few functions; the most important ones are in the \texttt{scaffold} family. The term scaffold was borrowed from the htmlwidgets package, which features the function \texttt{scaffoldWidget} (already used in this book). The idea of scaffolds in packer is very similar to the \texttt{scaffoldWidget} function: they set up the basic structure for projects.
 
-Whilst htmlwidgets only allows creating scaffolds for widgets, packer allows creating scaffolds for several things, namely:
+Whilst htmlwidgets only allows creating scaffolds for widgets; packer allows creating scaffolds for several things, namely:
 
 \begin{itemize}
 \tightlist
@@ -9815,7 +9852,7 @@ Whilst htmlwidgets only allows creating scaffolds for widgets, packer allows cre
   Golem applications with \texttt{scaffold\_golem}
 \end{itemize}
 
-This gives a few powerful functions that do (almost) all of the job of correctly setting up webpack. These will build the necessary file structure and configuration depending on the scaffold you lay down and the context (whether it is a basic package, a golem application, a package with an existing scaffold, etc.)
+This gives a few powerful functions that correctly set up webpack. These will build the necessary file structure and configuration depending on the scaffold and the context (whether it is a basic package, a golem application, a package with an existing scaffold, etc.)
 
 \begin{rmdnote}
 One can use multiple scaffolds in a single package or shiny application.
@@ -9828,7 +9865,7 @@ With some variations that will be explored in the coming sections, packer's \tex
 \begin{itemize}
 \tightlist
 \item
-  Initialise npm with \texttt{npm\ init\ -y}
+  Initialise npm with \texttt{npm\ init} and prefills the \texttt{package.json} file
 \item
   Install webpack and its CLI with \texttt{npm\ install\ webpack\ webpack-cli\ -\/-save-dev}
 \item
@@ -9836,7 +9873,7 @@ With some variations that will be explored in the coming sections, packer's \tex
 \item
   Creates the \texttt{srcjs} directory for the JavaScript source code.
 \item
-  Creates basic JavaScript files within the \texttt{srcjs} directory, e.g.: \texttt{index.js}
+  Creates raw JavaScript files within the \texttt{srcjs} directory, e.g.: \texttt{index.js}
 \item
   Creates the R functions (if necessary)
 \item
@@ -10044,7 +10081,7 @@ In the \texttt{srcjs/inputs} directory, packer created \texttt{increment.js}. Th
 \end{Highlighting}
 \end{Shaded}
 
-The \texttt{srcjs/index.js} file was also created; it imports the JavaScript binding detailed above with \texttt{import\ \textquotesingle{}./inputs/increment.js\textquotesingle{};}. Importantly, by default packer does not bundle all of these files into one; \texttt{index.js} is only populated for convenience in the event one would want to change this behaviour. Instead, packer uses \texttt{srcjs/inputs/increment.js} as entry point. It will handle multiple entry points, so every input, output, widgets, etc. are bundled separately. This is done so one can import those dynamically.
+The \texttt{srcjs/index.js} file was also created; it imports the JavaScript binding detailed above with \texttt{import\ \textquotesingle{}./inputs/increment.js\textquotesingle{};}. Notably, by default, packer does not bundle all of these files into one; \texttt{index.js} is only populated for convenience in the event one would want to change this behaviour. Instead, packer uses \texttt{srcjs/inputs/increment.js} as an entry point. It will handle multiple entry points, so every input, output, widgets, etc. are bundled separately. This is done so one can import those dynamically.
 
 \hypertarget{packer-bundle}{%
 \section{Bundle}\label{packer-bundle}}
@@ -10082,21 +10119,21 @@ Once the JavaScript bundled, we can install or load the package with \texttt{dev
 \end{Highlighting}
 \end{Shaded}
 
-No code was written, yet we have a fully-functional input! We'll leave at this, it's obviously not only meant to create increment buttons, but this sets up a solid base for the developer to customise the code and conveniently create a different input.
+No code was written, yet we have a fully-functional input! We'll leave at this, it's not only meant to create increment buttons, but this sets up a solid base for the developer to customise the code and conveniently create a different input.
 
-It is worth noting that we built a shiny input from within a package, this is meant to be exported and used in shiny applications elsewhere, but were one to run these exact same steps from a golem application packer would adapt the output path so that the input can be used directly in the application.
+It is worth noting that we built a shiny input from within a package, this is meant to be exported and used in shiny applications elsewhere, but were one to run these same steps from a golem application packer would adapt the output path so that the input can be used directly in the application.
 
 \hypertarget{packer-adv}{%
 \chapter{Packer Advanced}\label{packer-adv}}
 
-We're about to cover slightly more advanced uses of NPM and webpack with R using packer. These involve using an NPM dependency to develop a widget, and use \href{https://vuejs.org/}{Vue.js} to power the front-end of a shiny application.
+We're about to cover slightly more advanced uses of NPM and webpack with R using packer. These involve using an NPM dependency to develop a widget and use \href{https://vuejs.org/}{Vue.js} to power the front-end of a shiny application.
 
-Those will make for more concrete cases to bring webpack into your workflow, and also enable explaining more advanced topics only thus far briefly touched upon such as transpiling.
+Those will make for more concrete cases to bring webpack into your workflow, and also enable explaining more advanced topics only thus far briefly touched upon, such as transpiling.
 
 \hypertarget{packer-adv-widgets}{%
 \section{Widgets}\label{packer-adv-widgets}}
 
-The widget scaffold, like all other scaffolds must be run from within the root of a package. To demonstrate we'll write a widget for the \href{https://github.com/inorganik/countUp.js/}{countup} library that allows animating numbers.
+The widget scaffold, like all other scaffolds, must be run from within the root of a package. To demonstrate we'll write a widget for the \href{https://github.com/inorganik/countUp.js/}{countup} library that allows animating numbers.
 
 First, we create a package which we name \texttt{counter}. You can name the package different but avoid naming it \texttt{countup}. We will later have to install the external dependency also named \texttt{countup} and NPM does not allow a project named X to use a dependency also named X.
 
@@ -10106,7 +10143,7 @@ First, we create a package which we name \texttt{counter}. You can name the pack
 \end{Highlighting}
 \end{Shaded}
 
-From the root of the package we scaffold the widget with \texttt{scaffold\_widget}, which prints out some information on what packer exactly does.
+From the root of the package, we scaffold the widget with \texttt{scaffold\_widget}, which prints out some information on what packer exactly does.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10150,7 +10187,7 @@ From the root of the package we scaffold the widget with \texttt{scaffold\_widge
 ℹ Run `bundle` to build the JavaScript files
 \end{verbatim}
 
-Importantly, it runs \texttt{htmlwidgets::scaffoldWidget} internally, there is thus no need to run this function. With regard to the widget itself, there is very little difference between what \texttt{htmlwidgets::scaffoldWidget} and \texttt{packer::scaffold\_widget}. While, if you remember, the initial scaffold of htmlwidgets includes a simple function to display a message in HTML using \texttt{innerText}. The scaffold produced by packer differs only in that this message is displayed in \texttt{\textless{}h1\textgreater{}} HTML tags. That is so it can, from the get-go, demonstrate how to modularise a widget. We'll cover that in just a minute, before we do so, bundle the JavaScript and run the \texttt{counter} function to observe the output it generates.
+Importantly, it runs \texttt{htmlwidgets::scaffoldWidget} internally, there is thus no need to run this function. About the widget itself, there is very little difference between what \texttt{htmlwidgets::scaffoldWidget} and \texttt{packer::scaffold\_widget}. While, if you remember, the initial scaffold of htmlwidgets includes a simple function to display a message in HTML using \texttt{innerText}. The scaffold produced by packer differs only in that this message is displayed in \texttt{\textless{}h1\textgreater{}} HTML tags. That is so it can, from the get-go, demonstrate how to modularise a widget. We'll cover that in just a minute before we do so, bundle the JavaScript and run the \texttt{counter} function to observe the output it generates.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10160,7 +10197,7 @@ Importantly, it runs \texttt{htmlwidgets::scaffoldWidget} internally, there is t
 \end{Highlighting}
 \end{Shaded}
 
-This indeed displays the message in \texttt{\textless{}h1\textgreater{}} HTML tags. Now onto unpacking the structure generated by packer. We'll skip the R code to keep this concise as nothing differs from a standard widget on that side. Rather, we'll focus on the JavaScript code in the \texttt{srcjs} directory. First, in the \texttt{srcjs/widgets} directory one will find the file \texttt{countup.js}, this file contains the code that produces the widget.
+This indeed displays the message in \texttt{\textless{}h1\textgreater{}} HTML tags, now onto unpacking the structure generated by packer. We'll skip the R code to keep this concise as nothing differs from a standard widget on that side. Instead, we'll focus on the JavaScript code in the \texttt{srcjs} directory. First, in the \texttt{srcjs/widgets} directory, one will find the file \texttt{countup.js}, this file contains the code that produces the widget.
 
 At the top of the file are the imports. First, it imports \texttt{widgets}, which is an \emph{external dependency,} second it imports the function \texttt{asHeader} from the \texttt{header.js} file in the \texttt{modules} directory.
 
@@ -10200,7 +10237,7 @@ At the top of the file are the imports. First, it imports \texttt{widgets}, whic
 \end{Highlighting}
 \end{Shaded}
 
-The \texttt{header.js} file includes the \texttt{asHeader} function which accepts an \texttt{x} argument that is used to create the \texttt{\textless{}h1\textgreater{}} message. This functions is exported.
+The \texttt{header.js} file includes the \texttt{asHeader} function which accepts an \texttt{x} argument that is used to create the \texttt{\textless{}h1\textgreater{}} message. This function is exported.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10212,7 +10249,7 @@ The \texttt{header.js} file includes the \texttt{asHeader} function which accept
 \end{Highlighting}
 \end{Shaded}
 
-We will make changes to the JavaScript so that instead of displaying the message as text, uses the aforementioned countup library to animate a number. The first order of business is to in install countup. Here we use packer to do so, the function call below is identical to running \texttt{npm\ install\ countup\ -\/-save} from the terminal.
+We will make changes to the JavaScript so that instead of displaying the message as text, uses the aforementioned countup library to animate a number. The first order of business is to install countup. Here we use packer to do so, the function call below is identical to running \texttt{npm\ install\ countup\ -\/-save} from the terminal.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10220,7 +10257,7 @@ We will make changes to the JavaScript so that instead of displaying the message
 \end{Highlighting}
 \end{Shaded}
 
-We will not need the \texttt{header.js} file, we can delete it and in its stead create another file called \texttt{count.js}. This file will include a function that uses countup to animate the numbers, it should accept 1) the id of the element where countup should be used, and 2) the value that countup should animate. This function called \texttt{counter} is, at the end of the file, exported.
+We will not need the \texttt{header.js} file, we can delete it and in its stead create another file called \texttt{count.js}. This file will include a function that uses countup to animate the numbers; it should accept 1) the id of the element where countup should be used, and 2) the value that countup should animate. This function called \texttt{counter} is, at the end of the file, exported.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10234,6 +10271,10 @@ We will not need the \texttt{header.js} file, we can delete it and in its stead 
 \ImportTok{export} \OperatorTok{\{}\NormalTok{ counter }\OperatorTok{\};}
 \end{Highlighting}
 \end{Shaded}
+
+We need to add the import statement to bring in the \texttt{counter} function and run it in the \texttt{renderValue} method. Packer also added the htmlwidgets external dependency which is imported below with \texttt{import\ \textquotesingle{}widgets\textquotesingle{}}.
+
+Because we left the \emph{R function} \texttt{countup} untouched, we have to use the default \texttt{message} variable it accepts. Ideally, this argument in the R function should be renamed to something more adequate.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10270,8 +10311,52 @@ We will not need the \texttt{header.js} file, we can delete it and in its stead 
 \end{Highlighting}
 \end{Shaded}
 
+Finally, the JavaScript bundle can be generated with \texttt{packer::bundle()}, install the package or run \texttt{devtools::load\_all()}, and test that the widget works!
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{countup}\NormalTok{(}\DecValTok{12345}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+That hopefully is a compelling example to use NPM and webpack to build widgets. It could even be argued that it is easier to set up; dependencies are much more manageable; nothing has to be manually downloaded; it will be easier to update them in the future, etc.
+
 \hypertarget{packer-adv-shiny-vue}{%
 \section{Shiny with Vue}\label{packer-adv-shiny-vue}}
+
+In this example, we create a shiny application that uses \href{https://vuejs.org/}{Vue.js} in the front-end. If you prefer using \href{https://reactjs.org/}{React} know that it is also supported by webpack and packer. Vue is a framework to create user interfaces which, like React, makes much of the front-end work much more straightforward. It reduces the amount of code one has to write, simplifies business logic, enables to easily include more reactivity, and much more.
+
+Since packer only allows placing scaffolds in R packages the way one can build shiny applications is using the golem package. Golem is an opinionated framework for build applications \emph{as R packages.} Writing shiny applications as R packages brings many of the advantages that packages have to shiny applications: ease of installation, unit testing, dependency management, etc.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"golem"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+After installing golem from CRAN, we can create an application with the \texttt{golem::create\_golem} function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{create\_golem}\NormalTok{(}\StringTok{"vuer"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+From within a golem application one use a scaffold specifically designed for this with \texttt{scaffold\_golem}. Note that this does not mean other scaffolds will not work, custom shiny inputs and outputs can also be created with \texttt{scaffold\_input}, and \texttt{scaffold\_output} respectively. The \texttt{scaffold\_golem} function takes two core arguments; \texttt{vue} and \texttt{react}. Setting either of these to \texttt{TRUE} will prepare a scaffold specifically designed to support either Vue or React.
+
+The reason these arguments exist is because webpack requires further configuration that can be tricky to set up manually. Moreover, Vue supports (but does not require) a \texttt{.vue} files which can hold HTML, JavaScript, and CSS.
+
+When the \texttt{vue} argument is set to \texttt{TRUE} in \texttt{scaffold\_golem}, the function does follow the usual procedure or initialising NPM, creating the various files, and directories, but in addition configures two loaders and the vue plugin.
+
+Loaders are transformers, they scan for files in the \texttt{srcjs} directory and pre-process them. That allows using, for instance, using the Babel compiler that will transform the latest version of JavaScript into code that every browsers can run. This compiler is very often used, including here to compile Vue code. Since Vue allows placing CSS in \texttt{.vue} files another loader is required; one that will look for CSS and bundle it within the JavaScript file.
+
+Plugins are a feature of webpack that allow extending its functionalities, there is one for Vue which the function will install and configure for you.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{packer}\OperatorTok{::}\KeywordTok{scaffold\_golem}\NormalTok{(}\DataTypeTok{vue =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{part-closing-remarks}{%
 \part{Closing Remarks}\label{part-closing-remarks}}

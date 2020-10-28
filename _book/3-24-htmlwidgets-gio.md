@@ -30,14 +30,10 @@ Then again, the first order of business when looking to integrate a library is t
 </html>
 ```
 
-\begin{figure}[t]
-
-{\centering \includegraphics[width=1\linewidth]{images/gio-example} 
-
-}
-
-\caption{Gio.js example}(\#fig:gio-example)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/gio-example.png" alt="Gio.js example" width="100%" />
+<p class="caption">(\#fig:gio-example)Gio.js example</p>
+</div>
 
 Gio.js has itself a dependency, [three.js](https://threejs.org/), which needs to be imported before gio.js, other than that not much differs from libraries previously explored in this chapter.
 
@@ -161,14 +157,10 @@ devtools::load_all()
 gio(message = "This required but not used")
 ```
 
-\begin{figure}[t]
-
-{\centering \includegraphics[width=1\linewidth]{images/gio-init} 
-
-}
-
-\caption{Gio output without data}(\#fig:gio-init)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/gio-init.png" alt="Gio output without data" width="100%" />
+<p class="caption">(\#fig:gio-init)Gio output without data</p>
+</div>
 
 Not too shabby given how little work was put into this! Before we move on, let us optimise something. In the JavaScript code we retrieve the `container` using `el.id` but this in effect is very inefficient: `el` is identical to `container`.
 
@@ -421,14 +413,10 @@ The above would make it such that the serialiser no longer has to interpret how 
 
 There are pros and cons to each method. The preferable method is probably to alter the default serialiser __only where needed__; this is the method used in the remainder of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Moreover, htmlwidgets' serialiser extends jsonlite to allow converting JavaScript code which will come in handy later on. Transforming the data in JavaScript has one drawback, `HTMLWidgets.dataframeToD3` cannot be applied to the entire `x` object, it will only work on the subsets that hold the column-wise data (`x.data`) which tends to lead to clunky code as one uses said function in various places.
 
-\begin{figure}[t]
-
-{\centering \includegraphics[width=1\linewidth]{images/gio-data} 
-
-}
-
-\caption{Gio output with correct serialisation}(\#fig:gio-data)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/gio-data.png" alt="Gio output with correct serialisation" width="100%" />
+<p class="caption">(\#fig:gio-data)Gio output with correct serialisation</p>
+</div>
 
 ## On Print Method {#widgets-full-on-print}
 
@@ -489,14 +477,10 @@ g2 <- gio_style(g1, "juicyCake")
 g2
 ```
 
-\begin{figure}[t]
-
-{\centering \includegraphics[width=1\linewidth]{images/gio-style} 
-
-}
-
-\caption{Gio with a new theme}(\#fig:gio-style)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/gio-style.png" alt="Gio with a new theme" width="100%" />
+<p class="caption">(\#fig:gio-style)Gio with a new theme</p>
+</div>
 
 This is great but can be greatly improved upon with the magrittr pipe [@R-magrittr], it would allow effortlessly passing the output of each function to the next to obtain an API akin to that of plotly or highcharter.
 
