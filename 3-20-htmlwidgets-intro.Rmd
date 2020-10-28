@@ -89,3 +89,31 @@ shinyApp(ui, server)
 ```{r dt-example, echo=FALSE, fig.cap='DT package example'}
 knitr::include_graphics("images/DT-example.png")
 ```
+
+## Crosstalk {#widgets-intro-crosstalk}
+
+DT and plotly both fully support the crosstalk package [@R-crosstalk], a package to enable two widgets to communicate. In the example below, we use crosstalk to create a "shared dataset" that can be used to create 1) a table with DT, and 2) a scatter plot with plotly. Rows selected in the table are highlighted in the plot and vice versa.
+
+The `bscols` function is just a convenience function that makes it easy to put the visualisation and table side-by-side.
+
+```r
+library(DT)
+library(plotly)
+library(crosstalk)
+
+sd <- SharedData$new(iris[, c("Sepal.Length", "Sepal.Width")])
+
+bscols(
+  device = "lg",
+  datatable(sd, width = "100%"),
+  plot_ly(sd, x = ~Sepal.Length, y = ~Sepal.Width)
+)
+```
+
+```{r dt-example-crosstalk, echo=FALSE, fig.cap='DT & plotly with crosstalk'}
+knitr::include_graphics("images/dt-crosstalk-intro.png")
+```
+
+## Wrap-up {#widgets-intro-conclude}
+
+These are only two examples of widgets and how they can work together. But we hope this makes a compelling case for building such software as, in the remaining of this chapter, we learn how to build them, integrate them with crosstalk, shiny, and much more.
