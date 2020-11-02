@@ -152,10 +152,14 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/shiny-cookies-2.png" alt="Shiny using cookies" width="100%" />
-<p class="caption">(\#fig:shiny-cookies)Shiny using cookies</p>
-</div>
+\begin{figure}[t]
+
+{\centering \includegraphics[width=1\linewidth]{images/shiny-cookies-2} 
+
+}
+
+\caption{Shiny using cookies}(\#fig:shiny-cookies)
+\end{figure}
 
 Run the application and save your name. You can then refresh the application, and the welcome message will display your name. You can even kill the server entirely and re-run the app; the welcome message will still display!
 
