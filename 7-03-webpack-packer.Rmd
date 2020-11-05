@@ -82,7 +82,7 @@ packer::scaffold_input("increment")
 
 ── Adding files to '.gitignore' and '.Rbuildignore' ──
 
-✔ Setting active project to '/home/jp/Sites/javascript-for-r/code/increment'
+✔ Setting active project to '/javascript-for-r/code/increment'
 ✔ Adding '^srcjs$' to '.Rbuildignore'
 ✔ Adding '^node_modules$' to '.Rbuildignore'
 ✔ Adding '^package\\.json$' to '.Rbuildignore'
