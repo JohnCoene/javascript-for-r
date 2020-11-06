@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-11-02" />
+<meta name="date" content="2020-11-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -511,7 +511,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="prerequisites" class="section level1" number="2">
 <h1><span class="header-section-number">Chapter 2</span> Prerequisites</h1>
 <p>The code contained in the following pages is approachable to readers with basic knowledge of R. Still, familiarity with package development using <a href="https://devtools.r-lib.org/">devtools</a> <span class="citation">(Wickham, Hester, and Chang <a href="#ref-R-devtools" role="doc-biblioref">2020</a>)</span>, the <a href="https://shiny.rstudio.com/">Shiny</a> framework <span class="citation">(Chang, Cheng, Allaire, et al. <a href="#ref-R-shiny" role="doc-biblioref">2020</a>)</span>, the JSON data format, and JavaScript are essential.</p>
-<p>The reason for the former is that some of the ways one builds integrations with JavaScript naturally take the form of R packages. Also, R packages make sharing code, datasets, and anything else R-related extremely convenient, they come with a relatively strict structure, the ability to run unit tests, and much more. These have thus become a core feature of the R ecosystem and therefore, are used extensively in the book as we create several packages. The following section thus runs over the essentials of building a package to ensure everyone can keep up.</p>
+<p>The reason for the former is that some of the ways one builds integrations with JavaScript naturally take the form of R packages. Also, R packages make sharing code, datasets, and anything else R-related extremely convenient, they come with a relatively strict structure, the ability to run unit tests, and much more. These have thus become a core feature of the R ecosystem and therefore, are used extensively in the book as we create several packages. Therefore, the following section runs over the essentials of building a package to ensure everyone can keep up.</p>
 <p>Then we briefly go through the JSON data format as it will be used to a great extent to communicate between R and JavaScript. Since both Shiny and JavaScript run in the browser they make for axiomatic companions; we’ll therefore use Shiny extensively. Finally, there is an obligatory short introduction to JavaScript.</p>
 <p>It is highly recommended to use the freely available <a href="https://rstudio.com/products/rstudio/">RStudio IDE</a> to follow along as it makes a lot of things easier down the line.</p>
 <div id="basics-pacakge-dev" class="section level2" number="2.1">
@@ -685,7 +685,7 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 </div>
 <div id="serialising" class="section level3" number="2.2.1">
 <h3><span class="header-section-number">2.2.1</span> Serialising</h3>
-<p>JSON is to all intents and purposes the equivalent of lists in R; a flexible data format that can store pretty much anything–expect data.frames a structure that does not exist in JavaScript. Below we create a nested list and convert it to JSON with the help of jsonlite. We set <code>pretty</code> to <code>TRUE</code> to add indentation for cleaner printing, but this is an argument you should omit when writing production code, it will reduce the file size (fewer spaces = smaller file size).</p>
+<p>JSON is to all intents and purposes the equivalent of lists in R; a flexible data format that can store pretty much anything–except data.frames, a structure that does not exist in JavaScript. Below we create a nested list and convert it to JSON with the help of jsonlite. We set <code>pretty</code> to <code>TRUE</code> to add indentation for cleaner printing, but this is an argument you should omit when writing production code, it will reduce the file size (fewer spaces = smaller file size).</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="prerequisites.html#cb20-1"></a><span class="co"># install.packages(&quot;jsonlite&quot;)</span></span>
 <span id="cb20-2"><a href="prerequisites.html#cb20-2"></a><span class="kw">library</span>(jsonlite)</span>
 <span id="cb20-3"><a href="prerequisites.html#cb20-3"></a></span>
@@ -739,7 +739,7 @@ Remember to run <code>devtools::document()</code> after changing roxygen2 tags o
 <span id="cb23-12"><a href="prerequisites.html#cb23-12"></a><span class="co">#&gt;     &quot;dist&quot;: 10</span></span>
 <span id="cb23-13"><a href="prerequisites.html#cb23-13"></a><span class="co">#&gt;   }</span></span>
 <span id="cb23-14"><a href="prerequisites.html#cb23-14"></a><span class="co">#&gt; ]</span></span></code></pre></div>
-<p>What jsonlite does internally is essentially turning the data.frame into a list <em>rowwise</em> to produce a sub-list for every row then it serialises to JSON. This is generally how rectangular data is represented in lists, for instance, <code>purrr::transpose</code> does the same. Another great example is to use <code>console.table</code> in the JavaScript console (more on that later) to display the table JSON as a table.</p>
+<p>What jsonlite does internally is essentially turning the data.frame into a list <em>rowwise</em> to produce a sub-list for every row then it serialises to JSON. This is generally how rectangular data is represented in lists. For instance, <code>purrr::transpose</code> does the same. Another great example is to use <code>console.table</code> in the JavaScript console (more on that later) to display the table JSON as a table.</p>
 <div class="figure" style="text-align: center"><span id="fig:console-table"></span>
 <img src="images/console-table.png" alt="console.table output" width="100%" />
 <p class="caption">
@@ -781,7 +781,7 @@ FIGURE 2.2: console.table output
 <div id="basics-javascript" class="section level2" number="2.3">
 <h2><span class="header-section-number">2.3</span> JavaScript</h2>
 <p>The book is not meant to teach one JavaScript, only to show how graciously it can work with R. Let us thus go through the very basics to ensure we know enough to get started with the coming chapters.</p>
-<p>The easiest way to run JavaScript interactively is probably to create an HTML file (e.g.: <code>try.html</code>), write your code within a <code>&lt;script&gt;</code> tags and open the file in your web browser. The console output can be observed in the console of the browser, developer tools (more on that below).</p>
+<p>The easiest way to run JavaScript interactively is probably to create an HTML file (e.g.: <code>try.html</code>), write your code within a <code>&lt;script&gt;</code> tag and open the file in your web browser. The console output can be observed in the console of the browser, developer tools (more on that below).</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb27-1"><a href="prerequisites.html#cb27-1"></a><span class="er">&lt;</span>!–– index.html ––&gt;</span>
 <span id="cb27-2"><a href="prerequisites.html#cb27-2"></a><span class="kw">&lt;html&gt;</span></span>
 <span id="cb27-3"><a href="prerequisites.html#cb27-3"></a>  <span class="kw">&lt;head&gt;</span></span>
@@ -808,7 +808,7 @@ FIGURE 2.3: Trying JavaScript
 The RStudio IDE is built on Chromium, some of these tools will therefore also work in RStudio.
 </p>
 </div>
-<p>The easiest way to access the developer tools from the browser is by “inspecting:” right-click on an element on a webpage and select “inspect”. This will open the developer tools either at the bottom or on the right of the page.</p>
+<p>The easiest way to access the developer tools from the browser is by “inspecting”: right-click on an element on a webpage and select “inspect”. This will open the developer tools either at the bottom or on the right of the page.</p>
 <div class="figure" style="text-align: center"><span id="fig:chrome-devtools"></span>
 <img src="images/devtools.png" alt="Google Chrome Devtools" width="100%" />
 <p class="caption">
@@ -817,8 +817,8 @@ FIGURE 2.4: Google Chrome Devtools
 </div>
 <p>The developer tools pane consists of several tabs but we will mainly use:</p>
 <ol style="list-style-type: decimal">
-<li>Elements: Presents the DOM Tree, the HTML document structure, great for inspecting the structure of the outputs generated from R.</li>
-<li>Console: The JavaScript console where messages, errors, and other such things are logged. Essential for debugging.</li>
+<li>Elements: presents the DOM Tree, the HTML document structure, great for inspecting the structure of the outputs generated from R.</li>
+<li>Console: the JavaScript console where messages, errors, and other such things are logged. Essential for debugging.</li>
 </ol>
 </div>
 <div id="basics-var-scope" class="section level3" number="2.3.2">
@@ -841,7 +841,7 @@ FIGURE 2.4: Google Chrome Devtools
 <span id="cb31-5"><a href="prerequisites.html#cb31-5"></a><span class="kw">unlockBinding</span>(<span class="st">&quot;x&quot;</span>, <span class="dt">env =</span> .GlobalEnv) <span class="co"># unlock binding</span></span>
 <span id="cb31-6"><a href="prerequisites.html#cb31-6"></a>x &lt;-<span class="st"> </span><span class="dv">2</span> <span class="co"># works</span></span></code></pre></div>
 <p>Notably, <code>const</code> is mainly protecting yourself (the developer) against yourself, if something important is defined and should not change later in the code use <code>const</code> to avoid accidentally reassigning something to it later in the project.</p>
-<p>The <code>let</code> keyword is akin to declaring a variable with the <code>var</code> keyword, however, <code>let</code> (and <code>const</code>) will declare the variable in the “block scope.” This in effect further narrows down the scope where the variable will be accessible, a block scope is generally the area within <code>if</code>, <code>switch</code> conditions or <code>for</code> and <code>while</code> loops: areas within curly brackets.</p>
+<p>The <code>let</code> keyword is akin to declaring a variable with the <code>var</code> keyword. However, <code>let</code> (and <code>const</code>) will declare the variable in the “block scope.” In effect, this further narrows down the scope where the variable will be accessible, a block scope is generally the area within <code>if</code>, <code>switch</code> conditions or <code>for</code> and <code>while</code> loops: areas within curly brackets.</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb32-1"><a href="prerequisites.html#cb32-1"></a><span class="cf">if</span>(<span class="kw">true</span>)<span class="op">{</span></span>
 <span id="cb32-2"><a href="prerequisites.html#cb32-2"></a>  <span class="kw">let</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
 <span id="cb32-3"><a href="prerequisites.html#cb32-3"></a>  <span class="kw">var</span> y <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
@@ -892,7 +892,7 @@ Accessing variables from the parent environment (context) is useful in JavaScrip
 <span id="cb35-10"><a href="prerequisites.html#cb35-10"></a>    <span class="va">cnt</span>.<span class="at">innerText</span> <span class="op">=</span> <span class="st">&quot;The text has changed&quot;</span><span class="op">;</span></span>
 <span id="cb35-11"><a href="prerequisites.html#cb35-11"></a>  <span class="kw">&lt;/script&gt;</span></span>
 <span id="cb35-12"><a href="prerequisites.html#cb35-12"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
-<p>One final thing to note for future reference, though not limited to the ids or classes most such selection of elements from the DOM are done with those where the pound sign refers to an element’s id (<code>#id</code>) and a dot relates to an element’s class (<code>.class</code>), just like in CSS.</p>
+<p>One final thing to note for future reference: though not limited to the ids or classes most of such selection of elements from the DOM are done with those where the pound sign refers to an element’s id (<code>#id</code>) and a dot relates to an element’s class (<code>.class</code>), just like in CSS.</p>
 <div class="sourceCode" id="cb36"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb36-1"><a href="prerequisites.html#cb36-1"></a> <span class="er">&lt;</span>!–– index.html ––&gt;</span>
 <span id="cb36-2"><a href="prerequisites.html#cb36-2"></a><span class="kw">&lt;html&gt;</span></span>
 <span id="cb36-3"><a href="prerequisites.html#cb36-3"></a>  <span class="kw">&lt;head&gt;</span></span>
@@ -911,7 +911,7 @@ Accessing variables from the parent environment (context) is useful in JavaScrip
 <span id="cb36-16"><a href="prerequisites.html#cb36-16"></a>    <span class="kw">var</span> z <span class="op">=</span> <span class="va">document</span>.<span class="at">querySelector</span>(<span class="st">&quot;.stuff&quot;</span>)<span class="op">;</span></span>
 <span id="cb36-17"><a href="prerequisites.html#cb36-17"></a>  <span class="kw">&lt;/script&gt;</span></span>
 <span id="cb36-18"><a href="prerequisites.html#cb36-18"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
-<p>Getting elements from the DOM is a very common operation in JavaScript. A class can be applied to multiple elements which is useful to select and apply actions to multiple elements. The id attribute must be unique (no two elements can bear the same id in the HTML document) is useful to retrieve a specific element.</p>
+<p>Getting elements from the DOM is a very common operation in JavaScript. A class can be applied to multiple elements which is useful to select and apply actions to multiple elements. The id attribute must be unique (two elements cannot bear the same id in the HTML document), which is useful to retrieve a specific element.</p>
 <p>Interestingly some of that mechanism is used by shiny to retrieve and manipulate inputs, the argument <code>inputId</code> of shiny inputs effectively define the HTML <code>id</code> attribute of said input. Shiny can then internally make use of functions the likes of <code>getElementById</code> in order to get those inputs, set or update their values, etc.</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="prerequisites.html#cb37-1"></a>shiny<span class="op">::</span><span class="kw">actionButton</span>(<span class="dt">inputId =</span> <span class="st">&quot;theId&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;the label&quot;</span>) </span></code></pre></div>
 <div class="sourceCode" id="cb38"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb38-1"><a href="prerequisites.html#cb38-1"></a><span class="kw">&lt;button</span> </span>
@@ -926,14 +926,14 @@ Accessing variables from the parent environment (context) is useful in JavaScrip
 <div id="basics-shiny" class="section level2" number="2.4">
 <h2><span class="header-section-number">2.4</span> Shiny</h2>
 <p>It is assumed that the reader has basic knowledge of the shiny framework and already used it to build applications. However, there are some more obscure functionalities that one may not know, but that becomes essential when introducing JavaScript to applications. Chiefly, how to import external dependencies; JavaScript or otherwise.</p>
-<p>There are two ways to import dependencies: using the htmltools <span class="citation">(Cheng et al. <a href="#ref-R-htmltools" role="doc-biblioref">2020</a>)</span> package to create a dependency object that shiny can understand or manually serving and importing the files with shiny.</p>
+<p>There are two ways to import dependencies: using the htmltools <span class="citation">(Cheng et al. <a href="#ref-R-htmltools" role="doc-biblioref">2020</a>)</span> package to create a dependency object that shiny can understand, or manually serving and importing the files with shiny.</p>
 <div id="basics-static-files" class="section level3" number="2.4.1">
 <h3><span class="header-section-number">2.4.1</span> Serving Static Files</h3>
-<p>Static files are files that are downloaded by the clients, in this case, web browsers accessing shiny applications, as-is, these generally include images, CSS (<code>.css</code>), and JavaScript (<code>.js</code>).</p>
+<p>Static files are files that are downloaded by the clients, in this case, web browsers accessing shiny applications, as-is. These generally include images, CSS (<code>.css</code>), and JavaScript (<code>.js</code>).</p>
 <p>If you are familiar with R packages, static files are to shiny applications what the <code>inst</code> directory is to an R package; those files are installed as-is. They do not require further processing as opposed to the <code>src</code> folder, which contains files that need compiling, for instance.</p>
 <p>There are numerous functions to launch a shiny application locally; the two most used probably are <code>shinyApp</code> and <code>runApp</code>. The RStudio IDE comes with a convenient “Run” button when writing a shiny application, which when clicked in fact uses the function <code>shiny::runApp</code> in the background, this function looks for said static files in the <code>www</code> directory and makes them available at the same path (<code>/www</code>). If you are building your applications outside of RStudio, you should either also use <code>shiny::runApp</code> or specify the directory which then allows using <code>shiny::shinyApp</code>. Note that this only applies locally, shiny server (community and pro) as well as <a href="https://www.shinyapps.io/">shinyapps.io</a> use the same defaults as the RStudio IDE and <code>shiny::runApp</code>.</p>
 <p>To ensure the code in this book can run regardless of the reader’s machine or editor, the asset directory is always specified explicitly (when used). This is probably advised to steer clear of the potential headaches as, unlike the default, it’ll work regardless of the environment. If you are using golem <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> to develop your application, then you should not worry about this as it specifies the directory internally.</p>
-<p>Below we build a basic shiny application, however, before we define the ui and server we use the <code>shiny::addResourcePath</code> function to specify the location of the directory of static files that will be served by the server and thus accessible by the client. This function takes two arguments, first the <code>prefix</code>, which is the path (URL) at which the assets will be available, second the path to the directory of static assets.</p>
+<p>Below we build a basic shiny application. However, before we define the ui and server, we use the <code>shiny::addResourcePath</code> function to specify the location of the directory of static files that will be served by the server and thus accessible by the client. This function takes two arguments, first the <code>prefix</code>, which is the path (URL) at which the assets will be available, second the path to the directory of static assets.</p>
 <p>We thus create the “assets” directory and a JavaScript file called <code>script.js</code> within it.</p>
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="prerequisites.html#cb39-1"></a><span class="co"># run from root of app (where app.R is located)</span></span>
 <span id="cb39-2"><a href="prerequisites.html#cb39-2"></a><span class="kw">dir.create</span>(<span class="st">&quot;assets&quot;</span>)</span>
@@ -1027,7 +1027,7 @@ All files in your asset directory will be served online and accessible to anyone
 <span id="cb46-9"><a href="prerequisites.html#cb46-9"></a>      ...</span>
 <span id="cb46-10"><a href="prerequisites.html#cb46-10"></a>    )</span>
 <span id="cb46-11"><a href="prerequisites.html#cb46-11"></a>}</span></code></pre></div>
-<p>As the name indicates, htmltools goes beyond the generation of HTML tags and provides broader tools to work with HTML from R; this includes working the dependencies. These may appear simple at first after all were one working with an HTML document in order to import HTML or CSS one could use HTML tags.</p>
+<p>As the name indicates, htmltools goes beyond the generation of HTML tags and provides broader tools to work with HTML from R; this includes working the dependencies. These may appear simple at first: after all, were one working with an HTML document in order to import HTML or CSS one could use HTML tags.</p>
 <div class="sourceCode" id="cb47"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb47-1"><a href="prerequisites.html#cb47-1"></a> <span class="er">&lt;</span>!–– index.html ––&gt;</span>
 <span id="cb47-2"><a href="prerequisites.html#cb47-2"></a><span class="kw">&lt;html&gt;</span></span>
 <span id="cb47-3"><a href="prerequisites.html#cb47-3"></a>  <span class="kw">&lt;head&gt;</span></span>
@@ -1036,7 +1036,7 @@ All files in your asset directory will be served online and accessible to anyone
 <span id="cb47-6"><a href="prerequisites.html#cb47-6"></a>  <span class="kw">&lt;/head&gt;</span></span>
 <span id="cb47-7"><a href="prerequisites.html#cb47-7"></a>  <span class="kw">&lt;body&gt;&lt;/body&gt;</span></span>
 <span id="cb47-8"><a href="prerequisites.html#cb47-8"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
-<p>However, it can quickly get out of hand when working with modules and packages. Imagine having to manage the generation of dependencies such as the above when multiple functions rely on a dependency but being a dependency; it should only be imported once? The unified framework htmltools helps immensely in dealing with these sorts of issues.</p>
+<p>However, it can quickly get out of hand when working with modules and packages. Imagine having to manage the generation of dependencies such as the above when multiple functions rely on a dependency but, being a dependency, it should only be imported once? The unified framework htmltools helps immensely in dealing with these sorts of issues.</p>
 <p>The htmltools package provides utilities to import dependencies and ensure these are only rendered once, as they should be. The way this works is by creating a dependency object that packages like Shiny and R markdown can understand and translate into HTML dependencies. This is handled with the <code>htmlDependency</code> function, which returns an object of class <code>html_dependency</code>.</p>
 <div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="prerequisites.html#cb48-1"></a>dependency &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
 <span id="cb48-2"><a href="prerequisites.html#cb48-2"></a>  <span class="dt">name =</span> <span class="st">&quot;myDependency&quot;</span>,</span>
@@ -1084,7 +1084,7 @@ CDN stands for Content Delivery Network, a geographically distributed group of s
 </div>
 <div id="basics-deps-pro-cons" class="section level3" number="2.4.3">
 <h3><span class="header-section-number">2.4.3</span> Serving vs. htmltools</h3>
-<p>For multiple reasons, the best way to include dependencies is probably the former using htmltools. First, it will work with both shiny and rmarkdown <span class="citation">(Allaire et al. <a href="#ref-R-rmarkdown" role="doc-biblioref">2020</a>)</span> (whereas the other method previousl&lt; described only works with shiny) reducing the cognitive load on the developer (you); learn to use this method and you will be able to import dependencies for many different output types. Moreover, it comes with neat features that will be explored later in the book, e.g., dynamic dependencies for interactive visualisations or shiny.</p>
+<p>For multiple reasons, the best way to include dependencies is probably the former using htmltools. First, it will work with both shiny and rmarkdown <span class="citation">(Allaire et al. <a href="#ref-R-rmarkdown" role="doc-biblioref">2020</a>)</span> (whereas the other method previously described only works with shiny), reducing the cognitive load on the developer (you). Learn to use this method and you will be able to import dependencies for many different output types. Moreover, it comes with neat features that will be explored later in the book, e.g., dynamic dependencies for interactive visualisations or shiny.</p>
 <p>Also, using htmltools dependencies will allow other package developers to assess and access the dependencies you build quickly. The function <code>findDependencies</code> will accept another function from which it can extract the dependencies. The object it returns can then be used elsewhere making dependencies portable. Below we use this function to extract the dependencies of the <code>fluidPage</code> function from the shiny package.</p>
 <div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="prerequisites.html#cb53-1"></a>htmltools<span class="op">::</span><span class="kw">findDependencies</span>(</span>
 <span id="cb53-2"><a href="prerequisites.html#cb53-2"></a>  shiny<span class="op">::</span><span class="kw">fluidPage</span>()</span>

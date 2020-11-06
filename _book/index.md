@@ -1,10 +1,12 @@
 --- 
 title: "JavaScript for R"
 author: "John Coene"
-date: "2020-11-02"
+date: "2020-11-06"
 documentclass: krantz
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
+monofont: "Source Code Pro"
+monofontoptions: "Scale=0.7"
 link-citations: yes
 colorlinks: yes
 lot: yes
@@ -58,7 +60,7 @@ Notably, the focus of the book truly is the integration of JavaScript with R, wh
 
 ## Acknowledgement {-}
 
-Many people in the R community have inspired me and provided the knowledge to write this book, amongst them ultimately are [Ramnath Vaidyanathan](https://github.com/ramnathv/) for his amazing work on the htmlwidgets [@R-htmlwidgets] package, [Kent Russel](https://github.com/timelyportfolio) from whom I have learned a lot via his work on making Vue and React accessible in R, and [Carson Sievert](https://github.com/cpsievert) for pioneering probably the most popular integration of R and JavaScript with the plotly [@R-plotly] package.
+Many people in the R community have inspired me and provided the knowledge to write this book, amongst them ultimately are [Ramnath Vaidyanathan](https://github.com/ramnathv/) for his amazing work on the htmlwidgets [@R-htmlwidgets] package, [Kent Russell](https://github.com/timelyportfolio) from whom I have learned a lot via his work on making Vue and React accessible in R, and [Carson Sievert](https://github.com/cpsievert) for pioneering probably the most popular integration of R and JavaScript with the plotly [@R-plotly] package.
 
 Early reviewers also shared precious feedback that helped make the book dramatically better, thanks to [Maya Gans](@mayacelium), [
 Felipe Mattioni Maturana](@felipe_mattioni), and [Wei Su](@Wei_Su) for thoroughly going through every line of the book.

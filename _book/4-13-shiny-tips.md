@@ -158,7 +158,7 @@ server <- function(input, output) {
   output$table <- renderDT({
     # on click function
     onclick <- sprintf(
-      "Shiny.setInputValue('click', '%s', {priority: 'event'})", 
+      "Shiny.setInputValue('click', '%s')", 
       rownames(mtcars)
     ) 
     
@@ -191,7 +191,7 @@ server <- function(input, output) {
   output$table <- renderDT({
     # on click function
     onclick <- sprintf(
-      "Shiny.setInputValue('click', '%s', {priority: 'event'})", 
+      "Shiny.setInputValue('click', '%s')", 
       rownames(mtcars)
     ) 
 
@@ -234,7 +234,7 @@ server <- function(input, output) {
   output$table <- renderDT({
     # on click function
     onclick <- sprintf(
-      "Shiny.setInputValue('click', '%s', {priority: 'event'})", 
+      "Shiny.setInputValue('click', '%s')", 
       rownames(mtcars)
     ) 
 
