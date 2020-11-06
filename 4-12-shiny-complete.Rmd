@@ -4,7 +4,7 @@ Thus far, this part of the book has covered both ways data travels between JavaS
 
 We shall introduce a fascinating JavaScript library that enables running machine learning models in web browsers: [ml5.js](https://learn.ml5js.org/). The library is a high-level interface to [tensorflow.js](https://www.tensorflow.org/js) but very extensive as it includes a multitude of models to deal with sound, image, text, and more. In this chapter, one of those models is implemented, an image classifier using [mobileNet](https://arxiv.org/abs/1704.04861), but the method shown can be used to integrate any other model later on.
 
-This is not a gimmick, running a model this way means it runs in the client (web browsers), and not on the shiny server leaving it free to compute anything else and serve other concurrent users. It's also fast; JavaScript is often wrongly believed to be slow, on the contrary. Finally, the JavaScript API provided is dead simple; it's impressive how ml5.js exposes complex models through such a simple API.
+This is not a gimmick, running a model this way means it runs in the client (web browsers), and not on the shiny server leaving it free to compute anything else and serve other concurrent users. It's also fast; JavaScript is often wrongly believed to be slow, on the contrary. Finally, the JavaScript API provided is straightforward; it's impressive how ml5.js exposes complex models through such a simple API.
 
 For those who want to take it further, may already now TensorFlow and want to use a lower-level library, the genius of [tensorflow.js](https://www.tensorflow.org/js) is that it runs on WebGL and is therefore GPU-accelerated, i.e. it's not slow, and has a very similar API to the TensorFlow Python library.
 
