@@ -237,7 +237,7 @@ JSON (JavaScript Object Notation) is a prevalent data _interchange_ format with 
 
 ### Serialising {#serialising}
 
-JSON is to all intents and purposes the equivalent of lists in R; a flexible data format that can store pretty much anything--expect data.frames a structure that does not exist in JavaScript. Below we create a nested list and convert it to JSON with the help of jsonlite. We set `pretty` to `TRUE` to add indentation for cleaner printing, but this is an argument you should omit when writing production code, it will reduce the file size (fewer spaces = smaller file size). 
+JSON is to all intents and purposes the equivalent of lists in R; a flexible data format that can store pretty much anything--except data.frames a structure that does not exist in JavaScript. Below we create a nested list and convert it to JSON with the help of jsonlite. We set `pretty` to `TRUE` to add indentation for cleaner printing, but this is an argument you should omit when writing production code, it will reduce the file size (fewer spaces = smaller file size). 
 
 
 ```r
