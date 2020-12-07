@@ -329,7 +329,9 @@ ui <- fluidPage(
   ),
   actionButton("toggle", "Toggle text"),
   h1("This text is shown!", class = "to-toggle"),
-  actionButton("btn", "Another visible button", class = "to-toggle")
+  actionButton(
+    "btn", "Another visible button", class = "to-toggle"
+  )
 )
 
 server <- function(input, output, session){

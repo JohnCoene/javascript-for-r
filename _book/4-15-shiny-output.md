@@ -528,8 +528,10 @@ Thankfully there is a better way, combining htmltools and shiny to insert the de
 The `boxxy` function needs to take an additional argument `animate` which is passed to the output list. This will be used in the `render` function (and JavaScript binding) to render the dependency dynamically.
 
 ```r
-boxxy <- function(title, value, color = "black", aniamte = TRUE){
-  list(title = title, value = value, color = color, animate = animate)
+boxxy <- function(title, value, color = "black", animate = TRUE){
+  list(
+    title = title, value = value, color = color, animate = animate
+  )
 }
 ```
 
@@ -590,7 +592,8 @@ same and only renders one of them.
 The dependency generated with htmltools is then passed to the `shiny::createWebDependency` function, which internally uses `shiny::addResourcePath` to serve the dependency. This is necessary here as, at this stage, the countup dependency is not actually rendered; below we merely add it to the list of options that serialised to JSON. Indeed this will actually be injected JavaScript-side. Therefore the front-end needs to be able to access this file, hence it is served.
 
 ```r
-renderBoxxy <- function(expr, env = parent.frame(), quoted = FALSE) {
+renderBoxxy <- function(expr, env = parent.frame(), 
+  quoted = FALSE) {
   # Convert the expression + environment into a function
   func <- shiny::exprToFunction(expr, env, quoted)
 
@@ -631,16 +634,22 @@ $.extend(boxxyBinding, {
   },
   renderValue: function(el, data) {
 
+    let boxValue, boxTitle;
+
     el.style.backgroundColor = data.color;
 
     if(data.animate){
-      var counter = new CountUp(el.id + '-boxxy-value', 0, data.value);
+      var counter = new CountUp(
+        el.id + '-boxxy-value', 0, data.value
+      );
       counter.start();
     } else {
-      document.getElementById(el.id + '-boxxy-value').innerText = data.value;
+      boxValue = document.getElementById(el.id + '-boxxy-value')
+      boxValue.innerText = data.value;
     }
 
-    document.getElementById(el.id + '-boxxy-title').innerText = data.title;
+    boxTitle = document.getElementById(el.id + '-boxxy-title')
+    boxTitle.innerText = data.title;
   }
 });
 
@@ -658,17 +667,23 @@ $.extend(boxxyBinding, {
   },
   renderValue: function(el, data) {
 
+    let boxValue, boxTitle;
+
     el.style.backgroundColor = data.color;
 
     if(data.animate){
       Shiny.renderDependencies(data.deps); // render dependency
-      var counter = new CountUp(el.id + '-boxxy-value', 0, data.value);
+      var counter = new CountUp(
+        el.id + '-boxxy-value', 0, data.value
+      );
       counter.start();
     } else {
-      document.getElementById(el.id + '-boxxy-value').innerText = data.value;
+      boxValue = document.getElementById(el.id + '-boxxy-value')
+      boxValue.innerText = data.value;
     }
 
-    document.getElementById(el.id + '-boxxy-title').innerText = data.title;
+    boxTitle = document.getElementById(el.id + '-boxxy-title')
+    boxTitle.innerText = data.title;
   }
 });
 
@@ -712,7 +727,12 @@ One aspect that this example did not explore truly explore thus far is the idea 
 ```r
 # works too
 output$theId <- renderBoxxy({
-  list(title = "The Title", value = 123, color = "blue", animate = TRUE)
+  list(
+    title = "The Title", 
+    value = 123, 
+    color = "blue", 
+    animate = TRUE
+  )
 })
 ```
 
@@ -731,7 +751,12 @@ boxxy <- function(title, value, color = NULL, animate = TRUE){
     else
       color <- "#06d6a0"
 
-  list(title = title, value = value, color = color, animate = animate)
+  list(
+    title = title, 
+    value = value, 
+    color = color, 
+    animate = animate
+  )
 }
 ```
 

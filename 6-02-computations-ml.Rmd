@@ -53,7 +53,9 @@ ml_simple_lm <- function(y, x){
   ml$assign("y", y)
 
   # run regression
-  ml$eval("var regression = new ML.SimpleLinearRegression(x, y);")
+  ml$eval(
+    "var regression = new ML.SimpleLinearRegression(x, y);"
+  )
   
   # return results
   ml$get("regression")

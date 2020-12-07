@@ -4,6 +4,8 @@
 
 # Overview {#intro-overview}
 
+
+
 This book starts with a rationale for integrating JavaScript with R and supports it with examples, namely packages that use JavaScript and are available on CRAN. Then, we list the various ways in which one might go about making both languages work together. In the next chapter, we go over prerequisites and a review of concepts fundamental to fully understand the more advanced topics residing in the forthcoming chapters. 
 
 ## Rationale {#intro-overview-rationale}
@@ -16,7 +18,11 @@ Nevertheless, a fair reason to use JavaScript might be that the thing one wants 
 ```r
 library(lawn)
 
-lawn_count(lawn_data$polygons_count, lawn_data$points_count, "population")
+lawn_count(
+  lawn_data$polygons_count, 
+  lawn_data$points_count, 
+  "population"
+)
 #> <FeatureCollection>
 #>   Bounding box: -112.1 46.6 -112.0 46.6
 #>   No. features: 2
@@ -36,9 +42,14 @@ library(plotly)
 plot_ly(diamonds, x = ~cut, color = ~clarity, width = "100%")
 ```
 
+\begin{figure}[t]
 
+{\centering \includegraphics[width=1\linewidth]{images/01-plotly} 
 
-\begin{center}\includegraphics[width=1\linewidth]{1-01-intro-introduction_files/figure-latex/unnamed-chunk-2-1} 
+}
+
+\caption{Basic htmlwidget example}(\#fig:plotly-basic-example)
+\end{figure}
 
 Finally, JavaScript can work together with R to improve how we communicate insights. One of the many ways in which Shiny stands out is that it lets one create web applications solely from R code with no knowledge of HTML, CSS, or JavaScript but that does not mean they can't extend Shiny, quite the contrary. The [waiter package](http://waiter.john-coene.com/) [@R-waiter] integrates a variety of JavaScript libraries to display loading screens in Shiny applications.
 
@@ -90,7 +101,6 @@ Let's list the methods available to us to blend JavaScript with R before coverin
 
 ```r
 library(V8)
-#> Using V8 engine 6.8.275.32-node.55
 
 ctx <- v8()
 
@@ -121,9 +131,14 @@ Note that there are also two other prominent ways one can use JavaScript with R 
 reactable::reactable(iris[1:5, ], showPagination = TRUE)
 ```
 
+\begin{figure}[t]
 
+{\centering \includegraphics[width=1\linewidth]{images/01-reactable} 
 
-\begin{center}\includegraphics[width=1\linewidth]{1-01-intro-introduction_files/figure-latex/unnamed-chunk-4-1} 
+}
+
+\caption{reactable package example}(\#fig:reactable-example)
+\end{figure}
 
 There is also the package vueR [@R-vueR] which brings some of Vue.js to R.
 
@@ -140,6 +155,11 @@ r2d3::r2d3(
 )
 ```
 
+\begin{figure}[t]
 
+{\centering \includegraphics[width=1\linewidth]{images/01-d3} 
 
-\begin{center}\includegraphics[width=1\linewidth]{1-01-intro-introduction_files/figure-latex/unnamed-chunk-5-1} 
+}
+
+\caption{r2d3 basic example}(\#fig:r2d3)
+\end{figure}

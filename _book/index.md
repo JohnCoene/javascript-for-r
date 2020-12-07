@@ -1,11 +1,11 @@
 --- 
 title: "JavaScript for R"
 author: "John Coene"
-date: "2020-11-06"
+date: "2020-12-07"
 documentclass: krantz
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
-monofont: "Source Code Pro"
+fontsize: 10pt
 monofontoptions: "Scale=0.7"
 link-citations: yes
 colorlinks: yes

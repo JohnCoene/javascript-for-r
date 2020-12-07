@@ -1,5 +1,7 @@
 # Discover Webpack and NPM {#webpack-intro-discover}
 
+
+
 In this chapter, we discover how to feature webpack and NPM in a straightforward shiny project. The idea is not to build a complex application, only to find out how one might go about bringing them into an R project and observe some of their benefits (and potential issues).
 
 There is a lot of depth to NPM and webpack; we only touch upon the surface here so we can obtain a basic setup for a shiny application. We'll eventually go into slightly more details as this part of the book progress, but it will by no means fully explore the realm of webpack. It's always a good idea to take a look at the [official documentation](https://webpack.js.org/) to get a better picture of the technology.
@@ -314,8 +316,14 @@ file.create("src/secret.js")
 
 Therefore the entry point `index.js` needs to import `input.js` which itself imports the pass-phrase from `secret.js`.
 
+\begin{figure}[t]
 
-\begin{center}\includegraphics[width=1\linewidth]{7-02-webpack-npm-discover_files/figure-latex/unnamed-chunk-4-1} 
+{\centering \includegraphics[width=1\linewidth]{images/07-webpack-shiny} 
+
+}
+
+\caption{webpack with shiny}(\#fig:webpack-shiny)
+\end{figure}
 
 Again, there are multiple ways one can use to import and export modules, functions, variables, etc. This book will use the ES6 syntax as [recommended by webpack](https://webpack.js.org/api/module-methods/#es6-recommended). Though this mechanism is present in other languages such as Python (where it somewhat resembles ES6) it will take some getting used to for R programmers as though this language features some form of import (`library()`) and export (`@export` roxygen2 tag), this differs significantly from how it works in webpack. This is, however, key to using webpack as it is what ultimately enables the creation of modules that make code more robust.
 

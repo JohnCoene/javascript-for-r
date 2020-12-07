@@ -193,16 +193,18 @@ In the `srcjs/inputs` directory, packer created `increment.js`. This code contai
 import $ from 'jquery';
 import 'shiny';
 
-$(document).on("click", "button.incrementBinding", function(evt) {
-  // evt.target is the button that was clicked
-  var el = $(evt.target);
+$(document).on("click", "button.incrementBinding", 
+  function(evt) {
+    // evt.target is the button that was clicked
+    var el = $(evt.target);
 
-  // Set the button's text to its current value plus 1
-  el.text(parseInt(el.text()) + 1);
+    // Set the button's text to its current value plus 1
+    el.text(parseInt(el.text()) + 1);
 
-  // Raise an event to signal that the value changed
-  el.trigger("change");
-});
+    // Raise an event to signal that the value changed
+    el.trigger("change");
+  }
+);
 
 var incrementBinding = new Shiny.InputBinding();
 
@@ -226,7 +228,9 @@ $.extend(incrementBinding, {
   }
 });
 
-Shiny.inputBindings.register(incrementBinding, "increment.incrementBinding");
+Shiny.inputBindings.register(
+  incrementBinding, "increment.incrementBinding"
+);
 ```
 
 The `srcjs/index.js` file was also created; it imports the JavaScript binding detailed above with `import './inputs/increment.js';`. Notably, by default, packer does not bundle all of these files into one; `index.js` is only populated for convenience in the event one would want to change this behaviour. Instead, packer uses `srcjs/inputs/increment.js` as an entry point. It will handle multiple entry points, so every input, output, widgets, etc. are bundled separately. This is done so one can import those dynamically.

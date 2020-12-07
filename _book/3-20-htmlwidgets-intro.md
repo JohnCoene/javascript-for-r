@@ -2,6 +2,8 @@
 
 # Introduction to Widgets {#widgets-intro-intro}
 
+
+
 This part of the book explores the integration of JavaScript with R using the htmlwidgets package which focuses on libraries that produce a visual output, it is often used for data visualisation but is not limited to it.
 
 As in future parts of this book, we mainly learn through examples, building multiple widgets of increasing complexity as we progress through the chapters. Before writing the first widget, we explore existing R packages that allow creating interactive data visualisations as this gives a first glimpse at we build in this part of the book. Then we explore JavaScript libraries that make great candidates for htmlwidgets and attempt to understand how they work to grasp what is expected from the developer in order to integrate them with R. Finally, we build upon the previous chapter to improve how htmlwidgets work with shiny.
@@ -19,26 +21,19 @@ Plotly.js is a substantial library that provides over 40 chart types, including 
 
 ```r
 library(plotly)
-#> Loading required package: ggplot2
-#> 
-#> Attaching package: 'plotly'
-#> The following object is masked from 'package:ggplot2':
-#> 
-#>     last_plot
-#> The following object is masked from 'package:stats':
-#> 
-#>     filter
-#> The following object is masked from 'package:graphics':
-#> 
-#>     layout
 
 plot_ly(cars, x = ~speed, y = ~dist) %>% 
   add_markers()
 ```
 
+\begin{figure}[t]
 
+{\centering \includegraphics[width=1\linewidth]{images/03-plotly-scatter} 
 
-\begin{center}\includegraphics[width=1\linewidth]{3-20-htmlwidgets-intro_files/figure-latex/unnamed-chunk-1-1} 
+}
+
+\caption{plotly scatter plot}(\#fig:plotly-scatter-diagram)
+\end{figure}
 
 Plotly also has the ability to translate static ggplot2 [@R-ggplot2] charts to interactive plotly charts with the `ggplotly` function.
 
@@ -49,9 +44,14 @@ p <- ggplot(diamonds, aes(x = log(carat), y = log(price))) +
 ggplotly(p)
 ```
 
+\begin{figure}[t]
 
+{\centering \includegraphics[width=1\linewidth]{images/03-ggplotly} 
 
-\begin{center}\includegraphics[width=1\linewidth]{3-20-htmlwidgets-intro_files/figure-latex/unnamed-chunk-2-1} 
+}
+
+\caption{Interactive ggplot2 with plotly}(\#fig:plotly-ggplotly-diagram)
+\end{figure}
 
 All plotly charts are initialised with the `plot_ly` function and work nicely with the magrittr [@R-magrittr] pipe `%>%`. This implies that (almost) every function expects a plotly object (the output of `plot_ly`) and returns a modified version of that object. The pipe makes code easier to read and more concise.
 
@@ -70,9 +70,14 @@ plot_ly(mtcars, x = ~disp) %>%
   add_lines(y = ~fitted(loess(mpg ~ disp)))
 ```
 
+\begin{figure}[t]
 
+{\centering \includegraphics[width=1\linewidth]{images/03-plotly-multiple} 
 
-\begin{center}\includegraphics[width=1\linewidth]{3-20-htmlwidgets-intro_files/figure-latex/unnamed-chunk-4-1} 
+}
+
+\caption{Multiple layers with plotly}(\#fig:plotly-layers-diagram)
+\end{figure}
 
 ## DT package {#widgets-intro-dt}
 
@@ -83,9 +88,14 @@ The DT package [@R-DT] is a wrapper for the [DataTables](https://datatables.net/
 DT::datatable(cars)
 ```
 
+\begin{figure}[t]
 
+{\centering \includegraphics[width=1\linewidth]{images/03-DT} 
 
-\begin{center}\includegraphics[width=1\linewidth]{3-20-htmlwidgets-intro_files/figure-latex/unnamed-chunk-5-1} 
+}
+
+\caption{Interactive table with DT}(\#fig:plotly-dt-diagram)
+\end{figure}
 
 DT has grown very popular amongst shiny developers as it allows capturing server-side many of the users' interactions with the table, such as the selected row.
 

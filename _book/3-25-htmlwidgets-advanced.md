@@ -438,16 +438,18 @@ One issue that might arise is that of compatibility between widgets. What if som
 
 The htmlwidgets package comes with a function to extract the dependencies from a widget, so they can be reused in another. The function `htmlwidgets::getDependency` returns a list of objects of class `html_dependency` which can therefore be used in other widgets as demonstrated in the previous section.
 
-
 ```r
 # get dependencies of the gio package
 htmlwidgets::getDependency("gio")[2:3]
+```
+
+```
 #> [[1]]
 #> List of 10
 #>  $ name      : chr "three"
 #>  $ version   : chr "110"
 #>  $ src       :List of 1
-#>   ..$ file: chr "/home/jp/R/x86_64-pc-linux-gnu-library/4.0/gio/htmlwidgets/three"
+#>   ..$ file: chr "/home/usr/gio/htmlwidgets/three"
 #>  $ meta      : NULL
 #>  $ script    : chr "three.min.js"
 #>  $ stylesheet: NULL
@@ -462,7 +464,7 @@ htmlwidgets::getDependency("gio")[2:3]
 #>  $ name      : chr "gio"
 #>  $ version   : chr "2"
 #>  $ src       :List of 1
-#>   ..$ file: chr "/home/jp/R/x86_64-pc-linux-gnu-library/4.0/gio/htmlwidgets/gio"
+#>   ..$ file: chr "/home/usr/gio/htmlwidgets/gio"
 #>  $ meta      : NULL
 #>  $ script    : chr "gio.min.js"
 #>  $ stylesheet: NULL

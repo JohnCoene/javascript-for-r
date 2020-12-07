@@ -2,6 +2,8 @@
 
 # Bidirectional Communication {#shiny-intro}
 
+
+
 Shiny is the web framework of choice for the R programming language. Since JavaScript and Shiny both run in web browsers it follows that they can run alongside one another as one can include JavaScript in such applications. However, often disregarded is the ability for Shiny's R server to communicate to the front-end and vice versa. This collection of chapters aims to show precisely how this works. In this first part, we brush up on the essentials, so we understand how to include JavaScript in shiny applications.
 
 Then again, the goal is not to write a lot of convoluted JavaScript, on the contrary, with little knowledge of the language the aim is to write as little as possible but demonstrate to the reader that it is often enough to vastly improve the user experience of shiny applications.
@@ -10,8 +12,14 @@ Then again, the goal is not to write a lot of convoluted JavaScript, on the cont
 
 Shiny applications have two components the user interface (UI) and the server function. These two components communicate via a WebSocket: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server this connection is managed by shiny using the httpuv [@R-httpuv] and WebSocket [@R-websocket] packages, while in clients connecting to the server this connection is managed with JavaScript.  
 
+\begin{figure}[t]
 
-\begin{center}\includegraphics[width=1\linewidth]{4-11-shiny-first-look_files/figure-latex/unnamed-chunk-1-1} 
+{\centering \includegraphics[width=1\linewidth]{images/04-websocket} 
+
+}
+
+\caption{Websocket visualised}(\#fig:unnamed-chunk-2)
+\end{figure}
 
 With that in mind, we can put together a shiny application which though simple exploits bi-directional communication. The application takes a text input, sends the value of the input to the R server which sends it back to the UI.
 
@@ -34,8 +42,14 @@ shinyApp(ui, server)
 
 Drawing a diagram of the communication between the UI and the server reveals that thought this is a simple application a lot is happening.
 
+\begin{figure}[t]
 
-\begin{center}\includegraphics[width=1\linewidth]{4-11-shiny-first-look_files/figure-latex/unnamed-chunk-2-1} 
+{\centering \includegraphics[width=1\linewidth]{images/04-shiny-websocket} 
+
+}
+
+\caption{Shiny websocket visualised}(\#fig:shiny-websocket-diagram)
+\end{figure}
 
 Communicating between the R server and the user interface requires JavaScript and thus makes a reasonable chunk of this part of the book on web development with shiny.
 
@@ -59,10 +73,12 @@ Below we build an elementary example that features jBox in HTML; it includes the
   src="https://code.jquery.com/jquery-3.5.1.min.js">
   </script>
 <script 
-  src="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js">
+  src="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/
+    dist/jBox.all.min.js">
 </script>
 <link 
-  href="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css" 
+  href="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/
+    dist/jBox.all.min.css" 
   rel="stylesheet">
 </head>
 
@@ -210,8 +226,14 @@ shinyApp(ui, server)
 
 In the application above, notice the path that the message follows: it goes from the client (user input) to the server (`observeEvent`) which sends (`sendCustomMessage`) it back to the client. 
 
+\begin{figure}[t]
 
-\begin{center}\includegraphics[width=1\linewidth]{4-11-shiny-first-look_files/figure-latex/unnamed-chunk-3-1} 
+{\centering \includegraphics[width=1\linewidth]{images/04-custom-msg} 
+
+}
+
+\caption{Shiny alert with custom messages}(\#fig:shiny-alert-diagram)
+\end{figure}
 
 This might be considered suboptimal by some as it is not necessary to use the server as an intermediary (in this example at least). Though there is some truth to this the above will work perfectly fine---and the aim here is to make JavaScript work with R---not alongside it, the WebSocket is very efficient, and this will not have much overhead at all.
 
@@ -277,7 +299,9 @@ server <- function(input, output, session){
     color = 'black'
   )
   # send the notice
-  session$sendCustomMessage(type = "send-notice", message = notice)
+  session$sendCustomMessage(
+    type = "send-notice", message = notice
+  )
 }
 
 shinyApp(ui, server)
@@ -383,7 +407,9 @@ tags$script("Shiny.addCustomMessageHandler(
   type = 'send-alert', function(message) {
     // append callback
     message.onClose = function(){
-      Shiny.setInputValue('notice_close', true, {priority: 'event'});
+      Shiny.setInputValue(
+        'notice_close', true, {priority: 'event'}
+      );
     }
     new jBox('Notice', message);
 });")
@@ -413,7 +439,9 @@ ui <- fluidPage(
       "Shiny.addCustomMessageHandler(
         type = 'send-notice', function(message) {
           message.onClose = function(){
-            Shiny.setInputValue('notice_close', true, {priority: 'event'});
+            Shiny.setInputValue(
+              'notice_close', true, {priority: 'event'}
+            );
           }
           new jBox('Notice', message);
       });"

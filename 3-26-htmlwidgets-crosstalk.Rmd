@@ -2,6 +2,8 @@
 
 ```{r, include=FALSE}
 library(crosstalk)
+
+source("utils.R")
 ```
 
 Widgets can be linked with one another using the crosstalk [@R-crosstalk] package, a fantastic add-on for htmlwidgets that implements inter-widget interactions, namely selection and filtering. This, in effect, allows the selection or filtering of data points in one widget to be mirrored in another. This is enabled with the creation of "shared datasets" that can be used across widgets; outputs that share datasets share interactions.
@@ -179,8 +181,8 @@ Other than tabular data, crosstalk will require the widget to have the necessary
 
 As will be discovered later when support for crosstalk is brought to gio, minimal changes on the R side. As might be expected, crosstalk enables the communication between widgets via JavaScript. Hence much of what must be adapted by widgets developers happens in JavaScript too.
 
-```{r, echo=FALSE}
-DiagrammeR::grViz("
+```{r crosstalk-diagram, echo=FALSE, fig.cap='Crosstalk visualised'}
+d <- DiagrammeR::grViz("
 digraph G {
 
   graph [compound=true rankdir = LR]
@@ -208,6 +210,8 @@ digraph G {
   'Shared Dataset' -> 'Widget 1' [lhead=cluster_1 ltail=cluster_0];
 }
 ", width = "100%", height = 250)
+
+include_widget(d, "03-crosstalk-viz.png")
 ```
 
 Indeed the bi-directional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. 
@@ -256,8 +260,8 @@ In JavaScript, a widget "receives" the keys of selected and filtered data points
 
 Internally crosstalk knows what to share across widgets with `group`s groups share `key`s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other. 
 
-```{r, echo=FALSE}
-DiagrammeR::grViz("
+```{r crosstalk-groups-diagram, echo=FALSE, fig.cap='crosstalk groups visualised'}
+d <- DiagrammeR::grViz("
 digraph G {
 
   subgraph cluster_g1 {
@@ -298,6 +302,8 @@ digraph G {
 
 }
 ", width = "100%", height=250)
+
+include_widget(d, "03-crosstalk-grps.png")
 ```
 
 ```{block, type='rmdnote'}
@@ -513,73 +519,6 @@ sel_handle.on("change", function(e) {
 });
 ```
 
-### Recap JavaScript Code {#linking-widgets-recap}
-
-To recapitulate, this is what the JavaScript code should not look like.
-
-```js
-HTMLWidgets.widget({
-
-  name: 'gio',
-
-  type: 'output',
-
-  factory: function(el, width, height) {
-
-    // TODO: define shared variables for this instance
-    var controller;
-
-    // create selection handle
-    var sel_handle = new crosstalk.SelectionHandle();
-
-    // listen to change
-    sel_handle.on("change", function(e) {
-      if (e.sender !== sel_handle) {
-        // clear selection
-      }
-      controller.switchCountry(e.value[0]);
-    });
-
-
-    return {
-
-      renderValue: function(x) {
-
-        controller = new GIO.Controller(el);
-
-        // group
-        sel_handle.setGroup(x.crosstalk.group);
-        
-        // add data
-        controller.addData(x.data);
-
-        controller.setStyle(x.style);
-
-        // callback
-        function callback (selectedCountry, relatedCountries) {
-          sel_handle.set([selectedCountry.ISOCode]); // send keys
-        }
-
-        controller.onCountryPicked(callback);
-
-        // use stats
-        if(x.stats)
-          controller.enableStats();
-
-        // render
-        controller.init();
-
-      },
-
-      resize: function(width, height) {
-        controller.resizeUpdate();
-      },
-
-    };
-  }
-});
-```
-
 ## Using Crosstalk with Gio {#linking-widgets-using}
 
 Finally, now that gio supports shared datasets, we can create a few examples to demonstrate how it can be used. 
@@ -613,8 +552,8 @@ knitr::include_graphics("images/crosstalk-gio-1.png")
 
 Thankfully we can use the `group` argument in order to create edges and nodes that share keys and produce a more sensible link between widgets. 
 
-```{r, echo=FALSE}
-DiagrammeR::grViz("
+```{r crosstalk-gio-diagram, echo=FALSE, fig.cap='Crosstalk with gio'}
+d <- DiagrammeR::grViz("
 digraph {
 
   graph[rankdir = TB]
@@ -637,6 +576,8 @@ digraph {
   plotly -> keys [dir=both arrowsize=.5 constraint=false];
 }
 ", width="100%")
+
+include_widget(d, "03-crosstalk-gio.png")
 ```
 
 Below we create two shared datasets with the same group name, one for the edges and another for the nodes and use one for the gio visualisation and the other for the plotly graph.
@@ -653,7 +594,9 @@ url <- paste0(
 arcs <- jsonlite::fromJSON(url)
 
 # Wrap data frame in SharedData
-edges_sd <- SharedData$new(arcs, key = arcs$i, group = "sharedGroup")
+edges_sd <- SharedData$new(
+  arcs, key = arcs$i, group = "sharedGroup"
+)
 
 # create nodes
 iso2c <- unique(arcs$i)

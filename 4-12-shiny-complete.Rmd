@@ -1,5 +1,9 @@
 # A Complete Integration {#shiny-complete}
 
+```{r, include=FALSE}
+source("utils.R")
+```
+
 Thus far, this part of the book has covered both ways data travels between JavaScript and R in Shiny. However, the notices displayed in the previous chapter, though demonstrates how both languages can work together within shiny, comes short of illustrating some more advanced use cases, how to package such code and more. 
 
 We shall introduce a fascinating JavaScript library that enables running machine learning models in web browsers: [ml5.js](https://learn.ml5js.org/). The library is a high-level interface to [tensorflow.js](https://www.tensorflow.org/js) but very extensive as it includes a multitude of models to deal with sound, image, text, and more. In this chapter, one of those models is implemented, an image classifier using [mobileNet](https://arxiv.org/abs/1704.04861), but the method shown can be used to integrate any other model later on.
@@ -24,9 +28,11 @@ function modelLoaded() {
 }
 
 // Make a prediction with a selected image
-classifier.classify(document.getElementById('image'), (err, results) => {
-  console.log(results);
-});
+classifier.classify(
+  document.getElementById('image'), (err, results) => {
+    console.log(results);
+  }
+);
 ```
 
 First, the image `classifier` is initialised from the `ml5` object with the `imageClassifier` method. This method takes two arguments, the name of the pre-trained model to use (`MobileNet`) and a callback function that is run when the model is loaded. The the `classify` method from the `classifier` is used with, again, two arguments: 1) the DOM element that contains the image (`<img />`) and a callback function to do something with the results of the classification.
@@ -37,8 +43,8 @@ Now we can jump to the next section to think about how this can be implemented i
 
 In shiny, a dropdown menu could be provided to choose from pre-selected images, and upon selection, the server renders the selected image, at the click of a button the model then runs and sends the results to the R server which prints them in the UI.
 
-```{r, echo=FALSE}
-DiagrammeR::grViz("
+```{r shiny-complex-diagram, echo=FALSE, fig.cap='Simple shiny app, complex communication'}
+d <- DiagrammeR::grViz("
 digraph {
 
   graph [rankdir = LR]
@@ -72,6 +78,8 @@ digraph {
 
 }
 ", width="100%", height=450)
+
+d <- include_widget(d, "04-shiny-complex.png")
 ```
 
 This makes for what is probably a signature of shiny: a considerable amount of bi-directional communication between the server and client as shiny makes the most of the WebSocket. Some of the readers with more advanced knowledge in JavaScript will find ways to avoid the use of the server in places to do more in the client, either way, works.
@@ -239,9 +247,11 @@ const classifier = ml5.imageClassifier('MobileNet', modelLoaded);
 
 Shiny.addCustomMessageHandler('classify', function(data){
   // Classify bird
-  classifier.classify(document.getElementById("bird"), (err, results) => {
-    console.log(results)
-  });
+  classifier.classify(
+    document.getElementById("bird"), (err, results) => {
+      console.log(results)
+    }
+  );
 });
 ```
 
@@ -270,9 +280,11 @@ const classifier = ml5.imageClassifier('MobileNet', modelLoaded);
 
 Shiny.addCustomMessageHandler('classify', function(data){
   // Classify bird
-  classifier.classify(document.getElementById("bird"), (err, results) => {
-    Shiny.setInputValue("classification", results)
-  });
+  classifier.classify(
+    document.getElementById("bird"), (err, results) => {
+      Shiny.setInputValue("classification", results)
+    }
+  );
 });
 ```
 
@@ -366,9 +378,11 @@ Once the handler function created and registered with shiny what is left to do i
 ```js
 Shiny.addCustomMessageHandler('classify', function(data){
   // Classify bird
-  classifier.classify(document.getElementById("bird"), (err, results) => {
-    Shiny.setInputValue("classification:ml5.class", results);
-  });
+  classifier.classify(
+    document.getElementById("bird"), (err, results) => {
+      Shiny.setInputValue("classification:ml5.class", results);
+    }
+  );
 });
 ```
 
@@ -509,8 +523,11 @@ First, this will give users a much better interface where they may use whatever 
 ```r
 # R/classify.R
 #' @export
-classify <- function(id, session = shiny::getDefaultReactiveDomain()){
-  session$sendCustomMessage("ml5-classify", id)
+classify <- function(
+  id, 
+  session = shiny::getDefaultReactiveDomain()
+  ){
+    session$sendCustomMessage("ml5-classify", id)
 }
 ```
 
@@ -533,11 +550,13 @@ function modelLoaded() {
   console.log('Model Loaded!');
 }
 
-Shiny.addCustomMessageHandler('ml5-classify', function(data){
-  // Make a prediction with a selected image
-  classifier.classify(document.getElementById(data), (err, results) => {
-    Shiny.setInputValue(data + "_classification:ml5.class", results);
-  });
+Shiny.addCustomMessageHandler('classify', function(data){
+  // Classify bird
+  classifier.classify(
+    document.getElementById("bird"), (err, results) => {
+      Shiny.setInputValue("classification:ml5.class", results);
+    }
+  );
 });
 ```
 

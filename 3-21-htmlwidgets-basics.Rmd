@@ -2,6 +2,10 @@
 
 Having explored existing packages that build on top of the htmlwidgets package gives some idea of the end product, but much of how it works and where to start probably remains somewhat mysterious. 
 
+```{r include=FALSE}
+source("utils.R")
+```
+
 ## Read & Study {#widgets-basics-study}
 
 Once you have found an impressive library that you would like to use from R, the very first step when building a widget is to study the JavaScript library one wants to integrate thoroughly. Often one will overlook this step only to pay it back dearly later on.
@@ -25,18 +29,14 @@ Before going down the rabbit hole, let us explore the types of libraries one wil
 Looking at the code presented in the "Get Started" guide reveals just how convenient the library is. One must import plotly, of course, then have a `<div>` where the visualisation will be placed, then, using `Plotly.newPlot`, create the actual visualisation by passing it first the element previously mentioned and a JSON of options that describe the chart.
 
 ```html
-<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
-
 <head>
   <!-- Import library -->
   <script src="plotly-latest.min.js"></script>
 </head>
-
 <body>
   <!-- div to hold visualisation -->
   <div id="chart" style="width:600px;height:400px;"></div>
-
   <!-- Script to create visualisation -->
   <script>
     el = document.getElementById('chart');
@@ -46,7 +46,6 @@ Looking at the code presented in the "Get Started" guide reveals just how conven
     );
   </script>
 </body>
-
 </html>
 ```
 
@@ -61,18 +60,14 @@ Now let's look at how another popular library does it.
 [Highcharts](https://www.highcharts.com/) is another library which allows creating gorgeous visualisation, maps, and more; it's also very popular, albeit not being entirely open-source.
 
 ```html
-<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
-
 <head>
   <!-- Import library -->
   <script src="highcharts.js"></script>
 </head>
-
 <body>
   <!-- div to hold visualisation -->
   <div id="chart" style="width:100%;height:400px;"></div>
-
   <!-- Script to create visualisation -->
   <script>
     var myChart = Highcharts.chart('chart', {
@@ -89,7 +84,6 @@ Now let's look at how another popular library does it.
     });
   </script>
 </body>
-
 </html>
 ```
 
@@ -104,25 +98,23 @@ The above is very similar to what plotly.js requires: import libraries, create a
 [Chart.js](https://www.chartjs.org/) is yet another library with which to draw standard charts popular for its permissive license and convenient API.
 
 ```html
-<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
-
 <head>
   <!-- Import library -->
   <script src="Chart.min.js"></script>
 </head>
-
 <body>
   <!-- canvas to hold visualisation -->
   <canvas id="chart"></canvas>
-
   <!-- Script to create visualisation -->
   <script>
     var el = document.getElementById('chart').getContext('2d');    
     var myChart = new Chart(el, {
       type: 'bar',
       data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        labels: [
+          'Red', 'Blue', 'Yellow', 'Green', 
+          'Purple', 'Orange'],
         datasets: [{
           label: '# of Votes',
           data: [12, 19, 3, 5, 2, 3]
@@ -131,7 +123,6 @@ The above is very similar to what plotly.js requires: import libraries, create a
     });
   </script>
 </body>
-
 </html>
 ```
 
@@ -151,8 +142,8 @@ As observed, an interactive visualisation using JavaScript will be contained wit
 
 This gives the following basic diagram; it will be broken down further in the next chapter as the first widget is built.
 
-```{r, echo=FALSE}
-DiagrammeR::grViz("
+```{r widget-inner-diagram, echo=FALSE, fig.cap='htmlwidgets inner-workings visualised'}
+d <- DiagrammeR::grViz("
 digraph {
   graph [rankdir = LR]
 
@@ -181,6 +172,8 @@ digraph {
   'Dependencies' -> 'JavaScript'
 }
 ", width="100%", height=250)
+
+include_widget(d, "03-htmlwidget-viz.png")
 ```
 
 Thankfully the htmlwidgets package is there to handle most of this. Nonetheless, it is essential to understand that these operations are undertaken (to some degree) by htmlwidgets.

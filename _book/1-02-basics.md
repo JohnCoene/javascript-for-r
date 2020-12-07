@@ -1,5 +1,7 @@
 # Prerequisites {#prerequisites}
 
+
+
 The code contained in the following pages is approachable to readers with basic knowledge of R. Still, familiarity with package development using [devtools](https://devtools.r-lib.org/) [@R-devtools], the [Shiny](https://shiny.rstudio.com/) framework [@R-shiny], the JSON data format, and JavaScript are essential. 
 
 The reason for the former is that some of the ways one builds integrations with JavaScript naturally take the form of R packages. Also, R packages make sharing code, datasets, and anything else R-related extremely convenient, they come with a relatively strict structure, the ability to run unit tests, and much more. These have thus become a core feature of the R ecosystem and therefore, are used extensively in the book as we create several packages. Therefore, the following section runs over the essentials of building a package to ensure everyone can keep up. 
@@ -8,7 +10,7 @@ Then we briefly go through the JSON data format as it will be used to a great ex
 
 It is highly recommended to use the freely available [RStudio IDE](https://rstudio.com/products/rstudio/) to follow along as it makes a lot of things easier down the line.
 
-## R Package Development {#basics-pacakge-dev}
+## R Package Development {#basics-package-dev}
 
 Developing packages used to be notoriously tricky but things have considerably changed in recent years, namely thanks to the devtools [@R-devtools], roxygen2 [@R-roxygen2] and more recent [usethis](https://usethis.r-lib.org/) [@R-usethis] packages. Devtools is short for "developer tools," it is specifically designed to help creating packages; setting up tests, running checks, building and installing packages, etc. The second provides an all too convenient way to generate the documentation of packages, and usethis, more broadly helps setting up projects, and automating repetitive tasks. Here, we only skim over the fundamentals, there is an entire book by Hadley Wickham called [R Packages](http://r-pkgs.had.co.nz/) solely dedicated to the topic.
 
@@ -449,12 +451,10 @@ x = 2; // error
 
 Though this is probably only rarely done in R, one can produce something similar by locking the binding for a variable in its environment.
 
-
 ```r
 x <- 1 # declare x
 lockBinding("x", env = .GlobalEnv) # make constant
 x <- 2 # error
-#> Error in eval(expr, envir, enclos): cannot change value of locked binding for 'x'
 unlockBinding("x", env = .GlobalEnv) # unlock binding
 x <- 2 # works
 ```
@@ -510,8 +510,14 @@ JavaScript but should not be done in R
 
 One concept which does not exist in R is that of the "DOM" which stands for Document Object Model; this is also often referred to as the DOM tree as it very much follows a tree-like structure.
 
+\begin{figure}[t]
 
-\begin{center}\includegraphics[width=1\linewidth]{1-02-basics_files/figure-latex/unnamed-chunk-15-1} 
+{\centering \includegraphics[width=1\linewidth]{images/02-dom-viz} 
+
+}
+
+\caption{Document Object Model visualisation}(\#fig:dom-viz)
+\end{figure}
 
 When a web page is loaded, the browser creates a Document Object Model of the web page which can be accessed in JavaScript from the `document` object. This lets the developer programmatically manipulate the page itself so one can, for instance, add an element (e.g., a button), change the text of another, and plenty more.
 
@@ -767,7 +773,10 @@ dependency <- htmltools::htmlDependency(
 Shiny, R markdown, and other packages where htmltools is relevant will then be able to translate an `html_dependency` object into actual HTML dependencies. The above would, for instance, generate the following HTML.
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/jquery/jquery/dist/jquery.min.js"></script>
+<script 
+  src="https://cdn.jsdelivr.net/gh/jquery/jquery/
+    dist/jquery.min.js">
+</script>
 ```
 
 Notably, the `htmltools::htmlDependency` also takes a `package` argument which makes it such that the `src` path becomes relative to the package directory (the `inst` folder). Hence the snippet below imports a file located at `myPackage/inst/assets/script.js`; the ultimate full path will, of course, depend on where the package is installed on the users' machine.
@@ -803,21 +812,25 @@ For multiple reasons, the best way to include dependencies is probably the forme
 
 Also, using htmltools dependencies will allow other package developers to assess and access the dependencies you build quickly. The function `findDependencies` will accept another function from which it can extract the dependencies. The object it returns can then be used elsewhere making dependencies portable. Below we use this function to extract the dependencies of the `fluidPage` function from the shiny package.
 
-
 ```r
 htmltools::findDependencies(
   shiny::fluidPage()
 ) 
+```
+
+```
 #> [[1]]
 #> List of 10
 #>  $ name      : chr "bootstrap"
 #>  $ version   : chr "3.4.1"
 #>  $ src       :List of 2
 #>   ..$ href: chr "shared/bootstrap"
-#>   ..$ file: chr "/home/jp/R/x86_64-pc-linux-gnu-library/4.0/shiny/www/shared/bootstrap"
+#>   ..$ file: chr "/Library/shiny/www/shared/bootstrap"
 #>  $ meta      :List of 1
 #>   ..$ viewport: chr "width=device-width, initial-scale=1"
-#>  $ script    : chr [1:3] "js/bootstrap.min.js" "shim/html5shiv.min.js" "shim/respond.min.js"
+#>  $ script    : chr [1:3] "js/bootstrap.min.js" 
+  "shim/html5shiv.min.js" 
+  "shim/respond.min.js"
 #>  $ stylesheet: chr "css/bootstrap.min.css"
 #>  $ head      : NULL
 #>  $ attachment: NULL

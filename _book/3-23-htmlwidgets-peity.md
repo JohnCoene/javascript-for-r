@@ -54,8 +54,12 @@ jquery <- paste0(
   "https://code.jquery.com/jquery-3.5.1.min.js"
 )
 
-download.file(jquery, "./inst/htmlwidgets/jquery/jquery.min.js")
-download.file(peity, "./inst/htmlwidgets/peity/jquery.peity.min.js")
+download.file(
+  jquery, "./inst/htmlwidgets/jquery/jquery.min.js"
+)
+download.file(
+  peity, "./inst/htmlwidgets/peity/jquery.peity.min.js"
+)
 ```
 
 This produces a directory that looks like this:
@@ -76,7 +80,7 @@ This produces a directory that looks like this:
             └── jquery.peity.min.js
 ```
 
-In htmlwidgets dependencies are specified in the `.yml` file located at `inst/htmlwidgets` which at first contains a commented template.
+In htmlwidgets dependencies are specified in the `.yaml` file located at `inst/htmlwidgets` which at first contains a commented template.
 
 ```yml
 # (uncomment to add a dependency)
@@ -104,7 +108,7 @@ dependencies:
 
 \begin{rmdnote}
 The order of the dependencies matters, peity.js depends on jQuery hence
-the latter comes first in the \texttt{.yml}.
+the latter comes first in the \texttt{.yaml}.
 \end{rmdnote}
 
 The order in which one specifies the dependencies matters, just like it does in an HTML file, therefore jQuery is listed first. The `stylesheet` entries were removed as none of these libraries require CSS files. The `src` path points to the directory containing the JavaScript files and stylesheets relative to the `inst` directory of the package; this is akin to using the `system.file` function to return the full path to a file or directory within the package.
@@ -263,8 +267,8 @@ $(el).peity(x.type, {
 Reloading the package will now let one create a chart and define its type, but some options remain hard-coded. These can be made available from R in a variety of ways depending on the interface one wants to provide users of the package. Here we make them available via the three-dot construct (`...`) which are captured in a list and forwarded to the `x` object.
 
 ```r
-peity <- function(data, type = c("bar", "line", "pie", "donut"), ...,
-  width = NULL, height = NULL, elementId = NULL) {
+peity <- function(data, type = c("bar", "line", "pie", "donut"), 
+  ..., width = NULL, height = NULL, elementId = NULL) {
 
   type <- match.arg(type)
 

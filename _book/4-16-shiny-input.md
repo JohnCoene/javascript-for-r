@@ -1,5 +1,7 @@
 # Custom Inputs {#shiny-input}
 
+
+
 Shiny comes with a variety of inputs ranging from buttons to text fields; these inputs send data from the client to the R server. Custom inputs are in fact, no different than from shiny's out-of-the-box inputs, they work in the same way and are built on the same system.
 
 To explain and demonstrate how to build such a custom input, we shall build a switch input which is essentially a fancy-looking checkbox that can be toggled on and off.
@@ -554,8 +556,14 @@ The diagram below attempts to summarize the various elements that were put toget
 
 It all starts from the `switchInput` function which generates the HTML defining the switch input and its initial state. In the `subscribe` method, an event listener checks for changes on this HTML element (`$(el).on('change', ...)`), every time it changes (check/uncheck) it fires the shiny `callback` which sends the value of the input obtained from `getValue` through the WebSocket. When the value of the input is changed from the server this value travels through the WebSocket to the front-end where `receiveMessage` uses `setValue` to programmatically change the check box which incidentally triggers the change event, and back we go.
 
+\begin{figure}[t]
 
-\begin{center}\includegraphics[width=1\linewidth]{4-16-shiny-input_files/figure-latex/unnamed-chunk-3-1} 
+{\centering \includegraphics[width=1\linewidth]{images/04-shiny-input} 
+
+}
+
+\caption{Shiny input visualised}(\#fig:shiny-input-diagram)
+\end{figure}
 
 ## Exercise {#shiny-input-excercise}
 

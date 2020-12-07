@@ -171,8 +171,14 @@ Other than tabular data, crosstalk will require the widget to have the necessary
 
 As will be discovered later when support for crosstalk is brought to gio, minimal changes on the R side. As might be expected, crosstalk enables the communication between widgets via JavaScript. Hence much of what must be adapted by widgets developers happens in JavaScript too.
 
+\begin{figure}[t]
 
-\begin{center}\includegraphics[width=1\linewidth]{3-26-htmlwidgets-crosstalk_files/figure-latex/unnamed-chunk-4-1} 
+{\centering \includegraphics[width=1\linewidth]{images/03-crosstalk-viz} 
+
+}
+
+\caption{Crosstalk visualised}(\#fig:crosstalk-diagram)
+\end{figure}
 
 Indeed the bi-directional communication between widgets works in the RStudio viewer, R markdown, Shiny and elsewhere, clearly indicating that all of it is taking place in the browser. 
 
@@ -235,8 +241,14 @@ In JavaScript, a widget "receives" the keys of selected and filtered data points
 
 Internally crosstalk knows what to share across widgets with `group`s groups share `key`s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other. 
 
+\begin{figure}[t]
 
-\begin{center}\includegraphics[width=1\linewidth]{3-26-htmlwidgets-crosstalk_files/figure-latex/unnamed-chunk-9-1} 
+{\centering \includegraphics[width=1\linewidth]{images/03-crosstalk-grps} 
+
+}
+
+\caption{crosstalk groups visualised}(\#fig:crosstalk-groups-diagram)
+\end{figure}
 
 \begin{rmdnote}
 Crosstalk groups share keys.
@@ -302,7 +314,7 @@ The `gio` function also has to extract the group to which the dataset belongs; t
 ```r
 # groupName
 shared_arcs$groupName()
-#> [1] "SharedData469894cf"
+#> [1] "SharedData297ec031"
 
 # keys
 shared_arcs$key()
@@ -463,73 +475,6 @@ sel_handle.on("change", function(e) {
 });
 ```
 
-### Recap JavaScript Code {#linking-widgets-recap}
-
-To recapitulate, this is what the JavaScript code should not look like.
-
-```js
-HTMLWidgets.widget({
-
-  name: 'gio',
-
-  type: 'output',
-
-  factory: function(el, width, height) {
-
-    // TODO: define shared variables for this instance
-    var controller;
-
-    // create selection handle
-    var sel_handle = new crosstalk.SelectionHandle();
-
-    // listen to change
-    sel_handle.on("change", function(e) {
-      if (e.sender !== sel_handle) {
-        // clear selection
-      }
-      controller.switchCountry(e.value[0]);
-    });
-
-
-    return {
-
-      renderValue: function(x) {
-
-        controller = new GIO.Controller(el);
-
-        // group
-        sel_handle.setGroup(x.crosstalk.group);
-        
-        // add data
-        controller.addData(x.data);
-
-        controller.setStyle(x.style);
-
-        // callback
-        function callback (selectedCountry, relatedCountries) {
-          sel_handle.set([selectedCountry.ISOCode]); // send keys
-        }
-
-        controller.onCountryPicked(callback);
-
-        // use stats
-        if(x.stats)
-          controller.enableStats();
-
-        // render
-        controller.init();
-
-      },
-
-      resize: function(width, height) {
-        controller.resizeUpdate();
-      },
-
-    };
-  }
-});
-```
-
 ## Using Crosstalk with Gio {#linking-widgets-using}
 
 Finally, now that gio supports shared datasets, we can create a few examples to demonstrate how it can be used. 
@@ -568,8 +513,14 @@ bscols(
 
 Thankfully we can use the `group` argument in order to create edges and nodes that share keys and produce a more sensible link between widgets. 
 
+\begin{figure}[t]
 
-\begin{center}\includegraphics[width=1\linewidth]{3-26-htmlwidgets-crosstalk_files/figure-latex/unnamed-chunk-16-1} 
+{\centering \includegraphics[width=1\linewidth]{images/03-crosstalk-gio} 
+
+}
+
+\caption{Crosstalk with gio}(\#fig:crosstalk-gio-diagram)
+\end{figure}
 
 Below we create two shared datasets with the same group name, one for the edges and another for the nodes and use one for the gio visualisation and the other for the plotly graph.
 
@@ -585,7 +536,9 @@ url <- paste0(
 arcs <- jsonlite::fromJSON(url)
 
 # Wrap data frame in SharedData
-edges_sd <- SharedData$new(arcs, key = arcs$i, group = "sharedGroup")
+edges_sd <- SharedData$new(
+  arcs, key = arcs$i, group = "sharedGroup"
+)
 
 # create nodes
 iso2c <- unique(arcs$i)

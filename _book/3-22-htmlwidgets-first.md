@@ -2,6 +2,8 @@
 
 The previous chapter gave some indication as to how widgets work, but this is overall probably still shrouded in mystery. This chapter aims at demystifying what remains confusing. That is done by building a very basic widget to rummage through its components to observe how they interact and ultimately grasp a greater understanding of how such interactive outputs are actually produced. 
 
+
+
 ## The Scaffold {#widgets-first-scaffold}
 
 Though one could probably create widgets outside of an R package, it would only make things more complicated, htmlwidgets naturally take the form of R packages and are stunningly simple to create. Below we create a package named "playground" which will be used to mess around and explore.
@@ -164,8 +166,14 @@ htmlwidgets::createWidget(
 
 This is so htmlwidgets can internally match the output of `createWidget` to its JavaScript function. At this stage, it is probably fair to take a look at the diagram of what is happening.
 
+\begin{figure}[t]
 
-\begin{center}\includegraphics[width=1\linewidth]{3-22-htmlwidgets-first_files/figure-latex/unnamed-chunk-2-1} 
+{\centering \includegraphics[width=1\linewidth]{images/03-htmlwidgets-internals} 
+
+}
+
+\caption{htmlwidgets internals visualised}(\#fig:widget-internals-diagram)
+\end{figure}
 
 The `factory` function returns two functions, `resize`, and `renderValue`. The first is used to resize the output dynamically, it is not relevant to this widget is thus tackled later on. Let us focus on `renderValue`, the function that renders the output. It takes an object `x` from which the "message" variable is used as the text for object `el` (`el.innerText`). The object `x` passed to this function is actually the list of the same name that was built in the R function `play`! While in R one would access the `message` in list `x` with `x$message` in JavaScript to access the `message` in the JSON `x` one writes `x.message`, only changing the dollar sign to a dot. Let us show this perhaps more clearly by printing the content of `x`.
 
@@ -265,7 +273,9 @@ x = list(
 Reloading the package with `devtools::load_all` lets one use shiny tags as the message.
 
 ```r
-play(shiny::h2("Chocolate is a colour", style = "color:chocolate;"))
+play(
+  shiny::h2("Chocolate is a colour", style = "color:chocolate;")
+)
 ```
 
 \begin{figure}[t]
