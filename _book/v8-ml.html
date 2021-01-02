@@ -510,137 +510,137 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="v8-ml" class="section level1" number="19">
 <h1><span class="header-section-number">Chapter 19</span> Machine Learning</h1>
 <p>In this chapter, we build a package that, via V8, wraps <a href="https://github.com/mljs/ml">ml.js</a>, a library which brings machine learning to JavaScript. It covers quite a few models, we only include one: the linear regression. This is an interesting example because it reveals some proceedings that one is likely to run into when creating packages using V8.</p>
-<div class="sourceCode" id="cb381"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb381-1"><a href="v8-ml.html#cb381-1"></a><span class="kw">const</span> x <span class="op">=</span> [<span class="fl">0.5</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="fl">1.5</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="fl">2.5</span>]<span class="op">;</span></span>
-<span id="cb381-2"><a href="v8-ml.html#cb381-2"></a><span class="kw">const</span> y <span class="op">=</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span>]<span class="op">;</span></span>
-<span id="cb381-3"><a href="v8-ml.html#cb381-3"></a></span>
-<span id="cb381-4"><a href="v8-ml.html#cb381-4"></a><span class="kw">const</span> regression <span class="op">=</span> <span class="kw">new</span> <span class="va">ml</span>.<span class="at">SimpleLinearRegression</span>(x<span class="op">,</span> y)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb380"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb380-1"><a href="v8-ml.html#cb380-1"></a><span class="kw">const</span> x <span class="op">=</span> [<span class="fl">0.5</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="fl">1.5</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="fl">2.5</span>]<span class="op">;</span></span>
+<span id="cb380-2"><a href="v8-ml.html#cb380-2"></a><span class="kw">const</span> y <span class="op">=</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span>]<span class="op">;</span></span>
+<span id="cb380-3"><a href="v8-ml.html#cb380-3"></a></span>
+<span id="cb380-4"><a href="v8-ml.html#cb380-4"></a><span class="kw">const</span> regression <span class="op">=</span> <span class="kw">new</span> <span class="va">ml</span>.<span class="at">SimpleLinearRegression</span>(x<span class="op">,</span> y)<span class="op">;</span></span></code></pre></div>
 <div id="v8-ml-dependency" class="section level2" number="19.1">
 <h2><span class="header-section-number">19.1</span> Dependency</h2>
 <p>We start by creating a package and add the V8 package as dependency.</p>
-<div class="sourceCode" id="cb382"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb382-1"><a href="v8-ml.html#cb382-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;ml&quot;</span>)</span>
-<span id="cb382-2"><a href="v8-ml.html#cb382-2"></a>usethis<span class="op">::</span><span class="kw">use_package</span>(<span class="st">&quot;V8&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb381"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb381-1"><a href="v8-ml.html#cb381-1"></a>usethis<span class="op">::</span><span class="kw">create_package</span>(<span class="st">&quot;ml&quot;</span>)</span>
+<span id="cb381-2"><a href="v8-ml.html#cb381-2"></a>usethis<span class="op">::</span><span class="kw">use_package</span>(<span class="st">&quot;V8&quot;</span>)</span></code></pre></div>
 <p>Then we create the <code>inst</code> directory in which we place the ml.js file downloaded from the CDN.</p>
-<div class="sourceCode" id="cb383"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb383-1"><a href="v8-ml.html#cb383-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;inst&quot;</span>)</span>
-<span id="cb383-2"><a href="v8-ml.html#cb383-2"></a><span class="kw">download.file</span>(</span>
-<span id="cb383-3"><a href="v8-ml.html#cb383-3"></a>  <span class="st">&quot;https://www.lactame.com/lib/ml/4.0.0/ml.min.js&quot;</span>, </span>
-<span id="cb383-4"><a href="v8-ml.html#cb383-4"></a>  <span class="st">&quot;inst/ml.min.js&quot;</span></span>
-<span id="cb383-5"><a href="v8-ml.html#cb383-5"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb382"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb382-1"><a href="v8-ml.html#cb382-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;inst&quot;</span>)</span>
+<span id="cb382-2"><a href="v8-ml.html#cb382-2"></a><span class="kw">download.file</span>(</span>
+<span id="cb382-3"><a href="v8-ml.html#cb382-3"></a>  <span class="st">&quot;https://www.lactame.com/lib/ml/4.0.0/ml.min.js&quot;</span>, </span>
+<span id="cb382-4"><a href="v8-ml.html#cb382-4"></a>  <span class="st">&quot;inst/ml.min.js&quot;</span></span>
+<span id="cb382-5"><a href="v8-ml.html#cb382-5"></a>)</span></code></pre></div>
 <p>With the dependency downloaded one can start working on the R code. First, a new V8 context needs to be created and the ml.js file need to be imported in it.</p>
-<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="v8-ml.html#cb384-1"></a><span class="co"># zzz.R</span></span>
-<span id="cb384-2"><a href="v8-ml.html#cb384-2"></a>ml &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb384-3"><a href="v8-ml.html#cb384-3"></a></span>
-<span id="cb384-4"><a href="v8-ml.html#cb384-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
-<span id="cb384-5"><a href="v8-ml.html#cb384-5"></a>  ml &lt;&lt;-<span class="st"> </span>V8<span class="op">::</span><span class="kw">v8</span>()</span>
-<span id="cb384-6"><a href="v8-ml.html#cb384-6"></a>  mljs &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ml.min.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;ml&quot;</span>)</span>
-<span id="cb384-7"><a href="v8-ml.html#cb384-7"></a>  ml<span class="op">$</span><span class="kw">source</span>(mljs)</span>
-<span id="cb384-8"><a href="v8-ml.html#cb384-8"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb383"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb383-1"><a href="v8-ml.html#cb383-1"></a><span class="co"># zzz.R</span></span>
+<span id="cb383-2"><a href="v8-ml.html#cb383-2"></a>ml &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb383-3"><a href="v8-ml.html#cb383-3"></a></span>
+<span id="cb383-4"><a href="v8-ml.html#cb383-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
+<span id="cb383-5"><a href="v8-ml.html#cb383-5"></a>  ml &lt;&lt;-<span class="st"> </span>V8<span class="op">::</span><span class="kw">v8</span>()</span>
+<span id="cb383-6"><a href="v8-ml.html#cb383-6"></a>  mljs &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ml.min.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;ml&quot;</span>)</span>
+<span id="cb383-7"><a href="v8-ml.html#cb383-7"></a>  ml<span class="op">$</span><span class="kw">source</span>(mljs)</span>
+<span id="cb383-8"><a href="v8-ml.html#cb383-8"></a>}</span></code></pre></div>
 </div>
 <div id="v8-ml-regression" class="section level2" number="19.2">
 <h2><span class="header-section-number">19.2</span> Simple Regression</h2>
 <p>The <a href="https://github.com/mljs/regression-simple-linear">“simple linear regression”</a> consists of a simple function that takes two arrays. We can thus create a function that takes two vectors, <code>x</code>, and <code>y</code>, and runs the regression.</p>
-<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb385-1"><a href="v8-ml.html#cb385-1"></a><span class="co">#&#39; @export </span></span>
-<span id="cb385-2"><a href="v8-ml.html#cb385-2"></a>ml_simple_lm &lt;-<span class="st"> </span><span class="cf">function</span>(y, x){</span>
-<span id="cb385-3"><a href="v8-ml.html#cb385-3"></a>  <span class="co"># assign x and y</span></span>
-<span id="cb385-4"><a href="v8-ml.html#cb385-4"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;x&quot;</span>, x)</span>
-<span id="cb385-5"><a href="v8-ml.html#cb385-5"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;y&quot;</span>, y)</span>
-<span id="cb385-6"><a href="v8-ml.html#cb385-6"></a></span>
-<span id="cb385-7"><a href="v8-ml.html#cb385-7"></a>  <span class="co"># run regression</span></span>
-<span id="cb385-8"><a href="v8-ml.html#cb385-8"></a>  ml<span class="op">$</span><span class="kw">eval</span>(</span>
-<span id="cb385-9"><a href="v8-ml.html#cb385-9"></a>    <span class="st">&quot;var regression = new ML.SimpleLinearRegression(x, y);&quot;</span></span>
-<span id="cb385-10"><a href="v8-ml.html#cb385-10"></a>  )</span>
-<span id="cb385-11"><a href="v8-ml.html#cb385-11"></a>  </span>
-<span id="cb385-12"><a href="v8-ml.html#cb385-12"></a>  <span class="co"># return results</span></span>
-<span id="cb385-13"><a href="v8-ml.html#cb385-13"></a>  ml<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;regression&quot;</span>)</span>
-<span id="cb385-14"><a href="v8-ml.html#cb385-14"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="v8-ml.html#cb384-1"></a><span class="co">#&#39; @export </span></span>
+<span id="cb384-2"><a href="v8-ml.html#cb384-2"></a>ml_simple_lm &lt;-<span class="st"> </span><span class="cf">function</span>(y, x){</span>
+<span id="cb384-3"><a href="v8-ml.html#cb384-3"></a>  <span class="co"># assign x and y</span></span>
+<span id="cb384-4"><a href="v8-ml.html#cb384-4"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;x&quot;</span>, x)</span>
+<span id="cb384-5"><a href="v8-ml.html#cb384-5"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;y&quot;</span>, y)</span>
+<span id="cb384-6"><a href="v8-ml.html#cb384-6"></a></span>
+<span id="cb384-7"><a href="v8-ml.html#cb384-7"></a>  <span class="co"># run regression</span></span>
+<span id="cb384-8"><a href="v8-ml.html#cb384-8"></a>  ml<span class="op">$</span><span class="kw">eval</span>(</span>
+<span id="cb384-9"><a href="v8-ml.html#cb384-9"></a>    <span class="st">&quot;var regression = new ML.SimpleLinearRegression(x, y);&quot;</span></span>
+<span id="cb384-10"><a href="v8-ml.html#cb384-10"></a>  )</span>
+<span id="cb384-11"><a href="v8-ml.html#cb384-11"></a>  </span>
+<span id="cb384-12"><a href="v8-ml.html#cb384-12"></a>  <span class="co"># return results</span></span>
+<span id="cb384-13"><a href="v8-ml.html#cb384-13"></a>  ml<span class="op">$</span><span class="kw">get</span>(<span class="st">&quot;regression&quot;</span>)</span>
+<span id="cb384-14"><a href="v8-ml.html#cb384-14"></a>}</span></code></pre></div>
 <p>Then we can document and load the model to the function.</p>
-<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="v8-ml.html#cb386-1"></a><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
-<span id="cb386-2"><a href="v8-ml.html#cb386-2"></a><span class="co">## $name</span></span>
-<span id="cb386-3"><a href="v8-ml.html#cb386-3"></a><span class="co">## [1] &quot;simpleLinearRegression&quot;</span></span>
-<span id="cb386-4"><a href="v8-ml.html#cb386-4"></a><span class="co">## </span></span>
-<span id="cb386-5"><a href="v8-ml.html#cb386-5"></a><span class="co">## $slope</span></span>
-<span id="cb386-6"><a href="v8-ml.html#cb386-6"></a><span class="co">## [1] 0.1655676</span></span>
-<span id="cb386-7"><a href="v8-ml.html#cb386-7"></a><span class="co">## </span></span>
-<span id="cb386-8"><a href="v8-ml.html#cb386-8"></a><span class="co">## $intercept</span></span>
-<span id="cb386-9"><a href="v8-ml.html#cb386-9"></a><span class="co">## [1] 8.283906</span></span></code></pre></div>
+<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb385-1"><a href="v8-ml.html#cb385-1"></a><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
+<span id="cb385-2"><a href="v8-ml.html#cb385-2"></a><span class="co">## $name</span></span>
+<span id="cb385-3"><a href="v8-ml.html#cb385-3"></a><span class="co">## [1] &quot;simpleLinearRegression&quot;</span></span>
+<span id="cb385-4"><a href="v8-ml.html#cb385-4"></a><span class="co">## </span></span>
+<span id="cb385-5"><a href="v8-ml.html#cb385-5"></a><span class="co">## $slope</span></span>
+<span id="cb385-6"><a href="v8-ml.html#cb385-6"></a><span class="co">## [1] 0.1655676</span></span>
+<span id="cb385-7"><a href="v8-ml.html#cb385-7"></a><span class="co">## </span></span>
+<span id="cb385-8"><a href="v8-ml.html#cb385-8"></a><span class="co">## $intercept</span></span>
+<span id="cb385-9"><a href="v8-ml.html#cb385-9"></a><span class="co">## [1] 8.283906</span></span></code></pre></div>
 <p>This works but has a few issues, namely running two or more regression internally will override the variable <code>regression</code> in the V8 context. Let us demonstrate by implementing a function to predict.</p>
-<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb387-1"><a href="v8-ml.html#cb387-1"></a><span class="co">#&#39; @export</span></span>
-<span id="cb387-2"><a href="v8-ml.html#cb387-2"></a>ml_predict &lt;-<span class="st"> </span><span class="cf">function</span>(x){</span>
-<span id="cb387-3"><a href="v8-ml.html#cb387-3"></a>  ml<span class="op">$</span><span class="kw">call</span>(<span class="st">&quot;regression.predict&quot;</span>, x)</span>
-<span id="cb387-4"><a href="v8-ml.html#cb387-4"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="v8-ml.html#cb386-1"></a><span class="co">#&#39; @export</span></span>
+<span id="cb386-2"><a href="v8-ml.html#cb386-2"></a>ml_predict &lt;-<span class="st"> </span><span class="cf">function</span>(x){</span>
+<span id="cb386-3"><a href="v8-ml.html#cb386-3"></a>  ml<span class="op">$</span><span class="kw">call</span>(<span class="st">&quot;regression.predict&quot;</span>, x)</span>
+<span id="cb386-4"><a href="v8-ml.html#cb386-4"></a>}</span></code></pre></div>
 <p>We then document and load the functions to run two regressions in a row then and observe the issue. Unlike R the model we created only exists in JavaScript, unlike the <code>lm</code>, the function <code>ml_simple_lm</code> does not return the model. Therefore, <code>ml_simple_lm</code> does not distinguish between models, unlike <code>predict</code> which takes the model as the first argument and runs the prediction on it.</p>
 <p>This implementation of ml.js is indeed very dangerous.</p>
-<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="v8-ml.html#cb388-1"></a><span class="co"># first model</span></span>
-<span id="cb388-2"><a href="v8-ml.html#cb388-2"></a><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
-<span id="cb388-3"><a href="v8-ml.html#cb388-3"></a><span class="kw">ml_predict</span>(<span class="dv">15</span>)</span>
-<span id="cb388-4"><a href="v8-ml.html#cb388-4"></a><span class="co">## 25.18405</span></span>
-<span id="cb388-5"><a href="v8-ml.html#cb388-5"></a></span>
-<span id="cb388-6"><a href="v8-ml.html#cb388-6"></a><span class="co"># overrides model</span></span>
-<span id="cb388-7"><a href="v8-ml.html#cb388-7"></a><span class="kw">ml_simple_lm</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="kw">runif</span>(<span class="dv">10</span>))</span>
-<span id="cb388-8"><a href="v8-ml.html#cb388-8"></a></span>
-<span id="cb388-9"><a href="v8-ml.html#cb388-9"></a><span class="co"># produces different predictions</span></span>
-<span id="cb388-10"><a href="v8-ml.html#cb388-10"></a><span class="kw">ml_predict</span>(<span class="dv">15</span>)</span>
-<span id="cb388-11"><a href="v8-ml.html#cb388-11"></a><span class="co">## 10.76742</span></span></code></pre></div>
+<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb387-1"><a href="v8-ml.html#cb387-1"></a><span class="co"># first model</span></span>
+<span id="cb387-2"><a href="v8-ml.html#cb387-2"></a><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
+<span id="cb387-3"><a href="v8-ml.html#cb387-3"></a><span class="kw">ml_predict</span>(<span class="dv">15</span>)</span>
+<span id="cb387-4"><a href="v8-ml.html#cb387-4"></a><span class="co">## 25.18405</span></span>
+<span id="cb387-5"><a href="v8-ml.html#cb387-5"></a></span>
+<span id="cb387-6"><a href="v8-ml.html#cb387-6"></a><span class="co"># overrides model</span></span>
+<span id="cb387-7"><a href="v8-ml.html#cb387-7"></a><span class="kw">ml_simple_lm</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="kw">runif</span>(<span class="dv">10</span>))</span>
+<span id="cb387-8"><a href="v8-ml.html#cb387-8"></a></span>
+<span id="cb387-9"><a href="v8-ml.html#cb387-9"></a><span class="co"># produces different predictions</span></span>
+<span id="cb387-10"><a href="v8-ml.html#cb387-10"></a><span class="kw">ml_predict</span>(<span class="dv">15</span>)</span>
+<span id="cb387-11"><a href="v8-ml.html#cb387-11"></a><span class="co">## 10.76742</span></span></code></pre></div>
 <p>The package ml currently under construction should emulate R in that respect; the <code>ml_simple_lm</code> should return the model which should be usable with the <code>predict</code> function. In order to do we are going to need to track regressions internally in V8 so the <code>ml_simple_lm</code> return a proxy of the model that <code>predict</code> can use to predict on the intended model.</p>
 <p>In order to track and store regressions internally, we are going to declare an empty array when the package is loaded.</p>
-<div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb389-1"><a href="v8-ml.html#cb389-1"></a><span class="co"># zzz.R</span></span>
-<span id="cb389-2"><a href="v8-ml.html#cb389-2"></a>ml &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
-<span id="cb389-3"><a href="v8-ml.html#cb389-3"></a></span>
-<span id="cb389-4"><a href="v8-ml.html#cb389-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
-<span id="cb389-5"><a href="v8-ml.html#cb389-5"></a>  ml &lt;&lt;-<span class="st"> </span>V8<span class="op">::</span><span class="kw">v8</span>()</span>
-<span id="cb389-6"><a href="v8-ml.html#cb389-6"></a>  mljs &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ml.min.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;ml&quot;</span>)</span>
-<span id="cb389-7"><a href="v8-ml.html#cb389-7"></a>  ml<span class="op">$</span><span class="kw">source</span>(mljs)</span>
-<span id="cb389-8"><a href="v8-ml.html#cb389-8"></a>  ml<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;var regressions = [];&quot;</span>)</span>
-<span id="cb389-9"><a href="v8-ml.html#cb389-9"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="v8-ml.html#cb388-1"></a><span class="co"># zzz.R</span></span>
+<span id="cb388-2"><a href="v8-ml.html#cb388-2"></a>ml &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb388-3"><a href="v8-ml.html#cb388-3"></a></span>
+<span id="cb388-4"><a href="v8-ml.html#cb388-4"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname){</span>
+<span id="cb388-5"><a href="v8-ml.html#cb388-5"></a>  ml &lt;&lt;-<span class="st"> </span>V8<span class="op">::</span><span class="kw">v8</span>()</span>
+<span id="cb388-6"><a href="v8-ml.html#cb388-6"></a>  mljs &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;ml.min.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;ml&quot;</span>)</span>
+<span id="cb388-7"><a href="v8-ml.html#cb388-7"></a>  ml<span class="op">$</span><span class="kw">source</span>(mljs)</span>
+<span id="cb388-8"><a href="v8-ml.html#cb388-8"></a>  ml<span class="op">$</span><span class="kw">eval</span>(<span class="st">&quot;var regressions = [];&quot;</span>)</span>
+<span id="cb388-9"><a href="v8-ml.html#cb388-9"></a>}</span></code></pre></div>
 <p>Then, one can track regressions by creating an R object which is incremented every time <code>ml_simple_lm</code> runs; this can be used as a variable name in the JavaScript <code>regressions</code> array declare in <code>.onLoad</code>. This variable name must be stored in the object we intend to return so the <code>predict</code> method we will create later on can access the model and run predictions. Finally, in order to declare a new method on the <code>predict</code> function, we need to return an object bearing a unique class, below we use <code>mlSimpleRegression</code>.</p>
-<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb390-1"><a href="v8-ml.html#cb390-1"></a>counter &lt;-<span class="st"> </span><span class="kw">new.env</span>(<span class="dt">parent =</span> <span class="kw">emptyenv</span>())</span>
-<span id="cb390-2"><a href="v8-ml.html#cb390-2"></a>counter<span class="op">$</span>regressions &lt;-<span class="st"> </span><span class="dv">0</span></span>
-<span id="cb390-3"><a href="v8-ml.html#cb390-3"></a></span>
-<span id="cb390-4"><a href="v8-ml.html#cb390-4"></a><span class="co">#&#39; @export </span></span>
-<span id="cb390-5"><a href="v8-ml.html#cb390-5"></a>ml_simple_lm &lt;-<span class="st"> </span><span class="cf">function</span>(y, x){</span>
-<span id="cb390-6"><a href="v8-ml.html#cb390-6"></a>  counter<span class="op">$</span>regressions &lt;-<span class="st"> </span>counter<span class="op">$</span>regressions <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb390-7"><a href="v8-ml.html#cb390-7"></a></span>
-<span id="cb390-8"><a href="v8-ml.html#cb390-8"></a>  <span class="co"># assign variables</span></span>
-<span id="cb390-9"><a href="v8-ml.html#cb390-9"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;x&quot;</span>, x)</span>
-<span id="cb390-10"><a href="v8-ml.html#cb390-10"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;y&quot;</span>, y)</span>
-<span id="cb390-11"><a href="v8-ml.html#cb390-11"></a></span>
-<span id="cb390-12"><a href="v8-ml.html#cb390-12"></a>  <span class="co"># address</span></span>
-<span id="cb390-13"><a href="v8-ml.html#cb390-13"></a>  address &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;regressions[&#39;&quot;</span>, counter<span class="op">$</span>regressions, <span class="st">&quot;&#39;]&quot;</span>)</span>
-<span id="cb390-14"><a href="v8-ml.html#cb390-14"></a></span>
-<span id="cb390-15"><a href="v8-ml.html#cb390-15"></a>  <span class="co"># create regression</span></span>
-<span id="cb390-16"><a href="v8-ml.html#cb390-16"></a>  code &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb390-17"><a href="v8-ml.html#cb390-17"></a>    address, <span class="st">&quot; = new ML.SimpleLinearRegression(x, y);&quot;</span></span>
-<span id="cb390-18"><a href="v8-ml.html#cb390-18"></a>  )</span>
-<span id="cb390-19"><a href="v8-ml.html#cb390-19"></a>  ml<span class="op">$</span><span class="kw">eval</span>(code)</span>
-<span id="cb390-20"><a href="v8-ml.html#cb390-20"></a></span>
-<span id="cb390-21"><a href="v8-ml.html#cb390-21"></a>  <span class="co"># retrieve and append address</span></span>
-<span id="cb390-22"><a href="v8-ml.html#cb390-22"></a>  regression &lt;-<span class="st"> </span>ml<span class="op">$</span><span class="kw">get</span>(address)</span>
-<span id="cb390-23"><a href="v8-ml.html#cb390-23"></a>  regression<span class="op">$</span>address &lt;-<span class="st"> </span>address</span>
-<span id="cb390-24"><a href="v8-ml.html#cb390-24"></a></span>
-<span id="cb390-25"><a href="v8-ml.html#cb390-25"></a>  <span class="co"># create object of new class</span></span>
-<span id="cb390-26"><a href="v8-ml.html#cb390-26"></a>  <span class="kw">structure</span>(</span>
-<span id="cb390-27"><a href="v8-ml.html#cb390-27"></a>    regression, </span>
-<span id="cb390-28"><a href="v8-ml.html#cb390-28"></a>    <span class="dt">class =</span> <span class="kw">c</span>(<span class="st">&quot;mlSimpleRegression&quot;</span>, <span class="kw">class</span>(regression))</span>
-<span id="cb390-29"><a href="v8-ml.html#cb390-29"></a>  )</span>
-<span id="cb390-30"><a href="v8-ml.html#cb390-30"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb389-1"><a href="v8-ml.html#cb389-1"></a>counter &lt;-<span class="st"> </span><span class="kw">new.env</span>(<span class="dt">parent =</span> <span class="kw">emptyenv</span>())</span>
+<span id="cb389-2"><a href="v8-ml.html#cb389-2"></a>counter<span class="op">$</span>regressions &lt;-<span class="st"> </span><span class="dv">0</span></span>
+<span id="cb389-3"><a href="v8-ml.html#cb389-3"></a></span>
+<span id="cb389-4"><a href="v8-ml.html#cb389-4"></a><span class="co">#&#39; @export </span></span>
+<span id="cb389-5"><a href="v8-ml.html#cb389-5"></a>ml_simple_lm &lt;-<span class="st"> </span><span class="cf">function</span>(y, x){</span>
+<span id="cb389-6"><a href="v8-ml.html#cb389-6"></a>  counter<span class="op">$</span>regressions &lt;-<span class="st"> </span>counter<span class="op">$</span>regressions <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb389-7"><a href="v8-ml.html#cb389-7"></a></span>
+<span id="cb389-8"><a href="v8-ml.html#cb389-8"></a>  <span class="co"># assign variables</span></span>
+<span id="cb389-9"><a href="v8-ml.html#cb389-9"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;x&quot;</span>, x)</span>
+<span id="cb389-10"><a href="v8-ml.html#cb389-10"></a>  ml<span class="op">$</span><span class="kw">assign</span>(<span class="st">&quot;y&quot;</span>, y)</span>
+<span id="cb389-11"><a href="v8-ml.html#cb389-11"></a></span>
+<span id="cb389-12"><a href="v8-ml.html#cb389-12"></a>  <span class="co"># address</span></span>
+<span id="cb389-13"><a href="v8-ml.html#cb389-13"></a>  address &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;regressions[&#39;&quot;</span>, counter<span class="op">$</span>regressions, <span class="st">&quot;&#39;]&quot;</span>)</span>
+<span id="cb389-14"><a href="v8-ml.html#cb389-14"></a></span>
+<span id="cb389-15"><a href="v8-ml.html#cb389-15"></a>  <span class="co"># create regression</span></span>
+<span id="cb389-16"><a href="v8-ml.html#cb389-16"></a>  code &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb389-17"><a href="v8-ml.html#cb389-17"></a>    address, <span class="st">&quot; = new ML.SimpleLinearRegression(x, y);&quot;</span></span>
+<span id="cb389-18"><a href="v8-ml.html#cb389-18"></a>  )</span>
+<span id="cb389-19"><a href="v8-ml.html#cb389-19"></a>  ml<span class="op">$</span><span class="kw">eval</span>(code)</span>
+<span id="cb389-20"><a href="v8-ml.html#cb389-20"></a></span>
+<span id="cb389-21"><a href="v8-ml.html#cb389-21"></a>  <span class="co"># retrieve and append address</span></span>
+<span id="cb389-22"><a href="v8-ml.html#cb389-22"></a>  regression &lt;-<span class="st"> </span>ml<span class="op">$</span><span class="kw">get</span>(address)</span>
+<span id="cb389-23"><a href="v8-ml.html#cb389-23"></a>  regression<span class="op">$</span>address &lt;-<span class="st"> </span>address</span>
+<span id="cb389-24"><a href="v8-ml.html#cb389-24"></a></span>
+<span id="cb389-25"><a href="v8-ml.html#cb389-25"></a>  <span class="co"># create object of new class</span></span>
+<span id="cb389-26"><a href="v8-ml.html#cb389-26"></a>  <span class="kw">structure</span>(</span>
+<span id="cb389-27"><a href="v8-ml.html#cb389-27"></a>    regression, </span>
+<span id="cb389-28"><a href="v8-ml.html#cb389-28"></a>    <span class="dt">class =</span> <span class="kw">c</span>(<span class="st">&quot;mlSimpleRegression&quot;</span>, <span class="kw">class</span>(regression))</span>
+<span id="cb389-29"><a href="v8-ml.html#cb389-29"></a>  )</span>
+<span id="cb389-30"><a href="v8-ml.html#cb389-30"></a>}</span></code></pre></div>
 <p>Then on can implement the <code>predict</code> method for <code>mlSimpleRegression</code>. The function uses the <code>address</code> of the model to run the JavaScript <code>predict</code> method on that object.</p>
-<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb391-1"><a href="v8-ml.html#cb391-1"></a><span class="co">#&#39; @export </span></span>
-<span id="cb391-2"><a href="v8-ml.html#cb391-2"></a>predict.mlSimpleRegression &lt;-<span class="st"> </span><span class="cf">function</span>(object, newdata, ...){</span>
-<span id="cb391-3"><a href="v8-ml.html#cb391-3"></a>  code &lt;-<span class="st"> </span><span class="kw">paste0</span>(object<span class="op">$</span>address, <span class="st">&quot;.predict&quot;</span>)</span>
-<span id="cb391-4"><a href="v8-ml.html#cb391-4"></a>  ml<span class="op">$</span><span class="kw">call</span>(code, newdata)</span>
-<span id="cb391-5"><a href="v8-ml.html#cb391-5"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb390-1"><a href="v8-ml.html#cb390-1"></a><span class="co">#&#39; @export </span></span>
+<span id="cb390-2"><a href="v8-ml.html#cb390-2"></a>predict.mlSimpleRegression &lt;-<span class="st"> </span><span class="cf">function</span>(object, newdata, ...){</span>
+<span id="cb390-3"><a href="v8-ml.html#cb390-3"></a>  code &lt;-<span class="st"> </span><span class="kw">paste0</span>(object<span class="op">$</span>address, <span class="st">&quot;.predict&quot;</span>)</span>
+<span id="cb390-4"><a href="v8-ml.html#cb390-4"></a>  ml<span class="op">$</span><span class="kw">call</span>(code, newdata)</span>
+<span id="cb390-5"><a href="v8-ml.html#cb390-5"></a>}</span></code></pre></div>
 <p>We can then build and load the package to it in action.</p>
-<div class="sourceCode" id="cb392"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb392-1"><a href="v8-ml.html#cb392-1"></a><span class="kw">library</span>(ml)</span>
-<span id="cb392-2"><a href="v8-ml.html#cb392-2"></a></span>
-<span id="cb392-3"><a href="v8-ml.html#cb392-3"></a><span class="co"># first model</span></span>
-<span id="cb392-4"><a href="v8-ml.html#cb392-4"></a>model_cars &lt;-<span class="st"> </span><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
-<span id="cb392-5"><a href="v8-ml.html#cb392-5"></a></span>
-<span id="cb392-6"><a href="v8-ml.html#cb392-6"></a><span class="co"># second model</span></span>
-<span id="cb392-7"><a href="v8-ml.html#cb392-7"></a>model_random &lt;-<span class="st"> </span><span class="kw">ml_simple_lm</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="kw">runif</span>(<span class="dv">10</span>))</span>
-<span id="cb392-8"><a href="v8-ml.html#cb392-8"></a></span>
-<span id="cb392-9"><a href="v8-ml.html#cb392-9"></a><span class="kw">predict</span>(model_random, <span class="dv">15</span>)</span>
-<span id="cb392-10"><a href="v8-ml.html#cb392-10"></a><span class="co">#&gt; [1] 78.49427</span></span>
-<span id="cb392-11"><a href="v8-ml.html#cb392-11"></a><span class="kw">predict</span>(model_cars, <span class="dv">15</span>)</span>
-<span id="cb392-12"><a href="v8-ml.html#cb392-12"></a><span class="co">#&gt; [1] 10.76742</span></span></code></pre></div>
+<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb391-1"><a href="v8-ml.html#cb391-1"></a><span class="kw">library</span>(ml)</span>
+<span id="cb391-2"><a href="v8-ml.html#cb391-2"></a></span>
+<span id="cb391-3"><a href="v8-ml.html#cb391-3"></a><span class="co"># first model</span></span>
+<span id="cb391-4"><a href="v8-ml.html#cb391-4"></a>model_cars &lt;-<span class="st"> </span><span class="kw">ml_simple_lm</span>(cars<span class="op">$</span>speed, cars<span class="op">$</span>dist)</span>
+<span id="cb391-5"><a href="v8-ml.html#cb391-5"></a></span>
+<span id="cb391-6"><a href="v8-ml.html#cb391-6"></a><span class="co"># second model</span></span>
+<span id="cb391-7"><a href="v8-ml.html#cb391-7"></a>model_random &lt;-<span class="st"> </span><span class="kw">ml_simple_lm</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="kw">runif</span>(<span class="dv">10</span>))</span>
+<span id="cb391-8"><a href="v8-ml.html#cb391-8"></a></span>
+<span id="cb391-9"><a href="v8-ml.html#cb391-9"></a><span class="kw">predict</span>(model_random, <span class="dv">15</span>)</span>
+<span id="cb391-10"><a href="v8-ml.html#cb391-10"></a><span class="co">#&gt; [1] 78.49427</span></span>
+<span id="cb391-11"><a href="v8-ml.html#cb391-11"></a><span class="kw">predict</span>(model_cars, <span class="dv">15</span>)</span>
+<span id="cb391-12"><a href="v8-ml.html#cb391-12"></a><span class="co">#&gt; [1] 10.76742</span></span></code></pre></div>
 </div>
 <div id="v8-ml-exercises" class="section level2" number="19.3">
 <h2><span class="header-section-number">19.3</span> Exercises</h2>
