@@ -37,7 +37,7 @@ It might be hard to believe, but at this stage one already has a fully functioni
 play(message = "This is a widget!")
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/playground-1} 
 
@@ -166,7 +166,7 @@ htmlwidgets::createWidget(
 
 This is so htmlwidgets can internally match the output of `createWidget` to its JavaScript function. At this stage, it is probably fair to take a look at the diagram of what is happening.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/03-htmlwidgets-internals} 
 
@@ -184,7 +184,7 @@ el.innerText = x.message;
 
 We place `console.log` to print the content of `x` in the console, reload the package with `devtools::load_all` and use the function `play` again then explore the console from the browser (inspect and go to the "console" tab).
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/playground-console-x} 
 
@@ -207,7 +207,7 @@ console.log(el);
 el.innerText = x.message;
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/playground-console-el} 
 
@@ -238,7 +238,7 @@ After changing the `play.js` file as above, and re-loading the package, one can 
 play("<h1>Using HTML!</h1>")
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/playground-h1} 
 
@@ -278,7 +278,7 @@ play(
 )
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/playground-color} 
 

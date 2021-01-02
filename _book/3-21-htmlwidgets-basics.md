@@ -47,7 +47,7 @@ Looking at the code presented in the "Get Started" guide reveals just how conven
 </html>
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/candidate-plotly} 
 
@@ -90,7 +90,7 @@ Now let's look at how another popular library does it.
 </html>
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/candidate-highcharts} 
 
@@ -134,7 +134,7 @@ The above is very similar to what plotly.js requires: import libraries, create a
 </html>
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/candidate-chartjs} 
 
@@ -155,7 +155,7 @@ As observed, an interactive visualisation using JavaScript will be contained wit
 
 This gives the following basic diagram; it will be broken down further in the next chapter as the first widget is built.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/03-htmlwidget-viz} 
 

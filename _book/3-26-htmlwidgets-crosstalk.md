@@ -27,7 +27,7 @@ bscols(
 )
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/crosstalk} 
 
@@ -118,7 +118,7 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/crosstalk-shiny} 
 
@@ -171,7 +171,7 @@ Other than tabular data, crosstalk will require the widget to have the necessary
 
 As will be discovered later when support for crosstalk is brought to gio, minimal changes on the R side. As might be expected, crosstalk enables the communication between widgets via JavaScript. Hence much of what must be adapted by widgets developers happens in JavaScript too.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/03-crosstalk-viz} 
 
@@ -241,7 +241,7 @@ In JavaScript, a widget "receives" the keys of selected and filtered data points
 
 Internally crosstalk knows what to share across widgets with `group`s groups share `key`s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other. 
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/03-crosstalk-grps} 
 
@@ -314,7 +314,7 @@ The `gio` function also has to extract the group to which the dataset belongs; t
 ```r
 # groupName
 shared_arcs$groupName()
-#> [1] "SharedData297ec031"
+#> [1] "SharedData5cd64d8f"
 
 # keys
 shared_arcs$key()
@@ -502,7 +502,7 @@ bscols(
 )
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/crosstalk-gio-1} 
 
@@ -513,7 +513,7 @@ bscols(
 
 Thankfully we can use the `group` argument in order to create edges and nodes that share keys and produce a more sensible link between widgets. 
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/03-crosstalk-gio} 
 
@@ -558,7 +558,7 @@ bscols(
 )
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/crosstalk-gio-2} 
 

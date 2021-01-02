@@ -26,7 +26,7 @@ There are multiple ways to create a package. One could manually create every fil
 
 From the RStudio IDE go to `File > New Project > New Directory > R Package` then select "R package" and fill in the small form, namely name the package and specify the directory where it should be created. 
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/rstudio-create-package} 
 
@@ -315,7 +315,7 @@ toJSON(df, pretty = TRUE)
 
 What jsonlite does internally is essentially turning the data.frame into a list _rowwise_ to produce a sub-list for every row then it serialises to JSON. This is generally how rectangular data is represented in lists. For instance, `purrr::transpose` does the same. Another great example is to use `console.table` in the JavaScript console (more on that later) to display the table JSON as a table.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/console-table} 
 
@@ -391,7 +391,7 @@ The easiest way to run JavaScript interactively is probably to create an HTML fi
 </html>
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/tryingjs} 
 
@@ -411,7 +411,7 @@ also work in RStudio.
 
 The easiest way to access the developer tools from the browser is by "inspecting": right-click on an element on a webpage and select "inspect". This will open the developer tools either at the bottom or on the right of the page.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/devtools} 
 
@@ -510,7 +510,7 @@ JavaScript but should not be done in R
 
 One concept which does not exist in R is that of the "DOM" which stands for Document Object Model; this is also often referred to as the DOM tree as it very much follows a tree-like structure.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/02-dom-viz} 
 

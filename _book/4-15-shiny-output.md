@@ -20,7 +20,7 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/boxxy-example} 
 
@@ -485,7 +485,7 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/custom-output-boxxy} 
 

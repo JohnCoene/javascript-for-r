@@ -26,7 +26,7 @@ plot_ly(cars, x = ~speed, y = ~dist) %>%
   add_markers()
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/03-plotly-scatter} 
 
@@ -44,7 +44,7 @@ p <- ggplot(diamonds, aes(x = log(carat), y = log(price))) +
 ggplotly(p)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/03-ggplotly} 
 
@@ -70,7 +70,7 @@ plot_ly(mtcars, x = ~disp) %>%
   add_lines(y = ~fitted(loess(mpg ~ disp)))
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/03-plotly-multiple} 
 
@@ -88,7 +88,7 @@ The DT package [@R-DT] is a wrapper for the [DataTables](https://datatables.net/
 DT::datatable(cars)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/03-DT} 
 
@@ -129,7 +129,7 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/DT-example} 
 
@@ -158,7 +158,7 @@ bscols(
 )
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/dt-crosstalk-intro} 
 

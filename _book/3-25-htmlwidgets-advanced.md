@@ -71,7 +71,7 @@ arcs <- jsonlite::fromJSON(
 gio(arcs)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/gio-size-issue} 
 
@@ -119,7 +119,7 @@ htmlwidgets::createWidget(
 )
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/gio-fit} 
 
@@ -140,7 +140,7 @@ resize: function(width, height) {
 ...
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/gio-small} 
 
@@ -257,7 +257,7 @@ gio(arcs) %>%
   gio_title("Gio.js htmlwidget!")
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/gio-title} 
 
@@ -278,7 +278,7 @@ Thus far, this book has only covered one of two ways dependencies can be include
 
 The Google Chrome network tab shows the information on resources downloaded by the browser (including dependencies) including how long it takes. It is advisable to take a look at it to ensure no dependency drags load time.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/htmlwidgets-performances} 
 
@@ -421,7 +421,7 @@ arcs %>%
   gio_stats()
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/stats} 
 

@@ -98,7 +98,7 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/gio-shiny-input-no-handler} 
 
@@ -200,7 +200,7 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/gio-input-handler} 
 
@@ -259,7 +259,7 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/gio-shiny-error} 
 
@@ -615,7 +615,7 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/gio-shiny-clear} 
 
@@ -694,7 +694,7 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/gio-shiny-style} 
 

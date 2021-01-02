@@ -35,9 +35,7 @@ install.packages("V8")
 
 ## Basics {#v8-basics}
 
-V8 provides a reference class provided via the [R6](https://github.com/r-lib/R6) [@R-R6] package; this pertains to object-oriented programming; hence it might look unconventional to many R users. It's nonetheless easy to grasp. If one wants to learn more about the R6's reference class system, Hadley Wickham has an outstanding chapter on it in his [Advanced R](https://adv-r.hadley.nz/r6.html) book.
-
-Let us explore the basic functionalities of the package. First, load the library and use the function `v8` to instantiate a class; this effectively returns an execution environment, every such environment is independent of another.
+V8 provides an JavaScript execution environment through returning a closure-based object with `v8()`; Each of such environments is independent of another. 
 
 
 ```r
@@ -103,12 +101,22 @@ cat(engine$eval("JSON.stringify(vehicles, null, 2);"))
 
 However this reveals a tedious cyclical loop: 1) creating an object in JavaScript to 2) run a function on the aforementioned object 3) get the results back in R, and repeat. So V8 also allows calling JavaScript functions on R objects directly with the `call` method and obtain the results back in R. 
 
-
 ```r
 engine$eval("new Date();") # using eval
-#> [1] "Sun Oct 18 2020 18:34:45 GMT+0200 (Central European Summer Time)"
+```
+
+```
+#> [1] "Sun Oct 18 2020 18:34:45 GMT+0200 
+  (Central European Summer Time)"
+```
+
+```r
 engine$call("Date", Sys.Date()) # using call
-#> [1] "Sun Oct 18 2020 18:34:45 GMT+0200 (Central European Summer Time)"
+```
+
+```
+#> [1] "Sun Oct 18 2020 18:34:45 GMT+0200 
+  (Central European Summer Time)"
 ```
 
 Finally, one can run code interactively rather than as strings by calling the console from the engine with `engine$console()` you can then exit the console by typing `exit` or hitting the <kbd>ESC</kbd> key.
@@ -144,6 +152,8 @@ const result = fuse.search('tion')
 ```
 
 With some understanding of what is to be reproduced in R, we can import the library with the `source` method which takes a `file` argument that will accept a path or URL to a JavaScript file to source, below we use the handy CDN (Content Delivery Network) to avoid downloading a file.
+
+
 
 
 ```r

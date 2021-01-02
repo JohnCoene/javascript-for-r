@@ -103,7 +103,7 @@ $(document).on('shiny:idle', function(event) {
 
 The application will then display the gif when the server is busy running computations.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/shiny-events} 
 
@@ -264,7 +264,7 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/dt-button} 
 

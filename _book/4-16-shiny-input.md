@@ -115,7 +115,7 @@ input:checked + .slider:before {
 
 The above CSS should be placed in the previously created `assets/styles.css` file.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/checkbox-switch} 
 
@@ -500,7 +500,7 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/switch-example} 
 
@@ -556,7 +556,7 @@ The diagram below attempts to summarize the various elements that were put toget
 
 It all starts from the `switchInput` function which generates the HTML defining the switch input and its initial state. In the `subscribe` method, an event listener checks for changes on this HTML element (`$(el).on('change', ...)`), every time it changes (check/uncheck) it fires the shiny `callback` which sends the value of the input obtained from `getValue` through the WebSocket. When the value of the input is changed from the server this value travels through the WebSocket to the front-end where `receiveMessage` uses `setValue` to programmatically change the check box which incidentally triggers the change event, and back we go.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/04-shiny-input} 
 

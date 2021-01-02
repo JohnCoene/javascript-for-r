@@ -42,7 +42,7 @@ library(plotly)
 plot_ly(diamonds, x = ~cut, color = ~clarity, width = "100%")
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/01-plotly} 
 
@@ -77,7 +77,7 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/waiter} 
 
@@ -101,6 +101,7 @@ Let's list the methods available to us to blend JavaScript with R before coverin
 
 ```r
 library(V8)
+#> Using V8 engine 6.8.275.32-node.55
 
 ctx <- v8()
 
@@ -131,7 +132,7 @@ Note that there are also two other prominent ways one can use JavaScript with R 
 reactable::reactable(iris[1:5, ], showPagination = TRUE)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/01-reactable} 
 
@@ -155,7 +156,7 @@ r2d3::r2d3(
 )
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/01-d3} 
 

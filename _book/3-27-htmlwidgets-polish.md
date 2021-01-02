@@ -148,7 +148,7 @@ gio(
 ) 
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/crosstalk-three-dots} 
 

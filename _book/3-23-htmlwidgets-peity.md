@@ -314,7 +314,7 @@ browsable(
 
 
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/peity-div} 
 
@@ -360,7 +360,7 @@ browsable(
 )
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/peity-span} 
 

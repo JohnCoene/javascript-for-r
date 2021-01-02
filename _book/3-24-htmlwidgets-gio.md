@@ -32,7 +32,7 @@ Then again, the first order of business when looking to integrate a library is t
 </html>
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/gio-example} 
 
@@ -163,7 +163,7 @@ devtools::load_all()
 gio(message = "This required but not used")
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/gio-init} 
 
@@ -433,7 +433,7 @@ The above would make it such that the serialiser no longer has to interpret how 
 
 There are pros and cons to each method. The preferable method is probably to alter the default serialiser __only where needed__; this is the method used in the remainder of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Moreover, htmlwidgets' serialiser extends jsonlite to allow converting JavaScript code which will come in handy later on. Transforming the data in JavaScript has one drawback, `HTMLWidgets.dataframeToD3` cannot be applied to the entire `x` object, it will only work on the subsets that hold the column-wise data (`x.data`) which tends to lead to clunky code as one uses said function in various places.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/gio-data} 
 
@@ -501,7 +501,7 @@ g2 <- gio_style(g1, "juicyCake")
 g2
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/gio-style} 
 

@@ -152,7 +152,7 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/shiny-cookies-2} 
 

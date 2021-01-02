@@ -160,7 +160,7 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/shiny-complete-skeleton} 
 
@@ -227,7 +227,7 @@ As mentioned at the start of the chapter, the results of the classification shou
 
 Running the application and opening the console already gives us encouraging results! The classifier gives "flamingo" the greatest confidence (albeit at `0.48`).
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/shiny-complete-classify-console} 
 
@@ -311,7 +311,7 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/ml5-output} 
 
@@ -421,7 +421,7 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/shiny-complete-table} 
 

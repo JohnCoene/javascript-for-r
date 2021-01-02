@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-12-07" />
+<meta name="date" content="2021-01-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="widgets-final.html"/>
 <link rel="next" href="shiny-complete.html"/>
-<script src="libs/header-attrs-2.5/header-attrs.js"></script>
+<script src="libs/header-attrs-2.6/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -52,15 +52,13 @@
 
 
 <script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
-<link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
-<script src="libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
-<script src="libs/plotly-binding-4.9.2.1/plotly.js"></script>
+<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.9.2.9000/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
-<link href="libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-1.57.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-1.57.1/plotly-latest.min.js"></script>
 <script src="libs/core-js-2.5.3/shim.min.js"></script>
 <script src="libs/react-16.12.0/react.min.js"></script>
 <script src="libs/react-16.12.0/react-dom.min.js"></script>
@@ -517,31 +515,31 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">11.1</span> Websocket &amp; Shiny</h2>
 <p>Shiny applications have two components the user interface (UI) and the server function. These two components communicate via a WebSocket: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server this connection is managed by shiny using the httpuv <span class="citation">(Cheng and Chang <a href="#ref-R-httpuv" role="doc-biblioref">2020</a>)</span> and WebSocket <span class="citation">(Chang, Cheng, Dipert, et al. <a href="#ref-R-websocket" role="doc-biblioref">2020</a>)</span> packages, while in clients connecting to the server this connection is managed with JavaScript.</p>
 <div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-2"></span>
-<div id="htmlwidget-6210ca99ebc7ec1eb8e8" style="width:100%;height:576px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-6210ca99ebc7ec1eb8e8">{"x":{"diagram":"\ndigraph{\n  node [shape=record fontsize=10];\n\n  w1 [label=Websocket];\n  w2 [label=Websocket];\n  w3 [label=Websocket];\n  w4 [label=Websocket];\n\n  b1 [label=\"Browser\" color=gold];\n  b2 [label=\"Browser\" color=gold];\n  b3 [label=\"Browser\" color=gold];\n  b4 [label=\"Browser\" color=gold];\n\n  s [label=\"R server\" color=royalBlue];\n\n  s -> w1 -> b1 [dir=both color=dimGray arrowsize=.3];\n  s -> w2 -> b2 [dir=both color=dimGray arrowsize=.3];\n  s -> w3 -> b3 [dir=both color=dimGray arrowsize=.3];\n  s -> w4 -> b4 [dir=both color=dimGray arrowsize=.3];\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-3dda13ba04b6e1cf6ee8" style="width:100%;height:576px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3dda13ba04b6e1cf6ee8">{"x":{"diagram":"\ndigraph{\n  node [shape=record fontsize=10];\n\n  w1 [label=Websocket];\n  w2 [label=Websocket];\n  w3 [label=Websocket];\n  w4 [label=Websocket];\n\n  b1 [label=\"Browser\" color=gold];\n  b2 [label=\"Browser\" color=gold];\n  b3 [label=\"Browser\" color=gold];\n  b4 [label=\"Browser\" color=gold];\n\n  s [label=\"R server\" color=royalBlue];\n\n  s -> w1 -> b1 [dir=both color=dimGray arrowsize=.3];\n  s -> w2 -> b2 [dir=both color=dimGray arrowsize=.3];\n  s -> w3 -> b3 [dir=both color=dimGray arrowsize=.3];\n  s -> w4 -> b4 [dir=both color=dimGray arrowsize=.3];\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 FIGURE 11.1: Websocket visualised
 </p>
 </div>
 <p>With that in mind, we can put together a shiny application which though simple exploits bi-directional communication. The application takes a text input, sends the value of the input to the R server which sends it back to the UI.</p>
-<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="shiny-intro.html#cb195-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb195-2"><a href="shiny-intro.html#cb195-2"></a></span>
-<span id="cb195-3"><a href="shiny-intro.html#cb195-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb195-4"><a href="shiny-intro.html#cb195-4"></a>  <span class="kw">textInput</span>(<span class="st">&quot;nameInput&quot;</span>, <span class="st">&quot;Your name&quot;</span>),</span>
-<span id="cb195-5"><a href="shiny-intro.html#cb195-5"></a>  <span class="kw">textOutput</span>(<span class="st">&quot;nameOutput&quot;</span>)</span>
-<span id="cb195-6"><a href="shiny-intro.html#cb195-6"></a>)</span>
-<span id="cb195-7"><a href="shiny-intro.html#cb195-7"></a></span>
-<span id="cb195-8"><a href="shiny-intro.html#cb195-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
-<span id="cb195-9"><a href="shiny-intro.html#cb195-9"></a>  output<span class="op">$</span>nameOutput &lt;-<span class="st"> </span><span class="kw">renderText</span>({</span>
-<span id="cb195-10"><a href="shiny-intro.html#cb195-10"></a>    input<span class="op">$</span>nameInput</span>
-<span id="cb195-11"><a href="shiny-intro.html#cb195-11"></a>  })</span>
-<span id="cb195-12"><a href="shiny-intro.html#cb195-12"></a>}</span>
-<span id="cb195-13"><a href="shiny-intro.html#cb195-13"></a></span>
-<span id="cb195-14"><a href="shiny-intro.html#cb195-14"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="shiny-intro.html#cb197-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb197-2"><a href="shiny-intro.html#cb197-2"></a></span>
+<span id="cb197-3"><a href="shiny-intro.html#cb197-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb197-4"><a href="shiny-intro.html#cb197-4"></a>  <span class="kw">textInput</span>(<span class="st">&quot;nameInput&quot;</span>, <span class="st">&quot;Your name&quot;</span>),</span>
+<span id="cb197-5"><a href="shiny-intro.html#cb197-5"></a>  <span class="kw">textOutput</span>(<span class="st">&quot;nameOutput&quot;</span>)</span>
+<span id="cb197-6"><a href="shiny-intro.html#cb197-6"></a>)</span>
+<span id="cb197-7"><a href="shiny-intro.html#cb197-7"></a></span>
+<span id="cb197-8"><a href="shiny-intro.html#cb197-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
+<span id="cb197-9"><a href="shiny-intro.html#cb197-9"></a>  output<span class="op">$</span>nameOutput &lt;-<span class="st"> </span><span class="kw">renderText</span>({</span>
+<span id="cb197-10"><a href="shiny-intro.html#cb197-10"></a>    input<span class="op">$</span>nameInput</span>
+<span id="cb197-11"><a href="shiny-intro.html#cb197-11"></a>  })</span>
+<span id="cb197-12"><a href="shiny-intro.html#cb197-12"></a>}</span>
+<span id="cb197-13"><a href="shiny-intro.html#cb197-13"></a></span>
+<span id="cb197-14"><a href="shiny-intro.html#cb197-14"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>Drawing a diagram of the communication between the UI and the server reveals that thought this is a simple application a lot is happening.</p>
 <div class="figure" style="text-align: center"><span id="fig:shiny-websocket-diagram"></span>
-<div id="htmlwidget-97c11c9e3e2add23a040" style="width:100%;height:576px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-97c11c9e3e2add23a040">{"x":{"diagram":"\ndigraph {\n  graph[rankdir=LR fontsize = 10]\n  node[shape=record fontsize = 9]\n\n  subgraph cluster_0 {\n    textInput\n    textOutput\n    label=\"User Interface\"\n    color=gold\n  }\n\n  subgraph cluster_1 {\n    \"input list\"\n    renderOutput\n    label=\"R server\"\n    color=royalBlue\n  }\n\n  textInput -> \"input list\" [xlabel=websocket fontsize = 8]\n  \"input list\" -> renderOutput\n  renderOutput -> textOutput [label=websocket fontsize = 8]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-ffcbb15a8b1fd86dae43" style="width:100%;height:576px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ffcbb15a8b1fd86dae43">{"x":{"diagram":"\ndigraph {\n  graph[rankdir=LR fontsize = 10]\n  node[shape=record fontsize = 9]\n\n  subgraph cluster_0 {\n    textInput\n    textOutput\n    label=\"User Interface\"\n    color=gold\n  }\n\n  subgraph cluster_1 {\n    \"input list\"\n    renderOutput\n    label=\"R server\"\n    color=royalBlue\n  }\n\n  textInput -> \"input list\" [xlabel=websocket fontsize = 8]\n  \"input list\" -> renderOutput\n  renderOutput -> textOutput [label=websocket fontsize = 8]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 FIGURE 11.2: Shiny websocket visualised
 </p>
@@ -556,58 +554,60 @@ FIGURE 11.2: Shiny websocket visualised
 <div id="shiny-intro-explore" class="section level3" number="11.2.1">
 <h3><span class="header-section-number">11.2.1</span> Explore</h3>
 <p>Below we build an elementary example that features jBox in HTML; it includes the dependencies and a short script that displays a notification when the page is loaded.</p>
-<div class="sourceCode" id="cb196"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb196-1"><a href="shiny-intro.html#cb196-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
-<span id="cb196-2"><a href="shiny-intro.html#cb196-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb196-3"><a href="shiny-intro.html#cb196-3"></a><span class="kw">&lt;head&gt;</span></span>
-<span id="cb196-4"><a href="shiny-intro.html#cb196-4"></a><span class="kw">&lt;script</span> </span>
-<span id="cb196-5"><a href="shiny-intro.html#cb196-5"></a><span class="ot">  src=</span><span class="st">&quot;https://code.jquery.com/jquery-3.5.1.min.js&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb196-6"><a href="shiny-intro.html#cb196-6"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb196-7"><a href="shiny-intro.html#cb196-7"></a><span class="kw">&lt;script</span> </span>
-<span id="cb196-8"><a href="shiny-intro.html#cb196-8"></a><span class="ot">  src=</span><span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.js&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb196-9"><a href="shiny-intro.html#cb196-9"></a><span class="kw">&lt;/script&gt;</span></span>
-<span id="cb196-10"><a href="shiny-intro.html#cb196-10"></a><span class="kw">&lt;link</span> </span>
-<span id="cb196-11"><a href="shiny-intro.html#cb196-11"></a><span class="ot">  href=</span><span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/dist/jBox.all.min.css&quot;</span> </span>
-<span id="cb196-12"><a href="shiny-intro.html#cb196-12"></a><span class="ot">  rel=</span><span class="st">&quot;stylesheet&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb196-13"><a href="shiny-intro.html#cb196-13"></a><span class="kw">&lt;/head&gt;</span></span>
-<span id="cb196-14"><a href="shiny-intro.html#cb196-14"></a></span>
-<span id="cb196-15"><a href="shiny-intro.html#cb196-15"></a><span class="kw">&lt;body&gt;</span></span>
-<span id="cb196-16"><a href="shiny-intro.html#cb196-16"></a>  <span class="co">&lt;!-- Script to show a notification --&gt;</span></span>
-<span id="cb196-17"><a href="shiny-intro.html#cb196-17"></a>  <span class="kw">&lt;script&gt;</span></span>
-<span id="cb196-18"><a href="shiny-intro.html#cb196-18"></a>    <span class="kw">new</span> jBox(<span class="st">&#39;Notice&#39;</span><span class="op">,</span> {</span>
-<span id="cb196-19"><a href="shiny-intro.html#cb196-19"></a>      <span class="dt">content</span><span class="op">:</span> <span class="st">&#39;Hurray! A notice!&#39;</span></span>
-<span id="cb196-20"><a href="shiny-intro.html#cb196-20"></a>    })<span class="op">;</span></span>
-<span id="cb196-21"><a href="shiny-intro.html#cb196-21"></a>  <span class="kw">&lt;/script&gt;</span></span>
-<span id="cb196-22"><a href="shiny-intro.html#cb196-22"></a><span class="kw">&lt;/body&gt;</span></span>
-<span id="cb196-23"><a href="shiny-intro.html#cb196-23"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb198"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb198-1"><a href="shiny-intro.html#cb198-1"></a><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></span>
+<span id="cb198-2"><a href="shiny-intro.html#cb198-2"></a><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb198-3"><a href="shiny-intro.html#cb198-3"></a><span class="kw">&lt;head&gt;</span></span>
+<span id="cb198-4"><a href="shiny-intro.html#cb198-4"></a><span class="kw">&lt;script</span> </span>
+<span id="cb198-5"><a href="shiny-intro.html#cb198-5"></a><span class="ot">  src=</span><span class="st">&quot;https://code.jquery.com/jquery-3.5.1.min.js&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb198-6"><a href="shiny-intro.html#cb198-6"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb198-7"><a href="shiny-intro.html#cb198-7"></a><span class="kw">&lt;script</span> </span>
+<span id="cb198-8"><a href="shiny-intro.html#cb198-8"></a><span class="ot">  src=</span><span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/</span></span>
+<span id="cb198-9"><a href="shiny-intro.html#cb198-9"></a><span class="st">    dist/jBox.all.min.js&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb198-10"><a href="shiny-intro.html#cb198-10"></a><span class="kw">&lt;/script&gt;</span></span>
+<span id="cb198-11"><a href="shiny-intro.html#cb198-11"></a><span class="kw">&lt;link</span> </span>
+<span id="cb198-12"><a href="shiny-intro.html#cb198-12"></a><span class="ot">  href=</span><span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/</span></span>
+<span id="cb198-13"><a href="shiny-intro.html#cb198-13"></a><span class="st">    dist/jBox.all.min.css&quot;</span> </span>
+<span id="cb198-14"><a href="shiny-intro.html#cb198-14"></a><span class="ot">  rel=</span><span class="st">&quot;stylesheet&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb198-15"><a href="shiny-intro.html#cb198-15"></a><span class="kw">&lt;/head&gt;</span></span>
+<span id="cb198-16"><a href="shiny-intro.html#cb198-16"></a></span>
+<span id="cb198-17"><a href="shiny-intro.html#cb198-17"></a><span class="kw">&lt;body&gt;</span></span>
+<span id="cb198-18"><a href="shiny-intro.html#cb198-18"></a>  <span class="co">&lt;!-- Script to show a notification --&gt;</span></span>
+<span id="cb198-19"><a href="shiny-intro.html#cb198-19"></a>  <span class="kw">&lt;script&gt;</span></span>
+<span id="cb198-20"><a href="shiny-intro.html#cb198-20"></a>    <span class="kw">new</span> <span class="at">jBox</span>(<span class="st">&#39;Notice&#39;</span><span class="op">,</span> <span class="op">{</span></span>
+<span id="cb198-21"><a href="shiny-intro.html#cb198-21"></a>      <span class="dt">content</span><span class="op">:</span> <span class="st">&#39;Hurray! A notice!&#39;</span></span>
+<span id="cb198-22"><a href="shiny-intro.html#cb198-22"></a>    <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb198-23"><a href="shiny-intro.html#cb198-23"></a>  <span class="kw">&lt;/script&gt;</span></span>
+<span id="cb198-24"><a href="shiny-intro.html#cb198-24"></a><span class="kw">&lt;/body&gt;</span></span>
+<span id="cb198-25"><a href="shiny-intro.html#cb198-25"></a><span class="kw">&lt;/html&gt;</span></span></code></pre></div>
 <p>The very first thing one should do is to recreate this basic example in shiny so that when the app is loaded the notification appear, we will make this work with the bidirectional WebSocket communication afterwards. The “j” in jBox stands for jQuery which is already a dependency of shiny itself, there is, therefore, no need to import it, on the contrary one should not in order to avoid clashes.</p>
-<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="shiny-intro.html#cb197-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb197-2"><a href="shiny-intro.html#cb197-2"></a></span>
-<span id="cb197-3"><a href="shiny-intro.html#cb197-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb197-4"><a href="shiny-intro.html#cb197-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb197-5"><a href="shiny-intro.html#cb197-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb197-6"><a href="shiny-intro.html#cb197-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
-<span id="cb197-7"><a href="shiny-intro.html#cb197-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb197-8"><a href="shiny-intro.html#cb197-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
-<span id="cb197-9"><a href="shiny-intro.html#cb197-9"></a>      )</span>
-<span id="cb197-10"><a href="shiny-intro.html#cb197-10"></a>    ),</span>
-<span id="cb197-11"><a href="shiny-intro.html#cb197-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
-<span id="cb197-12"><a href="shiny-intro.html#cb197-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
-<span id="cb197-13"><a href="shiny-intro.html#cb197-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
-<span id="cb197-14"><a href="shiny-intro.html#cb197-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb197-15"><a href="shiny-intro.html#cb197-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
-<span id="cb197-16"><a href="shiny-intro.html#cb197-16"></a>      )</span>
-<span id="cb197-17"><a href="shiny-intro.html#cb197-17"></a>    )</span>
-<span id="cb197-18"><a href="shiny-intro.html#cb197-18"></a>  ),</span>
-<span id="cb197-19"><a href="shiny-intro.html#cb197-19"></a>  tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;</span></span>
-<span id="cb197-20"><a href="shiny-intro.html#cb197-20"></a><span class="st">    new jBox(&#39;Notice&#39;, {</span></span>
-<span id="cb197-21"><a href="shiny-intro.html#cb197-21"></a><span class="st">      content: &#39;Hurray! A notice!&#39;</span></span>
-<span id="cb197-22"><a href="shiny-intro.html#cb197-22"></a><span class="st">    });&quot;</span></span>
-<span id="cb197-23"><a href="shiny-intro.html#cb197-23"></a>  )</span>
-<span id="cb197-24"><a href="shiny-intro.html#cb197-24"></a>)</span>
-<span id="cb197-25"><a href="shiny-intro.html#cb197-25"></a></span>
-<span id="cb197-26"><a href="shiny-intro.html#cb197-26"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {}</span>
-<span id="cb197-27"><a href="shiny-intro.html#cb197-27"></a></span>
-<span id="cb197-28"><a href="shiny-intro.html#cb197-28"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="shiny-intro.html#cb199-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb199-2"><a href="shiny-intro.html#cb199-2"></a></span>
+<span id="cb199-3"><a href="shiny-intro.html#cb199-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb199-4"><a href="shiny-intro.html#cb199-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb199-5"><a href="shiny-intro.html#cb199-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb199-6"><a href="shiny-intro.html#cb199-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
+<span id="cb199-7"><a href="shiny-intro.html#cb199-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb199-8"><a href="shiny-intro.html#cb199-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
+<span id="cb199-9"><a href="shiny-intro.html#cb199-9"></a>      )</span>
+<span id="cb199-10"><a href="shiny-intro.html#cb199-10"></a>    ),</span>
+<span id="cb199-11"><a href="shiny-intro.html#cb199-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
+<span id="cb199-12"><a href="shiny-intro.html#cb199-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
+<span id="cb199-13"><a href="shiny-intro.html#cb199-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
+<span id="cb199-14"><a href="shiny-intro.html#cb199-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb199-15"><a href="shiny-intro.html#cb199-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
+<span id="cb199-16"><a href="shiny-intro.html#cb199-16"></a>      )</span>
+<span id="cb199-17"><a href="shiny-intro.html#cb199-17"></a>    )</span>
+<span id="cb199-18"><a href="shiny-intro.html#cb199-18"></a>  ),</span>
+<span id="cb199-19"><a href="shiny-intro.html#cb199-19"></a>  tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;</span></span>
+<span id="cb199-20"><a href="shiny-intro.html#cb199-20"></a><span class="st">    new jBox(&#39;Notice&#39;, {</span></span>
+<span id="cb199-21"><a href="shiny-intro.html#cb199-21"></a><span class="st">      content: &#39;Hurray! A notice!&#39;</span></span>
+<span id="cb199-22"><a href="shiny-intro.html#cb199-22"></a><span class="st">    });&quot;</span></span>
+<span id="cb199-23"><a href="shiny-intro.html#cb199-23"></a>  )</span>
+<span id="cb199-24"><a href="shiny-intro.html#cb199-24"></a>)</span>
+<span id="cb199-25"><a href="shiny-intro.html#cb199-25"></a></span>
+<span id="cb199-26"><a href="shiny-intro.html#cb199-26"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {}</span>
+<span id="cb199-27"><a href="shiny-intro.html#cb199-27"></a></span>
+<span id="cb199-28"><a href="shiny-intro.html#cb199-28"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:jbox-init"></span>
 <img src="images/jbox-init.png" alt="A basic jBox notice" width="100%" />
 <p class="caption">
@@ -621,64 +621,64 @@ FIGURE 11.3: A basic jBox notice
 <p>Now that we have a simple notice displayed in the application we can tie it with the R server; the alert should display a message sent by the R server, this would enable more dynamic messages such as displaying a message taken from a database or a user input. As might be expected there are two functions required to do so, an R function and its JavaScript complementary: one to send the data from the server and another to catch said data in the client and display the notice.</p>
 <p>Let us start by writing the R code to send the data, thankfully very little is required of the developer. One can send data from the R server to the client from the <code>session</code> object using the <code>sendCustomMessage</code> method. Note that being a method of the <code>session</code> object implies that this message will only be sent to said session: only the client connected to that session will receive the message.</p>
 <p>The <code>sendCustomMessage</code> method takes two arguments, first an identifier (<code>type</code>), second the actual data to send to JavaScript (<code>message</code>). The identifier passed first will be necessary JavaScript-side to “catch” that message and show the notice.</p>
-<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="shiny-intro.html#cb198-1"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb198-2"><a href="shiny-intro.html#cb198-2"></a>  <span class="co"># set the identifier to send-notice</span></span>
-<span id="cb198-3"><a href="shiny-intro.html#cb198-3"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
-<span id="cb198-4"><a href="shiny-intro.html#cb198-4"></a>    <span class="dt">type =</span> <span class="st">&quot;send-notice&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Hi there!&quot;</span></span>
-<span id="cb198-5"><a href="shiny-intro.html#cb198-5"></a>  )</span>
-<span id="cb198-6"><a href="shiny-intro.html#cb198-6"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="shiny-intro.html#cb200-1"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb200-2"><a href="shiny-intro.html#cb200-2"></a>  <span class="co"># set the identifier to send-notice</span></span>
+<span id="cb200-3"><a href="shiny-intro.html#cb200-3"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
+<span id="cb200-4"><a href="shiny-intro.html#cb200-4"></a>    <span class="dt">type =</span> <span class="st">&quot;send-notice&quot;</span>, <span class="dt">message =</span> <span class="st">&quot;Hi there!&quot;</span></span>
+<span id="cb200-5"><a href="shiny-intro.html#cb200-5"></a>  )</span>
+<span id="cb200-6"><a href="shiny-intro.html#cb200-6"></a>}</span></code></pre></div>
 <p>So while the above sends the message to JavaScript through the WebSocket, nothing is yet to be done with that message once it arrives in the client. We can add a “handler” for the identifier we defined (<code>send-notice</code>) which will do something with the message we sent from the server. This is done with the <code>addCustomMessageHandler</code> method from the <code>Shiny</code> object where the first argument is the identifier and the second is the function that handles the message, a function that takes a single argument: the data sent from the server.</p>
 <p>Below we add the handler for messages of type <code>send-notice</code>, the handler itself is a function that accepts the messages that were sent from the server and uses it to generate the notice via jBox.</p>
-<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="shiny-intro.html#cb199-1"></a>tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb199-2"><a href="shiny-intro.html#cb199-2"></a>  <span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
-<span id="cb199-3"><a href="shiny-intro.html#cb199-3"></a><span class="st">    type = &#39;send-notice&#39;, function(message) {</span></span>
-<span id="cb199-4"><a href="shiny-intro.html#cb199-4"></a><span class="st">      new jBox(&#39;Notice&#39;, {</span></span>
-<span id="cb199-5"><a href="shiny-intro.html#cb199-5"></a><span class="st">        content: message</span></span>
-<span id="cb199-6"><a href="shiny-intro.html#cb199-6"></a><span class="st">      });</span></span>
-<span id="cb199-7"><a href="shiny-intro.html#cb199-7"></a><span class="st">  });&quot;</span></span>
-<span id="cb199-8"><a href="shiny-intro.html#cb199-8"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="shiny-intro.html#cb201-1"></a>tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb201-2"><a href="shiny-intro.html#cb201-2"></a>  <span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
+<span id="cb201-3"><a href="shiny-intro.html#cb201-3"></a><span class="st">    type = &#39;send-notice&#39;, function(message) {</span></span>
+<span id="cb201-4"><a href="shiny-intro.html#cb201-4"></a><span class="st">      new jBox(&#39;Notice&#39;, {</span></span>
+<span id="cb201-5"><a href="shiny-intro.html#cb201-5"></a><span class="st">        content: message</span></span>
+<span id="cb201-6"><a href="shiny-intro.html#cb201-6"></a><span class="st">      });</span></span>
+<span id="cb201-7"><a href="shiny-intro.html#cb201-7"></a><span class="st">  });&quot;</span></span>
+<span id="cb201-8"><a href="shiny-intro.html#cb201-8"></a>)</span></code></pre></div>
 <p>This effectively enables passing a message that is taken from a database for instance, or as shown below from a user input, to the front-end which generates a notice.</p>
-<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="shiny-intro.html#cb200-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb200-2"><a href="shiny-intro.html#cb200-2"></a></span>
-<span id="cb200-3"><a href="shiny-intro.html#cb200-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb200-4"><a href="shiny-intro.html#cb200-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb200-5"><a href="shiny-intro.html#cb200-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb200-6"><a href="shiny-intro.html#cb200-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
-<span id="cb200-7"><a href="shiny-intro.html#cb200-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb200-8"><a href="shiny-intro.html#cb200-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
-<span id="cb200-9"><a href="shiny-intro.html#cb200-9"></a>      )</span>
-<span id="cb200-10"><a href="shiny-intro.html#cb200-10"></a>    ),</span>
-<span id="cb200-11"><a href="shiny-intro.html#cb200-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
-<span id="cb200-12"><a href="shiny-intro.html#cb200-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
-<span id="cb200-13"><a href="shiny-intro.html#cb200-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
-<span id="cb200-14"><a href="shiny-intro.html#cb200-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb200-15"><a href="shiny-intro.html#cb200-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
-<span id="cb200-16"><a href="shiny-intro.html#cb200-16"></a>      )</span>
-<span id="cb200-17"><a href="shiny-intro.html#cb200-17"></a>    )</span>
-<span id="cb200-18"><a href="shiny-intro.html#cb200-18"></a>  ),</span>
-<span id="cb200-19"><a href="shiny-intro.html#cb200-19"></a>  <span class="kw">textInput</span>(<span class="st">&quot;msg&quot;</span>, <span class="st">&quot;notice&quot;</span>),</span>
-<span id="cb200-20"><a href="shiny-intro.html#cb200-20"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;notify&quot;</span>, <span class="st">&quot;Notify myself&quot;</span>),</span>
-<span id="cb200-21"><a href="shiny-intro.html#cb200-21"></a>  tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb200-22"><a href="shiny-intro.html#cb200-22"></a>    <span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
-<span id="cb200-23"><a href="shiny-intro.html#cb200-23"></a><span class="st">      type = &#39;send-notice&#39;, function(message) {</span></span>
-<span id="cb200-24"><a href="shiny-intro.html#cb200-24"></a><span class="st">        new jBox(&#39;Notice&#39;, {</span></span>
-<span id="cb200-25"><a href="shiny-intro.html#cb200-25"></a><span class="st">          content: message</span></span>
-<span id="cb200-26"><a href="shiny-intro.html#cb200-26"></a><span class="st">        });</span></span>
-<span id="cb200-27"><a href="shiny-intro.html#cb200-27"></a><span class="st">    });&quot;</span></span>
-<span id="cb200-28"><a href="shiny-intro.html#cb200-28"></a>  )</span>
-<span id="cb200-29"><a href="shiny-intro.html#cb200-29"></a>)</span>
-<span id="cb200-30"><a href="shiny-intro.html#cb200-30"></a></span>
-<span id="cb200-31"><a href="shiny-intro.html#cb200-31"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb200-32"><a href="shiny-intro.html#cb200-32"></a></span>
-<span id="cb200-33"><a href="shiny-intro.html#cb200-33"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>notify, {</span>
-<span id="cb200-34"><a href="shiny-intro.html#cb200-34"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
-<span id="cb200-35"><a href="shiny-intro.html#cb200-35"></a>      <span class="dt">type =</span> <span class="st">&quot;send-notice&quot;</span>, <span class="dt">message =</span> input<span class="op">$</span>msg</span>
-<span id="cb200-36"><a href="shiny-intro.html#cb200-36"></a>    )</span>
-<span id="cb200-37"><a href="shiny-intro.html#cb200-37"></a>  })</span>
-<span id="cb200-38"><a href="shiny-intro.html#cb200-38"></a></span>
-<span id="cb200-39"><a href="shiny-intro.html#cb200-39"></a>}</span>
-<span id="cb200-40"><a href="shiny-intro.html#cb200-40"></a></span>
-<span id="cb200-41"><a href="shiny-intro.html#cb200-41"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="shiny-intro.html#cb202-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb202-2"><a href="shiny-intro.html#cb202-2"></a></span>
+<span id="cb202-3"><a href="shiny-intro.html#cb202-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb202-4"><a href="shiny-intro.html#cb202-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb202-5"><a href="shiny-intro.html#cb202-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb202-6"><a href="shiny-intro.html#cb202-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
+<span id="cb202-7"><a href="shiny-intro.html#cb202-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb202-8"><a href="shiny-intro.html#cb202-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
+<span id="cb202-9"><a href="shiny-intro.html#cb202-9"></a>      )</span>
+<span id="cb202-10"><a href="shiny-intro.html#cb202-10"></a>    ),</span>
+<span id="cb202-11"><a href="shiny-intro.html#cb202-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
+<span id="cb202-12"><a href="shiny-intro.html#cb202-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
+<span id="cb202-13"><a href="shiny-intro.html#cb202-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
+<span id="cb202-14"><a href="shiny-intro.html#cb202-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb202-15"><a href="shiny-intro.html#cb202-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
+<span id="cb202-16"><a href="shiny-intro.html#cb202-16"></a>      )</span>
+<span id="cb202-17"><a href="shiny-intro.html#cb202-17"></a>    )</span>
+<span id="cb202-18"><a href="shiny-intro.html#cb202-18"></a>  ),</span>
+<span id="cb202-19"><a href="shiny-intro.html#cb202-19"></a>  <span class="kw">textInput</span>(<span class="st">&quot;msg&quot;</span>, <span class="st">&quot;notice&quot;</span>),</span>
+<span id="cb202-20"><a href="shiny-intro.html#cb202-20"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;notify&quot;</span>, <span class="st">&quot;Notify myself&quot;</span>),</span>
+<span id="cb202-21"><a href="shiny-intro.html#cb202-21"></a>  tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb202-22"><a href="shiny-intro.html#cb202-22"></a>    <span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
+<span id="cb202-23"><a href="shiny-intro.html#cb202-23"></a><span class="st">      type = &#39;send-notice&#39;, function(message) {</span></span>
+<span id="cb202-24"><a href="shiny-intro.html#cb202-24"></a><span class="st">        new jBox(&#39;Notice&#39;, {</span></span>
+<span id="cb202-25"><a href="shiny-intro.html#cb202-25"></a><span class="st">          content: message</span></span>
+<span id="cb202-26"><a href="shiny-intro.html#cb202-26"></a><span class="st">        });</span></span>
+<span id="cb202-27"><a href="shiny-intro.html#cb202-27"></a><span class="st">    });&quot;</span></span>
+<span id="cb202-28"><a href="shiny-intro.html#cb202-28"></a>  )</span>
+<span id="cb202-29"><a href="shiny-intro.html#cb202-29"></a>)</span>
+<span id="cb202-30"><a href="shiny-intro.html#cb202-30"></a></span>
+<span id="cb202-31"><a href="shiny-intro.html#cb202-31"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb202-32"><a href="shiny-intro.html#cb202-32"></a></span>
+<span id="cb202-33"><a href="shiny-intro.html#cb202-33"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>notify, {</span>
+<span id="cb202-34"><a href="shiny-intro.html#cb202-34"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
+<span id="cb202-35"><a href="shiny-intro.html#cb202-35"></a>      <span class="dt">type =</span> <span class="st">&quot;send-notice&quot;</span>, <span class="dt">message =</span> input<span class="op">$</span>msg</span>
+<span id="cb202-36"><a href="shiny-intro.html#cb202-36"></a>    )</span>
+<span id="cb202-37"><a href="shiny-intro.html#cb202-37"></a>  })</span>
+<span id="cb202-38"><a href="shiny-intro.html#cb202-38"></a></span>
+<span id="cb202-39"><a href="shiny-intro.html#cb202-39"></a>}</span>
+<span id="cb202-40"><a href="shiny-intro.html#cb202-40"></a></span>
+<span id="cb202-41"><a href="shiny-intro.html#cb202-41"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:jbox-r2js"></span>
 <img src="images/jbox-r2js.png" alt="[A notice triggered by the server" width="100%" />
 <p class="caption">
@@ -687,8 +687,8 @@ FIGURE 11.4: [A notice triggered by the server
 </div>
 <p>In the application above, notice the path that the message follows: it goes from the client (user input) to the server (<code>observeEvent</code>) which sends (<code>sendCustomMessage</code>) it back to the client.</p>
 <div class="figure" style="text-align: center"><span id="fig:shiny-alert-diagram"></span>
-<div id="htmlwidget-dfc13dc5ca3896796912" style="width:100%;height:576px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-dfc13dc5ca3896796912">{"x":{"diagram":"\ndigraph{\n  graph [rankdir=LR]\n  node [shape=record fontsize=10];\n\n  subgraph cluster_0 {\n    textInput\n    handler [label=\"message handler\"]\n    notice [label = \"show notice\"]\n    label=\"Client\"\n    color=gold\n  }\n\n  subgraph cluster_1 {\n    send[label=\"sendCustomMessage\"]\n    label=\"Server\"\n    color=royalBlue\n  }\n\n  textInput -> send [label=\"value\"];\n  send -> handler [label=\"message\"];\n  handler -> notice;\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-bf07dbe0b14c00e5d737" style="width:100%;height:576px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-bf07dbe0b14c00e5d737">{"x":{"diagram":"\ndigraph{\n  graph [rankdir=LR]\n  node [shape=record fontsize=10];\n\n  subgraph cluster_0 {\n    textInput\n    handler [label=\"message handler\"]\n    notice [label = \"show notice\"]\n    label=\"Client\"\n    color=gold\n  }\n\n  subgraph cluster_1 {\n    send[label=\"sendCustomMessage\"]\n    label=\"Server\"\n    color=royalBlue\n  }\n\n  textInput -> send [label=\"value\"];\n  send -> handler [label=\"message\"];\n  handler -> notice;\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 FIGURE 11.5: Shiny alert with custom messages
 </p>
@@ -698,57 +698,59 @@ FIGURE 11.5: Shiny alert with custom messages
 <div id="shiny-intro-serialise" class="section level3" number="11.2.3">
 <h3><span class="header-section-number">11.2.3</span> Serialisation</h3>
 <p>Let us delve deeper into the data that is sent from the server to the front-end to understand how we can further customise the notice displayed, e.g. change the colour.</p>
-<div class="sourceCode" id="cb201"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb201-1"><a href="shiny-intro.html#cb201-1"></a><span class="kw">new</span> jBox(<span class="st">&#39;Notice&#39;</span><span class="op">,</span> {</span>
-<span id="cb201-2"><a href="shiny-intro.html#cb201-2"></a>  <span class="dt">content</span><span class="op">:</span> <span class="st">&#39;Hurray! A notice!&#39;</span><span class="op">,</span></span>
-<span id="cb201-3"><a href="shiny-intro.html#cb201-3"></a>  <span class="dt">color</span><span class="op">:</span> <span class="st">&#39;red&#39;</span></span>
-<span id="cb201-4"><a href="shiny-intro.html#cb201-4"></a>})<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb203"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb203-1"><a href="shiny-intro.html#cb203-1"></a><span class="kw">new</span> <span class="at">jBox</span>(<span class="st">&#39;Notice&#39;</span><span class="op">,</span> <span class="op">{</span></span>
+<span id="cb203-2"><a href="shiny-intro.html#cb203-2"></a>  <span class="dt">content</span><span class="op">:</span> <span class="st">&#39;Hurray! A notice!&#39;</span><span class="op">,</span></span>
+<span id="cb203-3"><a href="shiny-intro.html#cb203-3"></a>  <span class="dt">color</span><span class="op">:</span> <span class="st">&#39;red&#39;</span></span>
+<span id="cb203-4"><a href="shiny-intro.html#cb203-4"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 <p>The jBox notice is configured using a JSON object containing the options that define said notice to display (example above), including but not limited to the message. The most straightforward way to make all those options accessible to the server is to construct that list of options server-side before sending it to the front-end. For instance, the JSON of options displayed above would look like the R list below.</p>
-<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="shiny-intro.html#cb202-1"></a>options &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb202-2"><a href="shiny-intro.html#cb202-2"></a>  <span class="dt">content =</span> <span class="st">&#39;Hurray! A notice!&#39;</span>,</span>
-<span id="cb202-3"><a href="shiny-intro.html#cb202-3"></a>  <span class="dt">color =</span> <span class="st">&#39;red&#39;</span></span>
-<span id="cb202-4"><a href="shiny-intro.html#cb202-4"></a>)</span>
-<span id="cb202-5"><a href="shiny-intro.html#cb202-5"></a>jsonlite<span class="op">::</span><span class="kw">toJSON</span>(options, <span class="dt">pretty =</span> <span class="ot">TRUE</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb202-6"><a href="shiny-intro.html#cb202-6"></a><span class="co">#&gt; {</span></span>
-<span id="cb202-7"><a href="shiny-intro.html#cb202-7"></a><span class="co">#&gt;   &quot;content&quot;: &quot;Hurray! A notice!&quot;,</span></span>
-<span id="cb202-8"><a href="shiny-intro.html#cb202-8"></a><span class="co">#&gt;   &quot;color&quot;: &quot;red&quot;</span></span>
-<span id="cb202-9"><a href="shiny-intro.html#cb202-9"></a><span class="co">#&gt; }</span></span></code></pre></div>
+<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb204-1"><a href="shiny-intro.html#cb204-1"></a>options &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb204-2"><a href="shiny-intro.html#cb204-2"></a>  <span class="dt">content =</span> <span class="st">&#39;Hurray! A notice!&#39;</span>,</span>
+<span id="cb204-3"><a href="shiny-intro.html#cb204-3"></a>  <span class="dt">color =</span> <span class="st">&#39;red&#39;</span></span>
+<span id="cb204-4"><a href="shiny-intro.html#cb204-4"></a>)</span>
+<span id="cb204-5"><a href="shiny-intro.html#cb204-5"></a>jsonlite<span class="op">::</span><span class="kw">toJSON</span>(options, <span class="dt">pretty =</span> <span class="ot">TRUE</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb204-6"><a href="shiny-intro.html#cb204-6"></a><span class="co">#&gt; {</span></span>
+<span id="cb204-7"><a href="shiny-intro.html#cb204-7"></a><span class="co">#&gt;   &quot;content&quot;: &quot;Hurray! A notice!&quot;,</span></span>
+<span id="cb204-8"><a href="shiny-intro.html#cb204-8"></a><span class="co">#&gt;   &quot;color&quot;: &quot;red&quot;</span></span>
+<span id="cb204-9"><a href="shiny-intro.html#cb204-9"></a><span class="co">#&gt; }</span></span></code></pre></div>
 <p>Therefore one could construct this list server-side and use it in jBox straight away, doing so means the JavaScript code can be simplified to <code>new jBox('Notice', message);</code>.</p>
-<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb203-1"><a href="shiny-intro.html#cb203-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb203-2"><a href="shiny-intro.html#cb203-2"></a></span>
-<span id="cb203-3"><a href="shiny-intro.html#cb203-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb203-4"><a href="shiny-intro.html#cb203-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb203-5"><a href="shiny-intro.html#cb203-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb203-6"><a href="shiny-intro.html#cb203-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
-<span id="cb203-7"><a href="shiny-intro.html#cb203-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb203-8"><a href="shiny-intro.html#cb203-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
-<span id="cb203-9"><a href="shiny-intro.html#cb203-9"></a>      )</span>
-<span id="cb203-10"><a href="shiny-intro.html#cb203-10"></a>    ),</span>
-<span id="cb203-11"><a href="shiny-intro.html#cb203-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
-<span id="cb203-12"><a href="shiny-intro.html#cb203-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
-<span id="cb203-13"><a href="shiny-intro.html#cb203-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
-<span id="cb203-14"><a href="shiny-intro.html#cb203-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb203-15"><a href="shiny-intro.html#cb203-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
-<span id="cb203-16"><a href="shiny-intro.html#cb203-16"></a>      )</span>
-<span id="cb203-17"><a href="shiny-intro.html#cb203-17"></a>    ),</span>
-<span id="cb203-18"><a href="shiny-intro.html#cb203-18"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
-<span id="cb203-19"><a href="shiny-intro.html#cb203-19"></a><span class="st">      type = &#39;send-notice&#39;, function(message) {</span></span>
-<span id="cb203-20"><a href="shiny-intro.html#cb203-20"></a><span class="st">        // use notice send from the server</span></span>
-<span id="cb203-21"><a href="shiny-intro.html#cb203-21"></a><span class="st">        new jBox(&#39;Notice&#39;, message);</span></span>
-<span id="cb203-22"><a href="shiny-intro.html#cb203-22"></a><span class="st">    });&quot;</span>)</span>
-<span id="cb203-23"><a href="shiny-intro.html#cb203-23"></a>  )</span>
-<span id="cb203-24"><a href="shiny-intro.html#cb203-24"></a>)</span>
-<span id="cb203-25"><a href="shiny-intro.html#cb203-25"></a></span>
-<span id="cb203-26"><a href="shiny-intro.html#cb203-26"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb203-27"><a href="shiny-intro.html#cb203-27"></a>  <span class="co"># define notice options</span></span>
-<span id="cb203-28"><a href="shiny-intro.html#cb203-28"></a>  notice =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb203-29"><a href="shiny-intro.html#cb203-29"></a>    <span class="dt">content =</span> <span class="st">&#39;Hello from the server&#39;</span>,</span>
-<span id="cb203-30"><a href="shiny-intro.html#cb203-30"></a>    <span class="dt">color =</span> <span class="st">&#39;black&#39;</span></span>
-<span id="cb203-31"><a href="shiny-intro.html#cb203-31"></a>  )</span>
-<span id="cb203-32"><a href="shiny-intro.html#cb203-32"></a>  <span class="co"># send the notice</span></span>
-<span id="cb203-33"><a href="shiny-intro.html#cb203-33"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="dt">type =</span> <span class="st">&quot;send-notice&quot;</span>, <span class="dt">message =</span> notice)</span>
-<span id="cb203-34"><a href="shiny-intro.html#cb203-34"></a>}</span>
-<span id="cb203-35"><a href="shiny-intro.html#cb203-35"></a></span>
-<span id="cb203-36"><a href="shiny-intro.html#cb203-36"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="shiny-intro.html#cb205-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb205-2"><a href="shiny-intro.html#cb205-2"></a></span>
+<span id="cb205-3"><a href="shiny-intro.html#cb205-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb205-4"><a href="shiny-intro.html#cb205-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb205-5"><a href="shiny-intro.html#cb205-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb205-6"><a href="shiny-intro.html#cb205-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
+<span id="cb205-7"><a href="shiny-intro.html#cb205-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb205-8"><a href="shiny-intro.html#cb205-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
+<span id="cb205-9"><a href="shiny-intro.html#cb205-9"></a>      )</span>
+<span id="cb205-10"><a href="shiny-intro.html#cb205-10"></a>    ),</span>
+<span id="cb205-11"><a href="shiny-intro.html#cb205-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
+<span id="cb205-12"><a href="shiny-intro.html#cb205-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
+<span id="cb205-13"><a href="shiny-intro.html#cb205-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
+<span id="cb205-14"><a href="shiny-intro.html#cb205-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb205-15"><a href="shiny-intro.html#cb205-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
+<span id="cb205-16"><a href="shiny-intro.html#cb205-16"></a>      )</span>
+<span id="cb205-17"><a href="shiny-intro.html#cb205-17"></a>    ),</span>
+<span id="cb205-18"><a href="shiny-intro.html#cb205-18"></a>    tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
+<span id="cb205-19"><a href="shiny-intro.html#cb205-19"></a><span class="st">      type = &#39;send-notice&#39;, function(message) {</span></span>
+<span id="cb205-20"><a href="shiny-intro.html#cb205-20"></a><span class="st">        // use notice send from the server</span></span>
+<span id="cb205-21"><a href="shiny-intro.html#cb205-21"></a><span class="st">        new jBox(&#39;Notice&#39;, message);</span></span>
+<span id="cb205-22"><a href="shiny-intro.html#cb205-22"></a><span class="st">    });&quot;</span>)</span>
+<span id="cb205-23"><a href="shiny-intro.html#cb205-23"></a>  )</span>
+<span id="cb205-24"><a href="shiny-intro.html#cb205-24"></a>)</span>
+<span id="cb205-25"><a href="shiny-intro.html#cb205-25"></a></span>
+<span id="cb205-26"><a href="shiny-intro.html#cb205-26"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb205-27"><a href="shiny-intro.html#cb205-27"></a>  <span class="co"># define notice options</span></span>
+<span id="cb205-28"><a href="shiny-intro.html#cb205-28"></a>  notice =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb205-29"><a href="shiny-intro.html#cb205-29"></a>    <span class="dt">content =</span> <span class="st">&#39;Hello from the server&#39;</span>,</span>
+<span id="cb205-30"><a href="shiny-intro.html#cb205-30"></a>    <span class="dt">color =</span> <span class="st">&#39;black&#39;</span></span>
+<span id="cb205-31"><a href="shiny-intro.html#cb205-31"></a>  )</span>
+<span id="cb205-32"><a href="shiny-intro.html#cb205-32"></a>  <span class="co"># send the notice</span></span>
+<span id="cb205-33"><a href="shiny-intro.html#cb205-33"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
+<span id="cb205-34"><a href="shiny-intro.html#cb205-34"></a>    <span class="dt">type =</span> <span class="st">&quot;send-notice&quot;</span>, <span class="dt">message =</span> notice</span>
+<span id="cb205-35"><a href="shiny-intro.html#cb205-35"></a>  )</span>
+<span id="cb205-36"><a href="shiny-intro.html#cb205-36"></a>}</span>
+<span id="cb205-37"><a href="shiny-intro.html#cb205-37"></a></span>
+<span id="cb205-38"><a href="shiny-intro.html#cb205-38"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:jbox-custom"></span>
 <img src="images/jbox-custom.png" alt="Customised jBox notice" width="100%" />
 <p class="caption">
@@ -761,117 +763,121 @@ FIGURE 11.6: Customised jBox notice
 <p>Thus far we have covered how to pass data from the R server to JavaScript in order to display a notification, but we have yet to make the data travel the other way: from JavaScript to R. In this example we would like to send data from JavaScript to R when the notice is closed (either by itself or the user).</p>
 <p>One ubiquitous way that such feedback is enabled in JavaScript is through events and callback functions which are triggered upon an action being performed by the user (like the click of a button) or when other interesting things happen in the code. jBox provides numerous such <a href="https://stephanwagner.me/jBox/options#events">events</a> so functions can be used when a modal is created or when a notice is closed, for instance.</p>
 <p>The concept of the callback function is not totally foreign to R albeit rarely used. For instance, shiny comes with this feature, <code>shiny::onStop</code> and <code>shiny::onStart</code>. These allow having functions run when the application starts or exits, very useful to clean up and close database connections when the app exits.</p>
-<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb204-1"><a href="shiny-intro.html#cb204-1"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
-<span id="cb204-2"><a href="shiny-intro.html#cb204-2"></a>  shiny<span class="op">::</span><span class="kw">onStop</span>(</span>
-<span id="cb204-3"><a href="shiny-intro.html#cb204-3"></a>    <span class="co"># callback function fired when app is closed</span></span>
-<span id="cb204-4"><a href="shiny-intro.html#cb204-4"></a>    <span class="cf">function</span>(){</span>
-<span id="cb204-5"><a href="shiny-intro.html#cb204-5"></a>      <span class="kw">cat</span>(<span class="st">&quot;App has been closed&quot;</span>)</span>
-<span id="cb204-6"><a href="shiny-intro.html#cb204-6"></a>    }</span>
-<span id="cb204-7"><a href="shiny-intro.html#cb204-7"></a>  )</span>
-<span id="cb204-8"><a href="shiny-intro.html#cb204-8"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="shiny-intro.html#cb206-1"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){</span>
+<span id="cb206-2"><a href="shiny-intro.html#cb206-2"></a>  shiny<span class="op">::</span><span class="kw">onStop</span>(</span>
+<span id="cb206-3"><a href="shiny-intro.html#cb206-3"></a>    <span class="co"># callback function fired when app is closed</span></span>
+<span id="cb206-4"><a href="shiny-intro.html#cb206-4"></a>    <span class="cf">function</span>(){</span>
+<span id="cb206-5"><a href="shiny-intro.html#cb206-5"></a>      <span class="kw">cat</span>(<span class="st">&quot;App has been closed&quot;</span>)</span>
+<span id="cb206-6"><a href="shiny-intro.html#cb206-6"></a>    }</span>
+<span id="cb206-7"><a href="shiny-intro.html#cb206-7"></a>  )</span>
+<span id="cb206-8"><a href="shiny-intro.html#cb206-8"></a>}</span></code></pre></div>
 <p>In jBox, these callback functions are included in the JSON of options, below the <code>onClose</code> event is fired when the notice is closed.</p>
-<div class="sourceCode" id="cb205"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb205-1"><a href="shiny-intro.html#cb205-1"></a>{</span>
-<span id="cb205-2"><a href="shiny-intro.html#cb205-2"></a>  <span class="dt">content</span><span class="op">:</span> <span class="st">&#39;Alert!&#39;</span><span class="op">,</span></span>
-<span id="cb205-3"><a href="shiny-intro.html#cb205-3"></a>  <span class="dt">onClose</span><span class="op">:</span> <span class="kw">function</span>(){</span>
-<span id="cb205-4"><a href="shiny-intro.html#cb205-4"></a>    <span class="co">// Fired when closed </span></span>
-<span id="cb205-5"><a href="shiny-intro.html#cb205-5"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;Alert is closed&#39;</span>)<span class="op">;</span></span>
-<span id="cb205-6"><a href="shiny-intro.html#cb205-6"></a>  }</span>
-<span id="cb205-7"><a href="shiny-intro.html#cb205-7"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb207"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb207-1"><a href="shiny-intro.html#cb207-1"></a><span class="op">{</span></span>
+<span id="cb207-2"><a href="shiny-intro.html#cb207-2"></a>  <span class="dt">content</span><span class="op">:</span> <span class="st">&#39;Alert!&#39;</span><span class="op">,</span></span>
+<span id="cb207-3"><a href="shiny-intro.html#cb207-3"></a>  <span class="dt">onClose</span><span class="op">:</span> <span class="kw">function</span>()<span class="op">{</span></span>
+<span id="cb207-4"><a href="shiny-intro.html#cb207-4"></a>    <span class="co">// Fired when closed </span></span>
+<span id="cb207-5"><a href="shiny-intro.html#cb207-5"></a>    <span class="va">console</span>.<span class="at">log</span>(<span class="st">&#39;Alert is closed&#39;</span>)<span class="op">;</span></span>
+<span id="cb207-6"><a href="shiny-intro.html#cb207-6"></a>  <span class="op">}</span></span>
+<span id="cb207-7"><a href="shiny-intro.html#cb207-7"></a><span class="op">}</span></span></code></pre></div>
 <p>This raises one issue; one cannot truly serialise to executable code. The attempt below serialises the function to a string that <em>will not</em> be evaluated in JavaScript, just like <code>"function(x){ x + 1 }"</code> is not evaluated in R: it is not a function, it is a string.</p>
-<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="shiny-intro.html#cb206-1"></a><span class="co"># try to serialise an R function</span></span>
-<span id="cb206-2"><a href="shiny-intro.html#cb206-2"></a>jsonlite<span class="op">::</span><span class="kw">toJSON</span>(<span class="st">&quot;function(x){x + 1}&quot;</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb206-3"><a href="shiny-intro.html#cb206-3"></a><span class="co">#&gt; &quot;function(x){x + 1}&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="shiny-intro.html#cb208-1"></a><span class="co"># try to serialise an R function</span></span>
+<span id="cb208-2"><a href="shiny-intro.html#cb208-2"></a>jsonlite<span class="op">::</span><span class="kw">toJSON</span>(<span class="st">&quot;function(x){x + 1}&quot;</span>, <span class="dt">auto_unbox =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb208-3"><a href="shiny-intro.html#cb208-3"></a><span class="co">#&gt; &quot;function(x){x + 1}&quot;</span></span></code></pre></div>
 <p>One solution is to append the callback function to the object of options JavaScript-side.</p>
-<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="shiny-intro.html#cb207-1"></a>tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
-<span id="cb207-2"><a href="shiny-intro.html#cb207-2"></a><span class="st">  type = &#39;send-alert&#39;, function(message) {</span></span>
-<span id="cb207-3"><a href="shiny-intro.html#cb207-3"></a><span class="st">    // append callback</span></span>
-<span id="cb207-4"><a href="shiny-intro.html#cb207-4"></a><span class="st">    message.onClose = function(){</span></span>
-<span id="cb207-5"><a href="shiny-intro.html#cb207-5"></a><span class="st">      // TODO send data back to R</span></span>
-<span id="cb207-6"><a href="shiny-intro.html#cb207-6"></a><span class="st">    }</span></span>
-<span id="cb207-7"><a href="shiny-intro.html#cb207-7"></a><span class="st">    new jBox(&#39;Notice&#39;, message);</span></span>
-<span id="cb207-8"><a href="shiny-intro.html#cb207-8"></a><span class="st">});&quot;</span>)</span></code></pre></div>
-<p>Placing a function inside a JSON object is expected in JavaScript, in contrast with R where though it works is rarely if ever done (reference class/R6 are somewhat similar). The above JavaScript code to append the callback function could look something like the snippet below in R.</p>
-<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="shiny-intro.html#cb208-1"></a>message &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">content =</span> <span class="st">&quot;hello&quot;</span>)</span>
-<span id="cb208-2"><a href="shiny-intro.html#cb208-2"></a>message<span class="op">$</span>onClose &lt;-<span class="st"> </span><span class="cf">function</span>(msg){</span>
-<span id="cb208-3"><a href="shiny-intro.html#cb208-3"></a>  <span class="kw">print</span>(msg)</span>
-<span id="cb208-4"><a href="shiny-intro.html#cb208-4"></a>}</span>
-<span id="cb208-5"><a href="shiny-intro.html#cb208-5"></a>message<span class="op">$</span><span class="kw">onClose</span>(<span class="st">&quot;Closing!&quot;</span>)</span>
-<span id="cb208-6"><a href="shiny-intro.html#cb208-6"></a><span class="co">#&gt; [1] &quot;Closing!&quot;</span></span></code></pre></div>
-<p>This explains how the event is used in jBox (and many other libraries), but the body of the callback used previously is empty and therefore will not do anything: we need it to send data back to the R server so it can be notified when the notice is closed.</p>
-<p>This can be done by defining a simplified shiny input. While the book will eventually cover fully-fledged shiny inputs that can be registered, updated, and more, there is also a simplified version of the latter which allows sending reactive input values to the server where it can be used just like any other inputs (<code>input$id</code>). The value of the input can be defined using the <code>setInputValue</code> method, which takes the <code>id</code> of the input and the <code>value</code> to give it.</p>
-<p>Below place <code>Shiny.setInputValue('notice_close', true)</code> in the body of the function so the input <code>input$notice_close</code> will be set to <code>TRUE</code> when the notice closes.</p>
 <div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="shiny-intro.html#cb209-1"></a>tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
 <span id="cb209-2"><a href="shiny-intro.html#cb209-2"></a><span class="st">  type = &#39;send-alert&#39;, function(message) {</span></span>
 <span id="cb209-3"><a href="shiny-intro.html#cb209-3"></a><span class="st">    // append callback</span></span>
 <span id="cb209-4"><a href="shiny-intro.html#cb209-4"></a><span class="st">    message.onClose = function(){</span></span>
-<span id="cb209-5"><a href="shiny-intro.html#cb209-5"></a><span class="st">      Shiny.setInputValue(&#39;notice_close&#39;, true);</span></span>
+<span id="cb209-5"><a href="shiny-intro.html#cb209-5"></a><span class="st">      // TODO send data back to R</span></span>
 <span id="cb209-6"><a href="shiny-intro.html#cb209-6"></a><span class="st">    }</span></span>
 <span id="cb209-7"><a href="shiny-intro.html#cb209-7"></a><span class="st">    new jBox(&#39;Notice&#39;, message);</span></span>
 <span id="cb209-8"><a href="shiny-intro.html#cb209-8"></a><span class="st">});&quot;</span>)</span></code></pre></div>
+<p>Placing a function inside a JSON object is expected in JavaScript, in contrast with R where though it works is rarely if ever done (reference class/R6 are somewhat similar). The above JavaScript code to append the callback function could look something like the snippet below in R.</p>
+<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="shiny-intro.html#cb210-1"></a>message &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">content =</span> <span class="st">&quot;hello&quot;</span>)</span>
+<span id="cb210-2"><a href="shiny-intro.html#cb210-2"></a>message<span class="op">$</span>onClose &lt;-<span class="st"> </span><span class="cf">function</span>(msg){</span>
+<span id="cb210-3"><a href="shiny-intro.html#cb210-3"></a>  <span class="kw">print</span>(msg)</span>
+<span id="cb210-4"><a href="shiny-intro.html#cb210-4"></a>}</span>
+<span id="cb210-5"><a href="shiny-intro.html#cb210-5"></a>message<span class="op">$</span><span class="kw">onClose</span>(<span class="st">&quot;Closing!&quot;</span>)</span>
+<span id="cb210-6"><a href="shiny-intro.html#cb210-6"></a><span class="co">#&gt; [1] &quot;Closing!&quot;</span></span></code></pre></div>
+<p>This explains how the event is used in jBox (and many other libraries), but the body of the callback used previously is empty and therefore will not do anything: we need it to send data back to the R server so it can be notified when the notice is closed.</p>
+<p>This can be done by defining a simplified shiny input. While the book will eventually cover fully-fledged shiny inputs that can be registered, updated, and more, there is also a simplified version of the latter which allows sending reactive input values to the server where it can be used just like any other inputs (<code>input$id</code>). The value of the input can be defined using the <code>setInputValue</code> method, which takes the <code>id</code> of the input and the <code>value</code> to give it.</p>
+<p>Below place <code>Shiny.setInputValue('notice_close', true)</code> in the body of the function so the input <code>input$notice_close</code> will be set to <code>TRUE</code> when the notice closes.</p>
+<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="shiny-intro.html#cb211-1"></a>tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
+<span id="cb211-2"><a href="shiny-intro.html#cb211-2"></a><span class="st">  type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb211-3"><a href="shiny-intro.html#cb211-3"></a><span class="st">    // append callback</span></span>
+<span id="cb211-4"><a href="shiny-intro.html#cb211-4"></a><span class="st">    message.onClose = function(){</span></span>
+<span id="cb211-5"><a href="shiny-intro.html#cb211-5"></a><span class="st">      Shiny.setInputValue(&#39;notice_close&#39;, true);</span></span>
+<span id="cb211-6"><a href="shiny-intro.html#cb211-6"></a><span class="st">    }</span></span>
+<span id="cb211-7"><a href="shiny-intro.html#cb211-7"></a><span class="st">    new jBox(&#39;Notice&#39;, message);</span></span>
+<span id="cb211-8"><a href="shiny-intro.html#cb211-8"></a><span class="st">});&quot;</span>)</span></code></pre></div>
 <p>However, Shiny internally optimises how those values are set. First, if the input is set to the same value, then Shiny ignores it. This is fine if you are interested in the actual value of the input but will not work as expected if the input is to be used as an event. Indeed if you want to use this input in an <code>observe</code>, <code>observeEvent</code>, or <code>eventReactive</code>, you want it to be triggered every time the input changes, regardless of whether that value is the same as before. The second optimisation Shiny does is when the input is set to multiple different values before these have been processed then only the most recent value will actually be sent to the server.</p>
 <p>One can opt-out of these optimisations using the <code>priority: "event"</code> option when setting the input value, which is what we shall do here. We are not interested in the actual value of that input <code>TRUE</code>; we want to make sure the server gets notified every time a notification closes and given the optimisations, it will not since. The first time the event will be fired the input will be set from <code>NULL</code> to <code>TRUE</code> but every subsequent notification that close will not fire that event since the value will not change (it’s always sending <code>TRUE</code> to the server).</p>
-<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="shiny-intro.html#cb210-1"></a>tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
-<span id="cb210-2"><a href="shiny-intro.html#cb210-2"></a><span class="st">  type = &#39;send-alert&#39;, function(message) {</span></span>
-<span id="cb210-3"><a href="shiny-intro.html#cb210-3"></a><span class="st">    // append callback</span></span>
-<span id="cb210-4"><a href="shiny-intro.html#cb210-4"></a><span class="st">    message.onClose = function(){</span></span>
-<span id="cb210-5"><a href="shiny-intro.html#cb210-5"></a><span class="st">      Shiny.setInputValue(&#39;notice_close&#39;, true, {priority: &#39;event&#39;});</span></span>
-<span id="cb210-6"><a href="shiny-intro.html#cb210-6"></a><span class="st">    }</span></span>
-<span id="cb210-7"><a href="shiny-intro.html#cb210-7"></a><span class="st">    new jBox(&#39;Notice&#39;, message);</span></span>
-<span id="cb210-8"><a href="shiny-intro.html#cb210-8"></a><span class="st">});&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="shiny-intro.html#cb212-1"></a>tags<span class="op">$</span><span class="kw">script</span>(<span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
+<span id="cb212-2"><a href="shiny-intro.html#cb212-2"></a><span class="st">  type = &#39;send-alert&#39;, function(message) {</span></span>
+<span id="cb212-3"><a href="shiny-intro.html#cb212-3"></a><span class="st">    // append callback</span></span>
+<span id="cb212-4"><a href="shiny-intro.html#cb212-4"></a><span class="st">    message.onClose = function(){</span></span>
+<span id="cb212-5"><a href="shiny-intro.html#cb212-5"></a><span class="st">      Shiny.setInputValue(</span></span>
+<span id="cb212-6"><a href="shiny-intro.html#cb212-6"></a><span class="st">        &#39;notice_close&#39;, true, {priority: &#39;event&#39;}</span></span>
+<span id="cb212-7"><a href="shiny-intro.html#cb212-7"></a><span class="st">      );</span></span>
+<span id="cb212-8"><a href="shiny-intro.html#cb212-8"></a><span class="st">    }</span></span>
+<span id="cb212-9"><a href="shiny-intro.html#cb212-9"></a><span class="st">    new jBox(&#39;Notice&#39;, message);</span></span>
+<span id="cb212-10"><a href="shiny-intro.html#cb212-10"></a><span class="st">});&quot;</span>)</span></code></pre></div>
 <p>That done it can be incorporated into the application built thus far. Something interesting could be done server-side but to keep things brief and straightforward, we merely print the value of the input to the R console.</p>
-<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="shiny-intro.html#cb211-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb211-2"><a href="shiny-intro.html#cb211-2"></a></span>
-<span id="cb211-3"><a href="shiny-intro.html#cb211-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb211-4"><a href="shiny-intro.html#cb211-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
-<span id="cb211-5"><a href="shiny-intro.html#cb211-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb211-6"><a href="shiny-intro.html#cb211-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
-<span id="cb211-7"><a href="shiny-intro.html#cb211-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb211-8"><a href="shiny-intro.html#cb211-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
-<span id="cb211-9"><a href="shiny-intro.html#cb211-9"></a>      )</span>
-<span id="cb211-10"><a href="shiny-intro.html#cb211-10"></a>    ),</span>
-<span id="cb211-11"><a href="shiny-intro.html#cb211-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
-<span id="cb211-12"><a href="shiny-intro.html#cb211-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
-<span id="cb211-13"><a href="shiny-intro.html#cb211-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
-<span id="cb211-14"><a href="shiny-intro.html#cb211-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
-<span id="cb211-15"><a href="shiny-intro.html#cb211-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
-<span id="cb211-16"><a href="shiny-intro.html#cb211-16"></a>      )</span>
-<span id="cb211-17"><a href="shiny-intro.html#cb211-17"></a>    ),</span>
-<span id="cb211-18"><a href="shiny-intro.html#cb211-18"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
-<span id="cb211-19"><a href="shiny-intro.html#cb211-19"></a>      <span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
-<span id="cb211-20"><a href="shiny-intro.html#cb211-20"></a><span class="st">        type = &#39;send-notice&#39;, function(message) {</span></span>
-<span id="cb211-21"><a href="shiny-intro.html#cb211-21"></a><span class="st">          message.onClose = function(){</span></span>
-<span id="cb211-22"><a href="shiny-intro.html#cb211-22"></a><span class="st">            Shiny.setInputValue(&#39;notice_close&#39;, true, {priority: &#39;event&#39;});</span></span>
-<span id="cb211-23"><a href="shiny-intro.html#cb211-23"></a><span class="st">          }</span></span>
-<span id="cb211-24"><a href="shiny-intro.html#cb211-24"></a><span class="st">          new jBox(&#39;Notice&#39;, message);</span></span>
-<span id="cb211-25"><a href="shiny-intro.html#cb211-25"></a><span class="st">      });&quot;</span></span>
-<span id="cb211-26"><a href="shiny-intro.html#cb211-26"></a>    )</span>
-<span id="cb211-27"><a href="shiny-intro.html#cb211-27"></a>  ),</span>
-<span id="cb211-28"><a href="shiny-intro.html#cb211-28"></a>  <span class="kw">textInput</span>(<span class="st">&quot;msg&quot;</span>, <span class="st">&quot;A message to show as notice&quot;</span>),</span>
-<span id="cb211-29"><a href="shiny-intro.html#cb211-29"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;show&quot;</span>, <span class="st">&quot;Show the notice&quot;</span>)</span>
-<span id="cb211-30"><a href="shiny-intro.html#cb211-30"></a>)</span>
-<span id="cb211-31"><a href="shiny-intro.html#cb211-31"></a></span>
-<span id="cb211-32"><a href="shiny-intro.html#cb211-32"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb211-33"><a href="shiny-intro.html#cb211-33"></a></span>
-<span id="cb211-34"><a href="shiny-intro.html#cb211-34"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>show, {</span>
-<span id="cb211-35"><a href="shiny-intro.html#cb211-35"></a>    <span class="co"># define notice options</span></span>
-<span id="cb211-36"><a href="shiny-intro.html#cb211-36"></a>    notice =<span class="st"> </span><span class="kw">list</span>(</span>
-<span id="cb211-37"><a href="shiny-intro.html#cb211-37"></a>      <span class="dt">content =</span> input<span class="op">$</span>msg,</span>
-<span id="cb211-38"><a href="shiny-intro.html#cb211-38"></a>      <span class="dt">color =</span> <span class="st">&#39;black&#39;</span></span>
-<span id="cb211-39"><a href="shiny-intro.html#cb211-39"></a>    )</span>
-<span id="cb211-40"><a href="shiny-intro.html#cb211-40"></a></span>
-<span id="cb211-41"><a href="shiny-intro.html#cb211-41"></a>    <span class="co"># send the notice</span></span>
-<span id="cb211-42"><a href="shiny-intro.html#cb211-42"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
-<span id="cb211-43"><a href="shiny-intro.html#cb211-43"></a>      <span class="dt">type =</span> <span class="st">&quot;send-notice&quot;</span>, <span class="dt">message =</span> notice</span>
-<span id="cb211-44"><a href="shiny-intro.html#cb211-44"></a>    )</span>
-<span id="cb211-45"><a href="shiny-intro.html#cb211-45"></a>  })</span>
-<span id="cb211-46"><a href="shiny-intro.html#cb211-46"></a></span>
-<span id="cb211-47"><a href="shiny-intro.html#cb211-47"></a>  <span class="co"># print the output of the notice_close event (when fired)</span></span>
-<span id="cb211-48"><a href="shiny-intro.html#cb211-48"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>notice_close, {</span>
-<span id="cb211-49"><a href="shiny-intro.html#cb211-49"></a>    <span class="kw">print</span>(input<span class="op">$</span>notice_close)</span>
-<span id="cb211-50"><a href="shiny-intro.html#cb211-50"></a>  })</span>
-<span id="cb211-51"><a href="shiny-intro.html#cb211-51"></a>}</span>
-<span id="cb211-52"><a href="shiny-intro.html#cb211-52"></a></span>
-<span id="cb211-53"><a href="shiny-intro.html#cb211-53"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="shiny-intro.html#cb213-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb213-2"><a href="shiny-intro.html#cb213-2"></a></span>
+<span id="cb213-3"><a href="shiny-intro.html#cb213-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb213-4"><a href="shiny-intro.html#cb213-4"></a>  tags<span class="op">$</span><span class="kw">head</span>(</span>
+<span id="cb213-5"><a href="shiny-intro.html#cb213-5"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb213-6"><a href="shiny-intro.html#cb213-6"></a>      <span class="dt">src =</span> <span class="kw">paste0</span>(</span>
+<span id="cb213-7"><a href="shiny-intro.html#cb213-7"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb213-8"><a href="shiny-intro.html#cb213-8"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.js&quot;</span></span>
+<span id="cb213-9"><a href="shiny-intro.html#cb213-9"></a>      )</span>
+<span id="cb213-10"><a href="shiny-intro.html#cb213-10"></a>    ),</span>
+<span id="cb213-11"><a href="shiny-intro.html#cb213-11"></a>    tags<span class="op">$</span><span class="kw">link</span>(</span>
+<span id="cb213-12"><a href="shiny-intro.html#cb213-12"></a>      <span class="dt">rel =</span> <span class="st">&quot;stylesheet&quot;</span>,</span>
+<span id="cb213-13"><a href="shiny-intro.html#cb213-13"></a>      <span class="dt">href =</span> <span class="kw">paste0</span>(</span>
+<span id="cb213-14"><a href="shiny-intro.html#cb213-14"></a>        <span class="st">&quot;https://cdn.jsdelivr.net/gh/StephanWagner/&quot;</span>,</span>
+<span id="cb213-15"><a href="shiny-intro.html#cb213-15"></a>        <span class="st">&quot;jBox@v1.2.0/dist/jBox.all.min.css&quot;</span></span>
+<span id="cb213-16"><a href="shiny-intro.html#cb213-16"></a>      )</span>
+<span id="cb213-17"><a href="shiny-intro.html#cb213-17"></a>    ),</span>
+<span id="cb213-18"><a href="shiny-intro.html#cb213-18"></a>    tags<span class="op">$</span><span class="kw">script</span>(</span>
+<span id="cb213-19"><a href="shiny-intro.html#cb213-19"></a>      <span class="st">&quot;Shiny.addCustomMessageHandler(</span></span>
+<span id="cb213-20"><a href="shiny-intro.html#cb213-20"></a><span class="st">        type = &#39;send-notice&#39;, function(message) {</span></span>
+<span id="cb213-21"><a href="shiny-intro.html#cb213-21"></a><span class="st">          message.onClose = function(){</span></span>
+<span id="cb213-22"><a href="shiny-intro.html#cb213-22"></a><span class="st">            Shiny.setInputValue(</span></span>
+<span id="cb213-23"><a href="shiny-intro.html#cb213-23"></a><span class="st">              &#39;notice_close&#39;, true, {priority: &#39;event&#39;}</span></span>
+<span id="cb213-24"><a href="shiny-intro.html#cb213-24"></a><span class="st">            );</span></span>
+<span id="cb213-25"><a href="shiny-intro.html#cb213-25"></a><span class="st">          }</span></span>
+<span id="cb213-26"><a href="shiny-intro.html#cb213-26"></a><span class="st">          new jBox(&#39;Notice&#39;, message);</span></span>
+<span id="cb213-27"><a href="shiny-intro.html#cb213-27"></a><span class="st">      });&quot;</span></span>
+<span id="cb213-28"><a href="shiny-intro.html#cb213-28"></a>    )</span>
+<span id="cb213-29"><a href="shiny-intro.html#cb213-29"></a>  ),</span>
+<span id="cb213-30"><a href="shiny-intro.html#cb213-30"></a>  <span class="kw">textInput</span>(<span class="st">&quot;msg&quot;</span>, <span class="st">&quot;A message to show as notice&quot;</span>),</span>
+<span id="cb213-31"><a href="shiny-intro.html#cb213-31"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;show&quot;</span>, <span class="st">&quot;Show the notice&quot;</span>)</span>
+<span id="cb213-32"><a href="shiny-intro.html#cb213-32"></a>)</span>
+<span id="cb213-33"><a href="shiny-intro.html#cb213-33"></a></span>
+<span id="cb213-34"><a href="shiny-intro.html#cb213-34"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb213-35"><a href="shiny-intro.html#cb213-35"></a></span>
+<span id="cb213-36"><a href="shiny-intro.html#cb213-36"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>show, {</span>
+<span id="cb213-37"><a href="shiny-intro.html#cb213-37"></a>    <span class="co"># define notice options</span></span>
+<span id="cb213-38"><a href="shiny-intro.html#cb213-38"></a>    notice =<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb213-39"><a href="shiny-intro.html#cb213-39"></a>      <span class="dt">content =</span> input<span class="op">$</span>msg,</span>
+<span id="cb213-40"><a href="shiny-intro.html#cb213-40"></a>      <span class="dt">color =</span> <span class="st">&#39;black&#39;</span></span>
+<span id="cb213-41"><a href="shiny-intro.html#cb213-41"></a>    )</span>
+<span id="cb213-42"><a href="shiny-intro.html#cb213-42"></a></span>
+<span id="cb213-43"><a href="shiny-intro.html#cb213-43"></a>    <span class="co"># send the notice</span></span>
+<span id="cb213-44"><a href="shiny-intro.html#cb213-44"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
+<span id="cb213-45"><a href="shiny-intro.html#cb213-45"></a>      <span class="dt">type =</span> <span class="st">&quot;send-notice&quot;</span>, <span class="dt">message =</span> notice</span>
+<span id="cb213-46"><a href="shiny-intro.html#cb213-46"></a>    )</span>
+<span id="cb213-47"><a href="shiny-intro.html#cb213-47"></a>  })</span>
+<span id="cb213-48"><a href="shiny-intro.html#cb213-48"></a></span>
+<span id="cb213-49"><a href="shiny-intro.html#cb213-49"></a>  <span class="co"># print the output of the notice_close event (when fired)</span></span>
+<span id="cb213-50"><a href="shiny-intro.html#cb213-50"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>notice_close, {</span>
+<span id="cb213-51"><a href="shiny-intro.html#cb213-51"></a>    <span class="kw">print</span>(input<span class="op">$</span>notice_close)</span>
+<span id="cb213-52"><a href="shiny-intro.html#cb213-52"></a>  })</span>
+<span id="cb213-53"><a href="shiny-intro.html#cb213-53"></a>}</span>
+<span id="cb213-54"><a href="shiny-intro.html#cb213-54"></a></span>
+<span id="cb213-55"><a href="shiny-intro.html#cb213-55"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <pre><code>#&gt; [1] TRUE</code></pre>
 <div class="figure" style="text-align: center"><span id="fig:jbox-end"></span>
 <img src="images/jbox-end.png" alt="jBox final application" width="100%" />
@@ -887,7 +893,7 @@ FIGURE 11.7: jBox final application
 <h3>References</h3>
 <div id="refs" class="references">
 <div id="ref-R-websocket">
-<p>Chang, Winston, Joe Cheng, Alan Dipert, and Barbara Borges. 2020. <em>Websocket: WebSocket Client Library</em>. <a href="https://CRAN.R-project.org/package=websocket">https://CRAN.R-project.org/package=websocket</a>.</p>
+<p>Chang, Winston, Joe Cheng, Alan Dipert, and Barbara Borges. 2020. <em>Websocket: WebSocket Client Library</em>.</p>
 </div>
 <div id="ref-R-httpuv">
 <p>Cheng, Joe, and Winston Chang. 2020. <em>Httpuv: HTTP and Websocket Server Library</em>. <a href="https://github.com/rstudio/httpuv">https://github.com/rstudio/httpuv</a>.</p>

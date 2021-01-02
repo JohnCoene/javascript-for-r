@@ -424,7 +424,7 @@ devtools::load_all()
 run_app()
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/vue-bs4} 
 

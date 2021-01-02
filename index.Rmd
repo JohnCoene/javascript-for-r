@@ -18,7 +18,9 @@ graphics: yes
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set( 
+library(knitr)
+
+opts_chunk$set( 
   comment = "", 
   cache = TRUE,
   fig.align = "center", 
@@ -34,6 +36,15 @@ options(
   digits = 4,
   dplyr.summarise.inform = FALSE
 )
+
+if(is_latex_output()){
+  opts_chunk$set(
+    out.width = "\\textwidth", 
+    fig.width = 8, 
+    fig.asp = 0.618,
+    fig.pos = "H"
+  )
+}
 
 # otherwise output in PDF blurry
 library(DiagrammeRsvg)
@@ -92,7 +103,7 @@ lapply(pkgs, function(pkg) {
   if (system.file(package = pkg) == '') install.packages(pkg, repos = "https://cran.rstudio.com")
 })
 
-knitr::write_bib(c(.packages(), pkgs), 'packages.bib')
+write_bib(c(.packages(), pkgs), 'packages.bib')
 
 # fix remotes bib
 bib <- readLines("packages.bib")

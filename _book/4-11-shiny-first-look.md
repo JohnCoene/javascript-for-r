@@ -12,7 +12,7 @@ Then again, the goal is not to write a lot of convoluted JavaScript, on the cont
 
 Shiny applications have two components the user interface (UI) and the server function. These two components communicate via a WebSocket: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server this connection is managed by shiny using the httpuv [@R-httpuv] and WebSocket [@R-websocket] packages, while in clients connecting to the server this connection is managed with JavaScript.  
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/04-websocket} 
 
@@ -42,7 +42,7 @@ shinyApp(ui, server)
 
 Drawing a diagram of the communication between the UI and the server reveals that thought this is a simple application a lot is happening.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/04-shiny-websocket} 
 
@@ -126,7 +126,7 @@ server <- function(input, output) {}
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/jbox-init} 
 
@@ -215,7 +215,7 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/jbox-r2js} 
 
@@ -226,7 +226,7 @@ shinyApp(ui, server)
 
 In the application above, notice the path that the message follows: it goes from the client (user input) to the server (`observeEvent`) which sends (`sendCustomMessage`) it back to the client. 
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/04-custom-msg} 
 
@@ -307,7 +307,7 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/jbox-custom} 
 
@@ -479,7 +479,7 @@ shinyApp(ui, server)
 #> [1] TRUE
 ```
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/jbox-end} 
 

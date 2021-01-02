@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2020-12-07" />
+<meta name="date" content="2021-01-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="webpack-intro.html"/>
 <link rel="next" href="packer-overview.html"/>
-<script src="libs/header-attrs-2.5/header-attrs.js"></script>
+<script src="libs/header-attrs-2.6/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -52,15 +52,13 @@
 
 
 <script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
-<link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
-<script src="libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
-<script src="libs/plotly-binding-4.9.2.1/plotly.js"></script>
+<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.9.2.9000/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
-<link href="libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-1.57.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-1.57.1/plotly-latest.min.js"></script>
 <script src="libs/core-js-2.5.3/shim.min.js"></script>
 <script src="libs/react-16.12.0/react.min.js"></script>
 <script src="libs/react-16.12.0/react-dom.min.js"></script>
@@ -549,15 +547,15 @@ brew install node</code></pre>
 <div id="webpack-intro-setup" class="section level2" number="21.2">
 <h2><span class="header-section-number">21.2</span> Setup the app</h2>
 <p>Let us first put together a simple shiny application that which will serve as a basis for including webpack and npm. Create a new directory and in it place a file called <code>app.R</code> containing a very simple application.</p>
-<div class="sourceCode" id="cb395"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb395-1"><a href="webpack-intro-discover.html#cb395-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb395-2"><a href="webpack-intro-discover.html#cb395-2"></a></span>
-<span id="cb395-3"><a href="webpack-intro-discover.html#cb395-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb395-4"><a href="webpack-intro-discover.html#cb395-4"></a>  <span class="kw">h1</span>(<span class="st">&quot;A shiny app&quot;</span>)</span>
-<span id="cb395-5"><a href="webpack-intro-discover.html#cb395-5"></a>)</span>
-<span id="cb395-6"><a href="webpack-intro-discover.html#cb395-6"></a></span>
-<span id="cb395-7"><a href="webpack-intro-discover.html#cb395-7"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(...) {}</span>
-<span id="cb395-8"><a href="webpack-intro-discover.html#cb395-8"></a></span>
-<span id="cb395-9"><a href="webpack-intro-discover.html#cb395-9"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb400"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb400-1"><a href="webpack-intro-discover.html#cb400-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb400-2"><a href="webpack-intro-discover.html#cb400-2"></a></span>
+<span id="cb400-3"><a href="webpack-intro-discover.html#cb400-3"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb400-4"><a href="webpack-intro-discover.html#cb400-4"></a>  <span class="kw">h1</span>(<span class="st">&quot;A shiny app&quot;</span>)</span>
+<span id="cb400-5"><a href="webpack-intro-discover.html#cb400-5"></a>)</span>
+<span id="cb400-6"><a href="webpack-intro-discover.html#cb400-6"></a></span>
+<span id="cb400-7"><a href="webpack-intro-discover.html#cb400-7"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(...) {}</span>
+<span id="cb400-8"><a href="webpack-intro-discover.html#cb400-8"></a></span>
+<span id="cb400-9"><a href="webpack-intro-discover.html#cb400-9"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="webpack-intro-init-npm" class="section level2" number="21.3">
 <h2><span class="header-section-number">21.3</span> Initialise NPM</h2>
@@ -578,7 +576,7 @@ brew install node</code></pre>
 <p>As stated in the previous chapter, file size matters in JavaScript; it is, therefore, crucial that dependencies that are used only for development are not included in the final JavaScript file. With NPM this can be done by using the <code>--save-dev</code> flag, e.g.: <code>npm install webpack --save-dev</code> to install webpack. This is how it will be eventually installed as it is needed to prepare the final product (minify, bundle, etc.) but is not required to run the bundled file(s).</p>
 <p>Finally, there are the “true” dependencies, those that are needed in the output we’re creating. For instance, were we to rebuild the gio widget using NPM we could install it with <code>npm install giojs --save</code> because this dependency will be required in the output file we produce.</p>
 <p>Before moving on to the next section, let us install webpack and its command-line interface as developer dependencies.</p>
-<div class="sourceCode" id="cb396"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb396-1"><a href="webpack-intro-discover.html#cb396-1"></a><span class="ex">npm</span> install webpack webpack-cli --save-dev</span></code></pre></div>
+<div class="sourceCode" id="cb401"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb401-1"><a href="webpack-intro-discover.html#cb401-1"></a><span class="ex">npm</span> install webpack webpack-cli --save-dev</span></code></pre></div>
 <p>Notice that this updated the <code>package.json</code> file, created the <code>package-lock.json</code> file as well as a <code>node_modules</code> directory to obtain the following structure.</p>
 <pre><code>.
 ├── app.R
@@ -592,22 +590,22 @@ Exclude the <code>node_modules</code> directory from your version control (Git o
 </p>
 </div>
 <p>The dependencies are anyway not needed as one can pull the project without the <code>node_modules</code> then from the root of the project run <code>npm install</code> to install the dependencies that are listed in the <code>package.json</code> file. We can indeed observe that this file was updated to include <code>webpack</code> and <code>webpack-cli</code> as <code>devDependencies</code>, at the bottom of the file.</p>
-<div class="sourceCode" id="cb398"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb398-1"><a href="webpack-intro-discover.html#cb398-1"></a><span class="fu">{</span></span>
-<span id="cb398-2"><a href="webpack-intro-discover.html#cb398-2"></a>  <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;name-of-your-project&quot;</span><span class="fu">,</span></span>
-<span id="cb398-3"><a href="webpack-intro-discover.html#cb398-3"></a>  <span class="dt">&quot;version&quot;</span><span class="fu">:</span> <span class="st">&quot;1.0.0&quot;</span><span class="fu">,</span></span>
-<span id="cb398-4"><a href="webpack-intro-discover.html#cb398-4"></a>  <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;&quot;</span><span class="fu">,</span></span>
-<span id="cb398-5"><a href="webpack-intro-discover.html#cb398-5"></a>  <span class="dt">&quot;main&quot;</span><span class="fu">:</span> <span class="st">&quot;index.js&quot;</span><span class="fu">,</span></span>
-<span id="cb398-6"><a href="webpack-intro-discover.html#cb398-6"></a>  <span class="dt">&quot;scripts&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb398-7"><a href="webpack-intro-discover.html#cb398-7"></a>    <span class="dt">&quot;test&quot;</span><span class="fu">:</span> <span class="st">&quot;echo </span><span class="ch">\&quot;</span><span class="st">Error: no test specified</span><span class="ch">\&quot;</span><span class="st"> &amp;&amp; exit 1&quot;</span></span>
-<span id="cb398-8"><a href="webpack-intro-discover.html#cb398-8"></a>  <span class="fu">},</span></span>
-<span id="cb398-9"><a href="webpack-intro-discover.html#cb398-9"></a>  <span class="dt">&quot;keywords&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span></span>
-<span id="cb398-10"><a href="webpack-intro-discover.html#cb398-10"></a>  <span class="dt">&quot;author&quot;</span><span class="fu">:</span> <span class="st">&quot;&quot;</span><span class="fu">,</span></span>
-<span id="cb398-11"><a href="webpack-intro-discover.html#cb398-11"></a>  <span class="dt">&quot;license&quot;</span><span class="fu">:</span> <span class="st">&quot;ISC&quot;</span><span class="fu">,</span></span>
-<span id="cb398-12"><a href="webpack-intro-discover.html#cb398-12"></a>  <span class="dt">&quot;devDependencies&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb398-13"><a href="webpack-intro-discover.html#cb398-13"></a>    <span class="dt">&quot;webpack&quot;</span><span class="fu">:</span> <span class="st">&quot;^5.2.0&quot;</span><span class="fu">,</span></span>
-<span id="cb398-14"><a href="webpack-intro-discover.html#cb398-14"></a>    <span class="dt">&quot;webpack-cli&quot;</span><span class="fu">:</span> <span class="st">&quot;^4.1.0&quot;</span></span>
-<span id="cb398-15"><a href="webpack-intro-discover.html#cb398-15"></a>  <span class="fu">}</span></span>
-<span id="cb398-16"><a href="webpack-intro-discover.html#cb398-16"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb403"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb403-1"><a href="webpack-intro-discover.html#cb403-1"></a><span class="fu">{</span></span>
+<span id="cb403-2"><a href="webpack-intro-discover.html#cb403-2"></a>  <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;name-of-your-project&quot;</span><span class="fu">,</span></span>
+<span id="cb403-3"><a href="webpack-intro-discover.html#cb403-3"></a>  <span class="dt">&quot;version&quot;</span><span class="fu">:</span> <span class="st">&quot;1.0.0&quot;</span><span class="fu">,</span></span>
+<span id="cb403-4"><a href="webpack-intro-discover.html#cb403-4"></a>  <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;&quot;</span><span class="fu">,</span></span>
+<span id="cb403-5"><a href="webpack-intro-discover.html#cb403-5"></a>  <span class="dt">&quot;main&quot;</span><span class="fu">:</span> <span class="st">&quot;index.js&quot;</span><span class="fu">,</span></span>
+<span id="cb403-6"><a href="webpack-intro-discover.html#cb403-6"></a>  <span class="dt">&quot;scripts&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb403-7"><a href="webpack-intro-discover.html#cb403-7"></a>    <span class="dt">&quot;test&quot;</span><span class="fu">:</span> <span class="st">&quot;echo </span><span class="ch">\&quot;</span><span class="st">Error: no test specified</span><span class="ch">\&quot;</span><span class="st"> &amp;&amp; exit 1&quot;</span></span>
+<span id="cb403-8"><a href="webpack-intro-discover.html#cb403-8"></a>  <span class="fu">},</span></span>
+<span id="cb403-9"><a href="webpack-intro-discover.html#cb403-9"></a>  <span class="dt">&quot;keywords&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span></span>
+<span id="cb403-10"><a href="webpack-intro-discover.html#cb403-10"></a>  <span class="dt">&quot;author&quot;</span><span class="fu">:</span> <span class="st">&quot;&quot;</span><span class="fu">,</span></span>
+<span id="cb403-11"><a href="webpack-intro-discover.html#cb403-11"></a>  <span class="dt">&quot;license&quot;</span><span class="fu">:</span> <span class="st">&quot;ISC&quot;</span><span class="fu">,</span></span>
+<span id="cb403-12"><a href="webpack-intro-discover.html#cb403-12"></a>  <span class="dt">&quot;devDependencies&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb403-13"><a href="webpack-intro-discover.html#cb403-13"></a>    <span class="dt">&quot;webpack&quot;</span><span class="fu">:</span> <span class="st">&quot;^5.2.0&quot;</span><span class="fu">,</span></span>
+<span id="cb403-14"><a href="webpack-intro-discover.html#cb403-14"></a>    <span class="dt">&quot;webpack-cli&quot;</span><span class="fu">:</span> <span class="st">&quot;^4.1.0&quot;</span></span>
+<span id="cb403-15"><a href="webpack-intro-discover.html#cb403-15"></a>  <span class="fu">}</span></span>
+<span id="cb403-16"><a href="webpack-intro-discover.html#cb403-16"></a><span class="fu">}</span></span></code></pre></div>
 <p>The <code>package-lock.json</code> file is automatically generated and <em>should not be edited manually,</em> it describes the exact tree of all the dependencies. If you installed a package by mistake, you could uninstall it with <code>npm uninstall nameOfPage</code>.</p>
 <p><strong>Recap</strong></p>
 <ul>
@@ -621,34 +619,34 @@ Exclude the <code>node_modules</code> directory from your version control (Git o
 <h2><span class="header-section-number">21.5</span> Entry point &amp; output</h2>
 <p>In general, an NPM project with webpack will make use of an <code>src</code> directory where the source code is placed and a <code>dist</code> directory (for distributed) where the bundled source code will be placed, we’ll see how to change these defaults later on. It will eventually be necessary as the <code>src</code> directory in R packages is reserved for compiled code (e.g., C++) and therefore cannot be used to place JavaScript files.</p>
 <p>It will not be a problem here as we are not building a package.</p>
-<div class="sourceCode" id="cb399"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb399-1"><a href="webpack-intro-discover.html#cb399-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;src&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb404"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb404-1"><a href="webpack-intro-discover.html#cb404-1"></a><span class="kw">dir.create</span>(<span class="st">&quot;src&quot;</span>)</span></code></pre></div>
 <p>Webpack will then require at least one “entry point.” An entry point is an input file in the <code>src</code> directory that webpack will use as a source to produce the bundle. Let’s create the go-to “hello world” of JavaScript; the snippet below creates the <code>index.js</code> file with a basic vanilla JavaScript alert.</p>
-<div class="sourceCode" id="cb400"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb400-1"><a href="webpack-intro-discover.html#cb400-1"></a><span class="kw">writeLines</span>(<span class="st">&quot;alert(&#39;hello webpack!&#39;)&quot;</span>, <span class="st">&quot;src/index.js&quot;</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb405"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb405-1"><a href="webpack-intro-discover.html#cb405-1"></a><span class="kw">writeLines</span>(<span class="st">&quot;alert(&#39;hello webpack!&#39;)&quot;</span>, <span class="st">&quot;src/index.js&quot;</span>) </span></code></pre></div>
 <p>The next section on configuration will detail precisely how to indicate to webpack that this is indeed the entry point it should to use.</p>
 </div>
 <div id="webpack-intro-conf" class="section level2" number="21.6">
 <h2><span class="header-section-number">21.6</span> Configuration file</h2>
 <p>Webpack comes with a configuration file, <code>webpack.config.js</code> though for a larger project it is advised to split it into multiple configuration files (more on that later). This file can include numerous options, plugins, and other settings to customise how webpack transforms the entry point into an output, only some of which will be explored in this book as there are too many to cover.</p>
 <p>Below is probably the most straightforward file configuration file one may create. At the bare minimum, the configuration file will need to have an entry point specified; in this case, the <code>index.js</code> file previously created. If no <code>output</code> path is specified, then webpack will produce it at <code>dist/main.js</code> automatically.</p>
-<div class="sourceCode" id="cb401"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb401-1"><a href="webpack-intro-discover.html#cb401-1"></a><span class="co">// webpack.config.js</span></span>
-<span id="cb401-2"><a href="webpack-intro-discover.html#cb401-2"></a>module<span class="op">.</span><span class="at">exports</span> <span class="op">=</span> {</span>
-<span id="cb401-3"><a href="webpack-intro-discover.html#cb401-3"></a>  <span class="dt">entry</span><span class="op">:</span> <span class="st">&#39;./src/index.js&#39;</span></span>
-<span id="cb401-4"><a href="webpack-intro-discover.html#cb401-4"></a>}<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb406"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb406-1"><a href="webpack-intro-discover.html#cb406-1"></a><span class="co">// webpack.config.js</span></span>
+<span id="cb406-2"><a href="webpack-intro-discover.html#cb406-2"></a><span class="va">module</span>.<span class="at">exports</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb406-3"><a href="webpack-intro-discover.html#cb406-3"></a>  <span class="dt">entry</span><span class="op">:</span> <span class="st">&#39;./src/index.js&#39;</span></span>
+<span id="cb406-4"><a href="webpack-intro-discover.html#cb406-4"></a><span class="op">};</span></span></code></pre></div>
 <p>The <code>module.exports</code> line may confuse, it is covered a later section on <em>importing and exporting</em> variables and functions.</p>
 </div>
 <div id="webpack-intro-npm-scripts" class="section level2" number="21.7">
 <h2><span class="header-section-number">21.7</span> NPM scripts</h2>
 <p>NPM scripts allow automating development tasks such are running unit tests, serving files, and more, we’ll set it up to run webpack. The scripts are placed in the <code>package.json</code> file and are terminal commands.</p>
 <p>By default <code>npm-init</code> creates the following <code>test</code> script which echoes (prints) a message stating that no unit tests were set up.</p>
-<div class="sourceCode" id="cb402"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb402-1"><a href="webpack-intro-discover.html#cb402-1"></a><span class="er">&quot;scripts&quot;:</span> <span class="fu">{</span></span>
-<span id="cb402-2"><a href="webpack-intro-discover.html#cb402-2"></a>  <span class="dt">&quot;test&quot;</span><span class="fu">:</span> <span class="st">&quot;echo </span><span class="ch">\&quot;</span><span class="st">Error: no test specified</span><span class="ch">\&quot;</span><span class="st"> &amp;&amp; exit 1&quot;</span></span>
-<span id="cb402-3"><a href="webpack-intro-discover.html#cb402-3"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb407"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb407-1"><a href="webpack-intro-discover.html#cb407-1"></a><span class="er">&quot;scripts&quot;:</span> <span class="fu">{</span></span>
+<span id="cb407-2"><a href="webpack-intro-discover.html#cb407-2"></a>  <span class="dt">&quot;test&quot;</span><span class="fu">:</span> <span class="st">&quot;echo </span><span class="ch">\&quot;</span><span class="st">Error: no test specified</span><span class="ch">\&quot;</span><span class="st"> &amp;&amp; exit 1&quot;</span></span>
+<span id="cb407-3"><a href="webpack-intro-discover.html#cb407-3"></a><span class="fu">}</span></span></code></pre></div>
 <p>This script can be run from the terminal by typing <code>npm run test</code>. Those commands always follow the same pattern: <code>npm run</code> followed by the name of the script, in this case, <code>test</code>.</p>
 <p>Adding the script to run webpack is very straightforward, we can add an entry called <code>build</code> that runs <code>webpack</code>.</p>
-<div class="sourceCode" id="cb403"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb403-1"><a href="webpack-intro-discover.html#cb403-1"></a><span class="er">&quot;scripts&quot;:</span> <span class="fu">{</span></span>
-<span id="cb403-2"><a href="webpack-intro-discover.html#cb403-2"></a>  <span class="dt">&quot;test&quot;</span><span class="fu">:</span> <span class="st">&quot;echo </span><span class="ch">\&quot;</span><span class="st">Error: no test specified</span><span class="ch">\&quot;</span><span class="st"> &amp;&amp; exit 1&quot;</span><span class="fu">,</span></span>
-<span id="cb403-3"><a href="webpack-intro-discover.html#cb403-3"></a>  <span class="dt">&quot;build&quot;</span><span class="fu">:</span> <span class="st">&quot;webpack&quot;</span></span>
-<span id="cb403-4"><a href="webpack-intro-discover.html#cb403-4"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb408"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb408-1"><a href="webpack-intro-discover.html#cb408-1"></a><span class="er">&quot;scripts&quot;:</span> <span class="fu">{</span></span>
+<span id="cb408-2"><a href="webpack-intro-discover.html#cb408-2"></a>  <span class="dt">&quot;test&quot;</span><span class="fu">:</span> <span class="st">&quot;echo </span><span class="ch">\&quot;</span><span class="st">Error: no test specified</span><span class="ch">\&quot;</span><span class="st"> &amp;&amp; exit 1&quot;</span><span class="fu">,</span></span>
+<span id="cb408-3"><a href="webpack-intro-discover.html#cb408-3"></a>  <span class="dt">&quot;build&quot;</span><span class="fu">:</span> <span class="st">&quot;webpack&quot;</span></span>
+<span id="cb408-4"><a href="webpack-intro-discover.html#cb408-4"></a><span class="fu">}</span></span></code></pre></div>
 <p>So running <code>npm run build</code> produces the output file from the entry point file. However, we will modify this slightly in the next section as more features of webpack are uncovered.</p>
 </div>
 <div id="webpack-intro-webpack-mode" class="section level2" number="21.8">
@@ -658,35 +656,35 @@ Exclude the <code>node_modules</code> directory from your version control (Git o
 <p>Therefore webpack comes with a “development” mode that allows including the “source map” which maps the compiled code to the source files. This way, when an error or warning is raised JavaScript is able to point to the original line that causes it.</p>
 <p>There are again many different ways to set this up in the configuration file as the source map can be placed in the bundled file itself, in another file, and more. However, the easiest way is probably to specify the mode using webpack’s CLI tool. The source maps are optional as these make the output larger and one wants to keep this output as small as possible for it to load as fast as possible in web browsers. Those will thus only be used while developing the project to trace back errors and warnings but will not be included in the final output for production.</p>
 <p>Below we modify the scripts placed in the <code>package.json</code> file so two different scripts can be run: one for development and another for production.</p>
-<div class="sourceCode" id="cb404"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb404-1"><a href="webpack-intro-discover.html#cb404-1"></a><span class="er">&quot;scripts&quot;:</span> <span class="fu">{</span></span>
-<span id="cb404-2"><a href="webpack-intro-discover.html#cb404-2"></a>  <span class="dt">&quot;test&quot;</span><span class="fu">:</span> <span class="st">&quot;echo </span><span class="ch">\&quot;</span><span class="st">Error: no test specified</span><span class="ch">\&quot;</span><span class="st"> &amp;&amp; exit 1&quot;</span><span class="fu">,</span></span>
-<span id="cb404-3"><a href="webpack-intro-discover.html#cb404-3"></a>  <span class="dt">&quot;build-prod&quot;</span><span class="fu">:</span> <span class="st">&quot;webpack --mode=production&quot;</span><span class="fu">,</span></span>
-<span id="cb404-4"><a href="webpack-intro-discover.html#cb404-4"></a>  <span class="dt">&quot;build-dev&quot;</span><span class="fu">:</span> <span class="st">&quot;webpack --mode=development&quot;</span></span>
-<span id="cb404-5"><a href="webpack-intro-discover.html#cb404-5"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb409"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb409-1"><a href="webpack-intro-discover.html#cb409-1"></a><span class="er">&quot;scripts&quot;:</span> <span class="fu">{</span></span>
+<span id="cb409-2"><a href="webpack-intro-discover.html#cb409-2"></a>  <span class="dt">&quot;test&quot;</span><span class="fu">:</span> <span class="st">&quot;echo </span><span class="ch">\&quot;</span><span class="st">Error: no test specified</span><span class="ch">\&quot;</span><span class="st"> &amp;&amp; exit 1&quot;</span><span class="fu">,</span></span>
+<span id="cb409-3"><a href="webpack-intro-discover.html#cb409-3"></a>  <span class="dt">&quot;build-prod&quot;</span><span class="fu">:</span> <span class="st">&quot;webpack --mode=production&quot;</span><span class="fu">,</span></span>
+<span id="cb409-4"><a href="webpack-intro-discover.html#cb409-4"></a>  <span class="dt">&quot;build-dev&quot;</span><span class="fu">:</span> <span class="st">&quot;webpack --mode=development&quot;</span></span>
+<span id="cb409-5"><a href="webpack-intro-discover.html#cb409-5"></a><span class="fu">}</span></span></code></pre></div>
 <p>This allows running <code>npm run build-prod</code> to produce the production bundle and <code>npm run build-dev</code> to produce the development version that includes the source map.</p>
 </div>
 <div id="webpack-intro-bundle" class="section level2" number="21.9">
 <h2><span class="header-section-number">21.9</span> Bundle</h2>
 <p>One can then bundle the code using the scripts that we defined to produce the output bundle. Since we have not specified any <code>output</code> in webpack’s configuration file, it will create it at the default location <code>dist/main.js</code>.</p>
-<div class="sourceCode" id="cb405"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb405-1"><a href="webpack-intro-discover.html#cb405-1"></a><span class="ex">npm</span> run build-prod</span></code></pre></div>
+<div class="sourceCode" id="cb410"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb410-1"><a href="webpack-intro-discover.html#cb410-1"></a><span class="ex">npm</span> run build-prod</span></code></pre></div>
 <p>We can then include the output of webpack in the shiny application to test that all works well.</p>
-<div class="sourceCode" id="cb406"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb406-1"><a href="webpack-intro-discover.html#cb406-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb406-2"><a href="webpack-intro-discover.html#cb406-2"></a></span>
-<span id="cb406-3"><a href="webpack-intro-discover.html#cb406-3"></a>mainJs &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
-<span id="cb406-4"><a href="webpack-intro-discover.html#cb406-4"></a>  <span class="dt">name =</span> <span class="st">&quot;main&quot;</span>,</span>
-<span id="cb406-5"><a href="webpack-intro-discover.html#cb406-5"></a>  <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
-<span id="cb406-6"><a href="webpack-intro-discover.html#cb406-6"></a>  <span class="dt">src =</span> <span class="st">&quot;./dist&quot;</span>,</span>
-<span id="cb406-7"><a href="webpack-intro-discover.html#cb406-7"></a>  <span class="dt">script =</span> <span class="kw">c</span>(<span class="dt">file =</span> <span class="st">&quot;main.js&quot;</span>)</span>
-<span id="cb406-8"><a href="webpack-intro-discover.html#cb406-8"></a>)</span>
-<span id="cb406-9"><a href="webpack-intro-discover.html#cb406-9"></a></span>
-<span id="cb406-10"><a href="webpack-intro-discover.html#cb406-10"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb406-11"><a href="webpack-intro-discover.html#cb406-11"></a>  mainJs,</span>
-<span id="cb406-12"><a href="webpack-intro-discover.html#cb406-12"></a>  <span class="kw">h1</span>(<span class="st">&quot;A shiny app&quot;</span>)</span>
-<span id="cb406-13"><a href="webpack-intro-discover.html#cb406-13"></a>)</span>
-<span id="cb406-14"><a href="webpack-intro-discover.html#cb406-14"></a></span>
-<span id="cb406-15"><a href="webpack-intro-discover.html#cb406-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(...) {}</span>
-<span id="cb406-16"><a href="webpack-intro-discover.html#cb406-16"></a></span>
-<span id="cb406-17"><a href="webpack-intro-discover.html#cb406-17"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb411"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb411-1"><a href="webpack-intro-discover.html#cb411-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb411-2"><a href="webpack-intro-discover.html#cb411-2"></a></span>
+<span id="cb411-3"><a href="webpack-intro-discover.html#cb411-3"></a>mainJs &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
+<span id="cb411-4"><a href="webpack-intro-discover.html#cb411-4"></a>  <span class="dt">name =</span> <span class="st">&quot;main&quot;</span>,</span>
+<span id="cb411-5"><a href="webpack-intro-discover.html#cb411-5"></a>  <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
+<span id="cb411-6"><a href="webpack-intro-discover.html#cb411-6"></a>  <span class="dt">src =</span> <span class="st">&quot;./dist&quot;</span>,</span>
+<span id="cb411-7"><a href="webpack-intro-discover.html#cb411-7"></a>  <span class="dt">script =</span> <span class="kw">c</span>(<span class="dt">file =</span> <span class="st">&quot;main.js&quot;</span>)</span>
+<span id="cb411-8"><a href="webpack-intro-discover.html#cb411-8"></a>)</span>
+<span id="cb411-9"><a href="webpack-intro-discover.html#cb411-9"></a></span>
+<span id="cb411-10"><a href="webpack-intro-discover.html#cb411-10"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb411-11"><a href="webpack-intro-discover.html#cb411-11"></a>  mainJs,</span>
+<span id="cb411-12"><a href="webpack-intro-discover.html#cb411-12"></a>  <span class="kw">h1</span>(<span class="st">&quot;A shiny app&quot;</span>)</span>
+<span id="cb411-13"><a href="webpack-intro-discover.html#cb411-13"></a>)</span>
+<span id="cb411-14"><a href="webpack-intro-discover.html#cb411-14"></a></span>
+<span id="cb411-15"><a href="webpack-intro-discover.html#cb411-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(...) {}</span>
+<span id="cb411-16"><a href="webpack-intro-discover.html#cb411-16"></a></span>
+<span id="cb411-17"><a href="webpack-intro-discover.html#cb411-17"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>Running the above launches the app which presents the <code>alert()</code> that was placed in the <code>index.js</code> source file.</p>
 <p>This makes for a great start but is not precisely interesting; in the following sections, we elaborate on this basic configuration to make better use of webpack’s feature and produce something much more fun.</p>
 </div>
@@ -701,30 +699,30 @@ This is by no means a safe way to secure an application!
 </div>
 <p>Though it is certainly not a real-world example, it is educational and quite a bit of fun.</p>
 <p>The first thing to do is to install the mousetrap dependency, as indicated on the <a href="https://github.com/ccampbell/mousetrap">Github README</a> it can be obtained from NPM.</p>
-<div class="sourceCode" id="cb407"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb407-1"><a href="webpack-intro-discover.html#cb407-1"></a><span class="ex">npm</span> install mousetrap --save</span></code></pre></div>
+<div class="sourceCode" id="cb412"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb412-1"><a href="webpack-intro-discover.html#cb412-1"></a><span class="ex">npm</span> install mousetrap --save</span></code></pre></div>
 <p>Note that we use <code>--save</code> as mousetrap will need to be included in the output we create, it’s not a library we import for development purposes.</p>
 </div>
 <div id="webpack-intro-external-dependencies" class="section level2" number="21.11">
 <h2><span class="header-section-number">21.11</span> External Dependencies</h2>
 <p>If dependencies with webpack have to be installed from NPM it begs the question; what about dependencies that are already included in the project and are not available on NPM.</p>
 <p>For instance, this project is intended to work with a shiny application which comes bundled with jQuery, and the shiny JavaScript library. First, the shiny javaScript library is not available on NPM. Second installing it would result in duplicating dependencies which is hardly best practice. Thankfully webpack comes with a simple mechanism to handle these cases; external dependencies can be added to the configuration file under <code>externals</code>.</p>
-<div class="sourceCode" id="cb408"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb408-1"><a href="webpack-intro-discover.html#cb408-1"></a>module<span class="op">.</span><span class="at">exports</span> <span class="op">=</span> {</span>
-<span id="cb408-2"><a href="webpack-intro-discover.html#cb408-2"></a>  <span class="dt">entry</span><span class="op">:</span> <span class="st">&#39;./src/index.js&#39;</span><span class="op">,</span></span>
-<span id="cb408-3"><a href="webpack-intro-discover.html#cb408-3"></a>  <span class="dt">externals</span><span class="op">:</span> {</span>
-<span id="cb408-4"><a href="webpack-intro-discover.html#cb408-4"></a>    <span class="dt">shiny</span><span class="op">:</span> <span class="st">&#39;Shiny&#39;</span></span>
-<span id="cb408-5"><a href="webpack-intro-discover.html#cb408-5"></a>  }</span>
-<span id="cb408-6"><a href="webpack-intro-discover.html#cb408-6"></a>}<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb413"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb413-1"><a href="webpack-intro-discover.html#cb413-1"></a><span class="va">module</span>.<span class="at">exports</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb413-2"><a href="webpack-intro-discover.html#cb413-2"></a>  <span class="dt">entry</span><span class="op">:</span> <span class="st">&#39;./src/index.js&#39;</span><span class="op">,</span></span>
+<span id="cb413-3"><a href="webpack-intro-discover.html#cb413-3"></a>  <span class="dt">externals</span><span class="op">:</span> <span class="op">{</span></span>
+<span id="cb413-4"><a href="webpack-intro-discover.html#cb413-4"></a>    <span class="dt">shiny</span><span class="op">:</span> <span class="st">&#39;Shiny&#39;</span></span>
+<span id="cb413-5"><a href="webpack-intro-discover.html#cb413-5"></a>  <span class="op">}</span></span>
+<span id="cb413-6"><a href="webpack-intro-discover.html#cb413-6"></a><span class="op">};</span></span></code></pre></div>
 <p>The above will allow importing the <code>Shiny</code> object in scripts, which is needed to set the input value with <code>Shiny.setInputValue</code>; hence <code>Shiny</code> must be accessible in webpack. Let us delve into the import/export mechanism.</p>
 </div>
 <div id="webpack-intro-import-export" class="section level2" number="21.12">
 <h2><span class="header-section-number">21.12</span> Import &amp; Export</h2>
 <p>To demonstrate how webpack enables modularising code, we will not place all the code in the <code>index.js</code> file. We create two other files,<code>secret.js</code> and <code>input.js</code>, the first will contain the pass-phrase and the second will have the code to handle the key strokes via mousetrap and set the shiny input. This will enable using the pass-phrase in multiple places without duplicating code.</p>
-<div class="sourceCode" id="cb409"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb409-1"><a href="webpack-intro-discover.html#cb409-1"></a><span class="kw">file.create</span>(<span class="st">&quot;src/input.js&quot;</span>)</span>
-<span id="cb409-2"><a href="webpack-intro-discover.html#cb409-2"></a><span class="kw">file.create</span>(<span class="st">&quot;src/secret.js&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb414"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb414-1"><a href="webpack-intro-discover.html#cb414-1"></a><span class="kw">file.create</span>(<span class="st">&quot;src/input.js&quot;</span>)</span>
+<span id="cb414-2"><a href="webpack-intro-discover.html#cb414-2"></a><span class="kw">file.create</span>(<span class="st">&quot;src/secret.js&quot;</span>)</span></code></pre></div>
 <p>Therefore the entry point <code>index.js</code> needs to import <code>input.js</code> which itself imports the pass-phrase from <code>secret.js</code>.</p>
 <div class="figure" style="text-align: center"><span id="fig:webpack-shiny"></span>
-<div id="htmlwidget-86e7493da73db09bc5a3" style="width:100%;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-86e7493da73db09bc5a3">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR compound=true]\n  node [shape=box]\n\n  subgraph cluster0 {\n    shiny [label=\"import shiny\"]\n    label = \"input.js\"\n    color=gold\n  }\n\n  subgraph cluster1 {\n    passphrase [label=\"export var\"]\n    label = \"secret.js\"\n    color=gold\n  }\n\n  shiny -> \"index.js\" [label=\"import module\", ltail=cluster0]\n  passphrase -> shiny [label=\"import variable\", ltail=cluster1, lhead=cluster0]\n  \"externals\" -> shiny [label=\"import shiny\", lhead=cluster0]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-0c372784e61ac38cefe7" style="width:100%;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0c372784e61ac38cefe7">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR compound=true]\n  node [shape=box]\n\n  subgraph cluster0 {\n    shiny [label=\"import shiny\"]\n    label = \"input.js\"\n    color=gold\n  }\n\n  subgraph cluster1 {\n    passphrase [label=\"export var\"]\n    label = \"secret.js\"\n    color=gold\n  }\n\n  shiny -> \"index.js\" [label=\"import module\", ltail=cluster0]\n  passphrase -> shiny [label=\"import variable\", ltail=cluster1, lhead=cluster0]\n  \"externals\" -> shiny [label=\"import shiny\", lhead=cluster0]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 FIGURE 21.1: webpack with shiny
 </p>
@@ -736,80 +734,80 @@ FIGURE 21.1: webpack with shiny
 <p>Let’s place the variable <code>secret</code> in the <code>secret.js</code>. As a reminder, this variable will have to be imported by in another file (<code>input.js</code>) where it will be used to check if the pass-phrase typed by the user is correct.</p>
 <p>Declaring the variable itself does not change, we use the keyword <code>let</code> to declare a variable named <code>secret</code> that holds the pass-phrase. The issue is that with webpack, this variable will be internal to the file where it is declared. However, we ultimately want to import that variable in another file. To do so, we can place the keyword <code>export</code> in front of the declaration to indicate that this variable is exported from the file. Note that this will also work with functions and classes, and other objects.</p>
 <p>Placing <code>export</code> in front of an object constitutes a <em>named export</em>; the <code>secret.js</code> file explicitly exports the variable named <code>secret</code>.</p>
-<div class="sourceCode" id="cb410"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb410-1"><a href="webpack-intro-discover.html#cb410-1"></a><span class="im">export</span> <span class="kw">let</span> secret <span class="op">=</span> <span class="st">&#39;s e c r e t&#39;</span><span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb415"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb415-1"><a href="webpack-intro-discover.html#cb415-1"></a><span class="im">export</span> <span class="kw">let</span> secret <span class="op">=</span> <span class="st">&#39;s e c r e t&#39;</span><span class="op">;</span></span></code></pre></div>
 <p>Then this variable can be imported in the <code>input.js</code> file. The named export in <code>secret.js</code> comes with a corresponding named import in which is used in <code>input.js</code> to import the variable named <code>secret</code>, this is indicated by the curly braces. Note that again we include the path to the file (<code>./secret.js</code>), importing from <code>secret.js</code> without the path will fail.</p>
-<div class="sourceCode" id="cb411"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb411-1"><a href="webpack-intro-discover.html#cb411-1"></a><span class="im">import</span> { secret } <span class="im">from</span> <span class="st">&#39;./secret.js&#39;</span><span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb416"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb416-1"><a href="webpack-intro-discover.html#cb416-1"></a><span class="im">import</span> <span class="op">{</span> secret <span class="op">}</span> <span class="im">from</span> <span class="st">&#39;./secret.js&#39;</span><span class="op">;</span></span></code></pre></div>
 <p>The curly braces are used for named imports as multiple such variables or functions can then be imported, e.g. <code>import { foo, bar } from './file.js';</code> to import the named exports <code>foo</code> and <code>bar</code> from <code>file.js</code>.</p>
 </div>
 <div id="webpack-intro-import-export-default" class="section level3" number="21.12.2">
 <h3><span class="header-section-number">21.12.2</span> Default</h3>
 <p>An alternative would be to use a default export. A file can have a default export, said default could be a variable, a function, a list, or any number of things but <em>there can only be a single default export per file</em>. Default exports are indicated with by succeeding <code>export</code> with <code>default</code>.</p>
-<div class="sourceCode" id="cb412"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb412-1"><a href="webpack-intro-discover.html#cb412-1"></a><span class="co">// declare</span></span>
-<span id="cb412-2"><a href="webpack-intro-discover.html#cb412-2"></a><span class="kw">let</span> secret <span class="op">=</span> <span class="st">&#39;s e c r e t&#39;</span><span class="op">;</span></span>
-<span id="cb412-3"><a href="webpack-intro-discover.html#cb412-3"></a></span>
-<span id="cb412-4"><a href="webpack-intro-discover.html#cb412-4"></a><span class="co">// export</span></span>
-<span id="cb412-5"><a href="webpack-intro-discover.html#cb412-5"></a><span class="im">export</span> <span class="im">default</span> secret<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb417"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb417-1"><a href="webpack-intro-discover.html#cb417-1"></a><span class="co">// declare</span></span>
+<span id="cb417-2"><a href="webpack-intro-discover.html#cb417-2"></a><span class="kw">let</span> secret <span class="op">=</span> <span class="st">&#39;s e c r e t&#39;</span><span class="op">;</span></span>
+<span id="cb417-3"><a href="webpack-intro-discover.html#cb417-3"></a></span>
+<span id="cb417-4"><a href="webpack-intro-discover.html#cb417-4"></a><span class="co">// export</span></span>
+<span id="cb417-5"><a href="webpack-intro-discover.html#cb417-5"></a><span class="im">export</span> <span class="im">default</span> secret<span class="op">;</span></span></code></pre></div>
 <p>Rather interestingly, because one can declare multiple variables in a single line (e.g. <code>var a,b,c;</code>) and that only a single default can exist the default export and declaration cannot be placed on a single line. Only a single function be declared by line so declaring a function and its default export on a single line is valid.</p>
-<div class="sourceCode" id="cb413"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb413-1"><a href="webpack-intro-discover.html#cb413-1"></a><span class="co">// invalid</span></span>
-<span id="cb413-2"><a href="webpack-intro-discover.html#cb413-2"></a><span class="im">export</span> <span class="im">default</span> secret <span class="op">=</span> <span class="st">&#39;s e c r e t&#39;</span><span class="op">;</span></span>
-<span id="cb413-3"><a href="webpack-intro-discover.html#cb413-3"></a></span>
-<span id="cb413-4"><a href="webpack-intro-discover.html#cb413-4"></a><span class="co">// valid</span></span>
-<span id="cb413-5"><a href="webpack-intro-discover.html#cb413-5"></a><span class="im">export</span> <span class="im">default</span> <span class="kw">function</span> <span class="fu">sayHello</span>() {</span>
-<span id="cb413-6"><a href="webpack-intro-discover.html#cb413-6"></a>  alert(<span class="st">&quot;Hello!&quot;</span>)</span>
-<span id="cb413-7"><a href="webpack-intro-discover.html#cb413-7"></a>}<span class="op">;</span></span>
-<span id="cb413-8"><a href="webpack-intro-discover.html#cb413-8"></a></span>
-<span id="cb413-9"><a href="webpack-intro-discover.html#cb413-9"></a><span class="co">// valid</span></span>
-<span id="cb413-10"><a href="webpack-intro-discover.html#cb413-10"></a><span class="kw">var</span> x <span class="op">=</span> <span class="dv">0</span><span class="op">,</span></span>
-<span id="cb413-11"><a href="webpack-intro-discover.html#cb413-11"></a>    y <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
-<span id="cb413-12"><a href="webpack-intro-discover.html#cb413-12"></a></span>
-<span id="cb413-13"><a href="webpack-intro-discover.html#cb413-13"></a><span class="im">export</span> <span class="im">default</span> {x<span class="op">,</span> y}</span></code></pre></div>
+<div class="sourceCode" id="cb418"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb418-1"><a href="webpack-intro-discover.html#cb418-1"></a><span class="co">// invalid</span></span>
+<span id="cb418-2"><a href="webpack-intro-discover.html#cb418-2"></a><span class="im">export</span> <span class="im">default</span> secret <span class="op">=</span> <span class="st">&#39;s e c r e t&#39;</span><span class="op">;</span></span>
+<span id="cb418-3"><a href="webpack-intro-discover.html#cb418-3"></a></span>
+<span id="cb418-4"><a href="webpack-intro-discover.html#cb418-4"></a><span class="co">// valid</span></span>
+<span id="cb418-5"><a href="webpack-intro-discover.html#cb418-5"></a><span class="im">export</span> <span class="im">default</span> <span class="kw">function</span> <span class="at">sayHello</span>() <span class="op">{</span></span>
+<span id="cb418-6"><a href="webpack-intro-discover.html#cb418-6"></a>  <span class="at">alert</span>(<span class="st">&quot;Hello!&quot;</span>)</span>
+<span id="cb418-7"><a href="webpack-intro-discover.html#cb418-7"></a><span class="op">};</span></span>
+<span id="cb418-8"><a href="webpack-intro-discover.html#cb418-8"></a></span>
+<span id="cb418-9"><a href="webpack-intro-discover.html#cb418-9"></a><span class="co">// valid</span></span>
+<span id="cb418-10"><a href="webpack-intro-discover.html#cb418-10"></a><span class="kw">var</span> x <span class="op">=</span> <span class="dv">0</span><span class="op">,</span></span>
+<span id="cb418-11"><a href="webpack-intro-discover.html#cb418-11"></a>    y <span class="op">=</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb418-12"><a href="webpack-intro-discover.html#cb418-12"></a></span>
+<span id="cb418-13"><a href="webpack-intro-discover.html#cb418-13"></a><span class="im">export</span> <span class="im">default</span> <span class="op">{</span>x<span class="op">,</span> y<span class="op">}</span></span></code></pre></div>
 <p>Importing default exports in other files resembles all too much the syntax of named imports which may lead to confusion: it’s essentially the same omitting the curly braces.</p>
-<div class="sourceCode" id="cb414"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb414-1"><a href="webpack-intro-discover.html#cb414-1"></a><span class="im">import</span> secret <span class="im">from</span> <span class="st">&#39;./secret.js&#39;</span><span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb419"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb419-1"><a href="webpack-intro-discover.html#cb419-1"></a><span class="im">import</span> secret <span class="im">from</span> <span class="st">&#39;./secret.js&#39;</span><span class="op">;</span></span></code></pre></div>
 </div>
 <div id="webpack-intro-import-export-wrap-up" class="section level3" number="21.12.3">
 <h3><span class="header-section-number">21.12.3</span> Wrap up</h3>
 <p>We’ll be using a named export method in <code>secret.js</code>. The same general logic can be applied to import the external dependency shiny as well as mousetrap.</p>
-<div class="sourceCode" id="cb415"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb415-1"><a href="webpack-intro-discover.html#cb415-1"></a><span class="im">import</span> Shiny <span class="im">from</span> <span class="st">&#39;shiny&#39;</span><span class="op">;</span></span>
-<span id="cb415-2"><a href="webpack-intro-discover.html#cb415-2"></a><span class="im">import</span> { secret } <span class="im">from</span> <span class="st">&#39;./secret.js&#39;</span><span class="op">;</span></span>
-<span id="cb415-3"><a href="webpack-intro-discover.html#cb415-3"></a><span class="im">import</span> Mousetrap <span class="im">from</span> <span class="st">&#39;mousetrap&#39;</span><span class="op">;</span></span>
-<span id="cb415-4"><a href="webpack-intro-discover.html#cb415-4"></a></span>
-<span id="cb415-5"><a href="webpack-intro-discover.html#cb415-5"></a>Mousetrap<span class="op">.</span><span class="fu">bind</span>(secret<span class="op">,</span> <span class="kw">function</span>() { </span>
-<span id="cb415-6"><a href="webpack-intro-discover.html#cb415-6"></a>  Shiny<span class="op">.</span><span class="fu">setInputValue</span>(<span class="st">&#39;secret&#39;</span><span class="op">,</span> <span class="kw">true</span>)<span class="op">;</span></span>
-<span id="cb415-7"><a href="webpack-intro-discover.html#cb415-7"></a>})<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb420"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb420-1"><a href="webpack-intro-discover.html#cb420-1"></a><span class="im">import</span> Shiny <span class="im">from</span> <span class="st">&#39;shiny&#39;</span><span class="op">;</span></span>
+<span id="cb420-2"><a href="webpack-intro-discover.html#cb420-2"></a><span class="im">import</span> <span class="op">{</span> secret <span class="op">}</span> <span class="im">from</span> <span class="st">&#39;./secret.js&#39;</span><span class="op">;</span></span>
+<span id="cb420-3"><a href="webpack-intro-discover.html#cb420-3"></a><span class="im">import</span> Mousetrap <span class="im">from</span> <span class="st">&#39;mousetrap&#39;</span><span class="op">;</span></span>
+<span id="cb420-4"><a href="webpack-intro-discover.html#cb420-4"></a></span>
+<span id="cb420-5"><a href="webpack-intro-discover.html#cb420-5"></a><span class="va">Mousetrap</span>.<span class="at">bind</span>(secret<span class="op">,</span> <span class="kw">function</span>() <span class="op">{</span> </span>
+<span id="cb420-6"><a href="webpack-intro-discover.html#cb420-6"></a>  <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&#39;secret&#39;</span><span class="op">,</span> <span class="kw">true</span>)<span class="op">;</span></span>
+<span id="cb420-7"><a href="webpack-intro-discover.html#cb420-7"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
 <p>Finally, remember to import <code>input.js</code> in the entry point <code>index.js</code>.</p>
-<div class="sourceCode" id="cb416"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb416-1"><a href="webpack-intro-discover.html#cb416-1"></a><span class="co">// index.js</span></span>
-<span id="cb416-2"><a href="webpack-intro-discover.html#cb416-2"></a><span class="im">import</span> <span class="st">&#39;./input.js&#39;</span><span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb421"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb421-1"><a href="webpack-intro-discover.html#cb421-1"></a><span class="co">// index.js</span></span>
+<span id="cb421-2"><a href="webpack-intro-discover.html#cb421-2"></a><span class="im">import</span> <span class="st">&#39;./input.js&#39;</span><span class="op">;</span></span></code></pre></div>
 <p>This can then be bundled with <code>npm run bundle-prod</code> which will look at the entry point (<code>index.js</code>) observes that it imports the file <code>input.js</code> which itself imports <code>secret.js</code>; webpack builds this dependency tree and includes all that is needed in the bundle.</p>
 <p>This can be used in the shiny application, which we modify so it listens to the <code>secret</code> input and only when that input is set renders a plot and a message.</p>
-<div class="sourceCode" id="cb417"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb417-1"><a href="webpack-intro-discover.html#cb417-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb417-2"><a href="webpack-intro-discover.html#cb417-2"></a></span>
-<span id="cb417-3"><a href="webpack-intro-discover.html#cb417-3"></a>mainJs &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
-<span id="cb417-4"><a href="webpack-intro-discover.html#cb417-4"></a>  <span class="dt">name =</span> <span class="st">&quot;main&quot;</span>,</span>
-<span id="cb417-5"><a href="webpack-intro-discover.html#cb417-5"></a>  <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
-<span id="cb417-6"><a href="webpack-intro-discover.html#cb417-6"></a>  <span class="dt">src =</span> <span class="st">&quot;./dist&quot;</span>,</span>
-<span id="cb417-7"><a href="webpack-intro-discover.html#cb417-7"></a>  <span class="dt">script =</span> <span class="kw">c</span>(<span class="dt">file =</span> <span class="st">&quot;main.js&quot;</span>)</span>
-<span id="cb417-8"><a href="webpack-intro-discover.html#cb417-8"></a>)</span>
-<span id="cb417-9"><a href="webpack-intro-discover.html#cb417-9"></a></span>
-<span id="cb417-10"><a href="webpack-intro-discover.html#cb417-10"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb417-11"><a href="webpack-intro-discover.html#cb417-11"></a>  mainJs,</span>
-<span id="cb417-12"><a href="webpack-intro-discover.html#cb417-12"></a>  <span class="kw">p</span>(<span class="st">&quot;Type the secret phrase&quot;</span>),</span>
-<span id="cb417-13"><a href="webpack-intro-discover.html#cb417-13"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;hello&quot;</span>),</span>
-<span id="cb417-14"><a href="webpack-intro-discover.html#cb417-14"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
-<span id="cb417-15"><a href="webpack-intro-discover.html#cb417-15"></a>)</span>
-<span id="cb417-16"><a href="webpack-intro-discover.html#cb417-16"></a></span>
-<span id="cb417-17"><a href="webpack-intro-discover.html#cb417-17"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
-<span id="cb417-18"><a href="webpack-intro-discover.html#cb417-18"></a>  output<span class="op">$</span>hello &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
-<span id="cb417-19"><a href="webpack-intro-discover.html#cb417-19"></a>    <span class="kw">req</span>(input<span class="op">$</span>secret)</span>
-<span id="cb417-20"><a href="webpack-intro-discover.html#cb417-20"></a>    <span class="kw">h2</span>(<span class="st">&quot;You got the secret right!&quot;</span>)</span>
-<span id="cb417-21"><a href="webpack-intro-discover.html#cb417-21"></a>  })</span>
-<span id="cb417-22"><a href="webpack-intro-discover.html#cb417-22"></a></span>
-<span id="cb417-23"><a href="webpack-intro-discover.html#cb417-23"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb417-24"><a href="webpack-intro-discover.html#cb417-24"></a>    <span class="kw">req</span>(input<span class="op">$</span>secret)</span>
-<span id="cb417-25"><a href="webpack-intro-discover.html#cb417-25"></a>    <span class="kw">hist</span>(cars<span class="op">$</span>speed)</span>
-<span id="cb417-26"><a href="webpack-intro-discover.html#cb417-26"></a>  })</span>
-<span id="cb417-27"><a href="webpack-intro-discover.html#cb417-27"></a>}</span>
-<span id="cb417-28"><a href="webpack-intro-discover.html#cb417-28"></a></span>
-<span id="cb417-29"><a href="webpack-intro-discover.html#cb417-29"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb422"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb422-1"><a href="webpack-intro-discover.html#cb422-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb422-2"><a href="webpack-intro-discover.html#cb422-2"></a></span>
+<span id="cb422-3"><a href="webpack-intro-discover.html#cb422-3"></a>mainJs &lt;-<span class="st"> </span>htmltools<span class="op">::</span><span class="kw">htmlDependency</span>(</span>
+<span id="cb422-4"><a href="webpack-intro-discover.html#cb422-4"></a>  <span class="dt">name =</span> <span class="st">&quot;main&quot;</span>,</span>
+<span id="cb422-5"><a href="webpack-intro-discover.html#cb422-5"></a>  <span class="dt">version =</span> <span class="st">&quot;1.0.0&quot;</span>,</span>
+<span id="cb422-6"><a href="webpack-intro-discover.html#cb422-6"></a>  <span class="dt">src =</span> <span class="st">&quot;./dist&quot;</span>,</span>
+<span id="cb422-7"><a href="webpack-intro-discover.html#cb422-7"></a>  <span class="dt">script =</span> <span class="kw">c</span>(<span class="dt">file =</span> <span class="st">&quot;main.js&quot;</span>)</span>
+<span id="cb422-8"><a href="webpack-intro-discover.html#cb422-8"></a>)</span>
+<span id="cb422-9"><a href="webpack-intro-discover.html#cb422-9"></a></span>
+<span id="cb422-10"><a href="webpack-intro-discover.html#cb422-10"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb422-11"><a href="webpack-intro-discover.html#cb422-11"></a>  mainJs,</span>
+<span id="cb422-12"><a href="webpack-intro-discover.html#cb422-12"></a>  <span class="kw">p</span>(<span class="st">&quot;Type the secret phrase&quot;</span>),</span>
+<span id="cb422-13"><a href="webpack-intro-discover.html#cb422-13"></a>  <span class="kw">uiOutput</span>(<span class="st">&quot;hello&quot;</span>),</span>
+<span id="cb422-14"><a href="webpack-intro-discover.html#cb422-14"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb422-15"><a href="webpack-intro-discover.html#cb422-15"></a>)</span>
+<span id="cb422-16"><a href="webpack-intro-discover.html#cb422-16"></a></span>
+<span id="cb422-17"><a href="webpack-intro-discover.html#cb422-17"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output) {</span>
+<span id="cb422-18"><a href="webpack-intro-discover.html#cb422-18"></a>  output<span class="op">$</span>hello &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
+<span id="cb422-19"><a href="webpack-intro-discover.html#cb422-19"></a>    <span class="kw">req</span>(input<span class="op">$</span>secret)</span>
+<span id="cb422-20"><a href="webpack-intro-discover.html#cb422-20"></a>    <span class="kw">h2</span>(<span class="st">&quot;You got the secret right!&quot;</span>)</span>
+<span id="cb422-21"><a href="webpack-intro-discover.html#cb422-21"></a>  })</span>
+<span id="cb422-22"><a href="webpack-intro-discover.html#cb422-22"></a></span>
+<span id="cb422-23"><a href="webpack-intro-discover.html#cb422-23"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb422-24"><a href="webpack-intro-discover.html#cb422-24"></a>    <span class="kw">req</span>(input<span class="op">$</span>secret)</span>
+<span id="cb422-25"><a href="webpack-intro-discover.html#cb422-25"></a>    <span class="kw">hist</span>(cars<span class="op">$</span>speed)</span>
+<span id="cb422-26"><a href="webpack-intro-discover.html#cb422-26"></a>  })</span>
+<span id="cb422-27"><a href="webpack-intro-discover.html#cb422-27"></a>}</span>
+<span id="cb422-28"><a href="webpack-intro-discover.html#cb422-28"></a></span>
+<span id="cb422-29"><a href="webpack-intro-discover.html#cb422-29"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>Once the application is launched the user can type the phrase <code>secret</code> to see the content of the application.</p>
 <div class="figure" style="text-align: center"><span id="fig:mousetrap"></span>
 <img src="images/mousetrap.png" alt="Mousetrap example" width="100%" />

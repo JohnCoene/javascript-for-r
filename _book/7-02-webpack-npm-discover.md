@@ -316,7 +316,7 @@ file.create("src/secret.js")
 
 Therefore the entry point `index.js` needs to import `input.js` which itself imports the pass-phrase from `secret.js`.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/07-webpack-shiny} 
 
@@ -444,7 +444,7 @@ shinyApp(ui, server)
 
 Once the application is launched the user can type the phrase `secret` to see the content of the application.
 
-\begin{figure}[t]
+\begin{figure}[H]
 
 {\centering \includegraphics[width=1\linewidth]{images/mousetrap} 
 
