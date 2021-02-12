@@ -1,7 +1,7 @@
 --- 
 title: "JavaScript for R"
 author: "John Coene"
-date: "2021-01-10"
+date: "2021-02-12"
 documentclass: krantz
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike

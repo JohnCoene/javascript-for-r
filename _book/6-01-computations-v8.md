@@ -40,7 +40,6 @@ V8 provides an JavaScript execution environment through returning a closure-base
 
 ```r
 library(V8)
-#> Using V8 engine 6.8.275.32-node.55
 
 engine <- v8()
 ```
