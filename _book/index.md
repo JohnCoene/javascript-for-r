@@ -1,7 +1,7 @@
 --- 
 title: "JavaScript for R"
 author: "John Coene"
-date: "2021-02-12"
+date: "2021-04-07"
 documentclass: krantz
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
@@ -22,13 +22,18 @@ graphics: yes
 
 # Preface {-}
 
+_This is the online version of JavaScript for R, a book currently under development and intended for release as part of the [R series by CRC Press](https://www.routledge.com/Chapman--HallCRC-The-R-Series/book-series/CRCTHERSER)._
 
+  <div style = "float:left; width:400px; max-width:100%; margin-right:1em;">
+  <img src="images/cover.jpg" width = "100%">
+  <small><span>Photo by <a href="https://unsplash.com/@davisuko?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Cody Davis</a> on <a href="https://unsplash.com/s/photos/paint?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span></small>
+  </div>
 
 The R programming language has seen the integration of many languages; C, C++, Python, to name a few, can be seamlessly embedded into R so one can conveniently call code written in other languages from the R console. Little known to many, R works just as well with JavaScript---this book delves into the various ways both languages can work together.
 
 The ultimate aim of this work is to demonstrate to the reader the many great benefits one can reap by inviting JavaScript into their data science workflow. In that respect, the book is not teaching one JavaScript but instead demonstrates how little JavaScript can significantly support and enhance R code. Therefore the focus is on integrating external JavaScript libraries and only limited knowledge of JavaScript is required in order to learn from the book. Moreover, the book focuses on generalisable learnings so the reader can transfer takeaways from the book to solve real-world problems.
 
-Throughout the book, several shiny applications and R packages are put together as examples. All of these, along with the code for the entire book, can be found on the Github repository: [github.com/JohnCoene/javascript-for-r](https://github.com/JohnCoene/javascript-for-r).
+Throughout the book, several shiny applications and R packages are put together as examples. All of these, along with the code for the entire book, can be found on the GitHub repository: [github.com/JohnCoene/javascript-for-r](https://github.com/JohnCoene/javascript-for-r).
 
 ## Premise {-}
 

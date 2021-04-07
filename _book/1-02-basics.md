@@ -26,14 +26,10 @@ There are multiple ways to create a package. One could manually create every fil
 
 From the RStudio IDE go to `File > New Project > New Directory > R Package` then select "R package" and fill in the small form, namely name the package and specify the directory where it should be created. 
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/rstudio-create-package} 
-
-}
-
-\caption{Package creation wizard}(\#fig:rstudio-create-package)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/rstudio-create-package.png" alt="Package creation wizard" width="100%" />
+<p class="caption">(\#fig:rstudio-create-package)Package creation wizard</p>
+</div>
 
 But it could be argued that it's actually more accessible from the R console with the usethis package. The `create_package` function takes as first argument the path to create the package. If you run it from RStudio a new project window should open.
 
@@ -96,10 +92,9 @@ string_length <- function(string) {
 }
 ```
 
-\begin{rmdnote}
-Note that the function is preceded by its namespace with \texttt{::}
-(more on this later).
-\end{rmdnote}
+<div class="rmdnote">
+<p>Note that the function is preceded by its namespace with <code>::</code> (more on this later).</p>
+</div>
 
 The `DESCRIPTION` file does this, it will make sure that the dependencies of the package are met by users who install it. We can specify such dependencies under `Imports` where we can list packages required separated by a comma.
 
@@ -201,11 +196,9 @@ Above we import the function `str_length` from the `stringr` package using the `
 
 Finally, one can actually generate the `.Rd` documentation files and populate the `NAMESPACE` with either the `devtools::document()` function or `roxygen2::roxygenise()`.
 
-\begin{rmdnote}
-Remember to run \texttt{devtools::document()} after changing roxygen2
-tags otherwise changes are not actually reflected in the
-\texttt{NAMESPACE} and documentation.
-\end{rmdnote}
+<div class="rmdnote">
+<p>Remember to run <code>devtools::document()</code> after changing roxygen2 tags otherwise changes are not actually reflected in the <code>NAMESPACE</code> and documentation.</p>
+</div>
 
 ### Installed files {#basics-installed-files}
 
@@ -233,9 +226,9 @@ Note whilst this short guide will help you develop packages good enough for your
 
 JSON (JavaScript Object Notation) is a prevalent data _interchange_ format with which we will work extensively throughout this book; it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together, we must have a data format that can be understood by both---JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the [jsonlite package](https://CRAN.R-project.org/package=jsonlite) [@R-jsonlite] it is the serialiser used internally by all the packages we shall explore in this book.
 
-\begin{rmdnote}
-``To serialise'' is just jargon for converting data to JSON.
-\end{rmdnote}
+<div class="rmdnote">
+<p>“To serialise” is just jargon for converting data to JSON.</p>
+</div>
 
 ### Serialising {#serialising}
 
@@ -315,14 +308,10 @@ toJSON(df, pretty = TRUE)
 
 What jsonlite does internally is essentially turning the data.frame into a list _rowwise_ to produce a sub-list for every row then it serialises to JSON. This is generally how rectangular data is represented in lists. For instance, `purrr::transpose` does the same. Another great example is to use `console.table` in the JavaScript console (more on that later) to display the table JSON as a table.
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/console-table} 
-
-}
-
-\caption{console.table output}(\#fig:console-table)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/console-table.png" alt="console.table output" width="100%" />
+<p class="caption">(\#fig:console-table)console.table output</p>
+</div>
 
 We can reproduce this with the snippet below, we remove row names and use apply to turn every row into a list.
 
@@ -391,34 +380,25 @@ The easiest way to run JavaScript interactively is probably to create an HTML fi
 </html>
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/tryingjs} 
-
-}
-
-\caption{Trying JavaScript}(\#fig:trying-js)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/tryingjs.png" alt="Trying JavaScript" width="100%" />
+<p class="caption">(\#fig:trying-js)Trying JavaScript</p>
+</div>
 
 ### Developer Tools {#basics-chrome-devtools}
 
 Most of the JavaScript code written in this book is intended to be run in web browsers; it is thus vital that you have a great understanding of your web browser and its developer tools (devtools). In this section, we discuss those available in Google Chrome and Chromium but such tools, albeit somewhat different, also exist in Mozilla Firefox and Safari.
 
-\begin{rmdnote}
-The RStudio IDE is built on Chromium, some of these tools will therefore
-also work in RStudio.
-\end{rmdnote}
+<div class="rmdnote">
+<p>The RStudio IDE is built on Chromium, some of these tools will therefore also work in RStudio.</p>
+</div>
 
 The easiest way to access the developer tools from the browser is by "inspecting": right-click on an element on a webpage and select "inspect". This will open the developer tools either at the bottom or on the right of the page.
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/devtools} 
-
-}
-
-\caption{Google Chrome Devtools}(\#fig:chrome-devtools)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/devtools.png" alt="Google Chrome Devtools" width="100%" />
+<p class="caption">(\#fig:chrome-devtools)Google Chrome Devtools</p>
+</div>
 
 The developer tools pane consists of several tabs but we will mainly use:
 
@@ -501,23 +481,23 @@ function foo(){
 foo();
 ```
 
-\begin{rmdnote}
-Accessing variables from the parent environment (context) is useful in
-JavaScript but should not be done in R
-\end{rmdnote}
+<div class="rmdnote">
+<p>Accessing variables from the parent environment (context) is useful in JavaScript but should not be done in R</p>
+</div>
 
 ### Document Object Model {#basics-object-model}
 
 One concept which does not exist in R is that of the "DOM" which stands for Document Object Model; this is also often referred to as the DOM tree as it very much follows a tree-like structure.
 
-\begin{figure}[H]
+<div class="figure" style="text-align: center">
 
-{\centering \includegraphics[width=1\linewidth]{images/02-dom-viz} 
+```{=html}
+<div id="htmlwidget-4c9f283262b9ae6159b1" style="width:100%;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4c9f283262b9ae6159b1">{"x":{"diagram":"\ngraph {\n  graph [rankdir = TD]\n\n  node [shape=box]\n  \"document\"\n  \"<html>\"\n  \"<head>\"\n  \"<body>\"\n  \"<title>\"\n  \"<h1>\"\n  \"<div>\"\n  \"<a>\"\n\n  \"document\" -- \"<html>\"\n  \"<html>\" -- \"<head>\"\n  \"<html>\" -- \"<body>\"\n  \"<head>\" -- \"<title>\"\n  \"<body>\" -- \"<h1>\"\n  \"<body>\" -- \"<div>\"\n  \"<div>\" -- \"<a>\"\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+```
 
-}
-
-\caption{Document Object Model visualisation}(\#fig:dom-viz)
-\end{figure}
+<p class="caption">(\#fig:dom-viz)Document Object Model visualisation</p>
+</div>
 
 When a web page is loaded, the browser creates a Document Object Model of the web page which can be accessed in JavaScript from the `document` object. This lets the developer programmatically manipulate the page itself so one can, for instance, add an element (e.g., a button), change the text of another, and plenty more.
 
@@ -631,10 +611,9 @@ shinyApp(ui, server)
 
 If you then run the application and open it at the `/files/script.js` path (e.g.: `127.0.0.1:3000/files/script.js`) you should see the content of the JavaScript file (`console.log('Hello JS!')`), commenting the `addResourcePath` line will have a "Not Found" error displayed on the page instead.
 
-\begin{rmdnote}
-All files in your asset directory will be served online and accessible
-to anyone: do not place sensitive files in it.
-\end{rmdnote}
+<div class="rmdnote">
+<p>All files in your asset directory will be served online and accessible to anyone: do not place sensitive files in it.</p>
+</div>
 
 Though one may create multiple such directories and correspondingly use `addResourcePath` to specify multiple paths and prefixes, one will routinely specify a single one, named "assets" or "static," which contains multiple subdirectories, one for each type of static file to obtain a directory that looks something like the tree below. This is, however, an unwritten convention which is by no means forced upon the developer: do as you wish.
 
@@ -753,10 +732,9 @@ dependency <- htmltools::htmlDependency(
 
 About the above, the `src` argument points to the directory that contains the dependencies (`script` and `stylesheet`), this is done with a named vector where `file` indicates the path is a local directory and `href` indicates it is a remote server, generally a CDN. Note that one can also pass multiple `script` and `stylesheet` by using vectors, e.g.: `c("script.js", "anotherScript.js")`
 
-\begin{rmdnote}
-CDN stands for Content Delivery Network, a geographically distributed
-group of servers that provide fast transfer of dependencies.
-\end{rmdnote}
+<div class="rmdnote">
+<p>CDN stands for Content Delivery Network, a geographically distributed group of servers that provide fast transfer of dependencies.</p>
+</div>
 
 ```r
 # dependency to the latest jQuery

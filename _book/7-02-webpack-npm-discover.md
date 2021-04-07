@@ -10,11 +10,9 @@ There is a lot of depth to NPM and webpack; we only touch upon the surface here 
 
 As Node's Package Manager, a working installation of node.js is required: NPM ships with it. A bit like R in a sense where the package manager also comes with the language, install R, and you can install packages from CRAN with `install.packages`. The same applies here, install Node and you can install NPM packages from the command line.
 
-\begin{rmdnote}
-We are only going to use Node.js \emph{indirectly}, some of its
-functionalities and its package manager. This is not about building Node
-applications.
-\end{rmdnote}
+<div class="rmdnote">
+<p>We are only going to use Node.js <em>indirectly</em>, some of its functionalities and its package manager. This is not about building Node applications.</p>
+</div>
 
 Below are some directions on how to install node.js, in the event this does not work or you encounter issues please refer to the [official website](https://nodejs.org/en/).
 
@@ -95,7 +93,7 @@ As mentioned, it is rarely a good idea to install packages globally at the excep
 
 There are two other scopes on which packages can be installed. NPM allows distinguishing between packages that are needed to develop the project and packages that are needed in the final product being built. 
 
-R does not come with such convenience but could perhaps be useful, for instance throughout the book we used the usethis package to develop packages from setting it up to adding packages to the `DESCRIPTION` file, and more. Perhaps one would like to make this a "developer" dependency so that other developers that pull the package from Github have usethis installed and readily available. The advantage is that this dependency would not be included in the final product, that is, usethis is not required to use the package (only to develop it) and therefore is not installed by the user.
+R does not come with such convenience but could perhaps be useful, for instance throughout the book we used the usethis package to develop packages from setting it up to adding packages to the `DESCRIPTION` file, and more. Perhaps one would like to make this a "developer" dependency so that other developers that pull the package from GitHub have usethis installed and readily available. The advantage is that this dependency would not be included in the final product, that is, usethis is not required to use the package (only to develop it) and therefore is not installed by the user.
 
 As stated in the previous chapter, file size matters in JavaScript; it is, therefore, crucial that dependencies that are used only for development are not included in the final JavaScript file. With NPM this can be done by using the `--save-dev` flag, e.g.: `npm install webpack --save-dev` to install webpack. This is how it will be eventually installed as it is needed to prepare the final product (minify, bundle, etc.) but is not required to run the bundled file(s).
 
@@ -117,12 +115,11 @@ Notice that this updated the `package.json` file, created the `package-lock.json
 └── package.json
 ```
 
-The directory `node_modules` actually holds all the dependencies, it will grow in size as you add more, it's important that this directory is not pushed to whatever version control system you happen use (Github, Bitbucket, Gitlab). 
+The directory `node_modules` actually holds all the dependencies, it will grow in size as you add more, it's important that this directory is not pushed to whatever version control system you happen use (GitHub, Bitbucket, Gitlab). 
 
-\begin{rmdnote}
-Exclude the \texttt{node\_modules} directory from your version control
-(Git or otherwise)
-\end{rmdnote}
+<div class="rmdnote">
+<p>Exclude the <code>node_modules</code> directory from your version control (Git or otherwise)</p>
+</div>
 
 The dependencies are anyway not needed as one can pull the project without the `node_modules` then from the root of the project run `npm install` to install the dependencies that are listed in the `package.json` file. We can indeed observe that this file was updated to include `webpack` and `webpack-cli` as `devDependencies`, at the bottom of the file.
 
@@ -274,13 +271,13 @@ Let's install a dependency and make use of it in our shiny application.
 
 We'll install [mousetrap](https://github.com/ccampbell/mousetrap) a library to handle key-strokes. We're going to use it to hide the UI of the shiny application behind a secret pass-phrase; it will only be revealed after it has been typed. This can be done by observing a specific set of key-strokes with mousetrap and set a shiny input value when that particular sequence is typed.
 
-\begin{rmdnote}
-This is by no means a safe way to secure an application!
-\end{rmdnote}
+<div class="rmdnote">
+<p>This is by no means a safe way to secure an application!</p>
+</div>
 
 Though it is certainly not a  real-world example, it is educational and quite a bit of fun.
 
-The first thing to do is to install the mousetrap dependency, as indicated on the [Github README](https://github.com/ccampbell/mousetrap) it can be obtained from NPM.
+The first thing to do is to install the mousetrap dependency, as indicated on the [GitHub README](https://github.com/ccampbell/mousetrap) it can be obtained from NPM.
 
 ```bash
 npm install mousetrap --save
@@ -316,14 +313,15 @@ file.create("src/secret.js")
 
 Therefore the entry point `index.js` needs to import `input.js` which itself imports the pass-phrase from `secret.js`.
 
-\begin{figure}[H]
+<div class="figure" style="text-align: center">
 
-{\centering \includegraphics[width=1\linewidth]{images/07-webpack-shiny} 
+```{=html}
+<div id="htmlwidget-128ff1232c4679922abf" style="width:100%;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-128ff1232c4679922abf">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR compound=true]\n  node [shape=box]\n\n  subgraph cluster0 {\n    shiny [label=\"import shiny\"]\n    label = \"input.js\"\n    color=gold\n  }\n\n  subgraph cluster1 {\n    passphrase [label=\"export var\"]\n    label = \"secret.js\"\n    color=gold\n  }\n\n  shiny -> \"index.js\" [label=\"import module\", ltail=cluster0]\n  passphrase -> shiny [label=\"import variable\", ltail=cluster1, lhead=cluster0]\n  \"externals\" -> shiny [label=\"import shiny\", lhead=cluster0]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+```
 
-}
-
-\caption{webpack with shiny}(\#fig:webpack-shiny)
-\end{figure}
+<p class="caption">(\#fig:webpack-shiny)webpack with shiny</p>
+</div>
 
 Again, there are multiple ways one can use to import and export modules, functions, variables, etc. This book will use the ES6 syntax as [recommended by webpack](https://webpack.js.org/api/module-methods/#es6-recommended). Though this mechanism is present in other languages such as Python (where it somewhat resembles ES6) it will take some getting used to for R programmers as though this language features some form of import (`library()`) and export (`@export` roxygen2 tag), this differs significantly from how it works in webpack. This is, however, key to using webpack as it is what ultimately enables the creation of modules that make code more robust.
 
@@ -444,13 +442,9 @@ shinyApp(ui, server)
 
 Once the application is launched the user can type the phrase `secret` to see the content of the application.
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/mousetrap} 
-
-}
-
-\caption{Mousetrap example}(\#fig:mousetrap)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/mousetrap.png" alt="Mousetrap example" width="100%" />
+<p class="caption">(\#fig:mousetrap)Mousetrap example</p>
+</div>
 
 That is it for this chapter, as stated multiple times there is far more depth to webpack, but this is outside the scope of this book, instead in the next chapter we discover an easier way to set up such projects and make R and webpack work in a more seamless fashion.
