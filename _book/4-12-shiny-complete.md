@@ -53,9 +53,9 @@ The ml5.js framework and all its components are bundled in a single JavaScript f
 <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
 ```
 
-We will create an `html_dependency` object using the `htmlDependency` function from the htmltools package. If confused, go back to the first part of the book on Shiny prerequisites where it is explained in greater detail. 
+We will create an `html_dependency` object using the `htmlDependency` function from the htmltools package. If confused, go back to the first part of the book on Shiny prerequisites, where it is explained in greater detail. 
 
-We have two options at our disposal, either use the CDN (as shown in the previous code chunk) or download the file. We will start by making use of the CDN; later when we build a package for this functionality, we shall download it to provide users of the package a choice between using the local file or the CDN.
+We have two options at our disposal either use the CDN (as shown in the previous code chunk) or download the file. We will start by making use of the CDN; later when we build a package for this functionality, we shall download it to provide users of the package a choice between using the local file or the CDN.
 
 
 ```r
@@ -67,9 +67,9 @@ dependency_ml5 <- htmltools::htmlDependency(
 )
 ```
 
-## Static files {#shiny-complete-images}
+## Static Files {#shiny-complete-images}
 
-Images will, of course, be necessary in order to test the image classifier, we are therefore going to download some from Wikipedia. The following code chunk creates a directory of assets, downloads images of birds and saves them to the aforementioned directory. For brevity, we limit ourselves to downloading two images, one of a flamingo and another of a lorikeet but feel free to add more. Also, note that the pre-trained image classifier we are going to use in this example is not limited to birds.
+Images will, of course, be necessary in order to test the image classifier. We are therefore going to download some from Wikipedia. The following code chunk creates a directory of assets, downloads images of birds and saves them to the aforementioned directory. For brevity, we limit ourselves to downloading two images, one of a flamingo and another of a lorikeet, but feel free to add more. Also, note that the pre-trained image classifier we are going to use in this example is not limited to birds.
 
 ```r
 # static files directory
@@ -95,13 +95,13 @@ download.file(fl, destfile = "assets/flamingo.jpg")
 download.file(lo, destfile = "assets/lorikeet.jpg")
 ```
 
-Finally we should also add a JavaScript file which will eventually contain our custom functions to run the image classifier.
+Finally we should also add a JavaScript file, which will eventually contain our custom functions to run the image classifier.
 
 ```r
 file.create("www/classify.js")
 ```
 
-At this  stage one should obtain a directory resembling the tree below.
+At this  stage, one should obtain a directory resembling the tree below.
 
 ```
 .
@@ -118,7 +118,7 @@ These files will eventually need to be served (`addResourcePath`), so they are a
 
 At this stage, it's probably good to build a skeleton of the application. 
 
-After loading the Shiny package, we use the `addResourcePath` function to serve the images so they can be made accessible by the Shiny UI to display. At this stage, the application itself only provides a dropdown to select one of the two images previously downloaded, and a button to trigger the classification which currently does not do anything, we'll delve into this next. Since we placed the `classify.js` JavaScript file in the `assets` directory we can also import it in the UI with a `script` tag; importantly this is done _after_ the ml5.js dependency as it will depend on it. Another crucial thing that the app does is set the attribute `id` of the `<img>` to `bird`, it is essential to have a convenient way to uniquely identify the image later on as ml5.js will need to read this image in order to classify it.
+After loading the Shiny package, we use the `addResourcePath` function to serve the images so they can be made accessible by the Shiny UI to display. At this stage, the application itself only provides a dropdown to select one of the two images previously downloaded, and a button to trigger the classification, which currently does not do anything, we'll delve into this next. Since we placed the `classify.js` JavaScript file in the `assets` directory we can also import it in the UI with a `script` tag; importantly this is done _after_ the ml5.js dependency as it will depend on it. Another crucial thing that the app does is set the attribute `id` of the `<img>` to `bird` it is essential to have a convenient way to uniquely identify the image later on as ml5.js will need to read this image in order to classify it.
 
 ```r
 library(shiny)
@@ -179,9 +179,9 @@ observeEvent(input$classify, {
 
 We thus observe the button so that when clicked, a message is sent to the front end, via the WebSocket. Note that the `sendCustomMessage` method __must take data,__ hence the empty `list` that is used as the second argument. That, of course, won't do anything as we are yet to add a handler in JavaScript to handle this `classify` message that is sent.
 
-Looking back at the documentation of ml5.js we observe that before we can classify the image, the model should be loaded: we start by placing this code in the `classify.js` application.
+Looking back at the documentation of ml5.js, we observe that before we can classify the image, the model should be loaded: we start by placing this code in the `classify.js` application.
 
-The classifier is initialised from the `imageClassifier` method which takes 1) the pre-trained model to use (or its name), 2) a callback function. The callback function is run when the model is done loading, though we don't make use of it here the argument is not optional (omitting it will raise an error) so we pass a function that simply prints `Model Loaded!` to the console. 
+The classifier is initialised from the `imageClassifier` method, which takes 1) the pre-trained model to use (or its name), and 2) a callback function. The callback function is run when the model is done loading. Though we don't make use of it here the argument is not optional (omitting it will raise an error) so we pass a function that simply prints `Model Loaded!` to the console. 
 
 ```js
 // Mandatory callback function
@@ -197,7 +197,7 @@ const classifier = ml5.imageClassifier('MobileNet', modelLoaded);
 <p>There is no need to repeatedly initialise the classifier every time a user hits the “classify” button: this should only be done once.</p>
 </div>
 
-Finally, we can take care of the message handler. Remember the message sent from the R server bears the `classify` unique identifier. The handler function runs the `classify` method on the previously instantiated `classifier` object, this takes 1) the image to classify and 2) a callback function to handle the results of the classification. Here we genuinely get to why we gave the generated `<img>` of the selected bird and `id`: it helps us quickly select that image from JavaScript to use in the classifier with `document.getElementById("bird")`.
+Finally, we can take care of the message handler. Remember the message sent from the R server bears the `classify` unique identifier. The handler function runs the `classify` method on the previously instantiated `classifier` object. This takes 1) the image to classify and 2) a callback function to handle the results of the classification. Here we genuinely get to why we gave the generated `<img>` of the selected bird and `id`: it helps us quickly select that image from JavaScript to use in the classifier with `document.getElementById("bird")`.
 
 ```js
 // Mandatory callback function
@@ -231,7 +231,7 @@ Running the application and opening the console already gives us encouraging res
 
 The application thus classifies the images, but the results remain in the front end, and we would like to have those results returned to the R server so we can further process them and display them back to the user.
 
-As in the previous chapter, this can be done with the `setInputValue` function which, as a reminder, will do exactly as advertised: it will set an `input` with a given value in the R server: the code below will make it such that the `results` will be accessible in the R server with `input$classification`.
+As in the previous chapter, this can be done with the `setInputValue` function, which, as a reminder, will do exactly as advertised: it will set an `input` with a given value in the R server. The code below will make it such that the `results` will be accessible in the R server with `input$classification`.
 
 ```js
 // Mandatory callback function
@@ -309,9 +309,9 @@ shinyApp(ui, server)
 
 ## Input handler {#shiny-complete-input-handler}
 
-In the previous section on sending data from R to JavaScript, we used a "message handler" in JavaScript to handle the data coming from the server. There is also the corollary, an "input handler" to preprocess the data coming from JavaScript before it is made accessible by the input. In R, this is a function that must accept three arguments, the data coming to JavaScript, a Shiny session, and the name of the input. Note that all of these arguments are mandatory if they are not used in the function one omit them and use the three-dot construct instead.
+In the previous section on sending data from R to JavaScript, we used a "message handler" in JavaScript to handle the data coming from the server. There is also the corollary, an "input handler" to preprocess the data coming from JavaScript before it is made accessible by the input. In R, this is a function that must accept three arguments: the data coming to JavaScript, a Shiny session, and the name of the input. Note that all of these arguments are mandatory if they are not used in the function we can use the three-dot construct instead.
 
-Input handlers are most often used to reshape or change the type of the data coming in. To demonstrate how to use them, we will reshape the classification results sent to R as looking at the results of the classification in the R server one might notice a row-wise list which can be transformed into a `data.frame`. The function below makes use of the [purrr](https://github.com/tidyverse/purrr/) [@R-purrr] package to loop over every result and transform them into data.frames and return a single data.frame.
+Input handlers are most often used to reshape or change the type of the data coming in. To demonstrate how to use them, we will reshape the classification results sent to R as looking at the results of the classification in the R server one might notice a row-wise list, which can be transformed into a `data.frame`. The function below makes use of the [purrr](https://github.com/tidyverse/purrr/) [@R-purrr] package to loop over every result and transform them into data.frames and return a single data.frame.
 
 ```r
 # create handler
@@ -327,7 +327,7 @@ Once this function created, it needs to be registered with Shiny using the `regi
 shiny::registerInputHandler("ml5.class", process_results)
 ```
 
-Note that handlers can only be registered once, running the above twice will fail the second time, even if the handler function has changed. This is to ensure one does not accidentally overwrite handlers brought in by other packages. These can be overwritten by explicitly setting `force` to `TRUE`, but it is not advised. 
+Note that handlers can only be registered once; running the above twice will fail the second time, even if the handler function has changed. This is to ensure one does not accidentally overwrite handlers brought in by other packages. These can be overwritten by explicitly setting `force` to `TRUE`, but it is not advised. 
 
 <div class="rmdnote">
 <p>It is not advised to overwrite the registered handler.</p>
@@ -338,7 +338,7 @@ Note that handlers can only be registered once, running the above twice will fai
 registerInputHandler("ml5.class", process_results)
 ```
 
-Once the handler function created and registered with Shiny what is left to do is tell Shiny which input should use that handler. This is done by adding the name of the handler, `ml5.class`, preceded by a colon (`:ml5.class`) as a suffix to the input name.
+Once the handler function is created and registered with Shiny, what is left to do is tell Shiny which input should use that handler. This is done by adding the name of the handler, `ml5.class`, preceded by a colon (`:ml5.class`) as a suffix to the input name.
 
 ```js
 Shiny.addCustomMessageHandler('classify', function(data){
@@ -413,9 +413,9 @@ shinyApp(ui, server)
 <p class="caption">(\#fig:shiny-complete-table-output)Classifier table output</p>
 </div>
 
-## As a package {#shiny-complete-pkg}
+## As a Package {#shiny-complete-pkg}
 
-This chapter thus far built a nice application but the code written is hardly portable; were one to make use of the image classifier from ml5.js in another application everything would have to be rewritten or copy-pasted which hardly good practice and not remotely convenient. Instead this code should be packaged, so it is easily reusable and shareable. Moreover, this will benefit from all the other advantages that R packages bring to code such as documentation, reproducibility, and tests. This also forces the developer to think about the code differently, as we'll discover it's not as simple as wrapping individual functionalities from the app into functions. 
+This chapter thus far built a nice application, but the code written is hardly portable; were one to make use of the image classifier from ml5.js in another application, everything would have to be rewritten or copy-pasted, which is hardly good practice and not remotely convenient. Instead this code should be packaged, so it is easily reusable and shareable. Moreover, this will benefit from all the other advantages that R packages bring to code such as documentation, reproducibility, and tests. This also forces the developer to think about the code differently. As we'll discover it's not as simple as wrapping individual functionalities from the app into functions. 
 
 Before we delve into building the package, let us think through what it should include. The application using ml5 gives some indication as to what the package will look like. Users of the package should be able to reproduce what is executed in the application, namely import dependencies (including the "message handler"), send data to the JavaScript front end to trigger the classification, and then obtain the results in the R server.
 
@@ -427,7 +427,7 @@ usethis::create_package("ml5")
 
 ### Dependencies {#shiny-complete-pkg-deps}
 
-In the application, the web-hosted dependencies (CDN) were used. There are two advantages to using CDNs: 1) it's just convenient as one does not have to download them, 2) it's fast, CDNs are distributed geographically to improve the speed at which they serve the dependencies and will therefore generally outperform the alternative, serving the files locally. This may raise questions when building a package though as one generally want these to be as modular, self-contained, and reproducible as possible and none of these things go well with the idea of a remotely served dependency that is absolutely central to the package. The package should therefore provide both ways of importing dependencies: via the CDN or using locally stored files. The former will be faster while the latter can be used as a fallback in the event there is an issue with the CDN or one does not have internet for instance.
+In the application, the web-hosted dependencies (CDN) were used. There are two advantages to using CDNs: 1) it's just convenient as one does not have to download them, 2) it's fast---CDNs are distributed geographically to improve the speed at which they serve the dependencies and will therefore generally outperform the alternative, serving the files locally. This may raise questions when building a package though, as one generally wants these to be as modular, self-contained, and reproducible as possible, and none of these things go well with the idea of a remotely served dependency that is absolutely central to the package. The package should therefore provide both ways of importing dependencies: via the CDN or using locally-stored files. The former will be faster while the latter can be used as a fallback in the event there is an issue with the CDN or one does not have internet for instance.
 
 We can download the dependency hosted on the CDN and place it in the `inst` directory of the package. We also create another JavaScript `classify.js` that will contain the custom JavaScript code (message handler, etc.) as was done for the application.
 
@@ -443,7 +443,7 @@ download.file(uri, destfile = "inst/ml5.min.js")
 file.create("inst/classify.js")
 ```
 
-With the dependencies locally downloaded one can move on to create the R function that will be used to import the dependencies in the Shiny UI. The file `classify.js` should be imported via this function too. The function `useMl5` creates two `html_dependency` objects, one for the custom code with the message handler and another for the ml5 dependency, importantly at the end of the function these are returned in a `tagList` __where order matters__ as these will be rendered in the order they are listed: first the ml5 dependency then the file containing our custom code.
+With the dependencies locally downloaded one can move on to create the R function that will be used to import the dependencies in the Shiny UI. The file `classify.js` should be imported via this function too. The function `useMl5` creates two `html_dependency` objects, one for the custom code with the message handler and another for the ml5 dependency. Importantly at the end of the function these are returned in a `tagList` __where order matters__ as these will be rendered in the order they are listed: first the ml5 dependency then the file containing our custom code.
 
 ```r
 # R/deps.R
@@ -482,9 +482,9 @@ useMl5 <- function(cdn = TRUE) {
 
 ### Trigger classification {#shiny-complete-pkg-trigger}
 
-There will be a need for a function that sends a message to the front end to trigger the classification. In the application built previously the `id` of the image to classify was hard-coded, this must be changed when building a package. 
+There will be a need for a function that sends a message to the front end to trigger the classification. In the application built previously the `id` of the image to classify was hard-coded this must be changed when building a package. 
 
-First, this will give users a much better interface where they may use whatever `id` suits them rather. Second, this will allow using the model to classify images that may be placed in different places and bear different ids.
+First, this will give users a much better interface where they may use whatever `id` suits them. Second, this will allow using the model to classify images that may be placed in different places and bear different ids.
 
 ```r
 # R/classify.R
@@ -501,7 +501,7 @@ classify <- function(
 
 As a quick reminder, the JavaScript should initialise the model and provide a handler for the message `ml5-classify` that was defined in the previous section. Nothing needs to change with regard to the initialisation of the model. However, there are two things to adapt in the message handler. First, the `id` of the image to classify is now dynamically defined and passed from the R server; the code should therefore read `document.getElementById(data)` (where data is passed from the server) instead of `document.getElementById('birds')` as was previously hard-coded in the application. 
 
-Second, the application also had hardcoded the input id that was set with the results of the classification (`input$classification`) this will no longer work in a package: given the ability to classify multiple images the results of that classification should set different inputs so as not to overwrite one another. In the code below we therefore create a dynamic input using the id: `id` + `_classification`. Note that one can concatenate string in JavaScript using `+` while in R one would have to use the `paste0` function.
+Second, the application also had hardcoded the input id that was set with the results of the classification (`input$classification`). This will no longer work in a package: given the ability to classify multiple images the results of that classification should set different inputs so as not to overwrite one another. In the code below, we therefore create a dynamic input using the id: `id` + `_classification`. Note that one can concatenate string in JavaScript using `+`, while in R one would have to use the `paste0` function.
 
 Examples:
 
@@ -528,7 +528,7 @@ Shiny.addCustomMessageHandler('classify', function(data){
 
 ### Input handler {#shiny-complete-pkg-input-handler}
 
-As mentioned the input handler that transforms the result sent from JavaScript to R into a data.frame can only be registered once. Therefore placing the code that was written in an R file in the package will not work, or rather will work only once.
+As mentioned the input handler that transforms the result sent from JavaScript to R into a data.frame can only be registered once. Therefore, placing the code that was written in an R file in the package will not work, or rather will work only once.
 
 ```r
 # R/handler.R
@@ -541,7 +541,7 @@ handler <- function(data, ...){
 shiny::registerInputHandler("ml5.class", handler)
 ```
 
-When the library is loaded the first time it will work but all subsequent attempts will fails.
+When the library is loaded the first time it will work, but all subsequent attempts will fail.
 
 ```r
 library(ml5)
@@ -555,9 +555,9 @@ library(ml5)
 #>   There is already an input handler for type: ml5.class
 ```
 
-Packages can run functions when they are loaded or attached an `.onLoad` function which is called when the library is loaded in the global environment. The difference between loading and attaching a package can be subtle, in this case, it’s probably best to run the function when the package is loaded using .onLoad which the R Packages book describes as:
+Packages can run functions when they are loaded or attached to an `.onLoad` function, which is called when the library is loaded in the global environment. The difference between loading and attaching a package can be subtle. In this case, it’s probably best to run the function when the package is loaded using `.onLoad` which the R Packages book describes as:
 
-> Loading will load code, data and any DLLs; register S3 and S4 methods; and run the .onLoad() function. After loading, the package is available in memory, but because it’s not in the search path, you won’t be able to access its components without using 	::. Confusingly, :: will also load a package automatically if it isn’t already loaded. It’s rare to load a package explicitly, but you can do so with requireNamespace() or loadNamespace().
+> Loading will load code, data, and any DLLs; register S3 and S4 methods; and run the `.onLoad()` function. After loading, the package is available in memory, but because it’s not in the search path, you won’t be able to access its components without using `::`. Confusingly, `::` will also load a package automatically if it isn’t already loaded. It’s rare to load a package explicitly, but you can do so with `requireNamespace()` or `loadNamespace()`.
 
 — [R Packages Book](https://r-pkgs.org/)
 

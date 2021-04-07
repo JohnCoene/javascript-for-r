@@ -1,4 +1,4 @@
-# Tips & Tricks {#shiny-tips}
+# Tips and Tricks {#shiny-tips}
 
 While previous chapters on working with Shiny made use of external libraries and built packages that brought new functionalities previously not available in Shiny, one does not have to go to this length to take advantage of the learnings contained in those pages. Moreover, there are a few exciting things that have not yet been explored.
 
@@ -21,7 +21,7 @@ gif <- paste0(
 download.file(gif, "www/typing.gif")
 ```
 
-Then we create an application that draws and redraws a plot at the click of a button. Note that we give the gif an id as we will need to be able to retrieve this element JavaScript side (to dynamically show and hide it) and an `id` makes for an ideal selector.
+Then we create an application that draws and redraws a plot at the click of a button. Note that we give the gif an id as we will need to be able to retrieve this element JavaScript-side (to dynamically show and hide it), and an `id` makes for an ideal selector.
 
 ```r
 # app.R
@@ -54,7 +54,7 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-The gif should only be visible when the server is busy, unlike now. Whether it is visible will be controlled in JavaScript, so this should be initialised as hidden using CSS. The code below hides the gif with `visibility: hidden`, and repositions it, floating on top of the rest of the content in the top right of the page, the `z-index` ensures the gif appears on top of other elements.
+The gif should only be visible when the server is busy, unlike now. Whether it is visible will be controlled in JavaScript, so this should be initialised as hidden using CSS. The following code hides the gif with `visibility: hidden`, and repositions it, floating on top of the rest of the content in the top right of the page, the `z-index` ensures the gif appears on top of other elements.
 
 ```css
 /* style.css */
@@ -110,7 +110,7 @@ The application will then display the gif when the server is busy running comput
 
 ## Table Buttons {#shiny-tips-table-btn}
 
-For instance, using what was learned previously, one can place buttons inside a Shiny table and observe server-side, which is clicked. Starting with a basic application that only includes a table to which we ultimately want to add a column containing a button on each row. Here we achieve this by having each button set a different value (e.g. an id) to an input using `shiny.setInputValue`, but one could very well create different input names for each button.
+For instance, using what was learned previously, one can place buttons inside a Shiny table and observe server-side, which is clicked. With a basic application that only includes a table to which we ultimately want to add a column containing a button on each row. Here we achieve this by having each button set a different value (e.g., an id) to an input using `shiny.setInputValue`, but one could very well create different input names for each button.
 
 ```r
 library(DT)
@@ -137,9 +137,9 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-Note that in the above we pass some parameters to `datatable` not all are necessary at the exception of `escape` which is set to `FALSE` as we will ultimately place HTML code the table which should appear rendered rather than show said code as a string.
+Note that in the above we pass some parameters to `datatable` not all are necessary at the exception of `escape`, which is set to `FALSE` as we will ultimately place HTML code the table which should appear rendered rather than show said code as a string.
 
-We start by creating the on-click functions as R character strings for each row of the `mtcars` dataset. This is the function that will be triggered when buttons are clicked. This should look familiar, we use `Shiny.setInputValue` to define an input named `click` which is set to a different value for every row of the table.
+We start by creating the on-click functions as R character strings for each row of the `mtcars` dataset. This is the function that will be triggered when buttons are clicked. This should look familiar we use `Shiny.setInputValue` to define an input named `click`, which is set to a different value for every row of the table.
 
 ```r
 library(DT)
@@ -267,7 +267,7 @@ shinyApp(ui, server)
 
 ## jQuery {#shiny-tips-jQuery}
 
-The Shiny framework itself makes use and thus imports the [jQuery](https://jquery.com/) JavaScript library, a library that provides a convenient API to make many things easier, including animations.
+The Shiny framework itself makes use of and thus imports the [jQuery](https://jquery.com/) JavaScript library, a library that provides a convenient API to make many things easier, including animations.
 
 As an example, we could use jQuery's `show`, `hide`, or `toggle` functions to show or hide an HTML element at the press of a button.
 
@@ -337,4 +337,4 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-This is something where, again, R is leveraged in order to make it easier on the Shiny developer, but it must be said that it suffers from some inefficiency: the message travels from the browser (button click) to the R server where it is sent back to the browser and triggers `toggle`. It could indeed very well be rewritten in JavaScript entirely, this is, however, outside the scope of this book.
+This is something where, again, R is leveraged in order to make it easier on the Shiny developer, but it must be said that it suffers from some inefficiency: the message travels from the browser (button click) to the R server, where it is sent back to the browser and triggers `toggle`. It could indeed very well be rewritten in JavaScript entirely. This is, however, outside the scope of this book.
