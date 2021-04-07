@@ -1,6 +1,6 @@
 # Webpack with R {#packer-overview}
 
-In the previous chapter, we put together a simple shiny application using NPM and webpack. Hopefully, it hinted at some of the powerful things webpack can do but also revealed a downside: the overhead in merely creating the project. Moreover, the configuration will change depending on what the project is (application, package, etc.).
+In the previous chapter, we put together a simple Shiny application using NPM and webpack. Hopefully, it hinted at some of the powerful things webpack can do but also revealed a downside: the overhead in merely creating the project. Moreover, the configuration will change depending on what the project is (application, package, etc.).
 
 In this chapter, we discover the [packer](https://github.com/JohnCoene/packer) [@R-packer] R package, which provides many convenience functions to create and manage R projects that make use of webpack and NPM.
 
@@ -14,7 +14,7 @@ There are a few principles that the packer package follows strictly.
 
 1. It only aspires to become a specialised usethis for working with JavaScript and R, as such, it takes inspiration from other packages such as htmlwidgets, and devtools.
 2. It will never become a dependency to what you create. It's in a sense very much like an NPM "developer" dependency; it's used to develop the project but does not bring any additional overhead to what you're building.
-3. It should not interfere with the mission of webpack to build more robust JavaScript code. Therefore packer only builds on top of already strict R structures, namely packages (where golem can be used to create shiny applications).
+3. It should not interfere with the mission of webpack to build more robust JavaScript code. Therefore packer only builds on top of already strict R structures, namely packages (where golem can be used to create Shiny applications).
 
 ## Scaffolds {#packer-scaffolds}
 
@@ -31,7 +31,7 @@ Whilst htmlwidgets only allows creating scaffolds for widgets; packer allows cre
 This gives a few powerful functions that correctly set up webpack. These will build the necessary file structure and configuration depending on the scaffold and the context (whether it is a basic package, a golem application, a package with an existing scaffold, etc.)
 
 ```{block, type='rmdnote'}
-One can use multiple scaffolds in a single package or shiny application.
+One can use multiple scaffolds in a single package or Shiny application.
 ```
 
 Packer goes beyond merely setting up webpack and NPM; it will also create the necessary R functions, roxygen documentation, and examples, so every scaffold is fully functional out-of-the-box.
@@ -53,7 +53,7 @@ In the following sections, we unpack some of this as we explore a specific scaff
 
 ## Inputs {#packer-inputs}
 
-In a previous chapter, we explored how to build custom shiny inputs. Here, we'll use the packer package to produce a shiny button that increments at every click; hence we create a package called "increment."
+In a previous chapter, we explored how to build custom Shiny inputs. Here, we'll use the packer package to produce a Shiny button that increments at every click; hence we create a package called "increment."
 
 ```r
 usethis::create_package("increment")
@@ -163,7 +163,7 @@ incrementInput <- function(inputId, value = 0){
 }
 ```
 
-Note that packer does not use the namespace of functions (e.g. `shiny::tagList`). Instead, it uses the roxygen2 tags to import the necessary functions: `@importFrom shiny tags tagList`. Rather nicely, packer also created an example in the roxygen documentation. We'll run this later after we've bundled the JavaScript.
+Note that packer does not use the namespace of functions (e.g. `shiny::tagList`). Instead, it uses the roxygen2 tags to import the necessary functions: `@importFrom Shiny tags tagList`. Rather nicely, packer also created an example in the roxygen documentation. We'll run this later after we've bundled the JavaScript.
 
 ```r
 #' @examples 
@@ -237,7 +237,7 @@ The `srcjs/index.js` file was also created; it imports the JavaScript binding de
 
 ## Bundle {#packer-bundle}
 
-You can then run `packer::bundle` to bundle the JavaScript. The entry points and output directories will depend on the scaffold, shiny inputs' bundles are placed in the `inst/packer` directory unless this was run from a golem application, in which case the output is automatically changed to golem's standard.
+You can then run `packer::bundle` to bundle the JavaScript. The entry points and output directories will depend on the scaffold, Shiny inputs' bundles are placed in the `inst/packer` directory unless this was run from a golem application, in which case the output is automatically changed to golem's standard.
 
 ```r
 packer::bundle()
@@ -268,4 +268,4 @@ if(interactive())
 
 No code was written, yet we have a fully-functional input! We'll leave at this, it's not only meant to create increment buttons, but this sets up a solid base for the developer to customise the code and conveniently create a different input.
 
-It is worth noting that we built a shiny input from within a package, this is meant to be exported and used in shiny applications elsewhere, but were one to run these same steps from a golem application packer would adapt the output path so that the input can be used directly in the application.
+It is worth noting that we built a Shiny input from within a package, this is meant to be exported and used in Shiny applications elsewhere, but were one to run these same steps from a golem application packer would adapt the output path so that the input can be used directly in the application.

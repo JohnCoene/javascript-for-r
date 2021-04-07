@@ -102,7 +102,7 @@ dependencies:
 
 ## JavaScript {#widgets-full-js}
 
-Let's copy the JavaScript code from the [Get Started section of gio.js](https://giojs.org/index.html) in the `gio.js` file's `renderValue` function. At this point, the data format is not known, so we comment the line which adds data to the visualisation.
+Let's copy the JavaScript code from the [Get Started section of gio.js](https://giojs.org/index.html) in the `gio.js` file's `renderValue` function. At this point, the data format is not known, so we comment the line, which adds data to the visualisation.
 
 ```js
 // gio.js
@@ -138,7 +138,7 @@ HTMLWidgets.widget({
 });
 ```
 
-One can document and load the package, but it will not work as the code above attempts to place the visualisation in a `div` with `id = "globe"`. As for the previously written widget, this needs to be changed to `el.id`.
+One can document and load the package, but it will not work as the code above attempts to place the visualisation in a `div` with `id = "globe"`. As for the previously-written widget, this needs to be changed to `el.id`.
 
 ```js
 // gio.js
@@ -152,7 +152,7 @@ renderValue: function(x) {
 }
 ```
 
-At this stage the widget should generate a visualisation.
+At this stage, the widget should generate a visualisation.
 
 ```r
 devtools::document()
@@ -164,7 +164,7 @@ gio(message = "This required but not used")
 knitr::include_graphics("images/gio-init.png")
 ```
 
-Not too shabby given how little work was put into this! Before we move on, let us optimise something. In the JavaScript code we retrieve the `container` using `el.id` but this in effect is very inefficient: `el` is identical to `container`.
+Not too shabby given how little work was put into this! Before we move on, let us optimise something. In the JavaScript code, we retrieve the `container` using `el.id`, but this in effect is very inefficient: `el` is identical to `container`.
 
 ```js
 // gio.js
@@ -196,7 +196,7 @@ An exciting start, now onto adding data. Let us take a look at the [documentatio
 ]
 ```
 
-The JSON data should constitute of arrays that denote arcs to draw on the globe where each arc is defined by an exporting country (`e`), an importing country (`i`), and is given a value (`v`). The importing and exporting country, the source and target of the arc, are indicated by ISO alpha-2 country codes. We can read this JSON into R.
+The JSON data should constitute arrays that denote arcs to draw on the globe where each arc is defined by an exporting country (`e`), an importing country (`i`), and is given a value (`v`). The importing and exporting country, the source and target of the arc, are indicated by ISO alpha-2 country codes. We can read this JSON into R.
 
 ```{r}
 # data.frame to test
@@ -240,7 +240,7 @@ gio <- function(data, width = NULL, height = NULL, elementId = NULL) {
 }
 ```
 
-This must be reflected in the `play.js` file where we uncomment the line previously commented and use `x.data` passed from R.
+This must be reflected in the `play.js` file, where we uncomment the line previously commented and use `x.data` passed from R.
 
 ```js
 // gio.js
@@ -277,7 +277,7 @@ Unfortunately, this breaks everything, and we are presented with a blank screen.
 }
 ```
 
-Htmlwidgets serialised the data frame column-wise (long) where each array is a column, whereas gio.js expect the data to be wide (row-wise serialisation) where each array is an arc (row).
+Htmlwidgets serialised the data frame column-wise (long), where each array is a column, whereas gio.js expect the data to be wide (row-wise serialisation), where each array is an arc (row).
 
 ```{r}
 # column-wise
@@ -294,7 +294,7 @@ There are multiple ways to transform the data and ensure the serialised JSON is 
 
 ### Using JavaScript {#widgets-full-transform-data-js}
 
-JavaScript can be used to transform the data, thereby leaving the serialiser as-is only to reshape it into the client. The HTMLwidget JavaScript library (already imported by default) exports an object which provides a method, `dataframeToD3`, to transform the data from long to wide. 
+JavaScript can be used to transform the data, thereby leaving the serialiser as-is only to reshape it into the client. The htmlwidget JavaScript library (already imported by default) exports an object, which provides a method, `dataframeToD3`, to transform the data from long to wide. 
 
 ```js
 // gio.js
@@ -312,7 +312,7 @@ renderValue: function(x) {
 
 ### Modify Serialiser {#widgets-full-transform-data-modify}
 
-Instead of serialising the data a certain way then correct it in JavaScript as demonstrated previously, one can also modify, or even replace, htmlwidgets' default serialiser. Speaking of which, below is the default serializer used by htmlwidgets.
+Instead of serialising the data a certain way then correct it in JavaScript as demonstrated previously, one can also modify, or even replace the htmlwidgets default serialiser. Speaking of which, below is the default serializer used by htmlwidgets.
 
 ```r
 function (x, ..., dataframe = "columns", null = "null", 
@@ -368,7 +368,7 @@ Other arguments can be placed in the same list; they will ultimately reach the s
 
 ### Replace Serialiser {#widgets-full-transform-data-replace}
 
-Otherwise, the serialiser can also be replaced in its entirety, also by setting an attribute, `TOJSON_FUNC`, to the `x` object. Below the serialiser is changed to jsonify [@R-jsonify] which by default serialises data frames to wide, unlike htmlwidgets' serialiser, thereby also fixing the issue.
+Otherwise, the serialiser can also be replaced in its entirety, also by setting an attribute, `TOJSON_FUNC`, to the `x` object. Below the serialiser is changed to jsonify [@R-jsonify], which by default serialises data frames to wide, unlike htmlwidgets' serialiser, thereby also fixing the issue.
 
 
 ```r
@@ -412,9 +412,9 @@ x = list(
 
 The above would make it such that the serialiser no longer has to interpret how the data should be serialised (row-wise or column-wise), the data now being a list will be serialised correctly.
 
-### Pros & Cons {#widgets-full-transform-data-conclusion}
+### Pros and Cons {#widgets-full-transform-data-conclusion}
 
-There are pros and cons to each method. The preferable method is probably to alter the default serialiser __only where needed__; this is the method used in the remainder of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Moreover, htmlwidgets' serialiser extends jsonlite to allow converting JavaScript code which will come in handy later on. Transforming the data in JavaScript has one drawback, `HTMLWidgets.dataframeToD3` cannot be applied to the entire `x` object, it will only work on the subsets that hold the column-wise data (`x.data`) which tends to lead to clunky code as one uses said function in various places.
+There are pros and cons to each method. The preferable method is probably to alter the default serialiser __only where needed__; this is the method used in the remainder of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Moreover, htmlwidgets' serialiser extends jsonlite to allow converting JavaScript code, which will come in handy later on. Transforming the data in JavaScript has one drawback, `HTMLWidgets.dataframeToD3` cannot be applied to the entire `x` object, it will only work on the subsets that hold the column-wise data (`x.data`), which tends to lead to clunky code as one uses said function in various places.
 
 ```{r gio-data, fig.pos="H", echo=FALSE, fig.cap='Gio output with correct serialisation'}
 knitr::include_graphics("images/gio-data.png")
@@ -422,14 +422,14 @@ knitr::include_graphics("images/gio-data.png")
 
 ## On Print Method {#widgets-full-on-print}
 
-Let us add the option to style the globe, gio.js provides multiple [themes](https://giojs.org/html/docs/colorStyle.html), but they are currently not applicable from R. As a matter of fact, gio.js provides dozens of customisation options that should be available in the package as well. These, however, probably should be split across different functions, just like they are in gio.js, rather than all be accessible from a single function containing hundreds of arguments. This begs the question, when would one use another function given the function `gio` generates the visualisation? As it happens `gio` itself (or rather the function `htmlwidgets::createWidget` it contains) does not render the output, it returns an object of class "htmlwidget" which renders the visualisation on print (literally `htmlwidget.print` method).
+Let us add the option to style the globe: gio.js provides multiple [themes](https://giojs.org/html/docs/colorStyle.html) but they are currently not applicable from R. As a matter of fact, gio.js provides dozens of customisation options that should be available in the package as well. These, however, probably should be split across different functions, just like they are in gio.js, rather than all be accessible from a single function containing hundreds of arguments. This begs the question, when would one use another function given the function `gio` generates the visualisation? As it happens `gio` itself (or rather the function `htmlwidgets::createWidget` it contains) does not render the output; it returns an object of class "htmlwidget," which renders the visualisation on print (literally `htmlwidget.print` method).
 
 ```r
 g <- gio(arcs) # nothing renders
 g # visualisation renders
 ```
 
-Therefore, one can use functions on the object returned by `gio` which contains, amongst other things, the `x` list to which we can make changes, append data, or do any other operation that standard R lists allow. 
+Therefore, one can use functions on the object returned by `gio`, which contains, amongst other things, the `x` list to which we can make changes, append data, or do any other operation that standard R lists allow. 
 
 ```r
 print(g$x)
@@ -444,7 +444,7 @@ print(g$x)
 ## [1] "rows"
 ```
 
-This clarified the function to change the style of the visualisation can be added to the package. It would take as input the output of `gio` and append the style (name of theme) to the `x` list; this would then be used in JavaScript to change the look of the visualisation.
+This clarified, the function to change the style of the visualisation can be added to the package. It would take as input the output of `gio` and append the style (name of theme) to the `x` list; this would then be used in JavaScript to change the look of the visualisation.
 
 ```r
 #' @export
@@ -499,4 +499,4 @@ The pipe drastically improves the API that gio provides its users and thus proba
 usethis::use_pipe()
 ```
 
-This closes this chapter but is not the last we see of gio.js; we shall use it as an example in the next chapters as we extend its functionalities, polish certain aspects such as sizing and security.
+This closes this chapter but is not the last we see of gio.js; we shall use it as an example in the next chapters as we extend its functionalities and polish certain aspects such as sizing and security.

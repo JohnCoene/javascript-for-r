@@ -1,6 +1,6 @@
 # Widgets with Shiny {#shiny-widgets}
 
-We have seen how to make JavaScript and R communicate in shiny applications by passing data from the server to the client and back. This chapter explores how to apply that to htmlwidgets so they can provide additional functionalities when used in Shiny applications. 
+We have seen how to make JavaScript and R communicate in Shiny applications by passing data from the server to the client and back. This chapter explores how to apply that to htmlwidgets so they can provide additional functionalities when used in Shiny applications. 
 
 To demonstrate how to integrate these functionalities in widgets, we shall implement them in the previously built gio package.
 
@@ -8,7 +8,7 @@ To demonstrate how to integrate these functionalities in widgets, we shall imple
 
 ## Widgets to R {#shiny-widgets-to-r}
 
-In a previous chapter on [Linking Widgets](#linking-widgets), the topic of callback function was briefly explored. Gio.js provides a callback function that is fired every time a country is selected on globe; this is currently used to share said country with other widgets as part of the implementation with crosstalk. This callback function could also send data back to the R server where they could be used for many things like fetching more data on the selected country from a database or use that information to generate a shiny UI element like displaying the flag of the selected country, and much, much more.
+In a previous chapter on [Linking Widgets](#linking-widgets), the topic of callback function was briefly explored. Gio.js provides a callback function that is fired every time a country is selected on globe; this is currently used to share said country with other widgets as part of the implementation with crosstalk. This callback function could also send data back to the R server where they could be used for many things like fetching more data on the selected country from a database or use that information to generate a Shiny UI element like displaying the flag of the selected country, and much, much more.
 
 The callback function in the gio package currently looks like this; it only makes use of some of the data for crosstalk.
 
@@ -22,7 +22,7 @@ function callback (selectedCountry, relatedCountries) {
 controller.onCountryPicked(callback);
 ```
 
-We can make further use of this to define two different shiny inputs; one for the selected country and another for its related edges. 
+We can make further use of this to define two different Shiny inputs; one for the selected country and another for its related edges. 
 
 ```js
 // gio.js
@@ -34,7 +34,7 @@ function callback (selectedCountry, relatedCountries) {
 }
 ```
 
-However, this will generate an issue experienced in a previous chapter; multiple gio visualisations in a single shiny application would be defining the values of a single input. This can be remedied to by using the id of the visualisation to generate the input name dynamically.
+However, this will generate an issue experienced in a previous chapter; multiple gio visualisations in a single Shiny application would be defining the values of a single input. This can be remedied to by using the id of the visualisation to generate the input name dynamically.
 
 ```js
 renderValue: function(x) {
@@ -58,7 +58,7 @@ renderValue: function(x) {
 }
 ```
 
-The package can then be installed with `devtools::install` so we can test these inputs in a shiny application.
+The package can then be installed with `devtools::install` so we can test these inputs in a Shiny application.
 
 ```r
 library(gio)
@@ -146,7 +146,7 @@ related_countries_handler <- function(x, session, inputname){
 }
 ```
 
-Then the handler must be registered with shiny since handlers can only be registered once an excellent place to put it this is in the `.onLoad` function of the package.
+Then the handler must be registered with Shiny since handlers can only be registered once an excellent place to put it this is in the `.onLoad` function of the package.
 
 ```r
 # zzz.R
@@ -162,7 +162,7 @@ related_countries_handler <- function(x, session, inputname){
 }
 ```
 
-Finally, we can reinstall the package with `devtools::install` and create a shiny application to observe the change. Below we use a large example dataset and, since the input now returns a data frame, we can display the input value in a table.
+Finally, we can reinstall the package with `devtools::install` and create a Shiny application to observe the change. Below we use a large example dataset and, since the input now returns a data frame, we can display the input value in a table.
 
 ```r
 library(DT)
@@ -203,11 +203,11 @@ shinyApp(ui, server)
 
 ## R to Widgets {#shiny-widgets-r-to-widgets}
 
-This book previously explored how to send data from the shiny server to the front-end; this section applies this to htmlwidgets. Currently, using gio in shiny consists of generating the globe with the `renderGio` and complimentary `gioOutput` functions. This generates the complete visualisation, it creates the HTML element where it places the globe, draws the arcs based on the data, sets the style, etc.
+This book previously explored how to send data from the Shiny server to the front end; this section applies this to htmlwidgets. Currently, using gio in Shiny consists of generating the globe with the `renderGio` and complimentary `gioOutput` functions. This generates the complete visualisation, it creates the HTML element where it places the globe, draws the arcs based on the data, sets the style, etc.
 
 Now imagine that only one of those aspects needs changing, say the data, or the style, given the functions currently at hand one would have to redraw the entire visualisation, only this time changing the data or the style. This is inelegant and not efficient, most JavaScript visualisation libraries, including gio.js, will enable changing only certain aspects of the output without having to redraw it all from scratch.
 
-Before we look into the implementation, let us create a shiny application which would benefit from such a feature. The shiny application below provides a drop-down menu to select between two datasets to draw on the globe, running it reveals an issue with gio though. Upon selecting a dataset with the drop down a second globe appears underneath the original one. This is because internally gio.js creates a new element (`<canvas>`) within the `<div>` created by `htmlwidgets` when running `init` regardless of whether one was already created. Therefore, every call to `init` creates a new `<canvas>` with a different globe. Note that most visualisation libraries _will not have that issue_, they will detect the existing output and override it instead.
+Before we look into the implementation, let us create a Shiny application which would benefit from such a feature. The Shiny application below provides a drop-down menu to select between two datasets to draw on the globe, running it reveals an issue with gio though. Upon selecting a dataset with the drop down a second globe appears underneath the original one. This is because internally gio.js creates a new element (`<canvas>`) within the `<div>` created by `htmlwidgets` when running `init` regardless of whether one was already created. Therefore, every call to `init` creates a new `<canvas>` with a different globe. Note that most visualisation libraries _will not have that issue_, they will detect the existing output and override it instead.
 
 ```r
 library(gio)
@@ -290,9 +290,9 @@ gio_send_data <- function(id, data, source, target, value,
 }
 ```
 
-The function takes the id of the visualisation the data is destined for, the data object itself, and a shiny session used to send the data. The id of the visualisation is sent as part of the message and will be used to retrieve the instance of the visualisation and subsequently apply the new dataset. Note that we give this message the `send-data` identifier, this will be needed when we write its handler.
+The function takes the id of the visualisation the data is destined for, the data object itself, and a Shiny session used to send the data. The id of the visualisation is sent as part of the message and will be used to retrieve the instance of the visualisation and subsequently apply the new dataset. Note that we give this message the `send-data` identifier, this will be needed when we write its handler.
 
-There is one caveat that will make it such that the above will not work. To have gio.js work with data changes had to be made to the serialiser (using the `TOJSON_ARGS` attribute), this cannot be used here. The data being sent with Shiny via the session object the problem reoccurs: shiny, like htmlwidgets, serialises data frames column-wise and not row-wise. One can preview the way shiny serialises with `shiny:::toJSON` (three-colon).
+There is one caveat that will make it such that the above will not work. To have gio.js work with data changes had to be made to the serialiser (using the `TOJSON_ARGS` attribute), this cannot be used here. The data being sent with Shiny via the session object the problem reoccurs: Shiny, like htmlwidgets, serialises data frames column-wise and not row-wise. One can preview the way Shiny serialises with `shiny:::toJSON` (three-colon).
 
 
 ```r
@@ -414,7 +414,7 @@ function get_gio(id){
 
 ### Handle Data {#shiny-widgets-handle-data}
 
-We can now turn the attention to actually applying the data sent from the R server to the visualisation: the "message handler." Registering the message handler is only relevant if shiny is running. Therefore HTMLWidgets comes with a function to check whether that is the case which is useful to avoid needless errors. We can thus use it in an if statement in which all message handlers will be registered.
+We can now turn the attention to actually applying the data sent from the R server to the visualisation: the "message handler." Registering the message handler is only relevant if Shiny is running. Therefore HTMLWidgets comes with a function to check whether that is the case which is useful to avoid needless errors. We can thus use it in an if statement in which all message handlers will be registered.
 
 ```js
 // gio.js
@@ -454,7 +454,7 @@ if (HTMLWidgets.shinyMode){
 }
 ```
 
-We can then build a shiny application to test the new functionality.
+We can then build a Shiny application to test the new functionality.
 
 ```r
 library(gio)
@@ -514,7 +514,7 @@ Switching dataset with the dropdown only changes the data; it makes for a much s
 
 Before we add other similar functions, we ought to pause and consider the API this provides the user. There are two points, every function such as `gio_send_data`, will need to accept the `id` and `session` arguments. It will be tedious to so every time, following the old "don't repeat yourself" adage we ought to abstract this further. 
 
-This can be remedied to by introducing what is often referred to as a "proxy." A proxy is just a representation of the graph, or pragmatically, an object that contains the id of the visualisation and a shiny session. This object can subsequently be piped to other functions, thereby providing not only a cleaner but also a more consistent API. 
+This can be remedied to by introducing what is often referred to as a "proxy." A proxy is just a representation of the graph, or pragmatically, an object that contains the id of the visualisation and a Shiny session. This object can subsequently be piped to other functions, thereby providing not only a cleaner but also a more consistent API. 
 
 ```r
 #' @export
@@ -525,7 +525,7 @@ gio_proxy <- function(id,
 }
 ```
 
-Above we create a function called `gio_proxy` which takes the `id` of the chart one wants to build a proxy off, as well as the shiny `session`, they are returned in the form of a list. Next, we should adapt the `gio_send_data` so that it accepts the output of `gioProxy` instead of the `id` and `session` as done previously. In order to allow chaining such functions, we also make sure it returns the `proxy` object.
+Above we create a function called `gio_proxy` which takes the `id` of the chart one wants to build a proxy off, as well as the Shiny `session`, they are returned in the form of a list. Next, we should adapt the `gio_send_data` so that it accepts the output of `gioProxy` instead of the `id` and `session` as done previously. In order to allow chaining such functions, we also make sure it returns the `proxy` object.
 
 ```r
 #' @export
@@ -563,7 +563,7 @@ Shiny.addCustomMessageHandler(
 });
 ```
 
-Then one can build an application to test that new function. We build a shiny application with a button to add the data to the visualisation and another to clear data from it.
+Then one can build an application to test that new function. We build a Shiny application with a button to add the data to the visualisation and another to clear data from it.
 
 ```r
 library(gio)
@@ -631,7 +631,7 @@ Shiny.addCustomMessageHandler(
 });
 ```
 
-At this stage, one can try the function in a shiny application, but it will not work because most such methods that change underlying aspects of a visualisation will not be reflected in real-time. Gio.js, and many other libraries, will require one to explicitly ask for an update so the changes take effect. This has multiple advantages, one can stack multiple visual changes to execute them at the same time, and one can manage the load on the front-end. 
+At this stage, one can try the function in a Shiny application, but it will not work because most such methods that change underlying aspects of a visualisation will not be reflected in real-time. Gio.js, and many other libraries, will require one to explicitly ask for an update so the changes take effect. This has multiple advantages, one can stack multiple visual changes to execute them at the same time, and one can manage the load on the front end. 
 
 ```js
 Shiny.addCustomMessageHandler(

@@ -4,7 +4,7 @@
 library(peity)
 ```
 
-In this section, we build a package called `peity` which wraps the JavaScript library of the same name, [peity.js](https://github.com/benpickles/peity) to create inline charts. This builds upon many things we explored in the playground package built in the previous chapter.
+In this section, we build a package called `peity`, which wraps the JavaScript library of the same name, [peity.js](https://github.com/benpickles/peity), to create inline charts. This builds upon many things we explored in the playground package built in the previous chapter.
 
 ```r
 usethis::create_package("peity")
@@ -40,9 +40,9 @@ Peity.js depends on jQuery. Hence the latter is imported first; the data for the
 
 ## Dependencies {#widgets-realistic-deps}
 
-Once the package created and the widget scaffold laid down, we need to add the JavaScript dependencies without which nothing can move forward.
+Once the package is created and the widget scaffold laid down, we need to add the JavaScript dependencies without which nothing can move forward.
 
-Two dependencies are required in order for peity.js to run: peity.js and jQuery, instead of using the CDN those are downloaded as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Each of the two library is placed in its own respective directory.
+Two dependencies are required in order for peity.js to run: peity.js and jQuery. Instead of using the CDN those are downloaded as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Each of the two libraries is placed in its own respective directory.
 
 ```r
 dir.create("./inst/htmlwidgets/jquery")
@@ -82,7 +82,7 @@ This produces a directory that looks like this:
             └── jquery.peity.min.js
 ```
 
-In htmlwidgets dependencies are specified in the `.yaml` file located at `inst/htmlwidgets` which at first contains a commented template.
+In htmlwidgets, dependencies are specified in the `.yaml` file located at `inst/htmlwidgets`, which at first contains a commented template.
 
 ```yml
 # (uncomment to add a dependency)
@@ -109,7 +109,7 @@ dependencies:
 ```
 
 ```{block, type='rmdnote'}
-The order of the dependencies matters, peity.js depends on jQuery hence the latter comes first in the `.yaml`.
+The order of the dependencies matters. Peity.js depends on jQuery hence the latter comes first in the `.yaml`.
 ```
 
 The order in which one specifies the dependencies matters, just like it does in an HTML file, therefore jQuery is listed first. The `stylesheet` entries were removed as none of these libraries require CSS files. The `src` path points to the directory containing the JavaScript files and stylesheets relative to the `inst` directory of the package; this is akin to using the `system.file` function to return the full path to a file or directory within the package.
@@ -120,7 +120,7 @@ system.file("htmlwidgets/peity", package = "peity")
 #> "/home/me/packages/peity/inst/htmlwidgets/peity"
 ```
 
-We should verify that this is correct by using the one R function the package features and check the source code of the output to verify that the dependencies are well present in the HTML output. We thus run `peity("test")`, open the output in the browser (![](images/open-in-browser.png)) and look at the source code of the page. At the top of the page, one should see `jquery.min.js` and `jquery.peity.min.js` imported, clicking those links will either present you with the content of the file or an error.
+We should verify that this is correct by using the one R function the package features and check the source code of the output to verify that the dependencies are well present in the HTML output. We thus run `peity("test")`, open the output in the browser (![](images/open-in-browser.png)) and look at the source code of the page. At the top of the page, you should see `jquery.min.js` and `jquery.peity.min.js` imported, clicking those links will either present you with the content of the file or an error.
 
 ```html
 <!DOCTYPE html>
@@ -137,7 +137,7 @@ We should verify that this is correct by using the one R function the package fe
 
 ## Implementation {#widgets-realistic-implementation}
 
-Peity.js' JavaScript code is relatively uncomplicated, it is just one function, but integrating it with htmlwidgets requires some thinking. In the example below, peity is applied to the element with `id = 'elementId'`, the first argument of `peity` is the type of chart to produce form the data and the second optional argument is a JSON of options.
+The JavaScript code for peity.js is relatively uncomplicated. It is just one function, but integrating it with htmlwidgets requires some thinking. In the example below, peity is applied to the element with `id = 'elementId'`; the first argument of `peity` is the type of chart to produce from the data, and the second optional argument is a JSON of options.
 
 ```js
 $("#elementId").peity("bar", {
@@ -151,7 +151,7 @@ Also, the data that peity uses to draw the inline chart is not passed to the fun
 <span id="elementId">5,3,9,6</span>
 ```
 
-Therefore, the htmlwidget will have to insert the data in the HTML element then run the `peity` function to render the chart. Inserting the data is not easy as much as already done by htmlwidgets by default. Indeed the default htmlwidgets template takes a `message` from the R function, and inserts said message in the HTML element, passing a vector instead of a message produces precisely what peity expects!
+Therefore, the htmlwidget will have to insert the data in the HTML element, then run the `peity` function to render the chart. Inserting the data is actually already done by htmlwidgets by default. Indeed the default htmlwidgets template takes a `message` from the R function, and inserts said message in the HTML element, passing a vector instead of a message produces precisely what peity expects!
 
 ```r
 peity(c(1,5,6,2))
@@ -189,7 +189,7 @@ peity <- function(data, width = NULL, height = NULL,
 }
 ```
 
-The change in the R code must be mirrored in the `peity.js` file where it should set the `innerText` to `x.data` instead of `x.message`. 
+The change in the R code must be mirrored in the `peity.js` file, where it should set the `innerText` to `x.data` instead of `x.message`. 
 
 ```js
 // peity.js
@@ -213,7 +213,7 @@ renderValue: function(x) {
 }
 ```
 
-One could be tempted to run `devtools::load_all` but this will not work, namely because the function uses a selector that will not return any object; it needs to be applied to the div created by the widget not `#elementId`. As explained in the previous chapter, the selector of the element created is accessible from the `el` object. As a matter of fact, we did log in the browser console the id of the created div taken from `el.id`. Therefore concatenating the pound sign and the element id produces the select to said element (`.class`, `#id`).
+One could be tempted to run `devtools::load_all`, but this will not work, namely because the function uses a selector that will not return any object; it needs to be applied to the div created by the widget not `#elementId`. As explained in the previous chapter, the selector of the element created is accessible from the `el` object. As a matter of fact, we did log in the browser console the id of the created div taken from `el.id`. Therefore concatenating the pound sign and the element id produces the selector to said element (`.class`, `#id`).
 
 ```js
 $("#" + el.id).peity("bar", {
@@ -221,7 +221,7 @@ $("#" + el.id).peity("bar", {
 })
 ```
 
-This will work but can be further simplified; there is no need to recreate a selector using the `id` of the `el` element, the latter can be used in the jQuery selector directly.
+This will work but can be further simplified; there is no need to recreate a selector using the `id` of the `el` element; the latter can be used in the jQuery selector directly.
 
 ```js
 $(el).peity("bar", {
@@ -229,7 +229,7 @@ $(el).peity("bar", {
 })
 ```
 
-This will now produce a working widget, albeit limited to creating charts of a predefined type and colour. Next, these options defining the chart type, fill colours and others must be made available from R.
+This will now produce a working widget, albeit limited to creating charts of a predefined type and colour. Next, these options defining the chart type, fill colours, and others must be made available from R.
 
 Below we add a `type` argument to the `peity` function; this `type` argument is then forwarded to `x`, so it is serialised and accessible in the JavaScript file.
 
@@ -265,7 +265,7 @@ $(el).peity(x.type, {
 })
 ```
 
-Reloading the package will now let one create a chart and define its type, but some options remain hard-coded. These can be made available from R in a variety of ways depending on the interface one wants to provide users of the package. Here we make them available via the three-dot construct (`...`) which are captured in a list and forwarded to the `x` object.
+Reloading the package will now let one create a chart and define its type, but some options remain hard-coded. These can be made available from R in a variety of ways depending on the interface one wants to provide users of the package. Here we make them available via the three-dot construct (`...`), which are captured in a list and forwarded to the `x` object.
 
 ```r
 peity <- function(data, type = c("bar", "line", "pie", "donut"), 
@@ -337,7 +337,7 @@ There is nonetheless one remaining issue: peity.js is meant to create inline cha
 
 As pointed out multiple times, the widget is generated in a `<div>`, which is working fine for most visualisation libraries. However, we saw that peity.js works best when placed in a `<span>` as this allows placing the charts inline. 
 
-This can be changed by placing a function named `widgetname_html` which is looked up by htmlwidgets and used if found. This is probably the first such function one encounters and is relatively uncommon, but it is literally how the htmlwidgets package does it: it scans the namespace of the package looking for a function that starts with the name of the widget and ends in `_html` and if found uses it. Otherwise, it uses the default `div`. This function takes the three-dot construct (`...`) and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets need to be able to pass the `id`, `class`, and `style` attributes to the tag.
+This can be changed by placing a function named `widgetname_html`, which is looked up by htmlwidgets and used if found. This is probably the first such function one encounters and is relatively uncommon, but it is literally how the htmlwidgets package does it: it scans the namespace of the package looking for a function that starts with the name of the widget and ends in `_html` and if found uses it. Otherwise, it uses the default `div`. This function takes the three-dot construct (`...`) and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets need to be able to pass the `id`, `class`, and `style` attributes to the tag.
 
 ```r
 peity_html <- function(...){
@@ -345,7 +345,7 @@ peity_html <- function(...){
 }
 ```
 
-This can also come in handy if some arguments must be hard-coded such as assigning a specific class to every widget.
+This can also come in handy if some arguments must be hard-coded, such as assigning a specific class to every widget.
 
 ```r
 myWidget_html <- function(..., class){

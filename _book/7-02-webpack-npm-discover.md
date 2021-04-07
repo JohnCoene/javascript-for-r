@@ -2,9 +2,9 @@
 
 
 
-In this chapter, we discover how to feature webpack and NPM in a straightforward shiny project. The idea is not to build a complex application, only to find out how one might go about bringing them into an R project and observe some of their benefits (and potential issues).
+In this chapter, we discover how to feature webpack and NPM in a straightforward Shiny project. The idea is not to build a complex application, only to find out how one might go about bringing them into an R project and observe some of their benefits (and potential issues).
 
-There is a lot of depth to NPM and webpack; we only touch upon the surface here so we can obtain a basic setup for a shiny application. We'll eventually go into slightly more details as this part of the book progress, but it will by no means fully explore the realm of webpack. It's always a good idea to take a look at the [official documentation](https://webpack.js.org/) to get a better picture of the technology.
+There is a lot of depth to NPM and webpack; we only touch upon the surface here so we can obtain a basic setup for a Shiny application. We'll eventually go into slightly more details as this part of the book progress, but it will by no means fully explore the realm of webpack. It's always a good idea to take a look at the [official documentation](https://webpack.js.org/) to get a better picture of the technology.
 
 ## Installation {#webpack-intro-install}
 
@@ -55,7 +55,7 @@ If you are on another OS or Linux distro check the official, very concise [guide
 
 ## Setup the app {#webpack-intro-setup}
 
-Let us first put together a simple shiny application that which will serve as a basis for including webpack and npm. Create a new directory and in it place a file called `app.R` containing a very simple application.
+Let us first put together a simple Shiny application that which will serve as a basis for including webpack and npm. Create a new directory and in it place a file called `app.R` containing a very simple application.
 
 ```r
 library(shiny)
@@ -239,7 +239,7 @@ One can then bundle the code using the scripts that we defined to produce the ou
 npm run build-prod
 ```
 
-We can then include the output of webpack in the shiny application to test that all works well.
+We can then include the output of webpack in the Shiny application to test that all works well.
 
 ```r
 library(shiny)
@@ -267,9 +267,9 @@ This makes for a great start but is not precisely interesting; in the following 
 
 ## Internal Dependencies {#webpack-intro-internal-dependencies}
 
-Let's install a dependency and make use of it in our shiny application. 
+Let's install a dependency and make use of it in our Shiny application. 
 
-We'll install [mousetrap](https://github.com/ccampbell/mousetrap) a library to handle key-strokes. We're going to use it to hide the UI of the shiny application behind a secret pass-phrase; it will only be revealed after it has been typed. This can be done by observing a specific set of key-strokes with mousetrap and set a shiny input value when that particular sequence is typed.
+We'll install [mousetrap](https://github.com/ccampbell/mousetrap) a library to handle key-strokes. We're going to use it to hide the UI of the Shiny application behind a secret pass-phrase; it will only be revealed after it has been typed. This can be done by observing a specific set of key-strokes with mousetrap and set a Shiny input value when that particular sequence is typed.
 
 <div class="rmdnote">
 <p>This is by no means a safe way to secure an application!</p>
@@ -289,7 +289,7 @@ Note that we use `--save` as mousetrap will need to be included in the output we
 
 If dependencies with webpack have to be installed from NPM it begs the question; what about dependencies that are already included in the project and are not available on NPM.
 
-For instance, this project is intended to work with a shiny application which comes bundled with jQuery, and the shiny JavaScript library. First, the shiny javaScript library is not available on NPM. Second installing it would result in duplicating dependencies which is hardly best practice. Thankfully webpack comes with a simple mechanism to handle these cases; external dependencies can be added to the configuration file under `externals`.
+For instance, this project is intended to work with a Shiny application which comes bundled with jQuery, and the Shiny JavaScript library. First, the Shiny javaScript library is not available on NPM. Second installing it would result in duplicating dependencies which is hardly best practice. Thankfully webpack comes with a simple mechanism to handle these cases; external dependencies can be added to the configuration file under `externals`.
 
 ```js
 module.exports = {
@@ -304,7 +304,7 @@ The above will allow importing the `Shiny` object in scripts, which is needed to
 
 ## Import & Export {#webpack-intro-import-export}
 
-To demonstrate how webpack enables modularising code, we will not place all the code in the `index.js` file. We create two other files,`secret.js` and `input.js`, the first will contain the pass-phrase and the second will have the code to handle the key strokes via mousetrap and set the shiny input. This will enable using the pass-phrase in multiple places without duplicating code.
+To demonstrate how webpack enables modularising code, we will not place all the code in the `index.js` file. We create two other files,`secret.js` and `input.js`, the first will contain the pass-phrase and the second will have the code to handle the key strokes via mousetrap and set the Shiny input. This will enable using the pass-phrase in multiple places without duplicating code.
 
 ```r
 file.create("src/input.js")
@@ -385,7 +385,7 @@ import secret from './secret.js';
 
 ### Wrap up {#webpack-intro-import-export-wrap-up}
 
-We'll be using a named export method in `secret.js`. The same general logic can be applied to import the external dependency shiny as well as mousetrap. 
+We'll be using a named export method in `secret.js`. The same general logic can be applied to import the external dependency Shiny as well as mousetrap. 
 
 ```js
 import Shiny from 'shiny';
@@ -406,7 +406,7 @@ import './input.js';
 
 This can then be bundled with `npm run bundle-prod` which will look at the entry point (`index.js`) observes that it imports the file `input.js` which itself imports `secret.js`; webpack builds this dependency tree and includes all that is needed in the bundle. 
 
-This can be used in the shiny application, which we modify so it listens to the `secret` input and only when that input is set renders a plot and a message.
+This can be used in the Shiny application, which we modify so it listens to the `secret` input and only when that input is set renders a plot and a message.
 
 ```r
 library(shiny)

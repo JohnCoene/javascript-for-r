@@ -2,11 +2,11 @@
 
 
 
-Shiny comes with a variety of inputs ranging from buttons to text fields; these inputs send data from the client to the R server. Custom inputs are in fact, no different than from shiny's out-of-the-box inputs, they work in the same way and are built on the same system.
+Shiny comes with a variety of inputs ranging from buttons to text fields; these inputs send data from the client to the R server. Custom inputs are in fact, no different than from Shiny's out-of-the-box inputs, they work in the same way and are built on the same system.
 
 To explain and demonstrate how to build such a custom input, we shall build a switch input which is essentially a fancy-looking checkbox that can be toggled on and off.
 
-Custom shiny inputs very much resemble shiny outputs though they consist of a single R function (e.g.: `selectInput`) which generates the HTML and attaches necessary dependencies. When run from the R console, such functions will reveal the HTML they generate.
+Custom Shiny inputs very much resemble Shiny outputs though they consist of a single R function (e.g.: `selectInput`) which generates the HTML and attaches necessary dependencies. When run from the R console, such functions will reveal the HTML they generate.
 
 ```r
 shiny::textInput("theId", "The label")   
@@ -122,7 +122,7 @@ The above CSS should be placed in the previously created `assets/styles.css` fil
 
 ## Generate Input HTML {#shiny-input-html}
 
-Let us start with the R function to be used in the shiny UI. The `<input>` it generates bears a `switchInput` class, which will be used to identify all switch inputs from JavaScript, this was also done in the custom output. The function accepts an `id` argument; this is also common across all inputs and outputs as a unique identifier is required in order to retrieve the input JavaScript-side. 
+Let us start with the R function to be used in the Shiny UI. The `<input>` it generates bears a `switchInput` class, which will be used to identify all switch inputs from JavaScript, this was also done in the custom output. The function accepts an `id` argument; this is also common across all inputs and outputs as a unique identifier is required in order to retrieve the input JavaScript-side. 
 
 ```r
 # app.R
@@ -218,8 +218,8 @@ Then again the binding is "extended," this consists of adding several methods.
 - `getValue` returns the value of the input to be sent to the server.
 - `setValue` used to set the value of the input.
 - `receiveMessage` used to receive messages from the server.
-- `subscribe` tells shiny when and how to send the updated input value to the server.
-- `unsubscribe` removes event handlers, stops shiny from sending updated values to the server. 
+- `subscribe` tells Shiny when and how to send the updated input value to the server.
+- `unsubscribe` removes event handlers, stops Shiny from sending updated values to the server. 
 
 ### Find Inputs {#shiny-input-find}
 
@@ -322,7 +322,7 @@ $.extend(switchInput, {
 
 ### Subscribe & Unsubscribe Inputs {#shiny-input-sub-unsub}
 
-Finally, a crucial method is `subscribe`, this is run when the input is registered (more on that later) and is used to determine when shiny sends new values of the input back to the server. This method also accepts a `callback` which is the same function that tells shiny to update the value. This callback function accepts a single boolean value which in the [source code](https://github.com/rstudio/shiny/blob/master/srcjs/input_binding.js#L18) states is used to enable debouncing or throttling. This is covered in the next section on rate policy.
+Finally, a crucial method is `subscribe`, this is run when the input is registered (more on that later) and is used to determine when Shiny sends new values of the input back to the server. This method also accepts a `callback` which is the same function that tells Shiny to update the value. This callback function accepts a single boolean value which in the [source code](https://github.com/rstudio/shiny/blob/master/srcjs/input_binding.js#L18) states is used to enable debouncing or throttling. This is covered in the next section on rate policy.
 
 This method often consists of an event listener that observes changes on the input to send its to the server. In layman terms, when the switch input changes (on to off or vice versa) run the `callback` function which sends the data to the server.
 
@@ -353,7 +353,7 @@ $.extend(switchInput, {
 });
 ```
 
-Note that in the `subscribe` method we listen for `change`s on the input; hence the `setValue` also uses jQuery's `change` method; it ensures this event is fired and that shiny will subsequently pick it up. 
+Note that in the `subscribe` method we listen for `change`s on the input; hence the `setValue` also uses jQuery's `change` method; it ensures this event is fired and that Shiny will subsequently pick it up. 
 
 <div class="rmdnote">
 <p>Make sure the <code>setValue</code> method triggers the event observed in <code>subscribe</code></p>
@@ -365,7 +365,7 @@ The rate policy determines how frequently the binding should send new input valu
 
 __direct__
 
-The `direct` policy tells shiny to sends any new value directly, however often this occurs. Therefore, this policy does not make use of `delay`.
+The `direct` policy tells Shiny to sends any new value directly, however often this occurs. Therefore, this policy does not make use of `delay`.
 
 ```json
 {
@@ -375,7 +375,7 @@ The `direct` policy tells shiny to sends any new value directly, however often t
 
 __debounce__
 
-The `debounce` policy tells shiny to ignore all new values until no new values have been received for `delay` milliseconds.
+The `debounce` policy tells Shiny to ignore all new values until no new values have been received for `delay` milliseconds.
 
 ```json
 {
@@ -433,7 +433,7 @@ $.extend(switchInput, {
 
 ### Registering the Input Binding {#shiny-input-register}
 
-Finally, like the custom output, the input can be registered with shiny, it too takes a unique identifier as a second argument.
+Finally, like the custom output, the input can be registered with Shiny, it too takes a unique identifier as a second argument.
 
 ```js
 var switchInput = new Shiny.InputBinding();
@@ -545,7 +545,7 @@ shinyApp(ui, server)
 
 The diagram below attempts to summarize the various elements that were put together and used in the last application.
 
-It all starts from the `switchInput` function which generates the HTML defining the switch input and its initial state. In the `subscribe` method, an event listener checks for changes on this HTML element (`$(el).on('change', ...)`), every time it changes (check/uncheck) it fires the shiny `callback` which sends the value of the input obtained from `getValue` through the WebSocket. When the value of the input is changed from the server this value travels through the WebSocket to the front-end where `receiveMessage` uses `setValue` to programmatically change the check box which incidentally triggers the change event, and back we go.
+It all starts from the `switchInput` function which generates the HTML defining the switch input and its initial state. In the `subscribe` method, an event listener checks for changes on this HTML element (`$(el).on('change', ...)`), every time it changes (check/uncheck) it fires the Shiny `callback` which sends the value of the input obtained from `getValue` through the WebSocket. When the value of the input is changed from the server this value travels through the WebSocket to the front end where `receiveMessage` uses `setValue` to programmatically change the check box which incidentally triggers the change event, and back we go.
 
 <div class="figure" style="text-align: center">
 

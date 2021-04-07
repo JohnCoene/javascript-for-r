@@ -1,6 +1,6 @@
 # Webpack Advanced {#packer-adv}
 
-We're about to cover slightly more advanced uses of NPM and webpack with R using packer. These involve using an NPM dependency to develop a widget and use [Vue.js](https://vuejs.org/) and Bootstrap 3 to power the front-end of a shiny application.
+We're about to cover slightly more advanced uses of NPM and webpack with R using packer. These involve using an NPM dependency to develop a widget and use [Vue.js](https://vuejs.org/) and Bootstrap 3 to power the front end of a Shiny application.
 
 Those will make for more concrete cases to bring webpack into your workflow, and also enable explaining more advanced topics only thus far briefly touched upon, such as transpiling.
 
@@ -178,27 +178,27 @@ That hopefully is a compelling example to use NPM and webpack to build widgets. 
 
 ## Shiny with Vue & Bootstrap 4 {#packer-adv-shiny-vue}
 
-In this example, we create a shiny application that uses [Vue.js](https://vuejs.org/) and Bootstrap 4 in the front-end. As you may know, shiny ships with Bootstrap version 3, not 4 (the latest at the time of writing this).
+In this example, we create a Shiny application that uses [Vue.js](https://vuejs.org/) and Bootstrap 4 in the front end. As you may know, Shiny ships with Bootstrap version 3, not 4 (the latest at the time of writing this).
 
 ### Setup {#packer-adv-shiny-vue-setup}
 
-If you prefer using [React](https://reactjs.org/) know that it is also supported by webpack and packer. Vue is a framework to create user interfaces which, like React, makes much of the front-end work much more straightforward. It reduces the amount of code one has to write, simplifies business logic, enables easily including more reactivity, and much more.
+If you prefer using [React](https://reactjs.org/) know that it is also supported by webpack and packer. Vue is a framework to create user interfaces which, like React, makes much of the front end work much more straightforward. It reduces the amount of code one has to write, simplifies business logic, enables easily including more reactivity, and much more.
 
-Since packer only allows placing scaffolds in R packages, the way one can build shiny applications is using the golem package. Golem is an opinionated framework for build applications _as R packages._ Writing shiny applications as R packages brings many of the advantages that packages have to shiny applications: ease of installation, unit testing, dependency management, etc.
+Since packer only allows placing scaffolds in R packages, the way one can build Shiny applications is using the golem package. Golem is an opinionated framework for build applications _as R packages._ Writing Shiny applications as R packages brings many of the advantages that packages have to Shiny applications: ease of installation, unit testing, dependency management, etc.
 
 ```r
 install.packages("golem")
 ```
 
-After installing golem from CRAN, we can create an application with the `golem::create_golem` function; it's very similar to `usethis::create_package`, only it prepares a package specifically to build shiny applications.
+After installing golem from CRAN, we can create an application with the `golem::create_golem` function; it's very similar to `usethis::create_package`, only it prepares a package specifically to build Shiny applications.
 
 ```r
 golem::create_golem("vuer")
 ```
 
-From within a golem application, one uses a scaffold specifically designed for this with `scaffold_golem`. Note that this does not mean other scaffolds will not work, custom shiny inputs and outputs can also be created with `scaffold_input`, and `scaffold_output` respectively. The `scaffold_golem` function takes two core arguments; `vue` and `react`. Setting either of these to `TRUE` will prepare a scaffold specifically designed to support either Vue or React.
+From within a golem application, one uses a scaffold specifically designed for this with `scaffold_golem`. Note that this does not mean other scaffolds will not work, custom Shiny inputs and outputs can also be created with `scaffold_input`, and `scaffold_output` respectively. The `scaffold_golem` function takes two core arguments; `vue` and `react`. Setting either of these to `TRUE` will prepare a scaffold specifically designed to support either Vue or React.
 
-The reason these arguments exist is that webpack requires further configuration that can be tricky to set up manually. Moreover, Vue supports (but does not require) `.vue` files; these can hold HTML, JavaScript, and CSS. One can think of such files as similar to shiny modules; they encapsulate a part of the logic of the application for easy modularisation.
+The reason these arguments exist is that webpack requires further configuration that can be tricky to set up manually. Moreover, Vue supports (but does not require) `.vue` files; these can hold HTML, JavaScript, and CSS. One can think of such files as similar to Shiny modules; they encapsulate a part of the logic of the application for easy modularisation.
 
 When the `vue` argument is set to `TRUE` in `scaffold_golem`, the function does follow the usual procedure or initialising NPM, creating the various files, and directories, but in addition configures two loaders and the vue plugin.
 
@@ -268,7 +268,7 @@ tagList(
 ℹ Run `bundle` to build the JavaScript files
 ```
 
-Note the first instruction that was printed in the console; it states that a `tagList` to be placed in the shiny UI of the application. It imports the Vue dependency using via the CDN with `vueCDN()`, which is a function created by packer, creates a `<DIV>` with an id attribute of `app` that will be used as root of the Vue application; where the application generated by Vue will be placed. It also imports the bundled JavaScript (`index.js`). So let us place that in the shiny UI, which is in the `R/app_ui.R` file.
+Note the first instruction that was printed in the console; it states that a `tagList` to be placed in the Shiny UI of the application. It imports the Vue dependency using via the CDN with `vueCDN()`, which is a function created by packer, creates a `<DIV>` with an id attribute of `app` that will be used as root of the Vue application; where the application generated by Vue will be placed. It also imports the bundled JavaScript (`index.js`). So let us place that in the Shiny UI, which is in the `R/app_ui.R` file.
 
 ```r
 app_ui <- function(request) {
@@ -301,7 +301,7 @@ Next, we can install Bootstrap 4; we'll use [bootstrap-vue](https://bootstrap-vu
 packer::npm_install("bootstrap-vue", "bootstrap", scope = "prod")
 ```
 
-This will cause some issues though, as the shiny application will have two different versions of Bootstrap, the default version 3 and version 4 from the bundle. We need to remove Bootstrap 3.
+This will cause some issues though, as the Shiny application will have two different versions of Bootstrap, the default version 3 and version 4 from the bundle. We need to remove Bootstrap 3.
 
 ```r
 app_ui <- function(request) {

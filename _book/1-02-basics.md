@@ -4,7 +4,7 @@
 
 The code contained in the following pages is approachable to readers with basic knowledge of R. Still, familiarity with package development using [devtools](https://devtools.r-lib.org/) [@R-devtools], the [Shiny](https://shiny.rstudio.com/) framework [@R-shiny], the JSON data format, and JavaScript are essential. 
 
-The reason for the former is that some of the ways one builds integrations with JavaScript naturally take the form of R packages. Also, R packages make sharing code, datasets, and anything else R-related extremely convenient, they come with a relatively strict structure, the ability to run unit tests, and much more. These have thus become a core feature of the R ecosystem and therefore, are used extensively in the book as we create several packages. Therefore, the following section runs over the essentials of building a package to ensure everyone can keep up. 
+The reason for the former is that some of the ways one builds integrations with JavaScript naturally take the form of R packages. Also, R packages make sharing code, datasets, and anything else R-related extremely convenient, they come with a relatively strict structure, the ability to run unit tests, and much more. These have thus become a core feature of the R ecosystem and, therefore, are used extensively in the book as we create several packages. Therefore, the following section runs over the essentials of building a package to ensure everyone can keep up. 
 
 Then we briefly go through the JSON data format as it will be used to a great extent to communicate between R and JavaScript. Since both Shiny and JavaScript run in the browser they make for axiomatic companions; we'll therefore use Shiny extensively. Finally, there is an obligatory short introduction to JavaScript.
 
@@ -12,9 +12,9 @@ It is highly recommended to use the freely available [RStudio IDE](https://rstud
 
 ## R Package Development {#basics-package-dev}
 
-Developing packages used to be notoriously tricky but things have considerably changed in recent years, namely thanks to the devtools [@R-devtools], roxygen2 [@R-roxygen2] and more recent [usethis](https://usethis.r-lib.org/) [@R-usethis] packages. Devtools is short for "developer tools," it is specifically designed to help creating packages; setting up tests, running checks, building and installing packages, etc. The second provides an all too convenient way to generate the documentation of packages, and usethis, more broadly helps setting up projects, and automating repetitive tasks. Here, we only skim over the fundamentals, there is an entire book by Hadley Wickham called [R Packages](http://r-pkgs.had.co.nz/) solely dedicated to the topic.
+Developing packages used to be notoriously tricky, but things have considerably changed in recent years, namely thanks to the devtools [@R-devtools], roxygen2 [@R-roxygen2], and more recent [usethis](https://usethis.r-lib.org/) [@R-usethis] packages. Devtools is short for "developer tools," it is specifically designed to help creating packages; setting up tests, running checks, building and installing packages, etc. The second provides an all too convenient way to generate the documentation of packages, and usethis, more broadly, helps setting up projects, and automating repetitive tasks. Here, we only skim over the fundamentals, there is an entire book by Hadley Wickham called [*R Packages*](http://r-pkgs.had.co.nz/) solely dedicated to the topic.
 
-Start by installing those packages from CRAN, the roxygen2 package does not need to be explicitly installed as it is a dependency of devtools.
+Start by installing those packages from CRAN the roxygen2 package does not need to be explicitly installed as it is a dependency of devtools.
 
 ```r
 install.packages(c("devtools", "usethis"))
@@ -96,7 +96,7 @@ string_length <- function(string) {
 <p>Note that the function is preceded by its namespace with <code>::</code> (more on this later).</p>
 </div>
 
-The `DESCRIPTION` file does this, it will make sure that the dependencies of the package are met by users who install it. We can specify such dependencies under `Imports` where we can list packages required separated by a comma.
+The `DESCRIPTION` file does this; it will make sure that the dependencies of the package are met by users who install it. We can specify such dependencies under `Imports`, where we can list packages required separated by a comma.
 
 ```
 Imports:
@@ -126,7 +126,7 @@ string_length <- function(strings) {
 
 ### Documentation {#basics-documentation}
 
-Documenting packages used to be notoriously complicated but thanks to the package roxygen2 it is no longer the case. The documentation of functions of the package (accessible with `?`) and datasets that comprise the package reside in separate files sitting in the `man/` directory. These are `.Rd` files that use a custom syntax resembling LaTex. The roxygen package eases the creation of these files by turning special comments and tags in `.R` files into said `.Rd` files. 
+Documenting packages used to be notoriously complicated, but thanks to the package roxygen2 that is no longer the case. The documentation of functions of the package (accessible with `?`) and datasets that comprise the package reside in separate files sitting in the `man/` directory. These are `.Rd` files that use a custom syntax resembling LaTex. The roxygen package eases the creation of these files by turning special comments and tags in `.R` files into said `.Rd` files. 
 
 Special comments are a standard R comment `#` followed by an apostrophe `'`. The first sentence of the documentation is the title of the documentation file while the second is the description.
 
@@ -139,7 +139,7 @@ string_length <- function(strings) {
 }
 ```
 
-There are a plethora of roxygen2 tags to further document different sections, below we use two different tags to document the parameters and give an example. 
+There are a plethora of roxygen2 tags to further document different sections. Below we use two different tags to document the parameters and give an example. 
 
 ```r
 #' Strings Length
@@ -154,9 +154,9 @@ string_length <- function(strings) {
 }
 ```
 
-As well as generating documentation, the roxygen2 package also allows populating the `NAMESPACE` file. This is an extensive and often confusing topic, but for this book, we'll content with the following: the `NAMESPACE` includes functions that are _imported_ and _exported_ by the package.
+As well as generating documentation, the roxygen2 package also allows populating the `NAMESPACE` file. This is an extensive and often confusing topic, but for this book, we'll be content with the following: the `NAMESPACE` includes functions that are _imported_ and _exported_ by the package.
 
-By default functions that are present in the R files in the `R/` directory are not exported: they are not accessible outside the package. Therefore the `string_length` function defined previously will not be made available to users of the package, only other function within the package will be able to call it. To export it we can use the `@export` tag. This will place the function as exported in the `NAMESPACE` file.
+By default, functions that are present in the R files in the `R/` directory are not exported: they are not accessible outside the package. Therefore the `string_length` function defined previously will not be made available to users of the package, only other functions within the package will be able to call it. To export it we can use the `@export` tag. This will place the function as exported in the `NAMESPACE` file.
 
 ```r
 #' Strings Length
@@ -192,7 +192,7 @@ string_length <- function(strings) {
 }
 ```
 
-Above we import the function `str_length` from the `stringr` package using the `importFrom` roxygen2 tag. The first term following the tag is the name of the package wherefrom to import the functions, and the following terms are the name of the functions separated by spaces so one can import multiple functions from the same package with, e.g.: `@importFrom stringr str_length str_to_upper`. If the package uses very many functions from a single package one might also consider importing said package in its entirety with, e.g.: `@import stringr`.
+Above we import the function `str_length` from the `stringr` package using the `importFrom` roxygen2 tag. The first term following the tag is the name of the package wherefrom to import the functions, and the following terms are the name of the functions separated by spaces so one can import multiple functions from the same package with, e.g.: `@importFrom stringr str_length str_to_upper`. If the package imports many functions from a single package one might also consider importing the package in its entirety with, e.g.: `@import stringr`.
 
 Finally, one can actually generate the `.Rd` documentation files and populate the `NAMESPACE` with either the `devtools::document()` function or `roxygen2::roxygenise()`.
 
@@ -202,7 +202,7 @@ Finally, one can actually generate the `.Rd` documentation files and populate th
 
 ### Installed files {#basics-installed-files}
 
-Here we tackle the topic of installed files as it will be relevant to much of what the book covers. Installed files are files that are downloaded and copied as-is when users install the package. This directory will therefore come in very handy to store JavaScript files that package will require. These files can be accessed with the `system.file` function which will look for a file from the root of the `inst/` directory.
+Here we tackle the topic of installed files as it will be relevant to much of what the book covers. Installed files are files that are downloaded and copied as-is when users install the package. This directory will therefore come in very handy to store JavaScript files that package will require. These files can be accessed with the `system.file` function, which will look for a file from the root of the `inst/` directory.
 
 ```r
 # return path to `inst/dependency.js` in `myPackage`
@@ -224,7 +224,7 @@ Note whilst this short guide will help you develop packages good enough for your
 
 ## JSON {#basics-json}
 
-JSON (JavaScript Object Notation) is a prevalent data _interchange_ format with which we will work extensively throughout this book; it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together, we must have a data format that can be understood by both---JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the [jsonlite package](https://CRAN.R-project.org/package=jsonlite) [@R-jsonlite] it is the serialiser used internally by all the packages we shall explore in this book.
+JSON (JavaScript Object Notation) is a prevalent data _interchange_ format with which we will work extensively throughout this book; it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together, we must have a data format that can be understood by both---JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the [jsonlite package](https://CRAN.R-project.org/package=jsonlite) [@R-jsonlite] it is the serialiser used internally by all R packages that we explore in this book.
 
 <div class="rmdnote">
 <p>“To serialise” is just jargon for converting data to JSON.</p>
@@ -232,7 +232,7 @@ JSON (JavaScript Object Notation) is a prevalent data _interchange_ format with 
 
 ### Serialising {#serialising}
 
-JSON is to all intents and purposes the equivalent of lists in R; a flexible data format that can store pretty much anything--except data.frames, a structure that does not exist in JavaScript. Below we create a nested list and convert it to JSON with the help of jsonlite. We set `pretty` to `TRUE` to add indentation for cleaner printing, but this is an argument you should omit when writing production code, it will reduce the file size (fewer spaces = smaller file size). 
+JSON is to all intents and purposes the equivalent of lists in R; a flexible data format that can store pretty much anything--except data.frames, a structure that does not exist in JavaScript. Below we create a nested list and convert it to JSON with the help of jsonlite. We set `pretty` to `TRUE` to add indentation for cleaner printing, but this is an argument you should omit when writing production code; it will reduce the file size (fewer spaces = smaller file size). 
 
 
 ```r
@@ -257,7 +257,7 @@ toJSON(lst, pretty = TRUE)
 #> }
 ```
 
-Looking closely at the list and JSON output above, one quickly sees the resemblance. Something seems odd though, the first value in the list (`a = 1`) was serialised to an array (vector) of length one (`"a": [1]`) where one would probably expect an integer instead, `1` not `[1]`. This is not a mistake; we often forget that there are no scalar types in R and that `a` is, in fact, a vector as we can observe below.
+Looking closely at the list and JSON output above, one quickly sees the resemblance. Something seems odd though: the first value in the list (`a = 1`) was serialised to an array (vector) of length one (`"a": [1]`), where one would probably expect an integer instead, `1` not `[1]`. This is not a mistake; we often forget that there are no scalar types in R and that `a` is, in fact, a vector as we can observe below.
 
 
 ```r
@@ -268,7 +268,7 @@ is.vector(x)
 #> [1] TRUE
 ```
 
-JavaScript, on the other hand, does have scalar types, more often than not we will want to convert the vectors of length one to scalar types rather than arrays of length one. To do so we need to use the `auto_unbox` argument in `jsonlite::toJSON`, we'll do this most of the time we have to convert data to JSON.
+JavaScript, on the other hand, does have scalar types; more often than not we will want to convert the vectors of length one to scalar types rather than arrays of length one. To do so we need to use the `auto_unbox` argument in `jsonlite::toJSON`; we'll do this most of the time we have to convert data to JSON.
 
 
 ```r
@@ -282,7 +282,7 @@ toJSON(lst, pretty = TRUE, auto_unbox = TRUE)
 #> }
 ```
 
-As demonstrated above the vector of length one was "unboxed" into an integer, with `auto_unbox` set to `TRUE` jsonlite will properly convert such vectors into their appropriate type; integer, numeric, boolean, etc. Note that this only applies to vectors, lists of length one will be serialised to arrays of length one even with `auto_unbox` turned on: `list("hello")` will always be converted to `["hello"]`.
+As demonstrated above the vector of length one was "unboxed" into an integer; with `auto_unbox` set to `TRUE`, jsonlite will properly convert such vectors into their appropriate type integer, numeric, boolean, etc. Note that this only applies to vectors lists of length one will be serialised to arrays of length one even with `auto_unbox` turned on: `list("hello")` will always be converted to `["hello"]`.
 
 ### Tabular Data {#basics-tabular}
 
@@ -306,14 +306,14 @@ toJSON(df, pretty = TRUE)
 #> ]
 ```
 
-What jsonlite does internally is essentially turning the data.frame into a list _rowwise_ to produce a sub-list for every row then it serialises to JSON. This is generally how rectangular data is represented in lists. For instance, `purrr::transpose` does the same. Another great example is to use `console.table` in the JavaScript console (more on that later) to display the table JSON as a table.
+What jsonlite does internally is essentially turn the data.frame into a list _row-wise_ to produce a sub-list for every row then it serialises to JSON. This is generally how rectangular data is represented in lists. For instance, `purrr::transpose` does the same. Another great example is to use `console.table` in the JavaScript console (more on that later) to display the table JSON as a table (see figure 2.2).
 
 <div class="figure" style="text-align: center">
 <img src="images/console-table.png" alt="console.table output" width="100%" />
 <p class="caption">(\#fig:console-table)console.table output</p>
 </div>
 
-We can reproduce this with the snippet below, we remove row names and use apply to turn every row into a list.
+We can reproduce this with the snippet below; we remove row names and use apply to turn every row into a list.
 
 
 ```r
@@ -361,9 +361,9 @@ Jsonlite provides many more options and functions that will let you tune how JSO
 
 ## JavaScript {#basics-javascript}
 
-The book is not meant to teach one JavaScript, only to show how graciously it can work with R. Let us thus go through the very basics to ensure we know enough to get started with the coming chapters.
+The book is not meant to teach JavaScript, only to show how graciously it can work with R. Let us thus go through the very basics to ensure we know enough to get started with the coming chapters.
 
-The easiest way to run JavaScript interactively is probably to create an HTML file (e.g.: `try.html`), write your code within a `<script>` tag and open the file in your web browser. The console output can be observed in the console of the browser, developer tools (more on that below).
+The easiest way to run JavaScript interactively is probably to create an HTML file (e.g.: `try.html`), write your code within a `<script>` tag and open the file in your web browser. The console output can be observed in the console of the browser, developer tools (see figure 2.3).
 
 ```html
 <!–– index.html ––>
@@ -387,17 +387,17 @@ The easiest way to run JavaScript interactively is probably to create an HTML fi
 
 ### Developer Tools {#basics-chrome-devtools}
 
-Most of the JavaScript code written in this book is intended to be run in web browsers; it is thus vital that you have a great understanding of your web browser and its developer tools (devtools). In this section, we discuss those available in Google Chrome and Chromium but such tools, albeit somewhat different, also exist in Mozilla Firefox and Safari.
+Most of the JavaScript code written in this book is intended to be run in web browsers; it is thus vital that you have a great understanding of your web browser and its developer tools (devtools). In this section, we discuss those available in Google Chrome and Chromium, but such tools, albeit somewhat different, also exist in Mozilla Firefox and Safari.
 
 <div class="rmdnote">
 <p>The RStudio IDE is built on Chromium, some of these tools will therefore also work in RStudio.</p>
 </div>
 
-The easiest way to access the developer tools from the browser is by "inspecting": right-click on an element on a webpage and select "inspect". This will open the developer tools either at the bottom or on the right of the page.
+The easiest way to access the developer tools from the browser is by "inspecting": right-click on an element on a webpage and select "inspect." This will open the developer tools either at the bottom or on the right of the page.
 
 <div class="figure" style="text-align: center">
-<img src="images/devtools.png" alt="Google Chrome Devtools" width="100%" />
-<p class="caption">(\#fig:chrome-devtools)Google Chrome Devtools</p>
+<img src="images/devtools.png" alt="Google Chrome devtools" width="100%" />
+<p class="caption">(\#fig:chrome-devtools)Google Chrome devtools</p>
 </div>
 
 The developer tools pane consists of several tabs but we will mainly use:
@@ -407,7 +407,7 @@ The developer tools pane consists of several tabs but we will mainly use:
 
 ### Variable Declaration and Scope {#basics-var-scope}
 
-One significant way JavaScript differs from R is that variables must be declared using one of three keywords, `var`, `let`, or `const` which mainly affect the scope where the declared variable will be accessible.
+One significant way JavaScript differs from R is that variables must be declared using one of three keywords, `var`, `let`, or `const`, which mainly affect the scope where the declared variable will be accessible.
 
 ```js
 x = 1; // error
@@ -439,9 +439,9 @@ unlockBinding("x", env = .GlobalEnv) # unlock binding
 x <- 2 # works
 ```
 
-Notably, `const` is mainly protecting yourself (the developer) against yourself, if something important is defined and should not change later in the code use `const` to avoid accidentally reassigning something to it later in the project.
+Notably, `const` is mainly protecting yourself (the developer) against yourself; if something important is defined and should not change later in the code use `const` to avoid accidentally reassigning something to it later in the project.
 
-The `let` keyword is akin to declaring a variable with the `var` keyword. However, `let` (and `const`) will declare the variable in the "block scope." In effect, this further narrows down the scope where the variable will be accessible, a block scope is generally the area within `if`, `switch` conditions or `for` and `while` loops: areas within curly brackets.
+The `let` keyword is akin to declaring a variable with the `var` keyword. However, `let` (and `const`) will declare the variable in the "block scope." In effect, this further narrows down the scope where the variable will be accessible. A block scope is generally the area within `if`, `switch` conditions or `for` and `while` loops: areas within curly brackets.
 
 ```js
 if(true){
@@ -487,7 +487,7 @@ foo();
 
 ### Document Object Model {#basics-object-model}
 
-One concept which does not exist in R is that of the "DOM" which stands for Document Object Model; this is also often referred to as the DOM tree as it very much follows a tree-like structure.
+One concept does not exist in R is that of the "DOM" which stands for Document Object Model; this is also often referred to as the DOM tree as it very much follows a tree-like structure.
 
 <div class="figure" style="text-align: center">
 
@@ -499,7 +499,7 @@ One concept which does not exist in R is that of the "DOM" which stands for Docu
 <p class="caption">(\#fig:dom-viz)Document Object Model visualisation</p>
 </div>
 
-When a web page is loaded, the browser creates a Document Object Model of the web page which can be accessed in JavaScript from the `document` object. This lets the developer programmatically manipulate the page itself so one can, for instance, add an element (e.g., a button), change the text of another, and plenty more.
+When a web page is loaded, the browser creates a Document Object Model of the web page, which can be accessed in JavaScript from the `document` object. This lets the developer programmatically manipulate the page itself so one can, for instance, add an element (e.g., a button), change the text of another, and plenty more.
 
 The JavaScript code below grabs the element where `id='content'` from the `document` with `getElementById` and replaces the text (`innerText`). Even though the page only contains "Trying JavaScript!" when the page is opened (loaded) in the web browser JavaScript runs the code and changes it: this happens very fast so the original text cannot be seen.
 
@@ -541,9 +541,9 @@ One final thing to note for future reference: though not limited to the ids or c
 </html>
 ```
 
-Getting elements from the DOM is a very common operation in JavaScript. A class can be applied to multiple elements which is useful to select and apply actions to multiple elements. The id attribute must be unique (two elements cannot bear the same id in the HTML document), which is useful to retrieve a specific element. 
+Getting elements from the DOM is a very common operation in JavaScript. A class can be applied to multiple elements, which is useful to select and apply actions to multiple elements. The id attribute must be unique (two elements cannot bear the same id in the HTML document), which is useful to retrieve a specific element. 
 
-Interestingly some of that mechanism is used by shiny to retrieve and manipulate inputs, the argument `inputId` of shiny inputs effectively define the HTML `id` attribute of said input. Shiny can then internally make use of functions the likes of `getElementById` in order to get those inputs, set or update their values, etc.
+Interestingly some of that mechanism is used by Shiny to retrieve and manipulate inputs; the argument `inputId` of Shiny inputs effectively defines the HTML `id` attribute of said input. Shiny can then internally use functions the likes of `getElementById` in order to get those inputs, set or update their values, etc.
 
 ```r
 shiny::actionButton(inputId = "theId", label = "the label") 
@@ -562,21 +562,21 @@ This, of course, only scratches the surface of JavaScript; thus, this provides a
 
 ## Shiny {#basics-shiny}
 
-It is assumed that the reader has basic knowledge of the shiny framework and already used it to build applications. However, there are some more obscure functionalities that one may not know, but that becomes essential when introducing JavaScript to applications. Chiefly, how to import external dependencies; JavaScript or otherwise.
+It is assumed that the reader has basic knowledge of the Shiny framework and already used it to build applications. However, there are some more obscure functionalities that one may not know, but that becomes essential when introducing JavaScript to applications. Chiefly, how to import external dependencies; JavaScript or otherwise.
 
-There are two ways to import dependencies: using the htmltools [@R-htmltools] package to create a dependency object that shiny can understand, or manually serving and importing the files with shiny.
+There are two ways to import dependencies: using the htmltools [@R-htmltools] package to create a dependency object that Shiny can understand, or manually serving and importing the files with Shiny.
 
 ### Serving Static Files {#basics-static-files}
 
-Static files are files that are downloaded by the clients, in this case, web browsers accessing shiny applications, as-is. These generally include images, CSS (`.css`), and JavaScript (`.js`).
+Static files are files that are downloaded by the clients, in this case, web browsers accessing Shiny applications, as-is. These generally include images, CSS (`.css`), and JavaScript (`.js`).
 
-If you are familiar with R packages, static files are to shiny applications what the `inst` directory is to an R package; those files are installed as-is. They do not require further processing as opposed to the `src` folder, which contains files that need compiling, for instance.
+If you are familiar with R packages, static files are to Shiny applications what the `inst` directory is to an R package; those files are installed as-is. They do not require further processing as opposed to the `src` folder, which contains files that need compiling, for instance.
 
-There are numerous functions to launch a shiny application locally; the two most used probably are `shinyApp` and `runApp`. The RStudio IDE comes with a convenient "Run" button when writing a shiny application, which when clicked in fact uses the function `shiny::runApp` in the background, this function looks for said static files in the `www` directory and makes them available at the same path (`/www`). If you are building your applications outside of RStudio, you should either also use `shiny::runApp` or specify the directory which then allows using `shiny::shinyApp`. Note that this only applies locally, shiny server (community and pro) as well as [shinyapps.io](https://www.shinyapps.io/) use the same defaults as the RStudio IDE and `shiny::runApp`.
+There are numerous functions to launch a Shiny application locally; the two most used are probably `shinyApp` and `runApp`. The RStudio IDE comes with a convenient "Run" button when writing a shiny application, which when clicked in fact uses the function `shiny::runApp` in the background. This function looks for said static files in the `www` directory and makes them available at the same path (`/www`). If you are building your applications outside of RStudio, you should either also use `shiny::runApp` or specify the directory which then allows using `shiny::shinyApp`. Note that this only applies locally; Shiny server (community and pro) as well as [shinyapps.io](https://www.shinyapps.io/) use the same defaults as the RStudio IDE and `shiny::runApp`.
 
 To ensure the code in this book can run regardless of the reader's machine or editor, the asset directory is always specified explicitly (when used). This is probably advised to steer clear of the potential headaches as, unlike the default, it'll work regardless of the environment. If you are using golem [@R-golem] to develop your application, then you should not worry about this as it specifies the directory internally.
 
-Below we build a basic shiny application. However, before we define the ui and server, we use the `shiny::addResourcePath` function to specify the location of the directory of static files that will be served by the server and thus accessible by the client. This function takes two arguments, first the `prefix`, which is the path (URL) at which the assets will be available, second the path to the directory of static assets.
+Below we build a basic Shiny application. However, before we define the `ui` and `server`, we use the `shiny::addResourcePath` function to specify the location of the directory of static files that will be served by the server and thus accessible by the client. This function takes two arguments: first the `prefix`, which is the path (URL) at which the assets will be available, second the path to the directory of static assets.
 
 We thus create the "assets" directory and a JavaScript file called `script.js` within it.
 
@@ -641,7 +641,7 @@ At this stage, we have made the JavaScript file we created accessible by the cli
 </html>
 ```
 
-In shiny we write the UI in R and not in HTML (though this is also supported). Given the resemblance between the names of HTML tags and shiny UI functions, it is pretty straightforward, the html page above would look something like the shiny `ui` below. 
+In Shiny we write the UI in R and not in HTML (though this is also supported). Given the resemblance between the names of HTML tags and Shiny UI functions, it is pretty straightforward; the html page above would look something like the Shiny `ui` below. 
 
 ```r
 library(shiny)
@@ -658,7 +658,7 @@ ui <- fluidPage(
 
 The dependency is used in the `htmltools::singleton` function ensures that its content is _only imported in the document once._ 
 
-Note that we use the `tags` object which comes from the shiny package and includes HTML tags that are not exported as standalone functions. For instance, you can create a `<div>` in shiny with the `div` function, but `tags$div` will also work. This can now be applied to the shiny application; the `path/to/script.js` should be changed to `files/script.js` where `files` is the prefix we defined in `addResourcePath`.
+Note that we use the `tags` object, which comes from the Shiny package and includes HTML tags that are not exported as standalone functions. For instance, you can create a `<div>` in Shiny with the `div` function, but `tags$div` will also work. This can now be applied to the Shiny application; the `path/to/script.js` should be changed to `files/script.js`, where `files` is the prefix we defined in `addResourcePath`.
 
 ```r
 # app.R
@@ -679,11 +679,11 @@ server <- function(input, output){}
 shinyApp(ui, server)
 ```
 
-From the browser, inspecting page (right click > inspect > console tab) one should see `Hello JS!` in the console which means the application correctly ran the code in the JavaScript file.
+From the browser, inspecting page (right click > inspect > console tab) one should see `Hello JS!` in the console, which means the application correctly ran the code in the JavaScript file.
 
 ### Htmltools {#basics-htmltools}
 
-The htmltools package powers much of the shiny UI, most of the tags that comprise the UI are indeed imported by shiny from htmltools. For instance `shiny::actionButton` is just a light wrapper around htmltools `tags`.
+The htmltools package powers much of the Shiny UI, most of the tags that comprise the UI are indeed imported by Shiny from htmltools. For instance `shiny::actionButton` is just a light wrapper around htmltools `tags`.
 
 ```r
 shiny::actionButton
@@ -716,7 +716,7 @@ As the name indicates, htmltools goes beyond the generation of HTML tags and pro
 </html>
 ```
 
-However, it can quickly get out of hand when working with modules and packages. Imagine having to manage the generation of dependencies such as the above when multiple functions rely on a dependency but, being a dependency, it should only be imported once? The unified framework htmltools helps immensely in dealing with these sorts of issues.
+However, it can quickly get out of hand when working with modules and packages. Imagine having to manage the generation of dependencies, such as the above when multiple functions rely on a dependency, but being a dependency, it should only be imported once? The unified framework htmltools helps immensely in dealing with these sorts of issues.
 
 The htmltools package provides utilities to import dependencies and ensure these are only rendered once, as they should be. The way this works is by creating a dependency object that packages like Shiny and R markdown can understand and translate into HTML dependencies. This is handled with the `htmlDependency` function, which returns an object of class `html_dependency`.
 
@@ -730,7 +730,7 @@ dependency <- htmltools::htmlDependency(
 )
 ```
 
-About the above, the `src` argument points to the directory that contains the dependencies (`script` and `stylesheet`), this is done with a named vector where `file` indicates the path is a local directory and `href` indicates it is a remote server, generally a CDN. Note that one can also pass multiple `script` and `stylesheet` by using vectors, e.g.: `c("script.js", "anotherScript.js")`
+About the above, the `src` argument points to the directory that contains the dependencies (`script` and `stylesheet`); this is done with a named vector where `file` indicates the path is a local directory and `href` indicates it is a remote server, generally a CDN. Note that one can also pass multiple `script` and `stylesheet` by using vectors, e.g.: `c("script.js", "anotherScript.js")`
 
 <div class="rmdnote">
 <p>CDN stands for Content Delivery Network, a geographically distributed group of servers that provide fast transfer of dependencies.</p>
@@ -757,7 +757,7 @@ Shiny, R markdown, and other packages where htmltools is relevant will then be a
 </script>
 ```
 
-Notably, the `htmltools::htmlDependency` also takes a `package` argument which makes it such that the `src` path becomes relative to the package directory (the `inst` folder). Hence the snippet below imports a file located at `myPackage/inst/assets/script.js`; the ultimate full path will, of course, depend on where the package is installed on the users' machine.
+Notably, the `htmltools::htmlDependency` also takes a `package` argument, which makes it such that the `src` path becomes relative to the package directory (the `inst` folder). Hence the snippet below imports a file located at `myPackage/inst/assets/script.js`; the ultimate full path will, of course, depend on where the package is installed on the users' machine.
 
 ```r
 dependency <- htmltools::htmlDependency(
@@ -769,7 +769,7 @@ dependency <- htmltools::htmlDependency(
 )
 ```
 
-However, how does one use it in R markdown or shiny? Well merely placing it in the Shiny UI or an evaluated R markdown chunk will the job.
+However, how does one use it in R markdown or Shiny? Well, merely placing it in the Shiny UI or an evaluated R markdown chunk will do the job.
 
 ```r
 # place it in the shiny UI
@@ -786,9 +786,9 @@ ui <- fluidPage(
 
 ### Serving vs. htmltools {#basics-deps-pro-cons}
 
-For multiple reasons, the best way to include dependencies is probably the former using htmltools. First, it will work with both shiny and rmarkdown [@R-rmarkdown] (whereas the other method previously described only works with shiny), reducing the cognitive load on the developer (you). Learn to use this method and you will be able to import dependencies for many different output types. Moreover, it comes with neat features that will be explored later in the book, e.g., dynamic dependencies for interactive visualisations or shiny.
+For multiple reasons, the best way to include dependencies is probably the former using htmltools. First, it will work with both Shiny and rmarkdown [@R-rmarkdown] (whereas the other method previously described only works with Shiny), reducing the cognitive load on the developer (you). Learn to use this method and you will be able to import dependencies for many different output types. Moreover, it comes with neat features that will be explored later in the book, e.g., dynamic dependencies for interactive visualisations or Shiny.
 
-Also, using htmltools dependencies will allow other package developers to assess and access the dependencies you build quickly. The function `findDependencies` will accept another function from which it can extract the dependencies. The object it returns can then be used elsewhere making dependencies portable. Below we use this function to extract the dependencies of the `fluidPage` function from the shiny package.
+Also, using htmltools dependencies will allow other package developers to assess and access the dependencies you build quickly. The function `findDependencies` will accept another function from which it can extract the dependencies. The object it returns can then be used elsewhere, making dependencies portable. Below we use this function to extract the dependencies of the `fluidPage` function from the Shiny package.
 
 ```r
 htmltools::findDependencies(
@@ -817,7 +817,7 @@ htmltools::findDependencies(
 #>  - attr(*, "class")= chr "html_dependency"
 ```
 
-Extracting dependencies from other packages will become useful later in the book as we try to assess and whether package we build can work together with other packages: making sure dependencies do not clash or importing dependencies from other packages.
+Extracting dependencies from other packages will become useful later in the book as we assess compatibility between packages: making sure dependencies do not clash and importing dependencies from other packages.
 
-Using `shiny::addResourcePath` has one advantage, its use is not limited to making CSS and JavaScript files available in Shiny, it can be used to serve other file types such as JSON or images that may also be needed in the application.
+Using `shiny::addResourcePath` has one advantage: its use is not limited to making CSS and JavaScript files available in Shiny; it can be used to serve other file types such as JSON or images that may also be needed in the application.
 

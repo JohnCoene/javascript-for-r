@@ -4,19 +4,19 @@
 
 
 
-This part of the book explores the integration of JavaScript with R using the htmlwidgets package which focuses on libraries that produce a visual output, it is often used for data visualisation but is not limited to it.
+This part of the book explores the integration of JavaScript with R using the htmlwidgets package, which focuses on libraries that produce a visual output. It is often used for data visualisation but is not limited to it.
 
-As in future parts of this book, we mainly learn through examples, building multiple widgets of increasing complexity as we progress through the chapters. Before writing the first widget, we explore existing R packages that allow creating interactive data visualisations as this gives a first glimpse at we build in this part of the book. Then we explore JavaScript libraries that make great candidates for htmlwidgets and attempt to understand how they work to grasp what is expected from the developer in order to integrate them with R. Finally, we build upon the previous chapter to improve how htmlwidgets work with shiny.
+As in future parts of this book, we mainly learn through examples, building multiple widgets of increasing complexity as we progress through the chapters. Before writing the first widget, we explore existing R packages that allow creating interactive data visualisations as this gives a first glimpse at what we ultimately build in this part of the book. Then we explore JavaScript libraries that make great candidates for htmlwidgets and attempt to understand how they work to grasp what is expected from the developer in order to integrate them with R. Finally, we build upon the previous chapter to improve how htmlwidgets work with Shiny.
 
 The htmlwidgets package originates from the rCharts [@R-rCharts] package created in 2012 by Ramnath Vaidyanathan. It brought together a plethora of data visualisation JavaScript libraries, datamaps, highcharts, morris.js, and many more. Though no longer maintained rCharts ultimately paved the way towards a framework for interactive visualisations in R: two years later, in 2014, Ramnath and other prominent R users start working on htmlwidgets.
 
-The objective of this chapter is to explore existing widgets available on CRAN, discover how they work, whilst focusing on their prominent features as we will learn how to implement those in our very own widget in the coming chapters.
+The objective of this chapter is to explore existing widgets available on CRAN, discover how they work, whilst focusing on their prominent features as we learn how to implement those in our very own widget in the coming chapters.
 
 ## Plotly package {#widgets-plotly}
 
 The plotly [@R-plotly] R package is probably one of the first and the most popular widget built thus far; it has been downloaded from CRAN 4.9 million times at the time of writing this. 
 
-Plotly.js is a substantial library that provides over 40 chart types, including 3D charts, statistical graphs, and maps, all of which are available from the R interface, there is so much depth to plotly that there is an entire [book](https://plotly-r.com/) on the topic.
+Plotly.js is a substantial library that provides over 40 chart types, including 3D charts, statistical graphs, and maps, all of which are available from the R interface. There is so much depth to plotly that there is an entire [book](https://plotly-r.com/) on the topic.
 
 
 ```r
@@ -84,7 +84,7 @@ plot_ly(mtcars, x = ~disp) %>%
 
 ## DT package {#widgets-intro-dt}
 
-The DT package [@R-DT] is a wrapper for the [DataTables](https://datatables.net/) jQuery plug-in which allows creating interactive tables from R `data.frame` objects.
+The DT package [@R-DT] is a wrapper for the [DataTables](https://datatables.net/) jQuery plug-in, which allows creating interactive tables from R `data.frame` objects.
 
 
 ```r
@@ -101,7 +101,7 @@ DT::datatable(cars)
 <p class="caption">(\#fig:plotly-dt-diagram)Interactive table with DT</p>
 </div>
 
-DT has grown very popular amongst shiny developers as it allows capturing server-side many of the users' interactions with the table, such as the selected row.
+DT has grown very popular amongst Shiny developers as it allows capturing server-side many of the users' interactions with the table, such as the selected row.
 
 ```r
 library(DT)
@@ -165,4 +165,4 @@ bscols(
 
 ## Wrap-up {#widgets-intro-conclude}
 
-These are only two examples of widgets and how they can work together. But we hope this makes a compelling case for building such software as, in the remaining of this chapter, we learn how to build them, integrate them with crosstalk, shiny, and much more.
+These are only two examples of widgets and how they can work together. But we hope this makes a compelling case for building such software as we next learn how to build them, integrate them with crosstalk, Shiny, and much more.

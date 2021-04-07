@@ -2,13 +2,13 @@
 
 In this chapter, we polish the API that gio presents its users and provide guidelines to integrate other JavaScript libraries with R best.
 
-## Htmlwidgets & Data {#widgets-final-data}
+## Htmlwidgets and Data {#widgets-final-data}
 
-The gio package built thus far revolves around the `gio` function which expects a dataframe with three columns named `e`, `i`, and `v`, which is not great practice; there are ample reasons why very few functions do that.
+The gio package built thus far revolves around the `gio` function, which expects a dataframe with three columns named `e`, `i`, and `v`, which is not great practice; there are ample reasons why very few functions do that.
 
-First, it is unlikely that one comes across a dataset with such names in the real world thus users of the package will likely need to rename the columns of the dataset in order to use gio making the package rather unwieldy. Second, this makes understanding and approaching the gio package more complicated; it will not be evident by looking at the examples, and usage of gio.
+First, it is unlikely that one comes across a dataset with such names in the real world thus users of the package will likely need to rename the columns of the dataset in order to use gio, making the package rather unwieldy. Second, this makes understanding and approaching the gio package more complicated; it will not be evident by looking at the examples, and usage of gio.
 
-Instead `gio` should accept the dataframe as the first argument and then the relevant columns to extract. This can be implemented in many ways ranging from arguments that accept the column names as strings to reproducing ggplot2's `aes` function. Below we settle for a solution probably lies somewhere in between: using non-standard evaluation to provide arguments that accept the bare name of the columns.
+Instead `gio` should accept the dataframe as the first argument and then the relevant columns to extract. This can be implemented in many ways ranging from arguments that accept the column names as strings to reproducing ggplot2's `aes` function. Here we settle for using non-standard evaluation to provide arguments that accept the bare name of the columns.
 
 ```r
 gio <- function(data, source, target, value, ..., 
@@ -77,7 +77,7 @@ This small change makes the package a great deal more comfortable to use and und
 
 ## Plethora of Options {#widgets-final-options}
 
-Some JavaScript libraries can be extensive and come with thousands of options that can make the port to R rather bulky, never hesitate to make use of the three dots construct (`...`) to make these accessible yet saving you from having to hard-code thousands of arguments.
+Some JavaScript libraries can be extensive and come with thousands of options that can make the port to R rather bulky. Never hesitate to make use of the three dots construct (`...`) to make these accessible yet saving you from having to hard-code thousands of arguments.
 
 For instance, gio.js accepts a JSON of options to customise the globe further. One could port all of these manually, or allow users to specify those configurations via the three-dot construct.
 
@@ -110,7 +110,7 @@ var configs = {
 controller = new Gio.controller(el, configs);
 ```
 
-The three dots can be added to the `gio` function which internally captures them in a `list` named `configs` so it can be easily referenced in JavaScript.
+The three dots can be added to the `gio` function, which internally captures them in a `list` named `configs` so it can be easily referenced in JavaScript.
 
 ```r
 # add ...three dots
@@ -155,21 +155,21 @@ gio(
 
 ## Interface Design {#widgets-final-interface}
 
-As you develop a wrapper to an external visualisation library, you will have to make design choices. In building gio we more or less mirrored the JavaScript code one to one: where there is a JavaScript function to change the theme of the visualisation, there is one in R, etc. This might not scale appropriately as more and more functions are added to the package. 
+As you develop a wrapper to an external visualisation library, you will have to make design choices. In building gio, we more or less mirrored the JavaScript code one to one: where there is a JavaScript function to change the theme of the visualisation, there is one in R, etc. This might not scale appropriately as more and more functions are added to the package. 
 
-As observed the gio.js library has a function named `setStyle` to change the theme of the visualisation, but it has numerous others, `setSurfaceColor`, `addHalo`, `setHaloColor`, `removeHalo`, and plenty more. We might want to wrap all or some of these in a single function to provide a more convenient API to the R user. 
+As observed, the gio.js library has a function named `setStyle` to change the theme of the visualisation, but it has numerous others, `setSurfaceColor`, `addHalo`, `setHaloColor`, `removeHalo`, and plenty more. We might want to wrap all or some of these in a single function to provide a more convenient API to the R user. 
 
 <div class="rmdnote">
 <p>Design for humans: always keep in mind the interface you make available to users as you develop the package.</p>
 </div>
 
-You can always go beyond what the underlying library provides. For instance, the country selected by default is always China, regardless of whether the data includes that country or not. This can lead to creating underwhelming visualisations as no arcs appear. One can consider adding to the `gio` function simple heuristics to ensure that is not the case, or have the function throw a warning when the initial country is not present in the dataset.
+You can always go beyond what the underlying library provides. For instance, the country selected by default is always China, regardless of whether the data includes that country or not. This can lead to creating underwhelming visualisations as no arcs appear. One can consider adding simple heiristics to the `gio` function to ensure that is not the case, or have the function throw a warning when the initial country is not present in the dataset.
 
-Finally, consider R users' expectations. There are many prominent visualisation packages on CRAN already, users of the gio package will likely have used ggplot2 [@R-ggplot2], plotly, or highcharter before. Though these provide somewhat different APIs they set precedents, the more the API of gio resembles those, the easier it will be for new users to start using gio. However, do not let this restrict the package either, never hesitate to do differently than ggplot2 if you think it will provide a better interface to your users.
+Finally, consider R users' expectations. There are many prominent visualisation packages on CRAN already, users of the gio package will likely have used ggplot2 [@R-ggplot2], plotly, or highcharter before. Though these provide somewhat different APIs, they set precedents. The more the API of gio resembles those, the easier it will be for new users to start using gio. However, do not let this restrict the package either. Never hesitate to do differently than ggplot2 if you think it will provide a better interface to your users.
 
 ## Exercises {#widgets-final-exercises}
 
-Widgets likely involve numerous concepts that are new to most readers. It is a good idea to try and work on a widget of your own to grasp the learnings of this part of the book entirely. A quick Google search for "JavaScript visualisation libraries" uncovers hundreds of candidate libraries that can be ported to R; below is but a small selection.
+Widgets likely involve numerous concepts that are new to most readers. It is a good idea to try and work on a widget of your own to grasp the learnings of this part of the book entirely. A quick Google search for "JavaScript visualisation libraries" uncovers hundreds of candidate libraries that can be made accessible from R; below is but a small selection.
 
 - [chart.js](https://www.chartjs.org/) - simple yet flexible JavaScript charting
 - [cytoscape.js](https://js.cytoscape.org/) - network theory library for visualisation and analysis

@@ -2,13 +2,13 @@
 
 # Managing JavaScript {#webpack-intro}
 
-Thus far, all of the JavaScript code written in this book was placed directly in the file that was imported in the front-end, be it htmlwidgets or shiny-related code. While this works for the smaller projects, it is bound to lead to headaches for the larger ones.
+Thus far, all of the JavaScript code written in this book was placed directly in the file that was imported in the front end, be it htmlwidgets or Shiny-related code. While this works for the smaller projects, it is bound to lead to headaches for the larger ones.
 
 It's the same problem one faces when writing R code. While a small script of 300 lines of code will do the job, a large script of 10,000 lines quickly becomes unmanageable. Therefore when tackling more extensive projects, the R programmer will turn to solutions that enforce a specific file structure and provide utilities to harmonise how those files work together. Some of these solutions may include the drake [@R-drake] or targets [@R-targets] packages, both of which provide tools to manage complex workflows. Another method often used is to build the project as an R package, thereby enforcing a particular structure and enabling reproducibility, unit tests, and more. 
 
 The issues mentioned above are also a concern in JavaScript though here one has to consider additional pitfalls. Like R, JavaScript is a continually evolving language, but while R code is written on version `4.0.0` will likely run fine on version `3.0.0` it is not precisely the case for JavaScript. As the language evolves and changes, web browsers have to keep up to support any new feature brought by new releases. 
 
-Therefore JavaScript code that is written on the latest version may not run on all browsers. Also, consider that even if the latest versions of Google Chrome and Mozilla Firefox tend to support the latest JavaScript, users who visit your shiny applications or use your htmlwidgets may not have their browsers up to date.
+Therefore JavaScript code that is written on the latest version may not run on all browsers. Also, consider that even if the latest versions of Google Chrome and Mozilla Firefox tend to support the latest JavaScript, users who visit your Shiny applications or use your htmlwidgets may not have their browsers up to date.
 
 In JavaScript, code mismanagement might be exacerbated because it often relies on other files such as CSS, JSON, images, and more, making it challenging to build robust projects. Moving an image from one folder to another or removing a CSS file may break an entire JavaScript project.
 
@@ -22,9 +22,9 @@ Combine all of the above and software that involves JavaScript can quickly becom
 
 ## Example {#webpack-example}
 
-There are admittedly few R packages that make use of such technology though it must be said that many could greatly benefit from it. Given its size and complexity a package such as shiny, however, could probably not do without it.
+There are admittedly few R packages that make use of such technology though it must be said that many could greatly benefit from it. Given its size and complexity a package such as Shiny, however, could probably not do without it.
 
-Shiny makes use of Grunt, the source code that comprises all of the JavaScript required to run the front-end (inputs, outputs, modals, etc.) is in the `srcjs` directory which can be seen on [official GitHub repository](https://github.com/rstudio/shiny). This folder includes a multitude of JavaScript files the name of which indicates the code they encompass; `input_binding_checkbox.js`, `modal.js`, etc.
+Shiny makes use of Grunt, the source code that comprises all of the JavaScript required to run the front end (inputs, outputs, modals, etc.) is in the `srcjs` directory which can be seen on [official GitHub repository](https://github.com/rstudio/shiny). This folder includes a multitude of JavaScript files the name of which indicates the code they encompass; `input_binding_checkbox.js`, `modal.js`, etc.
 
 These files are processed by Grunt which, based on the `Gruntfile.js` configuration file in the `tools` directory, into different bundles that go in the `inst` folder of the package.
 
@@ -38,7 +38,7 @@ Ensuring that the JavaScript code can run on most browsers is no trivial task. T
 
 ## Minification {#webpack-minification}
 
-Web browsers always need to load the files necessary to render a webpage, be it a static website, a shiny application, or a standalone widget. Loading those files can take critical time and make the loading of a web application slow. Therefore it is good practice to reduce the size of those files. This includes compressing images, so they are smaller in size and load faster but also "minifying" CSS and JavaScript code.
+Web browsers always need to load the files necessary to render a webpage, be it a static website, a Shiny application, or a standalone widget. Loading those files can take critical time and make the loading of a web application slow. Therefore it is good practice to reduce the size of those files. This includes compressing images, so they are smaller in size and load faster but also "minifying" CSS and JavaScript code.
 
 When writing code us humans like to use comprehensible variable names, line breaks, spaces and other things that help make things clear and readable. Machines however, do not need much of that, as long as the code is valid, it will run. 
 
@@ -100,6 +100,6 @@ NPM, combined with the decoupling, and bundling covered in previous sections, en
 
 To be clear, it's not always necessary to involve webpack and NPM into a project; these can take some time to set up and be excessive for a smaller project. It's good to be familiar with them as one might want to make use of those in larger projects.
 
-Webpack and NPM were not designed with R in mind, so there are some potential issues to consider when using it in packages and shiny applications.
+Webpack and NPM were not designed with R in mind, so there are some potential issues to consider when using it in packages and Shiny applications.
 
-In the following chapter, we discover how to include both webpack and NPM to make more robust shiny applications, widgets, and other packages that involve JavaScript.
+In the following chapter, we discover how to include both webpack and NPM to make more robust Shiny applications, widgets, and other packages that involve JavaScript.
