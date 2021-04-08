@@ -411,7 +411,7 @@ HTMLWidgets.widget({
 });
 ```
 
-Then, anywhere in the `gio.js` file, we create a function which uses `HTMLWidgets.find` to retrieve the instance of the htmlwidgets, it takes a selector as input. We concatenate the pound sign to select the widget based on its id (`#id`, `.class`). This, in effect, returns an object which includes all the functions returned by the `factory` function: `renderValue`, `resize`, and `getGlobe`. We can therefore use the `getGlobe` method available from that object to retrieve the actual `controller`.
+Then, anywhere in the `gio.js` file, we create a function that uses `HTMLWidgets.find` to retrieve the instance of the htmlwidgets it takes a selector as input. We concatenate the pound sign to select the widget based on its id (`#id`, `.class`). This, in effect, returns an object, which includes all the functions returned by the `factory` function: `renderValue`, `resize`, and `getGlobe`. We can therefore use the `getGlobe` method available from that object to retrieve the actual `controller`.
 
 ```js
 // gio.js
@@ -424,7 +424,7 @@ function get_gio(id){
 
 ### Handle Data {#shiny-widgets-handle-data}
 
-We can now turn the attention to actually applying the data sent from the R server to the visualisation: the "message handler." Registering the message handler is only relevant if Shiny is running. Therefore HTMLWidgets comes with a function to check whether that is the case which is useful to avoid needless errors. We can thus use it in an if statement in which all message handlers will be registered.
+We can now turn our attention to actually applying the data sent from the R server to the visualisation: the "message handler." Registering the message handler is only relevant if Shiny is running. Therefore htmlwidgets comes with a function to check whether that is the case, which is useful to avoid needless errors. We can thus use it in an if-statement in which all message handlers will be registered.
 
 ```js
 // gio.js
@@ -441,7 +441,7 @@ if (HTMLWidgets.shinyMode){
 }
 ```
 
-What the currently empty `send-data` message handler should do is fetch the widget using the `id` sent from R with the `get_gio` function and then use the `addData` method to override the previously define arcs.
+What the currently empty `send-data` message handler should do is fetch the widget using the `id` sent from R with the `get_gio` function and then use the `addData` method to override the previously-defined arcs.
 
 ```js
 // gio.js
@@ -529,13 +529,14 @@ This can be remedied to by introducing what is often referred to as a "proxy." A
 ```r
 #' @export
 gio_proxy <- function(id, 
-  session = shiny::getDefaultReactiveDomain()){
+  session = shiny::getDefaultReactiveDomain()
+){
 
   list(id = id, session = session)
 }
 ```
 
-Above we create a function called `gio_proxy` which takes the `id` of the chart one wants to build a proxy off, as well as the Shiny `session`, they are returned in the form of a list. Next, we should adapt the `gio_send_data` so that it accepts the output of `gioProxy` instead of the `id` and `session` as done previously. In order to allow chaining such functions, we also make sure it returns the `proxy` object.
+Above we create a function called `gio_proxy`; it takes the `id` of the chart one wants to build a proxy for, as well as the Shiny `session`, these are returned in the form of a list. Next, we should adapt the `gio_send_data` so that it accepts the output of `gioProxy` instead of the `id` and `session` as done previously. In order to allow chaining such functions, we also make sure it returns the `proxy` object.
 
 ```r
 #' @export
@@ -548,9 +549,9 @@ gio_send_data <- function(proxy, data){
 
 ## Clear Data {#shiny-widgets-clear-data}
 
-In order to actively demonstrate the advantage of the "proxy" function as well as to hammer home how such functions work, we shall build another which removes all data from the globe. In JavaScript it's as simple as `controller.clearData();`.
+In order to actively demonstrate the advantage of the "proxy" function as well as to hammer home how such functions work, we shall build another, which removes all data from the globe. In JavaScript, it's as simple as `controller.clearData();`.
 
-The journey starts with the R code where we create a new function that sends a message to clear the data; the message only needs to contain the id of the visualisation from which data needs to be cleared, as before it will be used to retrieve the `controller` from which the `clearData` method is available. 
+The journey starts with the R code, where we create a new function that sends a message to clear the data; the message only needs to contain the id of the visualisation from which data needs to be cleared, as before it will be used to retrieve the `controller` from which the `clearData` method is available. 
 
 ```r
 #' @export
@@ -630,7 +631,7 @@ gio_set_style <- function(proxy, style){
 }
 ```
 
-Then adding the JavaScript handler.
+Then, adding the JavaScript handler.
 
 ```js
 Shiny.addCustomMessageHandler(
