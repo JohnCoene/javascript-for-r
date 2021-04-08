@@ -12,9 +12,9 @@ install.packages("packer")
 
 There are a few principles that the packer package follows strictly.
 
-1. It only aspires to become a specialised usethis for working with JavaScript and R, as such, it takes inspiration from other packages such as htmlwidgets, and devtools.
+1. It only aspires to become a specialised usethis for working with JavaScript and R. As such, it takes inspiration from other packages such as htmlwidgets and devtools.
 2. It will never become a dependency to what you create. It's in a sense very much like an NPM "developer" dependency; it's used to develop the project but does not bring any additional overhead to what you're building.
-3. It should not interfere with the mission of webpack to build more robust JavaScript code. Therefore packer only builds on top of already strict R structures, namely packages (where golem can be used to create Shiny applications).
+3. It should not interfere with the mission of webpack to build more robust JavaScript code. Therefore, packer only builds on top of already, strict R structures, namely packages (where golem can be used to create Shiny applications).
 
 ## Scaffolds {#packer-scaffolds}
 
@@ -41,7 +41,7 @@ With some variations that will be explored in the coming sections, packer's `sca
 - Initialise npm with `npm init` and prefills the `package.json` file
 - Install webpack and its CLI with `npm install webpack webpack-cli --save-dev`
 - Creates three webpack configuration files: `webpack.common.js`, `webpack.prod.js`, and `webpack.dev.js`
-- Creates the `srcjs` directory for the JavaScript source code.
+- Creates the `srcjs` directory for the JavaScript source code
 - Creates raw JavaScript files within the `srcjs` directory, e.g.: `index.js`
 - Creates the R functions (if necessary)
 - Adds the necessary NPM scripts to `package.json`
@@ -61,7 +61,7 @@ usethis::create_package("increment")
 
 From the root of the package, we scaffold a custom input. Notably, this takes a `name` argument, which is used as names for the various files, functions, and modules it creates so choose it with care. The function prints some information about the operations it executes. 
 
-When run from an interactive session packer also opens the most pertinent files in the default editor or IDE.
+When run from an interactive session, packer also opens the most pertinent files in the default editor or IDE.
 
 ```r
 packer::scaffold_input("increment")
@@ -106,9 +106,9 @@ packer::scaffold_input("increment")
 
 The scaffold creates the file structure below. Notice that `increment` was used as the name of some files and that packer creates three webpack configuration files; one for development, another for production, and a third that contains configuration shared across those two modes.
 
-It created one R file, `increment.R` which contains the exported input function named `incrementInput`. It also created the `inst/packer` directory which is currently empty but will eventually contain the bundled JavaScript file(s).
+It created one R file, `increment.R`, which contains the exported input function named `incrementInput`. It also created the `inst/packer` directory, which is currently empty but will eventually contain the bundled JavaScript file(s).
 
-The function also initialised NPM which created the `node_modules` directory as well as the `package.json` and `package-lock.json`, packer also added the necessary scripts to `package.json` so one should not need to interact with those files directly.
+The function also initialised NPM, which created the `node_modules` directory, as well as the `package.json` and `package-lock.json`, packer also added the necessary scripts to `package.json` so one should not need to interact with those files directly.
 
 Finally, it also created the `srcjs` directory containing core JavaScript files to produce the input binding.
 
@@ -163,7 +163,7 @@ incrementInput <- function(inputId, value = 0){
 }
 ```
 
-Note that packer does not use the namespace of functions (e.g. `shiny::tagList`). Instead, it uses the roxygen2 tags to import the necessary functions: `@importFrom Shiny tags tagList`. Rather nicely, packer also created an example in the roxygen documentation. We'll run this later after we've bundled the JavaScript.
+Note that packer does not use the namespace of functions (e.g., `shiny::tagList`). Instead, it uses the roxygen2 tags to import the necessary functions: `@importFrom Shiny tags tagList`. Rather nicely, packer also created an example in the roxygen documentation. We'll run this later after we've bundled the JavaScript.
 
 ```r
 #' @examples 
@@ -185,9 +185,9 @@ Note that packer does not use the namespace of functions (e.g. `shiny::tagList`)
 #'  shinyApp(ui, server)
 ```
 
-## JavaScript files {#packer-js-files}
+## JavaScript Files {#packer-js-files}
 
-In the `srcjs/inputs` directory, packer created `increment.js`. This code contains the JavaScript binding for the increment button. As a reminder one is not limited to a single scaffold, we could scaffold another input, the JavaScript binding of which would be placed alongside this file, also in `srcjs/inputs`.
+In the `srcjs/inputs` directory, packer created `increment.js`. This code contains the JavaScript binding for the increment button. As a reminder, one is not limited to a single scaffold. We could scaffold another input, the JavaScript binding of which would be placed alongside this file, also in `srcjs/inputs`.
 
 ```js
 import $ from 'jquery';
@@ -245,7 +245,7 @@ packer::bundle()
 
 By default packer will bundle the files for production, this can be managed with the functions `packer::bundle_dev()` and `packer::bundle_prod()`. 
 
-Once the JavaScript bundled, we can install or load the package with `devtools::load_all`, and use the example that was created for us to test the input.
+Once the JavaScript is bundled, we can install or load the package with `devtools::load_all` and use the example that was created for us to test the input.
 
 ```r
 library(shiny)
@@ -266,6 +266,6 @@ if(interactive())
   shinyApp(ui, server)
 ```
 
-No code was written, yet we have a fully-functional input! We'll leave at this, it's not only meant to create increment buttons, but this sets up a solid base for the developer to customise the code and conveniently create a different input.
+No code was written, yet we have a fully-functional input! We'll leave ir at this: it's not only meant to create increment buttons, but this sets up a solid base for the developer to customise the code and conveniently create a different input.
 
 It is worth noting that we built a Shiny input from within a package, this is meant to be exported and used in Shiny applications elsewhere, but were one to run these same steps from a golem application packer would adapt the output path so that the input can be used directly in the application.

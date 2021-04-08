@@ -1,6 +1,6 @@
 # Machine Learning {#v8-ml}
 
-In this chapter, we build a package that, via V8, wraps [ml.js](https://github.com/mljs/ml), a library which brings machine learning to JavaScript. It covers quite a few models, we only include one: the linear regression. This is an interesting example because it reveals some proceedings that one is likely to run into when creating packages using V8.
+In this chapter, we build a package that, via V8, wraps [ml.js](https://github.com/mljs/ml), a library that brings machine learning to JavaScript. It covers quite a few models; we only include one: the linear regression. This is an interesting example because it reveals some proceedings that one is likely to run into when creating packages using V8.
 
 ```js
 const x = [0.5, 1, 1.5, 2, 2.5];
@@ -28,7 +28,7 @@ download.file(
 )
 ```
 
-With the dependency downloaded one can start working on the R code. First, a new V8 context needs to be created and the ml.js file need to be imported in it.
+With the dependency downloaded, one can start working on the R code. First, a new V8 context needs to be created and the ml.js file needs to be imported into it.
 
 ```r
 # zzz.R
@@ -85,7 +85,7 @@ ml_predict <- function(x){
 }
 ```
 
-We then document and load the functions to run two regressions in a row then and observe the issue. Unlike R the model we created only exists in JavaScript, unlike the `lm`, the function `ml_simple_lm` does not return the model. Therefore, `ml_simple_lm` does not distinguish between models, unlike `predict` which takes the model as the first argument and runs the prediction on it.
+We then document and load the functions to run two regressions in a row then observe the issue. Unlike R, the model we created only exists in JavaScript, unlike the `lm`, the function `ml_simple_lm` does not return the model. Therefore, `ml_simple_lm` does not distinguish between models, unlike `predict`, which takes the model as the first argument and runs the prediction on it.
 
 This implementation of ml.js is indeed very dangerous.
 
@@ -103,7 +103,7 @@ ml_predict(15)
 ## 10.76742
 ```
 
-The package ml currently under construction should emulate R in that respect; the `ml_simple_lm` should return the model which should be usable with the `predict` function. In order to do we are going to need to track regressions internally in V8 so the `ml_simple_lm` return a proxy of the model that `predict` can use to predict on the intended model.
+The package ml currently under construction should emulate R in that respect; the `ml_simple_lm` should return the model, which should be usable with the `predict` function. In order to do so, we are going to need to track regressions internally in V8 so the `ml_simple_lm` returns a proxy of the model that `predict` can use to predict on the intended model.
 
 In order to track and store regressions internally, we are going to declare an empty array when the package is loaded.
 
@@ -119,7 +119,7 @@ ml <- NULL
 }
 ```
 
-Then, one can track regressions by creating an R object which is incremented every time `ml_simple_lm` runs; this can be used as a variable name in the JavaScript `regressions` array declare in `.onLoad`. This variable name must be stored in the object we intend to return so the `predict` method we will create later on can access the model and run predictions. Finally, in order to declare a new method on the `predict` function, we need to return an object bearing a unique class, below we use `mlSimpleRegression`.
+Then, one can track regressions by creating an R object, which is incremented every time `ml_simple_lm` runs; this can be used as a variable name in the JavaScript `regressions` array declare in `.onLoad`. This variable name must be stored in the object we intend to return so the `predict` method we will create later on can access the model and run predictions. Finally, in order to declare a new method on the `predict` function, we need to return an object bearing a unique class. Below we use `mlSimpleRegression`.
 
 ```r
 counter <- new.env(parent = emptyenv())
@@ -154,7 +154,7 @@ ml_simple_lm <- function(y, x){
 }
 ```
 
-Then on can implement the `predict` method for `mlSimpleRegression`. The function uses the `address` of the model to run the JavaScript `predict` method on that object.
+Then one can implement the `predict` method for `mlSimpleRegression`. The function uses the `address` of the model to run the JavaScript `predict` method on that object.
 
 ```r
 #' @export 

@@ -203,7 +203,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2021-04-07}
+\date{2021-04-08}
 
 \begin{document}
 \maketitle
@@ -262,7 +262,7 @@ Notably, the focus of the book truly is the integration of JavaScript with R, wh
 \item
   The fourth part of the book details how JavaScript can work with Shiny. Once the basics are out of the way, the second chapter builds the first utility to display notifications programmatically. Then we create a Shiny application that runs an image classification algorithm in the browser. This is then followed by the creation of custom Shiny inputs and outputs. Finally, Shiny and htmlwidgets are (literally) connected by including additional functionalities in interactive visualisations when used with the Shiny framework.
 \item
-  Then the book delves into using JavaScript for computations, namely via the V8 engine and node.js. After a short introduction, chapters will walk the reader through various examples: a fuzzy search, a time format converter, and some basic natural language operations.
+  Then the book delves into using JavaScript for computations, namely via the V8 engine and Node.js. After a short introduction, chapters will walk the reader through various examples: a fuzzy search, a time format converter, and some basic natural language operations.
 \item
   Finally, we look at how one can use some of the more modern JavaScript technologies such as Vue, React, and webpack with R---these can make the use of JavaScript more agile and robust.
 \item
@@ -4087,7 +4087,7 @@ The \texttt{gio} function also has to extract the group to which the dataset bel
 \begin{Highlighting}[]
 \CommentTok{# groupName}
 \NormalTok{shared_arcs}\OperatorTok{$}\KeywordTok{groupName}\NormalTok{()}
-\CommentTok{#> [1] "SharedDatae9f1535b"}
+\CommentTok{#> [1] "SharedDatadf3b988c"}
 
 \CommentTok{# keys}
 \NormalTok{shared_arcs}\OperatorTok{$}\KeywordTok{key}\NormalTok{()}
@@ -8357,7 +8357,7 @@ We will need to be able to access the instance of the visualisation (\texttt{con
 \end{Highlighting}
 \end{Shaded}
 
-Then, anywhere in the \texttt{gio.js} file, we create a function which uses \texttt{HTMLWidgets.find} to retrieve the instance of the htmlwidgets, it takes a selector as input. We concatenate the pound sign to select the widget based on its id (\texttt{\#id}, \texttt{.class}). This, in effect, returns an object which includes all the functions returned by the \texttt{factory} function: \texttt{renderValue}, \texttt{resize}, and \texttt{getGlobe}. We can therefore use the \texttt{getGlobe} method available from that object to retrieve the actual \texttt{controller}.
+Then, anywhere in the \texttt{gio.js} file, we create a function that uses \texttt{HTMLWidgets.find} to retrieve the instance of the htmlwidgets it takes a selector as input. We concatenate the pound sign to select the widget based on its id (\texttt{\#id}, \texttt{.class}). This, in effect, returns an object, which includes all the functions returned by the \texttt{factory} function: \texttt{renderValue}, \texttt{resize}, and \texttt{getGlobe}. We can therefore use the \texttt{getGlobe} method available from that object to retrieve the actual \texttt{controller}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8373,7 +8373,7 @@ Then, anywhere in the \texttt{gio.js} file, we create a function which uses \tex
 \hypertarget{shiny-widgets-handle-data}{%
 \subsection{Handle Data}\label{shiny-widgets-handle-data}}
 
-We can now turn the attention to actually applying the data sent from the R server to the visualisation: the ``message handler.'' Registering the message handler is only relevant if Shiny is running. Therefore HTMLWidgets comes with a function to check whether that is the case which is useful to avoid needless errors. We can thus use it in an if statement in which all message handlers will be registered.
+We can now turn our attention to actually applying the data sent from the R server to the visualisation: the ``message handler.'' Registering the message handler is only relevant if Shiny is running. Therefore htmlwidgets comes with a function to check whether that is the case, which is useful to avoid needless errors. We can thus use it in an if-statement in which all message handlers will be registered.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8392,7 +8392,7 @@ We can now turn the attention to actually applying the data sent from the R serv
 \end{Highlighting}
 \end{Shaded}
 
-What the currently empty \texttt{send-data} message handler should do is fetch the widget using the \texttt{id} sent from R with the \texttt{get\_gio} function and then use the \texttt{addData} method to override the previously define arcs.
+What the currently empty \texttt{send-data} message handler should do is fetch the widget using the \texttt{id} sent from R with the \texttt{get\_gio} function and then use the \texttt{addData} method to override the previously-defined arcs.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8486,14 +8486,15 @@ This can be remedied to by introducing what is often referred to as a ``proxy.''
 \begin{Highlighting}[]
 \CommentTok{#' @export}
 \NormalTok{gio_proxy <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id, }
-  \DataTypeTok{session =}\NormalTok{ shiny}\OperatorTok{::}\KeywordTok{getDefaultReactiveDomain}\NormalTok{())\{}
+  \DataTypeTok{session =}\NormalTok{ shiny}\OperatorTok{::}\KeywordTok{getDefaultReactiveDomain}\NormalTok{()}
+\NormalTok{)\{}
 
   \KeywordTok{list}\NormalTok{(}\DataTypeTok{id =}\NormalTok{ id, }\DataTypeTok{session =}\NormalTok{ session)}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
 
-Above we create a function called \texttt{gio\_proxy} which takes the \texttt{id} of the chart one wants to build a proxy off, as well as the Shiny \texttt{session}, they are returned in the form of a list. Next, we should adapt the \texttt{gio\_send\_data} so that it accepts the output of \texttt{gioProxy} instead of the \texttt{id} and \texttt{session} as done previously. In order to allow chaining such functions, we also make sure it returns the \texttt{proxy} object.
+Above we create a function called \texttt{gio\_proxy}; it takes the \texttt{id} of the chart one wants to build a proxy for, as well as the Shiny \texttt{session}, these are returned in the form of a list. Next, we should adapt the \texttt{gio\_send\_data} so that it accepts the output of \texttt{gioProxy} instead of the \texttt{id} and \texttt{session} as done previously. In order to allow chaining such functions, we also make sure it returns the \texttt{proxy} object.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8509,9 +8510,9 @@ Above we create a function called \texttt{gio\_proxy} which takes the \texttt{id
 \hypertarget{shiny-widgets-clear-data}{%
 \section{Clear Data}\label{shiny-widgets-clear-data}}
 
-In order to actively demonstrate the advantage of the ``proxy'' function as well as to hammer home how such functions work, we shall build another which removes all data from the globe. In JavaScript it's as simple as \texttt{controller.clearData();}.
+In order to actively demonstrate the advantage of the ``proxy'' function as well as to hammer home how such functions work, we shall build another, which removes all data from the globe. In JavaScript, it's as simple as \texttt{controller.clearData();}.
 
-The journey starts with the R code where we create a new function that sends a message to clear the data; the message only needs to contain the id of the visualisation from which data needs to be cleared, as before it will be used to retrieve the \texttt{controller} from which the \texttt{clearData} method is available.
+The journey starts with the R code, where we create a new function that sends a message to clear the data; the message only needs to contain the id of the visualisation from which data needs to be cleared, as before it will be used to retrieve the \texttt{controller} from which the \texttt{clearData} method is available.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8605,7 +8606,7 @@ The previous proxies defined worked for reasons unbeknownst to the author of thi
 \end{Highlighting}
 \end{Shaded}
 
-Then adding the JavaScript handler.
+Then, adding the JavaScript handler.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8683,7 +8684,7 @@ This forces the chart to update, applying the new style. Below we write an appli
 \hypertarget{v8}{%
 \chapter{The V8 Engine}\label{v8}}
 
-V8 is an R interface to Google's open-source JavaScript engine of the same name; it powers Google Chrome, node.js and many other things. It is the last integration of JavaScript with R that is covered in this book. Both the V8 package and the engine it wraps are straightforward yet amazingly powerful.
+V8 is an R interface to Google's open-source JavaScript engine of the same name; it powers Google Chrome, Node.js, and many other things. It is the last integration of JavaScript with R that is covered in this book. Both the V8 package and the engine it wraps are straightforward yet amazingly powerful.
 
 \hypertarget{v8-installation}{%
 \section{Installation}\label{v8-installation}}
@@ -8746,7 +8747,7 @@ The \texttt{eval} method allows running JavaScript code from R.
 \end{Highlighting}
 \end{Shaded}
 
-Two observations worth making on the above snippet of code. First, the variable we got back in R is a character vector when it should have been either an integer or a numeric. This is because we used the \texttt{eval} method, which returns what is printed in the v8 console, \texttt{get} is more appropriate; it converts the output to its appropriate R equivalent.
+Two observations are worth making on the above snippet of code. First, the variable we got back in R is a character vector when it should have been either an integer or a numeric. This is because we used the \texttt{eval} method, which returns what is printed in the V8 console, but \texttt{get} is more appropriate; it converts the output to its appropriate R equivalent.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8772,7 +8773,7 @@ Second, while creating a scalar with \texttt{eval("var\ x\ =\ 1;")} appears pain
 \end{Highlighting}
 \end{Shaded}
 
-All of the conversion is handled by V8 internally with jsonlite, as demonstrated in the previous chapter. We can confirm that the data frame was converted to a list row-wise; using \texttt{JSON.stringify} to display how the object is stored in V8.
+All of the conversion is handled by V8 internally with jsonlite, as demonstrated in the previous chapter. We can confirm that the data frame was converted to a list row-wise, using \texttt{JSON.stringify} to display how the object is stored in V8.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8794,7 +8795,7 @@ All of the conversion is handled by V8 internally with jsonlite, as demonstrated
 \end{Highlighting}
 \end{Shaded}
 
-However this reveals a tedious cyclical loop: 1) creating an object in JavaScript to 2) run a function on the aforementioned object 3) get the results back in R, and repeat. So V8 also allows calling JavaScript functions on R objects directly with the \texttt{call} method and obtain the results back in R.
+However this reveals a tedious cyclical loop: 1) creating an object in JavaScript to 2) run a function on the aforementioned object, 3) get the results back in R, and repeat. So V8 also allows calling JavaScript functions on R objects directly with the \texttt{call} method and obtains the results back in R.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8818,14 +8819,14 @@ However this reveals a tedious cyclical loop: 1) creating an object in JavaScrip
   (Central European Summer Time)"
 \end{verbatim}
 
-Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()} you can then exit the console by typing \texttt{exit} or hitting the ESC key.
+Finally, one can run code interactively rather than as strings by calling the console from the engine with \texttt{engine\$console()}. You can then exit the console by typing \texttt{exit} or hitting the ESC key.
 
 \hypertarget{v8-external}{%
 \section{External Libraries}\label{v8-external}}
 
-V8 is quite bare in and of itself; there is, for instance, no functionalities built-in to read or write files from disk, it thus becomes truly interesting when you can use it JavaScript libraries. We'll demonstrate this using \href{https://fusejs.io/}{fuse.js} a fuzzy-search library.
+V8 is quite bare in and of itself; there is, for instance, no functionalities built in to read or write files from disk. It thus becomes truly interesting when you can leverage JavaScript libraries. We'll demonstrate this using \href{https://fusejs.io/}{fuse.js} a fuzzy-search library.
 
-The very first step of integrating any external library is to look at the code, often examples, to grasp an idea of what is to be achieved from R. Below is an example from the official documentation. First, an array of two \texttt{books} is defined; this is later used to test the search. Then another array of options is defined, this should at the very least include the key(s) that should be searched, here it is set to search through the title and authors. Then, the fuse object is initialised based on the array of books and the options. Finally, the \texttt{search} method is used to retrieve all books, the title or author of which, partially match the term \texttt{tion}.
+The very first step of integrating any external library is to look at the code (often examples) to grasp an idea of what is to be achieved from R. Below is an example from the official documentation. First, an array of two \texttt{books} is defined; this is later used to test the search. Then another array of options is defined. This should at the very least include the key(s) that should be searched; here it is set to search through the title and authors. Then, the fuse object is initialised based on the array of books and the options. Finally, the \texttt{search} method is used to retrieve all books, the title or author of which partially match the term \texttt{tion}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8853,7 +8854,7 @@ The very first step of integrating any external library is to look at the code, 
 \end{Highlighting}
 \end{Shaded}
 
-With some understanding of what is to be reproduced in R, we can import the library with the \texttt{source} method which takes a \texttt{file} argument that will accept a path or URL to a JavaScript file to source, below we use the handy CDN (Content Delivery Network) to avoid downloading a file.
+With some understanding of what is to be reproduced in R, we can import the library with the \texttt{source} method, which takes a \texttt{file} argument that will accept a path or URL to a JavaScript file to source. Below we use the handy CDN (Content Delivery Network) to avoid downloading a file.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8926,7 +8927,7 @@ Then again, we can make sure that the data frame was turned into a row-wise JSON
 \end{Highlighting}
 \end{Shaded}
 
-Now we can define options for the search; we don't get into the details of fuse.js here as this is not the purpose of this book, you can read more about the options in the \href{https://fusejs.io/\#Examples}{examples section} of the site. We can mimic the format of the JSON options shown on the website with a simple list and assign that to a new variable in the engine. Note that we wrap the title in a \texttt{list} to ensure it is converted to an array of length 1: \texttt{list("title")} should be converted to a \texttt{{[}"title"{]}} array and not a \texttt{"title"} scalar.
+Now we can define options for the search; we don't get into the details of fuse.js here as this is not the purpose of this book. You can read more about the options in the \href{https://fusejs.io/\#Examples}{examples section} of the site. We can mimic the format of the JSON options shown on the website with a simple list and assign that to a new variable in the engine. Note that we wrap the title in a \texttt{list} to ensure it is converted to an array of length 1: \texttt{list("title")} should be converted to a \texttt{{[}"title"{]}} array and not a \texttt{"title"} scalar.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8961,7 +8962,7 @@ Then we can finish the second step of the online examples, instantiate a fuse.js
 \end{Highlighting}
 \end{Shaded}
 
-A search for ``sense'' returns a vector of ids where the term ``sense'' was found; \texttt{c} and \texttt{d} or the books Common Sense, Sense and Sensibility. We could perhaps make that last code simpler using the \texttt{call} method.
+A search for ``sense'' returns a vector of ids where the term ``sense'' was found; \texttt{c} and \texttt{d} or the books \emph{Common Sense}, \emph{Sense and Sensibility}. We could perhaps make that last code simpler using the \texttt{call} method.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8973,11 +8974,11 @@ A search for ``sense'' returns a vector of ids where the term ``sense'' was foun
 \hypertarget{v8-npm}{%
 \section{NPM Packages}\label{v8-npm}}
 
-We can also use \href{https://www.npmjs.com/}{npm} packages, though not all will work. NPM is node's Package Manager, or in a sense Node's equivalent of CRAN.
+We can also use \href{https://www.npmjs.com/}{npm} packages, though not all will work. NPM is Node's package manager, or in a sense Node's equivalent of CRAN.
 
-To use NPM packages we need \href{http://browserify.org/}{browserify}, a node library to bundle all dependencies of an NPM package into a single file which can subsequently be imported in V8. Browserify is itself an NPM package, and therefore requires Node.js to be installed. The reason browserify is required is that the JavaScript code written for Node.js is different from that which should be written for web browsers, therefore importing a Javascript file built with node.js in a browser may not work: browserify will translate node.js code (where necessary) into JavaScript code the browser can run.
+To use NPM packages we need \href{http://browserify.org/}{browserify}, a node library to bundle all dependencies of an NPM package into a single file, which can subsequently be imported in V8. Browserify is itself an NPM package, and therefore requires Node.js to be installed. The reason browserify is required will be covered in more depth in chapter 20, in essence, NPM assumes disk access to load dependencies in \texttt{require()} (JavaScript) statements. This will not work with V8. Browserify will bundle all the files that comprise an NPM module into a single file that does not require disk access.
 
-You can install browserify globally with the following the \texttt{g} flag. Install node.js and type the following the terminal.
+You can install browserify globally with the following the \texttt{g} flag. Once Node.js installed, browserify can be installed from the \emph{terminal} (not R console) with the \texttt{npm} command.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9002,7 +9003,7 @@ Then we browserify it. From the terminal, the first line creates a file called \
 \end{Highlighting}
 \end{Shaded}
 
-We can now source \texttt{ms.js} with v8, before we do so we ought to look at example code to see what has to be reproduced using V8. Luckily the library is very straightforward: it includes a single function for all conversions, e.g.: \texttt{ms(\textquotesingle{}2\ days\textquotesingle{})} to convert two days in milliseconds.
+We can now source \texttt{ms.js} with V8. Before we do so we ought to look at example code to see what has to be reproduced using V8. Luckily the library is very straightforward: it includes a single function for all conversions, e.g.: \texttt{ms(\textquotesingle{}2\ days\textquotesingle{})} to convert two days in milliseconds.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9027,7 +9028,7 @@ Then using the library simply consists of using \texttt{eval} or preferably \tex
 \hypertarget{v8-pkg}{%
 \section{Use in Packages}\label{v8-pkg}}
 
-In this section, we detail how one should go about using V8 in an R package if you are not familiar with package development you can skip ahead. We start by creating a package called ``ms'' that will hold functionalities we explored in the previous section on NPM packages.
+In this section, we detail how one should go about using V8 in an R package. If you are not familiar with package development you can skip ahead. We start by creating a package called ``ms'' that will hold functionalities we explored in the previous section on NPM packages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9044,7 +9045,7 @@ The package is going to rely on V8 so it needs to be added under \texttt{Imports
 \end{Highlighting}
 \end{Shaded}
 
-The package should also include the external library \texttt{ms.js} browserified from the NPM package which should be placed it in the \texttt{inst} directory. Create it and place the \texttt{ms.js} file within the latter.
+The package should also include the external library \texttt{ms.js} browserified from the NPM package, which should be placed it in the \texttt{inst} directory. Create it and place the \texttt{ms.js} file within the latter.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9052,11 +9053,11 @@ The package should also include the external library \texttt{ms.js} browserified
 \end{Highlighting}
 \end{Shaded}
 
-As explored, the core of the V8 package is the execution environment(s) that are spawned using the \texttt{v8} function. One could perhaps provide a function that returns the object created by \texttt{v8}, but it would not be convenient: this function would need to be called explicitly by the users of the package and the output of it would need to be passed to every subsequent function. Thankfully there is a better way.
+As explored, the core of the V8 package is the execution environment(s) that are spawned using the \texttt{v8} function. One could perhaps provide a function that returns the object created by \texttt{v8}, but it would not be convenient: this function would need to be called explicitly by the users of the package, and the output of it would need to be passed to every subsequent function. Thankfully there is a better way.
 
 Instead, we can use the function \texttt{.onLoad}, to create the execution environment and import the dependency when the package is loaded by the user.
 
-You can read more about this function in Hadley Wickham's \href{http://r-pkgs.had.co.nz/r.html}{Advanced R book}. This is in effect very similar to how the Python integration of R, \href{https://rstudio.github.io/reticulate}{reticulate} \citep{R-reticulate} is \href{https://rstudio.github.io/reticulate/articles/package.html}{used in packages}. This function is often placed in a \texttt{zzz.R} file.
+You can read more about this function in Hadley Wickham's \href{http://r-pkgs.had.co.nz/r.html}{\emph{Advanced R} book}. This is, in effect, very similar to how the Python integration of R, \href{https://rstudio.github.io/reticulate}{reticulate} \citep{R-reticulate}, is \href{https://rstudio.github.io/reticulate/articles/package.html}{used in packages}. This function is often placed in a \texttt{zzz.R} file.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9100,7 +9101,7 @@ Now the dependency can be sourced in the \texttt{.onLoad} function. We can locat
 \end{Highlighting}
 \end{Shaded}
 
-We can then create a \texttt{to\_ms} function, it will have access the \texttt{ms} object we instantiated in \texttt{.onLoad}.
+We can then create a \texttt{to\_ms} function. It will have access to the \texttt{ms} object we instantiated in \texttt{.onLoad}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9111,7 +9112,7 @@ We can then create a \texttt{to\_ms} function, it will have access the \texttt{m
 \end{Highlighting}
 \end{Shaded}
 
-After running \texttt{devtools::document()} and installing the package with \texttt{devtools::install()} it's ready to used.
+After running \texttt{devtools::document()} and installing the package with \texttt{devtools::install()}, it's ready to be used.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9123,7 +9124,7 @@ After running \texttt{devtools::document()} and installing the package with \tex
 \hypertarget{v8-ml}{%
 \chapter{Machine Learning}\label{v8-ml}}
 
-In this chapter, we build a package that, via V8, wraps \href{https://github.com/mljs/ml}{ml.js}, a library which brings machine learning to JavaScript. It covers quite a few models, we only include one: the linear regression. This is an interesting example because it reveals some proceedings that one is likely to run into when creating packages using V8.
+In this chapter, we build a package that, via V8, wraps \href{https://github.com/mljs/ml}{ml.js}, a library that brings machine learning to JavaScript. It covers quite a few models; we only include one: the linear regression. This is an interesting example because it reveals some proceedings that one is likely to run into when creating packages using V8.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9158,7 +9159,7 @@ Then we create the \texttt{inst} directory in which we place the ml.js file down
 \end{Highlighting}
 \end{Shaded}
 
-With the dependency downloaded one can start working on the R code. First, a new V8 context needs to be created and the ml.js file need to be imported in it.
+With the dependency downloaded, one can start working on the R code. First, a new V8 context needs to be created and the ml.js file needs to be imported into it.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9224,7 +9225,7 @@ This works but has a few issues, namely running two or more regression internall
 \end{Highlighting}
 \end{Shaded}
 
-We then document and load the functions to run two regressions in a row then and observe the issue. Unlike R the model we created only exists in JavaScript, unlike the \texttt{lm}, the function \texttt{ml\_simple\_lm} does not return the model. Therefore, \texttt{ml\_simple\_lm} does not distinguish between models, unlike \texttt{predict} which takes the model as the first argument and runs the prediction on it.
+We then document and load the functions to run two regressions in a row then observe the issue. Unlike R, the model we created only exists in JavaScript, unlike the \texttt{lm}, the function \texttt{ml\_simple\_lm} does not return the model. Therefore, \texttt{ml\_simple\_lm} does not distinguish between models, unlike \texttt{predict}, which takes the model as the first argument and runs the prediction on it.
 
 This implementation of ml.js is indeed very dangerous.
 
@@ -9244,7 +9245,7 @@ This implementation of ml.js is indeed very dangerous.
 \end{Highlighting}
 \end{Shaded}
 
-The package ml currently under construction should emulate R in that respect; the \texttt{ml\_simple\_lm} should return the model which should be usable with the \texttt{predict} function. In order to do we are going to need to track regressions internally in V8 so the \texttt{ml\_simple\_lm} return a proxy of the model that \texttt{predict} can use to predict on the intended model.
+The package ml currently under construction should emulate R in that respect; the \texttt{ml\_simple\_lm} should return the model, which should be usable with the \texttt{predict} function. In order to do so, we are going to need to track regressions internally in V8 so the \texttt{ml\_simple\_lm} returns a proxy of the model that \texttt{predict} can use to predict on the intended model.
 
 In order to track and store regressions internally, we are going to declare an empty array when the package is loaded.
 
@@ -9262,7 +9263,7 @@ In order to track and store regressions internally, we are going to declare an e
 \end{Highlighting}
 \end{Shaded}
 
-Then, one can track regressions by creating an R object which is incremented every time \texttt{ml\_simple\_lm} runs; this can be used as a variable name in the JavaScript \texttt{regressions} array declare in \texttt{.onLoad}. This variable name must be stored in the object we intend to return so the \texttt{predict} method we will create later on can access the model and run predictions. Finally, in order to declare a new method on the \texttt{predict} function, we need to return an object bearing a unique class, below we use \texttt{mlSimpleRegression}.
+Then, one can track regressions by creating an R object, which is incremented every time \texttt{ml\_simple\_lm} runs; this can be used as a variable name in the JavaScript \texttt{regressions} array declare in \texttt{.onLoad}. This variable name must be stored in the object we intend to return so the \texttt{predict} method we will create later on can access the model and run predictions. Finally, in order to declare a new method on the \texttt{predict} function, we need to return an object bearing a unique class. Below we use \texttt{mlSimpleRegression}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9299,7 +9300,7 @@ Then, one can track regressions by creating an R object which is incremented eve
 \end{Highlighting}
 \end{Shaded}
 
-Then on can implement the \texttt{predict} method for \texttt{mlSimpleRegression}. The function uses the \texttt{address} of the model to run the JavaScript \texttt{predict} method on that object.
+Then one can implement the \texttt{predict} method for \texttt{mlSimpleRegression}. The function uses the \texttt{address} of the model to run the JavaScript \texttt{predict} method on that object.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9324,7 +9325,7 @@ We can then build and load the package to it in action.
 \NormalTok{model_random <-}\StringTok{ }\KeywordTok{ml_simple_lm}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{, }\KeywordTok{runif}\NormalTok{(}\DecValTok{10}\NormalTok{))}
 
 \KeywordTok{predict}\NormalTok{(model_random, }\DecValTok{15}\NormalTok{)}
-\CommentTok{#> [1] 19.05512}
+\CommentTok{#> [1] -130.8514}
 \KeywordTok{predict}\NormalTok{(model_cars, }\DecValTok{15}\NormalTok{)}
 \CommentTok{#> [1] 10.76742}
 \end{Highlighting}
@@ -9353,44 +9354,44 @@ Thus far, all of the JavaScript code written in this book was placed directly in
 
 It's the same problem one faces when writing R code. While a small script of 300 lines of code will do the job, a large script of 10,000 lines quickly becomes unmanageable. Therefore when tackling more extensive projects, the R programmer will turn to solutions that enforce a specific file structure and provide utilities to harmonise how those files work together. Some of these solutions may include the drake \citep{R-drake} or targets \citep{R-targets} packages, both of which provide tools to manage complex workflows. Another method often used is to build the project as an R package, thereby enforcing a particular structure and enabling reproducibility, unit tests, and more.
 
-The issues mentioned above are also a concern in JavaScript though here one has to consider additional pitfalls. Like R, JavaScript is a continually evolving language, but while R code is written on version \texttt{4.0.0} will likely run fine on version \texttt{3.0.0} it is not precisely the case for JavaScript. As the language evolves and changes, web browsers have to keep up to support any new feature brought by new releases.
+The issues mentioned above are also a concern in JavaScript, though here one has to consider additional pitfalls. Like R, JavaScript is a continually evolving language, but while R code written on version \texttt{4.0.0} will likely run fine on version \texttt{3.0.0}, it is not precisely the case for JavaScript. As the language evolves and changes, web browsers have to keep up to support any new feature brought by new releases.
 
 Therefore JavaScript code that is written on the latest version may not run on all browsers. Also, consider that even if the latest versions of Google Chrome and Mozilla Firefox tend to support the latest JavaScript, users who visit your Shiny applications or use your htmlwidgets may not have their browsers up to date.
 
 In JavaScript, code mismanagement might be exacerbated because it often relies on other files such as CSS, JSON, images, and more, making it challenging to build robust projects. Moving an image from one folder to another or removing a CSS file may break an entire JavaScript project.
 
-Also, in JavaScript, code size matters: the smaller the file, the faster it will load in the browser. JavaScript files are reduced in size with a process called ``minification,'' which consists of removing all unnecessary characters such as spaces from a JavaScript file to obtain a ``minified'' version that fits on a single line, which is smaller in size. This is because humans cannot read or write minified code; try removing all line breaks and spaces from your R scripts if you think otherwise, then imagine JavaScript minification takes it a step further.
+Also, in JavaScript, code size matters: the smaller the file, the faster it will load in the browser. JavaScript files are reduced in size with a process called ``minification,'' which consists of removing all unnecessary characters, such as spaces, from a JavaScript file to obtain a ``minified'' version that fits on a single line, which is smaller in size. This is because humans cannot read or write minified code; try removing all line breaks and spaces from your R scripts if you think otherwise, then imagine JavaScript minification takes it a step further.
 
-Finally, since R is rather strict packages enforce a specific structure, JavaScript does not come with such restrictions off the shelf. Therefore, it's even more tempting for the developer to take shortcuts and make a mess of their projects.
+Finally, since R is rather strict, packages enforce a specific structure; JavaScript does not come with such restrictions off the shelf. Therefore, it's even more tempting for the developer to take shortcuts and make a mess of their projects.
 
 Combine all of the above and software that involves JavaScript can quickly become poorly structured and cumbersome. Moreover, considering all these potential issues as one writes code is unsustainable as it dramatically increases the cognitive load and ultimately distracts from writing code itself: it's just too much to consider. Thankfully some tools have been invented over the years to help JavaScript developers manage all of these matters. These tools differ slightly from one another, they each have their pros and cons, but all have the same goal: making JavaScript projects more robust and manageable.
 
-\href{https://gruntjs.com/}{Grunt} describes itself as a ``the JavaScript task runner,'' and will carry minification, compilation, unit testing, linting, and more. There is also \href{https://parceljs.org/}{Parcel} a web application bundler that will minify, bundle, (and more) JavaScript code. However, the one we shall use in this part of the book is \href{https://webpack.js.org/}{webpack}, as it is very similar to Grunt and is one of the most popular.
+\href{https://gruntjs.com/}{Grunt} describes itself as a ``the JavaScript task runner,'' and will carry minification, compilation, unit testing, linting, and more. There is also \href{https://parceljs.org/}{Parcel} a web application bundler that will minify and bundle (and more) JavaScript code. However, the one we shall use in this part of the book is \href{https://webpack.js.org/}{webpack}, as it is very similar to Grunt and is one of the most popular.
 
 \hypertarget{webpack-example}{%
 \section{Example}\label{webpack-example}}
 
-There are admittedly few R packages that make use of such technology though it must be said that many could greatly benefit from it. Given its size and complexity a package such as Shiny, however, could probably not do without it.
+There are admittedly few R packages that make use of such technology, though it must be said that many could greatly benefit from it. Given its size and complexity a package such as Shiny, however, could probably not do without it.
 
-Shiny makes use of Grunt, the source code that comprises all of the JavaScript required to run the front end (inputs, outputs, modals, etc.) is in the \texttt{srcjs} directory which can be seen on \href{https://github.com/rstudio/shiny}{official GitHub repository}. This folder includes a multitude of JavaScript files the name of which indicates the code they encompass; \texttt{input\_binding\_checkbox.js}, \texttt{modal.js}, etc.
+Shiny makes use of Grunt, the source code that comprises all of the JavaScript required to run the front end (inputs, outputs, modals, etc.) is in the \texttt{srcjs} directory which can be found on the \href{https://github.com/rstudio/shiny}{official GitHub repository.} This folder includes a multitude of JavaScript files the names of which indicate the code they encompass; \texttt{input\_binding\_checkbox.js}, \texttt{modal.js}, etc.
 
-These files are processed by Grunt which, based on the \texttt{Gruntfile.js} configuration file in the \texttt{tools} directory, into different bundles that go in the \texttt{inst} folder of the package.
+These files are processed by Grunt which, using the \texttt{Gruntfile.js} configuration file in the \texttt{tools} directory, creates multiple bundles that it places in the \texttt{inst} folder of the package.
 
 \hypertarget{webpack-browser}{%
 \section{Transpiling}\label{webpack-browser}}
 
-As new functionalities are made available in JavaScript with every modern version web browsers, have to keep pace and support running said functionalities. First, this is not always the case, major web browsers such as Google Chrome, Mozilla Firefox, and Safari generally do a decent job of keeping up, but one can never count on the individuals using those to do keep their browsers up to date.
+As new functionalities are made available in JavaScript, with every modern version web browsers have to keep pace and support running said functionalities. First, this is not always the case, major web browsers such as Google Chrome, Mozilla Firefox, and Safari generally do a decent job of keeping up, but one can never count on the individuals using those to do keep their browsers up to date.
 
 Imagine building a large htmlwidgets for a client only to discover that for IT security reasons all their company laptops run a particular version of a web browser that does not support critical functionalities the widget relies upon.
 
-Ensuring that the JavaScript code can run on most browsers is no trivial task. The best way to do so \emph{is not} to write outdated JavaScript code that all browsers should support, the solution is actually to use a \href{https://babeljs.io/}{Babel}. This transpiler will convert ``ECMAScript 2015+ code into a backwards-compatible version of JavaScript.'' This way one can use the latest JavaScript, even before browsers officially support it, transpile it with Babel to obtain a JavaScript file that will run on any browser that supports ECMAScript 2015 (JavaScript version released in 2015).
+Ensuring that the JavaScript code can run on most browsers is no trivial task. The best way to do so \emph{is not} to write outdated JavaScript code that all browsers should support, the solution is actually to use a \href{https://babeljs.io/}{Babel.} This transpiler will convert ``ECMAScript 2015+ code into a backwards-compatible version of JavaScript.'' This way one can use the latest JavaScript, even before browsers officially support it, and transpile it with Babel to obtain a JavaScript file that will run on any browser that supports ECMAScript 2015 (JavaScript version released in 2015).
 
 \hypertarget{webpack-minification}{%
 \section{Minification}\label{webpack-minification}}
 
 Web browsers always need to load the files necessary to render a webpage, be it a static website, a Shiny application, or a standalone widget. Loading those files can take critical time and make the loading of a web application slow. Therefore it is good practice to reduce the size of those files. This includes compressing images, so they are smaller in size and load faster but also ``minifying'' CSS and JavaScript code.
 
-When writing code us humans like to use comprehensible variable names, line breaks, spaces and other things that help make things clear and readable. Machines however, do not need much of that, as long as the code is valid, it will run.
+When writing code, us humans like to use comprehensible variable names, line breaks, spaces, and other things that help make things clear and readable. Machines, however, do not need any of that; as long as the code is valid, it will run.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9405,7 +9406,7 @@ When writing code us humans like to use comprehensible variable names, line brea
 \end{Highlighting}
 \end{Shaded}
 
-Minification is the process of removing all of the ``syntactic sugar'' that is unnecessary to obtain JavaScript that fits in a single line and makes for a smaller file. See the example given here where the code above is minified to get the code below, note that the comment was removed and even some variable names have changed to be shorter.
+Minification is the process of removing all of the ``syntactic sugar'' that is unnecessary to obtain JavaScript code that fits in a single line and makes for a smaller file. See the example given here where the code above is minified to get the code below, note that the comment was removed and even some variable names have changed to be shorter.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9416,9 +9417,9 @@ Minification is the process of removing all of the ``syntactic sugar'' that is u
 The minified files of a library tend to end in \texttt{.min.js} though minified code can very well be placed in a \texttt{.js} file.
 
 \hypertarget{webpack-structure}{%
-\section{Bundling \& Modules}\label{webpack-structure}}
+\section{Bundling and Modules}\label{webpack-structure}}
 
-Managing the structure of JavaScript projects can be tricky. One does not want to place 2,000 lines of code in a single line but splitting JavaScript code into multiple files is complicated.
+Managing the structure of JavaScript projects can be tricky. One does not want to place 2,000 lines of code in a single file, but splitting JavaScript code into multiple files is complicated.
 
 While writing an R package, one is free to organise the functions in different files as their content (functions, data, etc.) is ultimately loaded into the global environment with \texttt{library} by the user of the package.
 
@@ -9431,23 +9432,23 @@ In JavaScript, one does not have the luxury of writing code across different fil
 \end{Highlighting}
 \end{Shaded}
 
-While this may be fine for two or three files, it quickly goes out of hand as one has to remember to import those in the correct order. In the above example, variables declared in \texttt{main.js} cannot be used in \texttt{utils.js}, unless we change the order of the import in which case something else will likely break.
+While this may be fine for two or three files, it quickly gets out of hand as one has to remember to import those in the correct order. In the above example, variables declared in \texttt{main.js} cannot be used in \texttt{utils.js}, unless we change the order of the import in which case something else will likely break.
 
 It's therefore essential to use tools that allow splitting JavaScript programs into modules (to write programs in different files), manage the dependencies between these files, then ``bundle'' those correctly into one or more files destined to be imported in the browser.
 
 \hypertarget{webpack-decouple}{%
 \section{Decoupling}\label{webpack-decouple}}
 
-One thing that might become apparent from the previous sections is the idea of decoupling the final code that makes it into the web browser from the code we write. It is thanks to this decoupling that we can write easy to read JavaScript code on the latest version across multiple files to then run the various processes of transpiling, bundling, and minifying to obtain code that is more efficient and robust for the browser.
+One thing that might become apparent from the previous sections is the idea of decoupling the final code that makes it into the web browser from the code we write. It is thanks to this decoupling that we can write easy-to-read JavaScript code on the latest version across multiple files to then run the various processes of transpiling, bundling, and minifying to obtain code that is more efficient and robust for the browser.
 
 This may appear like a lot to manage. Thankfully we can use the aforementioned webpack software to take care of all these procedures for us. There is nonetheless a gentle learning curve to make use of it as it involves multiple new concepts.
 
-Moreover, webpack does not limit itself to the processes as mentioned earlier. It will also take care of other things such as removing ``dead code,'' functions or variables that are declared but not used, allows integrating CSS and other files in JavaScript itself, and so much more.
+Moreover, webpack does not limit itself to the previously-mentioned processes. It will also take care of other things such as removing ``dead code,'' functions or variables that are declared but not used, and it allows integrating CSS and other files in JavaScript itself, and so much more.
 
 \hypertarget{webpack-npm}{%
 \section{NPM}\label{webpack-npm}}
 
-Another new piece of software that one needs to be introduced is Node's Package Manager, hereafter referred to as NPM. As indicated by the name it's a package manager for Node.js, or translated for the R user it's Node's loose equivalent of CRAN. One first significant difference is that while CRAN performs very rigorous checks on any package submitted NPM does not, one can publish almost anything.
+Another new piece of software that we need to be introduce is Node's Package Manager, hereafter referred to as NPM. As indicated by the name, it's a package manager for Node.js, or translated for the R user it's Node's loose equivalent of CRAN. One first significant difference is that while CRAN performs very rigorous checks on any package submitted, NPM does not; one can publish almost anything.
 
 Notice how every dependency used in this book had to be either found through a CDN or manually downloaded, only to be imported in the final document. Again, this is useful for the smaller projects but may become a hindrance when multiple dependencies have to be managed and updated, added and removed, etc.
 
@@ -9469,12 +9470,12 @@ In the following chapter, we discover how to include both webpack and NPM to mak
 
 In this chapter, we discover how to feature webpack and NPM in a straightforward Shiny project. The idea is not to build a complex application, only to find out how one might go about bringing them into an R project and observe some of their benefits (and potential issues).
 
-There is a lot of depth to NPM and webpack; we only touch upon the surface here so we can obtain a basic setup for a Shiny application. We'll eventually go into slightly more details as this part of the book progress, but it will by no means fully explore the realm of webpack. It's always a good idea to take a look at the \href{https://webpack.js.org/}{official documentation} to get a better picture of the technology.
+There is a lot of depth to NPM and webpack; we only touch upon the surface here so we can obtain a basic setup for a Shiny application. We'll eventually go into slightly more detail as this part of the book progresses, but it will by no means fully explore the realm of webpack. It's always a good idea to take a look at the \href{https://webpack.js.org/}{official documentation} to get a better picture of the technology.
 
 \hypertarget{webpack-intro-install}{%
 \section{Installation}\label{webpack-intro-install}}
 
-As Node's Package Manager, a working installation of node.js is required: NPM ships with it. A bit like R in a sense where the package manager also comes with the language, install R, and you can install packages from CRAN with \texttt{install.packages}. The same applies here, install Node and you can install NPM packages from the command line.
+As Node's Package Manager, a working installation of Node.js, is required, NPM ships with it. A bit like R in a sense where the package manager also comes with the language, install R, and you can install packages from CRAN with \texttt{install.packages}. The same applies here, install Node and you can install NPM packages from the command line.
 
 \begin{rmdnote}
 We are only going to use Node.js \emph{indirectly}, some of its
@@ -9482,7 +9483,7 @@ functionalities and its package manager. This is not about building Node
 applications.
 \end{rmdnote}
 
-Below are some directions on how to install node.js, in the event this does not work or you encounter issues please refer to the \href{https://nodejs.org/en/}{official website}.
+Below are some directions on how to install Node.js. In the event this does not work or you encounter issues please refer to the \href{https://nodejs.org/en/}{official website}.
 
 \hypertarget{webpack-intro-install-mac}{%
 \subsection{Mac OS}\label{webpack-intro-install-mac}}
@@ -9526,9 +9527,9 @@ scoop install nodejs
 If you are on another OS or Linux distro check the official, very concise \href{https://nodejs.org/en/download/package-manager/}{guide} to install from various package managers.
 
 \hypertarget{webpack-intro-setup}{%
-\section{Setup the app}\label{webpack-intro-setup}}
+\section{Set Up the App}\label{webpack-intro-setup}}
 
-Let us first put together a simple Shiny application that which will serve as a basis for including webpack and npm. Create a new directory and in it place a file called \texttt{app.R} containing a very simple application.
+Let us first put together a simple Shiny application that will serve as a basis for including webpack and npm. Create a new directory and in it place a file called \texttt{app.R} containing a very simple application.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9553,24 +9554,24 @@ Whereas in R we previously used the usethis package to create packages with \tex
 
 An NPM project can be initialised with the command \texttt{npm\ init}, which when run prompts the user with a few questions, such as the name of the project, the license to use, etc. These have little importance for what we do here but will matter if you decide to publish the package on NPM. One can also pass the ``yes'' flag to the function to skip those questions: \texttt{npm\ init\ -y}.
 
-This creates a \texttt{package.json} file which is loosely equivalent to the \texttt{DESCRIPTION} of an R package; it includes information on the dependencies of the project, the version of the project, and more.
+This creates a \texttt{package.json} file, which is loosely equivalent to the \texttt{DESCRIPTION} of an R package; it includes information on the dependencies of the project, the version of the project, and more.
 
-We will revisit this file later in the chapter, at this stage ensure you have run \texttt{npm\ init} (with or without the \texttt{-y} flag).
+We will revisit this file later in the chapter. At this stage ensure you have run \texttt{npm\ init} (with or without the \texttt{-y} flag) from the root of the project (where the \texttt{app.R} file is located).
 
 \hypertarget{webpack-intro-install-pkgs}{%
-\section{Installing NPM packages}\label{webpack-intro-install-pkgs}}
+\section{Installing NPM Packages}\label{webpack-intro-install-pkgs}}
 
-Unless the R programmer uses packages such as renv \citep{R-renv} or packrat \citep{R-packrat} then packages are installed globally on the machine, running \texttt{install.packages("dplyr")} installs a single version of dplyr across the entire device. Because CRAN is strict and its packages subsequently stable it tends not to be too much of an issue. Packages submitted to CRAN are checked for reverse dependencies (other packages that depend on it) to see if the submission could cause problems downstream.
+Unless the R programmer uses packages such as renv \citep{R-renv} or packrat \citep{R-packrat} then packages are installed globally on the machine, running \texttt{install.packages("dplyr")} installs a single version of dplyr across the entire device. Because CRAN is strict and its packages subsequently stable, it tends not to be too much of an issue. Packages submitted to CRAN are checked for reverse dependencies (other packages that depend on it) to see if the submission could cause problems downstream.
 
 However, NPM does no such thing with packages that are submitted. Therefore the developer has to be more careful about dependencies, particularly versioning as packages can dramatically change from one version to the next. Thus it makes sense that NPM out-of-the-box advocates and provides tools to encapsulate projects. It is \emph{not recommended,} to install NPM packages globally. NPM projects (the directory where \texttt{npm\ init} was run) come bundled with the equivalent of renv/packrat.
 
 Installing Node packages also takes place at the command line with the \texttt{install} command followed by the name of the package to install, e.g.: \texttt{npm\ install\ nameOfPackage}.
 
-As mentioned, it is rarely a good idea to install packages globally at the exception of very few packages such as command-line applications used across the machine. As an example, the \href{https://docsify.js.org/}{docsify-cli} package for documentation generation can safely be installed globally as it is used at the command line in projects that don't necessarily use NPM. This can be achieved with the \texttt{-g} flag that stands for ``global:'' \texttt{npm\ install\ docsify-cli\ -g}.
+As mentioned, it is rarely a good idea to install packages globally at the exception of very few packages, such as command-line applications used across the machine. As an example, the \href{https://docsify.js.org/}{docsify-cli} package for documentation generation can safely be installed globally as it is used at the command line in projects that don't necessarily use NPM. This can be achieved with the \texttt{-g} flag that stands for ``global'': \texttt{npm\ install\ docsify-cli\ -g}.
 
 There are two other scopes on which packages can be installed. NPM allows distinguishing between packages that are needed to develop the project and packages that are needed in the final product being built.
 
-R does not come with such convenience but could perhaps be useful, for instance throughout the book we used the usethis package to develop packages from setting it up to adding packages to the \texttt{DESCRIPTION} file, and more. Perhaps one would like to make this a ``developer'' dependency so that other developers that pull the package from GitHub have usethis installed and readily available. The advantage is that this dependency would not be included in the final product, that is, usethis is not required to use the package (only to develop it) and therefore is not installed by the user.
+R does not come with such convenience but it could perhaps be useful. For instance throughout the book we used the usethis package to develop packages from setting it up to adding packages to the \texttt{DESCRIPTION} file, and more. Perhaps one would like to make this a ``developer'' dependency so that other developers that pull the package from GitHub have usethis installed and readily available. The advantage is that this dependency would not be included in the final product, that is, usethis is not required to use the package (only to develop it) and therefore is not installed by the user.
 
 As stated in the previous chapter, file size matters in JavaScript; it is, therefore, crucial that dependencies that are used only for development are not included in the final JavaScript file. With NPM this can be done by using the \texttt{-\/-save-dev} flag, e.g.: \texttt{npm\ install\ webpack\ -\/-save-dev} to install webpack. This is how it will be eventually installed as it is needed to prepare the final product (minify, bundle, etc.) but is not required to run the bundled file(s).
 
@@ -9584,7 +9585,7 @@ Before moving on to the next section, let us install webpack and its command-lin
 \end{Highlighting}
 \end{Shaded}
 
-Notice that this updated the \texttt{package.json} file, created the \texttt{package-lock.json} file as well as a \texttt{node\_modules} directory to obtain the following structure.
+Notice that this updated the \texttt{package.json} file and created the \texttt{package-lock.json} file as well as a \texttt{node\_modules} directory to obtain the following structure.
 
 \begin{verbatim}
 .
@@ -9594,7 +9595,7 @@ Notice that this updated the \texttt{package.json} file, created the \texttt{pac
 └── package.json
 \end{verbatim}
 
-The directory \texttt{node\_modules} actually holds all the dependencies, it will grow in size as you add more, it's important that this directory is not pushed to whatever version control system you happen use (GitHub, Bitbucket, Gitlab).
+The directory \texttt{node\_modules} actually holds all the dependencies, and it will grow in size as you add more, it's important that this directory is not pushed to whatever version control system you happen use (GitHub, Bitbucket, Gitlab).
 
 \begin{rmdnote}
 Exclude the \texttt{node\_modules} directory from your version control
@@ -9624,7 +9625,7 @@ The dependencies are anyway not needed as one can pull the project without the \
 \end{Highlighting}
 \end{Shaded}
 
-The \texttt{package-lock.json} file is automatically generated and \emph{should not be edited manually,} it describes the exact tree of all the dependencies. If you installed a package by mistake, you could uninstall it with \texttt{npm\ uninstall\ nameOfPage}.
+The \texttt{package-lock.json} file is automatically generated and \emph{should not be edited manually.} It describes the exact tree of all the dependencies. If you installed a package by mistake, you could uninstall it with \texttt{npm\ uninstall\ nameOfPage}.
 
 \textbf{Recap}
 
@@ -9641,9 +9642,9 @@ The \texttt{package-lock.json} file is automatically generated and \emph{should 
 \end{itemize}
 
 \hypertarget{webpack-intro-entry-points}{%
-\section{Entry point \& output}\label{webpack-intro-entry-points}}
+\section{Entry Point and Output}\label{webpack-intro-entry-points}}
 
-In general, an NPM project with webpack will make use of an \texttt{src} directory where the source code is placed and a \texttt{dist} directory (for distributed) where the bundled source code will be placed, we'll see how to change these defaults later on. It will eventually be necessary as the \texttt{src} directory in R packages is reserved for compiled code (e.g., C++) and therefore cannot be used to place JavaScript files.
+In general, an NPM project with webpack will make use of an \texttt{src} directory where the source code is placed and a \texttt{dist} directory (for distributed) where the bundled source code will be placed; we'll see how to change these defaults later on. It will eventually be necessary as the \texttt{src} directory in R packages is reserved for compiled code (e.g., C++) and therefore cannot be used to place JavaScript files.
 
 It will not be a problem here as we are not building a package.
 
@@ -9661,14 +9662,14 @@ Webpack will then require at least one ``entry point.'' An entry point is an inp
 \end{Highlighting}
 \end{Shaded}
 
-The next section on configuration will detail precisely how to indicate to webpack that this is indeed the entry point it should to use.
+The next section on configuration will detail precisely how to indicate to webpack that this is indeed the entry point it should use.
 
 \hypertarget{webpack-intro-conf}{%
-\section{Configuration file}\label{webpack-intro-conf}}
+\section{Configuration File}\label{webpack-intro-conf}}
 
-Webpack comes with a configuration file, \texttt{webpack.config.js} though for a larger project it is advised to split it into multiple configuration files (more on that later). This file can include numerous options, plugins, and other settings to customise how webpack transforms the entry point into an output, only some of which will be explored in this book as there are too many to cover.
+Webpack comes with a configuration file, \texttt{webpack.config.js}. Though for a larger project it is advised to split it into multiple configuration files (more on that later). This file can include numerous options, plugins, and other settings to customise how webpack transforms the entry point into an output, only some of which will be explored in this book as there are too many to cover.
 
-Below is probably the most straightforward file configuration file one may create. At the bare minimum, the configuration file will need to have an entry point specified; in this case, the \texttt{index.js} file previously created. If no \texttt{output} path is specified, then webpack will produce it at \texttt{dist/main.js} automatically.
+Below is probably the most straightforward configuration file one may create. At the bare minimum, the configuration file will need to have an entry point specified; in this case, the previously-created \texttt{index.js} file. If no \texttt{output} path is specified, then webpack will produce it at \texttt{dist/main.js} automatically.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9679,14 +9680,14 @@ Below is probably the most straightforward file configuration file one may creat
 \end{Highlighting}
 \end{Shaded}
 
-The \texttt{module.exports} line may confuse, it is covered a later section on \emph{importing and exporting} variables and functions.
+The \texttt{module.exports} line may confuse; it is covered in a later section on \emph{importing and exporting} variables and functions.
 
 \hypertarget{webpack-intro-npm-scripts}{%
 \section{NPM scripts}\label{webpack-intro-npm-scripts}}
 
-NPM scripts allow automating development tasks such are running unit tests, serving files, and more, we'll set it up to run webpack. The scripts are placed in the \texttt{package.json} file and are terminal commands.
+NPM scripts allow automating development tasks such as running unit tests, serving files, and more, we'll set it up to run webpack. The scripts are placed in the \texttt{package.json} file and are terminal commands.
 
-By default \texttt{npm-init} creates the following \texttt{test} script which echoes (prints) a message stating that no unit tests were set up.
+By default \texttt{npm-init} creates the following \texttt{test} script, which echoes (prints) a message stating that no unit tests were set up.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9714,11 +9715,11 @@ So running \texttt{npm\ run\ build} produces the output file from the entry poin
 \hypertarget{webpack-intro-webpack-mode}{%
 \section{Source maps}\label{webpack-intro-webpack-mode}}
 
-We will improve upon the previous section so we can run webpack on two different modes; one for production and one for development.
+We will improve upon the previous section so we can run webpack on two different modes: one for production and one for development.
 
-Since the output of webpack is any number of files bundled into one, it can make debugging more difficult to trace back the source of an error or warning. When files \texttt{a.js}, \texttt{b.js}, and \texttt{c.js} are bundled into \texttt{dist/main.js}, the stack trace will point to errors in \texttt{dist/main.js} which is not helpful as the developer needs to know in which original file the bug lies.
+Since the output of webpack is any number of files bundled into one, it can make debugging more difficult. When files \texttt{a.js}, \texttt{b.js}, and \texttt{c.js} are bundled into \texttt{dist/main.js}, the stack trace will point to errors in \texttt{dist/main.js}, which is not helpful as the developer needs to know in which original file the bug lies.
 
-Therefore webpack comes with a ``development'' mode that allows including the ``source map'' which maps the compiled code to the source files. This way, when an error or warning is raised JavaScript is able to point to the original line that causes it.
+Therefore, webpack comes with a ``development'' mode that allows including the ``source map,'' which maps the compiled code to the source files. This way, when an error or warning is raised JavaScript is able to point to the original line of code that causes it.
 
 There are again many different ways to set this up in the configuration file as the source map can be placed in the bundled file itself, in another file, and more. However, the easiest way is probably to specify the mode using webpack's CLI tool. The source maps are optional as these make the output larger and one wants to keep this output as small as possible for it to load as fast as possible in web browsers. Those will thus only be used while developing the project to trace back errors and warnings but will not be included in the final output for production.
 
@@ -9771,16 +9772,16 @@ We can then include the output of webpack in the Shiny application to test that 
 \end{Highlighting}
 \end{Shaded}
 
-Running the above launches the app which presents the \texttt{alert()} that was placed in the \texttt{index.js} source file.
+Running the above launches the app, which presents the \texttt{alert()} that was placed in the \texttt{index.js} source file.
 
 This makes for a great start but is not precisely interesting; in the following sections, we elaborate on this basic configuration to make better use of webpack's feature and produce something much more fun.
 
 \hypertarget{webpack-intro-internal-dependencies}{%
 \section{Internal Dependencies}\label{webpack-intro-internal-dependencies}}
 
-Let's install a dependency and make use of it in our Shiny application.
+Let's install a dependency and use it in our Shiny application.
 
-We'll install \href{https://github.com/ccampbell/mousetrap}{mousetrap} a library to handle key-strokes. We're going to use it to hide the UI of the Shiny application behind a secret pass-phrase; it will only be revealed after it has been typed. This can be done by observing a specific set of key-strokes with mousetrap and set a Shiny input value when that particular sequence is typed.
+We'll install \href{https://github.com/ccampbell/mousetrap}{mousetrap,} a library to handle key-strokes. We're going to use it to hide the UI of the Shiny application behind a secret pass-phrase; it will only be revealed after it has been typed. This can be done by observing a specific set of key-strokes with mousetrap and set a Shiny input value when that particular sequence is typed.
 
 \begin{rmdnote}
 This is by no means a safe way to secure an application!
@@ -9788,7 +9789,7 @@ This is by no means a safe way to secure an application!
 
 Though it is certainly not a real-world example, it is educational and quite a bit of fun.
 
-The first thing to do is to install the mousetrap dependency, as indicated on the \href{https://github.com/ccampbell/mousetrap}{GitHub README} it can be obtained from NPM.
+The first thing to do is to install the mousetrap dependency; as indicated on the \href{https://github.com/ccampbell/mousetrap}{GitHub README} it can be obtained from NPM.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9803,7 +9804,7 @@ Note that we use \texttt{-\/-save} as mousetrap will need to be included in the 
 
 If dependencies with webpack have to be installed from NPM it begs the question; what about dependencies that are already included in the project and are not available on NPM.
 
-For instance, this project is intended to work with a Shiny application which comes bundled with jQuery, and the Shiny JavaScript library. First, the Shiny javaScript library is not available on NPM. Second installing it would result in duplicating dependencies which is hardly best practice. Thankfully webpack comes with a simple mechanism to handle these cases; external dependencies can be added to the configuration file under \texttt{externals}.
+For instance, this project is intended to work with a Shiny application, which comes bundled with jQuery, and the Shiny JavaScript library. First, the Shiny javaScript library is not available on NPM. Second installing it would result in duplicating dependencies, which is hardly best practice. Thankfully webpack comes with a simple mechanism to handle these cases; external dependencies can be added to the configuration file under \texttt{externals}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9819,9 +9820,9 @@ For instance, this project is intended to work with a Shiny application which co
 The above will allow importing the \texttt{Shiny} object in scripts, which is needed to set the input value with \texttt{Shiny.setInputValue}; hence \texttt{Shiny} must be accessible in webpack. Let us delve into the import/export mechanism.
 
 \hypertarget{webpack-intro-import-export}{%
-\section{Import \& Export}\label{webpack-intro-import-export}}
+\section{Import and Export}\label{webpack-intro-import-export}}
 
-To demonstrate how webpack enables modularising code, we will not place all the code in the \texttt{index.js} file. We create two other files,\texttt{secret.js} and \texttt{input.js}, the first will contain the pass-phrase and the second will have the code to handle the key strokes via mousetrap and set the Shiny input. This will enable using the pass-phrase in multiple places without duplicating code.
+To demonstrate how webpack enables modularising code, we will not place all the code in the \texttt{index.js} file. We create two other files: \texttt{secret.js} and \texttt{input.js}. The first will contain the pass-phrase and the second will have the code to handle the key strokes via mousetrap and set the Shiny input. This will enable using the pass-phrase in multiple places without duplicating code.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9830,7 +9831,7 @@ To demonstrate how webpack enables modularising code, we will not place all the 
 \end{Highlighting}
 \end{Shaded}
 
-Therefore the entry point \texttt{index.js} needs to import \texttt{input.js} which itself imports the pass-phrase from \texttt{secret.js}.
+Therefore, the entry point \texttt{index.js} needs to import the \texttt{input.js} file, which itself imports the pass-phrase from \texttt{secret.js}.
 
 \begin{figure}[H]
 
@@ -9838,17 +9839,17 @@ Therefore the entry point \texttt{index.js} needs to import \texttt{input.js} wh
 
 }
 
-\caption{webpack with shiny}\label{fig:webpack-shiny}
+\caption{Webpack with Shiny}\label{fig:webpack-shiny}
 \end{figure}
 
-Again, there are multiple ways one can use to import and export modules, functions, variables, etc. This book will use the ES6 syntax as \href{https://webpack.js.org/api/module-methods/\#es6-recommended}{recommended by webpack}. Though this mechanism is present in other languages such as Python (where it somewhat resembles ES6) it will take some getting used to for R programmers as though this language features some form of import (\texttt{library()}) and export (\texttt{@export} roxygen2 tag), this differs significantly from how it works in webpack. This is, however, key to using webpack as it is what ultimately enables the creation of modules that make code more robust.
+Again, there are multiple ways to import and export modules, functions, variables, etc. This book will use the ES6 syntax as \href{https://webpack.js.org/api/module-methods/\#es6-recommended}{recommended by webpack.} Though this mechanism is present in other languages, such as Python (where it somewhat resembles ES6), it will take some getting used to for R programmers as though this language features some form of import (\texttt{library()}) and export (\texttt{@export} roxygen2 tag), this differs significantly from how it works in webpack. This is, however, key to using webpack, as it is what ultimately enables the creation of modules that make code more robust.
 
 There are two different kinds of exports and imports possible, ``named'' and ``default.'' We shall cover them in that order.
 
 \hypertarget{webpack-intro-import-export-named}{%
 \subsection{Named}\label{webpack-intro-import-export-named}}
 
-Let's place the variable \texttt{secret} in the \texttt{secret.js}. As a reminder, this variable will have to be imported by in another file (\texttt{input.js}) where it will be used to check if the pass-phrase typed by the user is correct.
+Let's place the variable \texttt{secret} in the \texttt{secret.js} file. As a reminder, this variable will have to be imported by in another file (\texttt{input.js}) where it will be used to check if the pass-phrase typed by the user is correct.
 
 Declaring the variable itself does not change, we use the keyword \texttt{let} to declare a variable named \texttt{secret} that holds the pass-phrase. The issue is that with webpack, this variable will be internal to the file where it is declared. However, we ultimately want to import that variable in another file. To do so, we can place the keyword \texttt{export} in front of the declaration to indicate that this variable is exported from the file. Note that this will also work with functions and classes, and other objects.
 
@@ -9860,7 +9861,7 @@ Placing \texttt{export} in front of an object constitutes a \emph{named export};
 \end{Highlighting}
 \end{Shaded}
 
-Then this variable can be imported in the \texttt{input.js} file. The named export in \texttt{secret.js} comes with a corresponding named import in which is used in \texttt{input.js} to import the variable named \texttt{secret}, this is indicated by the curly braces. Note that again we include the path to the file (\texttt{./secret.js}), importing from \texttt{secret.js} without the path will fail.
+Then this variable can be imported in the \texttt{input.js} file. The named export in \texttt{secret.js} comes with a corresponding named import in \texttt{input.js} to import the variable named \texttt{secret}; this is indicated by the curly braces. Note that again we include the path to the file (\texttt{./secret.js}), importing from \texttt{secret.js} without the path will fail.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9868,12 +9869,12 @@ Then this variable can be imported in the \texttt{input.js} file. The named expo
 \end{Highlighting}
 \end{Shaded}
 
-The curly braces are used for named imports as multiple such variables or functions can then be imported, e.g.~\texttt{import\ \{\ foo,\ bar\ \}\ from\ \textquotesingle{}./file.js\textquotesingle{};} to import the named exports \texttt{foo} and \texttt{bar} from \texttt{file.js}.
+The curly braces are used for named imports as multiple such variables or functions can then be imported, e.g., \texttt{import\ \{\ foo,\ bar\ \}\ from\ \textquotesingle{}./file.js\textquotesingle{};} to import the named exports \texttt{foo} and \texttt{bar} from \texttt{file.js}.
 
 \hypertarget{webpack-intro-import-export-default}{%
 \subsection{Default}\label{webpack-intro-import-export-default}}
 
-An alternative would be to use a default export. A file can have a default export, said default could be a variable, a function, a list, or any number of things but \emph{there can only be a single default export per file}. Default exports are indicated with by succeeding \texttt{export} with \texttt{default}.
+An alternative would be to use a default export. A file can have a default export; said default could be a variable, a function, a list, or any number of things but \emph{there can only be a single default export per file}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9885,17 +9886,12 @@ An alternative would be to use a default export. A file can have a default expor
 \end{Highlighting}
 \end{Shaded}
 
-Rather interestingly, because one can declare multiple variables in a single line (e.g.~\texttt{var\ a,b,c;}) and that only a single default can exist the default export and declaration cannot be placed on a single line. Only a single function be declared by line so declaring a function and its default export on a single line is valid.
+Rather interestingly, because multiple variables can be declared on a single line (e.g., \texttt{var\ a,b,c;}) but only a single default can exist, the default export and vriable declaration cannot be placed on a single line.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{// invalid}
 \ImportTok{export} \ImportTok{default}\NormalTok{ secret }\OperatorTok{=} \StringTok{'s e c r e t'}\OperatorTok{;}
-
-\CommentTok{// valid}
-\ImportTok{export} \ImportTok{default} \KeywordTok{function} \AttributeTok{sayHello}\NormalTok{() }\OperatorTok{\{}
-  \AttributeTok{alert}\NormalTok{(}\StringTok{"Hello!"}\NormalTok{)}
-\OperatorTok{\};}
 
 \CommentTok{// valid}
 \KeywordTok{var}\NormalTok{ x }\OperatorTok{=} \DecValTok{0}\OperatorTok{,}
@@ -9905,7 +9901,18 @@ Rather interestingly, because one can declare multiple variables in a single lin
 \end{Highlighting}
 \end{Shaded}
 
-Importing default exports in other files resembles all too much the syntax of named imports which may lead to confusion: it's essentially the same omitting the curly braces.
+This only applies to variables as only a single function can be declared by line so declaring a function and its default export on athe same line is valid.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// valid}
+\ImportTok{export} \ImportTok{default} \KeywordTok{function} \AttributeTok{sayHello}\NormalTok{() }\OperatorTok{\{}
+  \AttributeTok{alert}\NormalTok{(}\StringTok{"Hello!"}\NormalTok{)}
+\OperatorTok{\};}
+\end{Highlighting}
+\end{Shaded}
+
+Importing default exports in other files resembles all too much the syntax of named imports, which may lead to confusion: it's essentially the same omitting the curly braces.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9914,7 +9921,7 @@ Importing default exports in other files resembles all too much the syntax of na
 \end{Shaded}
 
 \hypertarget{webpack-intro-import-export-wrap-up}{%
-\subsection{Wrap up}\label{webpack-intro-import-export-wrap-up}}
+\subsection{Wrap-up}\label{webpack-intro-import-export-wrap-up}}
 
 We'll be using a named export method in \texttt{secret.js}. The same general logic can be applied to import the external dependency Shiny as well as mousetrap.
 
@@ -9939,7 +9946,7 @@ Finally, remember to import \texttt{input.js} in the entry point \texttt{index.j
 \end{Highlighting}
 \end{Shaded}
 
-This can then be bundled with \texttt{npm\ run\ bundle-prod} which will look at the entry point (\texttt{index.js}) observes that it imports the file \texttt{input.js} which itself imports \texttt{secret.js}; webpack builds this dependency tree and includes all that is needed in the bundle.
+This can then be bundled with \texttt{npm\ run\ bundle-prod}, which will start at the entry point (\texttt{index.js}) observe that it imports the file \texttt{input.js}, then look at that file and see that it imports \texttt{secret.js}; webpack builds this dependency tree and includes all that is needed in the bundle.
 
 This can be used in the Shiny application, which we modify so it listens to the \texttt{secret} input and only when that input is set renders a plot and a message.
 
@@ -9988,7 +9995,7 @@ Once the application is launched the user can type the phrase \texttt{secret} to
 \caption{Mousetrap example}\label{fig:mousetrap}
 \end{figure}
 
-That is it for this chapter, as stated multiple times there is far more depth to webpack, but this is outside the scope of this book, instead in the next chapter we discover an easier way to set up such projects and make R and webpack work in a more seamless fashion.
+That is it for this chapter. As stated multiple times there is far more depth to webpack, but this is outside the scope of this book, instead in the next chapter we discover an easier way to set up such projects and make R and webpack work in a more seamless fashion.
 
 \hypertarget{packer-overview}{%
 \chapter{Webpack with R}\label{packer-overview}}
@@ -10012,11 +10019,11 @@ There are a few principles that the packer package follows strictly.
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  It only aspires to become a specialised usethis for working with JavaScript and R, as such, it takes inspiration from other packages such as htmlwidgets, and devtools.
+  It only aspires to become a specialised usethis for working with JavaScript and R. As such, it takes inspiration from other packages such as htmlwidgets and devtools.
 \item
   It will never become a dependency to what you create. It's in a sense very much like an NPM ``developer'' dependency; it's used to develop the project but does not bring any additional overhead to what you're building.
 \item
-  It should not interfere with the mission of webpack to build more robust JavaScript code. Therefore packer only builds on top of already strict R structures, namely packages (where golem can be used to create Shiny applications).
+  It should not interfere with the mission of webpack to build more robust JavaScript code. Therefore, packer only builds on top of already, strict R structures, namely packages (where golem can be used to create Shiny applications).
 \end{enumerate}
 
 \hypertarget{packer-scaffolds}{%
@@ -10059,7 +10066,7 @@ With some variations that will be explored in the coming sections, packer's \tex
 \item
   Creates three webpack configuration files: \texttt{webpack.common.js}, \texttt{webpack.prod.js}, and \texttt{webpack.dev.js}
 \item
-  Creates the \texttt{srcjs} directory for the JavaScript source code.
+  Creates the \texttt{srcjs} directory for the JavaScript source code
 \item
   Creates raw JavaScript files within the \texttt{srcjs} directory, e.g.: \texttt{index.js}
 \item
@@ -10089,7 +10096,7 @@ In a previous chapter, we explored how to build custom Shiny inputs. Here, we'll
 
 From the root of the package, we scaffold a custom input. Notably, this takes a \texttt{name} argument, which is used as names for the various files, functions, and modules it creates so choose it with care. The function prints some information about the operations it executes.
 
-When run from an interactive session packer also opens the most pertinent files in the default editor or IDE.
+When run from an interactive session, packer also opens the most pertinent files in the default editor or IDE.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10138,9 +10145,9 @@ When run from an interactive session packer also opens the most pertinent files 
 
 The scaffold creates the file structure below. Notice that \texttt{increment} was used as the name of some files and that packer creates three webpack configuration files; one for development, another for production, and a third that contains configuration shared across those two modes.
 
-It created one R file, \texttt{increment.R} which contains the exported input function named \texttt{incrementInput}. It also created the \texttt{inst/packer} directory which is currently empty but will eventually contain the bundled JavaScript file(s).
+It created one R file, \texttt{increment.R}, which contains the exported input function named \texttt{incrementInput}. It also created the \texttt{inst/packer} directory, which is currently empty but will eventually contain the bundled JavaScript file(s).
 
-The function also initialised NPM which created the \texttt{node\_modules} directory as well as the \texttt{package.json} and \texttt{package-lock.json}, packer also added the necessary scripts to \texttt{package.json} so one should not need to interact with those files directly.
+The function also initialised NPM, which created the \texttt{node\_modules} directory, as well as the \texttt{package.json} and \texttt{package-lock.json}, packer also added the necessary scripts to \texttt{package.json} so one should not need to interact with those files directly.
 
 Finally, it also created the \texttt{srcjs} directory containing core JavaScript files to produce the input binding.
 
@@ -10198,7 +10205,7 @@ The R file contains the \texttt{incrementInput} function. Notably, the function 
 \end{Highlighting}
 \end{Shaded}
 
-Note that packer does not use the namespace of functions (e.g.~\texttt{shiny::tagList}). Instead, it uses the roxygen2 tags to import the necessary functions: \texttt{@importFrom\ Shiny\ tags\ tagList}. Rather nicely, packer also created an example in the roxygen documentation. We'll run this later after we've bundled the JavaScript.
+Note that packer does not use the namespace of functions (e.g., \texttt{shiny::tagList}). Instead, it uses the roxygen2 tags to import the necessary functions: \texttt{@importFrom\ Shiny\ tags\ tagList}. Rather nicely, packer also created an example in the roxygen documentation. We'll run this later after we've bundled the JavaScript.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10223,9 +10230,9 @@ Note that packer does not use the namespace of functions (e.g.~\texttt{shiny::ta
 \end{Shaded}
 
 \hypertarget{packer-js-files}{%
-\section{JavaScript files}\label{packer-js-files}}
+\section{JavaScript Files}\label{packer-js-files}}
 
-In the \texttt{srcjs/inputs} directory, packer created \texttt{increment.js}. This code contains the JavaScript binding for the increment button. As a reminder one is not limited to a single scaffold, we could scaffold another input, the JavaScript binding of which would be placed alongside this file, also in \texttt{srcjs/inputs}.
+In the \texttt{srcjs/inputs} directory, packer created \texttt{increment.js}. This code contains the JavaScript binding for the increment button. As a reminder, one is not limited to a single scaffold. We could scaffold another input, the JavaScript binding of which would be placed alongside this file, also in \texttt{srcjs/inputs}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10288,7 +10295,7 @@ You can then run \texttt{packer::bundle} to bundle the JavaScript. The entry poi
 
 By default packer will bundle the files for production, this can be managed with the functions \texttt{packer::bundle\_dev()} and \texttt{packer::bundle\_prod()}.
 
-Once the JavaScript bundled, we can install or load the package with \texttt{devtools::load\_all}, and use the example that was created for us to test the input.
+Once the JavaScript is bundled, we can install or load the package with \texttt{devtools::load\_all} and use the example that was created for us to test the input.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10311,14 +10318,14 @@ Once the JavaScript bundled, we can install or load the package with \texttt{dev
 \end{Highlighting}
 \end{Shaded}
 
-No code was written, yet we have a fully-functional input! We'll leave at this, it's not only meant to create increment buttons, but this sets up a solid base for the developer to customise the code and conveniently create a different input.
+No code was written, yet we have a fully-functional input! We'll leave ir at this: it's not only meant to create increment buttons, but this sets up a solid base for the developer to customise the code and conveniently create a different input.
 
 It is worth noting that we built a Shiny input from within a package, this is meant to be exported and used in Shiny applications elsewhere, but were one to run these same steps from a golem application packer would adapt the output path so that the input can be used directly in the application.
 
 \hypertarget{packer-adv}{%
 \chapter{Webpack Advanced}\label{packer-adv}}
 
-We're about to cover slightly more advanced uses of NPM and webpack with R using packer. These involve using an NPM dependency to develop a widget and use \href{https://vuejs.org/}{Vue.js} and Bootstrap 3 to power the front end of a Shiny application.
+We're about to cover slightly more advanced uses of NPM and webpack with R using packer. These involve using an NPM dependency to develop a widget and use \href{https://vuejs.org/}{Vue.js} and Bootstrap 4 to power the front end of a Shiny application.
 
 Those will make for more concrete cases to bring webpack into your workflow, and also enable explaining more advanced topics only thus far briefly touched upon, such as transpiling.
 
@@ -10327,7 +10334,7 @@ Those will make for more concrete cases to bring webpack into your workflow, and
 
 The widget scaffold, like all other scaffolds, must be run from within the root of a package. To demonstrate we'll write a widget for the \href{https://github.com/inorganik/countUp.js/}{countup} library that allows animating numbers.
 
-First, we create a package which we name \texttt{counter}. You can name the package different but avoid naming it \texttt{countup}. We will later have to install the external dependency also named \texttt{countup} and NPM does not allow a project named X to use a dependency also named X.
+First, we create a package which we name \texttt{counter}. You can name the package differently but avoid naming it \texttt{countup}. We will later have to install the external dependency also named \texttt{countup} and NPM does not allow a project named X to use a dependency also named X.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10379,7 +10386,7 @@ From the root of the package, we scaffold the widget with \texttt{scaffold\_widg
 ℹ Run `bundle` to build the JavaScript files
 \end{verbatim}
 
-Importantly, it runs \texttt{htmlwidgets::scaffoldWidget} internally, there is thus no need to run this function. About the widget itself, there is very little difference between what \texttt{htmlwidgets::scaffoldWidget} and \texttt{packer::scaffold\_widget}. While, if you remember, the initial scaffold of htmlwidgets includes a simple function to display a message in HTML using \texttt{innerText}. The scaffold produced by packer differs only in that this message is displayed in \texttt{\textless{}h1\textgreater{}} HTML tags. That is so it can, from the get-go, demonstrate how to modularise a widget. We'll cover that in just a minute before we do so, bundle the JavaScript and run the \texttt{counter} function to observe the output it generates.
+Importantly, it runs \texttt{htmlwidgets::scaffoldWidget} internally, there is thus no need to run this function. About the widget itself, there is very little difference between what \texttt{htmlwidgets::scaffoldWidget} and \texttt{packer::scaffold\_widget}. While, if you remember, the initial scaffold of htmlwidgets includes a simple function to display a message in HTML using \texttt{innerText}. The scaffold produced by packer differs only in that this message is displayed in \texttt{\textless{}h1\textgreater{}} HTML tags. That is so it can, from the get-go, demonstrate how to modularise a widget. We'll cover that in just a minute, before we do so, bundle the JavaScript and run the \texttt{counter} function to observe the output it generates.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10389,9 +10396,9 @@ Importantly, it runs \texttt{htmlwidgets::scaffoldWidget} internally, there is t
 \end{Highlighting}
 \end{Shaded}
 
-This indeed displays the message in \texttt{\textless{}h1\textgreater{}} HTML tags, now onto unpacking the structure generated by packer. We'll skip the R code to keep this concise as nothing differs from a standard widget on that side. Instead, we'll focus on the JavaScript code in the \texttt{srcjs} directory. First, in the \texttt{srcjs/widgets} directory, one will find the file \texttt{countup.js}, this file contains the code that produces the widget.
+This indeed displays the message in \texttt{\textless{}h1\textgreater{}} HTML tags, now onto unpacking the structure generated by packer. We'll skip the R code to keep this concise as nothing differs from a standard widget on that side. Instead, we'll focus on the JavaScript code in the \texttt{srcjs} directory. First, in the \texttt{srcjs/widgets} directory, one will find the file \texttt{countup.js}. This file contains the code that produces the widget.
 
-At the top of the file are the imports. First, it imports \texttt{widgets}, which is an \emph{external dependency,} second it imports the function \texttt{asHeader} from the \texttt{header.js} file in the \texttt{modules} directory.
+At the top of the file are the imports. First, it imports \texttt{widgets}, which is the htmlwidgets \emph{external dependency,} second it imports the function \texttt{asHeader} from the \texttt{header.js} file in the \texttt{modules} directory.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10429,7 +10436,7 @@ At the top of the file are the imports. First, it imports \texttt{widgets}, whic
 \end{Highlighting}
 \end{Shaded}
 
-The \texttt{header.js} file includes the \texttt{asHeader} function which accepts an \texttt{x} argument that is used to create the \texttt{\textless{}h1\textgreater{}} message. This function is exported.
+The \texttt{header.js} file includes the \texttt{asHeader} function, which accepts an \texttt{x} argument that is used to create the \texttt{\textless{}h1\textgreater{}} message. This function is exported.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10441,7 +10448,7 @@ The \texttt{header.js} file includes the \texttt{asHeader} function which accept
 \end{Highlighting}
 \end{Shaded}
 
-We will make changes to the JavaScript so that instead of displaying the message as text, uses the aforementioned countup library to animate a number. The first order of business is to install countup. Here we use packer to do so, the function call below is identical to running \texttt{npm\ install\ countup\ -\/-save} from the terminal.
+We will make changes to the JavaScript so that instead of displaying the message as text, it uses the aforementioned countup library to animate a number. The first order of business is to install countup. Here we use packer to do so; the function call below is identical to running \texttt{npm\ install\ countup\ -\/-save} from the terminal.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10449,7 +10456,7 @@ We will make changes to the JavaScript so that instead of displaying the message
 \end{Highlighting}
 \end{Shaded}
 
-We will not need the \texttt{header.js} file, we can delete it and in its stead create another file called \texttt{count.js}. This file will include a function that uses countup to animate the numbers; it should accept 1) the id of the element where countup should be used, and 2) the value that countup should animate. This function called \texttt{counter} is, at the end of the file, exported.
+We will not need the \texttt{header.js} file. We can delete it and in its stead create another file called \texttt{count.js}. This file will include a function that uses countup to animate the numbers. It should accept 1) the id of the element where countup should be used, and 2) the value that countup should animate. This function called \texttt{counter} is, at the end of the file, exported.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10464,7 +10471,7 @@ We will not need the \texttt{header.js} file, we can delete it and in its stead 
 \end{Highlighting}
 \end{Shaded}
 
-We need to add the import statement to bring in the \texttt{counter} function and run it in the \texttt{renderValue} method. Packer also added the htmlwidgets external dependency which is imported below with \texttt{import\ \textquotesingle{}widgets\textquotesingle{}}.
+We need to add the import statement to bring in the \texttt{counter} function and run it in the \texttt{renderValue} method. Packer also added the htmlwidgets external dependency, which is imported below with \texttt{import\ \textquotesingle{}widgets\textquotesingle{}}.
 
 Because we left the \emph{R function} \texttt{countup} untouched, we have to use the default \texttt{message} variable it accepts. Ideally, this argument in the R function should be renamed to something more adequate.
 
@@ -10514,16 +10521,16 @@ Finally, the JavaScript bundle can be generated with \texttt{packer::bundle()}, 
 That hopefully is a compelling example to use NPM and webpack to build widgets. It could even be argued that it is easier to set up; dependencies are much more manageable; nothing has to be manually downloaded; it will be easier to update them in the future, etc.
 
 \hypertarget{packer-adv-shiny-vue}{%
-\section{Shiny with Vue \& Bootstrap 4}\label{packer-adv-shiny-vue}}
+\section{Shiny with Vue and Bootstrap 4}\label{packer-adv-shiny-vue}}
 
 In this example, we create a Shiny application that uses \href{https://vuejs.org/}{Vue.js} and Bootstrap 4 in the front end. As you may know, Shiny ships with Bootstrap version 3, not 4 (the latest at the time of writing this).
 
 \hypertarget{packer-adv-shiny-vue-setup}{%
 \subsection{Setup}\label{packer-adv-shiny-vue-setup}}
 
-If you prefer using \href{https://reactjs.org/}{React} know that it is also supported by webpack and packer. Vue is a framework to create user interfaces which, like React, makes much of the front end work much more straightforward. It reduces the amount of code one has to write, simplifies business logic, enables easily including more reactivity, and much more.
+If you prefer using \href{https://reactjs.org/}{React}, know that it is also supported by webpack and packer. Vue is a framework to create user interfaces that, like React, make much of the front end work much more straightforward. It reduces the amount of code one has to write, simplifies business logic, enables reactivity, and much more.
 
-Since packer only allows placing scaffolds in R packages, the way one can build Shiny applications is using the golem package. Golem is an opinionated framework for build applications \emph{as R packages.} Writing Shiny applications as R packages brings many of the advantages that packages have to Shiny applications: ease of installation, unit testing, dependency management, etc.
+Since packer only allows placing scaffolds in R packages, the way one can build Shiny applications is using the golem package. Golem is an opinionated framework to build applications \emph{as R packages.} Writing Shiny applications as R packages brings many of the advantages that packages have to Shiny applications: ease of installation, unit testing, dependency management, etc.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10539,19 +10546,19 @@ After installing golem from CRAN, we can create an application with the \texttt{
 \end{Highlighting}
 \end{Shaded}
 
-From within a golem application, one uses a scaffold specifically designed for this with \texttt{scaffold\_golem}. Note that this does not mean other scaffolds will not work, custom Shiny inputs and outputs can also be created with \texttt{scaffold\_input}, and \texttt{scaffold\_output} respectively. The \texttt{scaffold\_golem} function takes two core arguments; \texttt{vue} and \texttt{react}. Setting either of these to \texttt{TRUE} will prepare a scaffold specifically designed to support either Vue or React.
+From within a golem application, one uses a scaffold specifically designed for this with \texttt{scaffold\_golem}. Note that this does not mean other scaffolds will not work, custom Shiny inputs and outputs can also be created with \texttt{scaffold\_input} and \texttt{scaffold\_output}, respectively. The \texttt{scaffold\_golem} function takes two core arguments; \texttt{vue} and \texttt{react}. Setting either of these to \texttt{TRUE} will prepare a scaffold specifically designed to support either Vue or React.
 
 The reason these arguments exist is that webpack requires further configuration that can be tricky to set up manually. Moreover, Vue supports (but does not require) \texttt{.vue} files; these can hold HTML, JavaScript, and CSS. One can think of such files as similar to Shiny modules; they encapsulate a part of the logic of the application for easy modularisation.
 
 When the \texttt{vue} argument is set to \texttt{TRUE} in \texttt{scaffold\_golem}, the function does follow the usual procedure or initialising NPM, creating the various files, and directories, but in addition configures two loaders and the vue plugin.
 
-Loaders are transformers, they scan for files in the \texttt{srcjs} directory and pre-process them. That allows using, for instance, using the Babel compiler that will transform the latest version of JavaScript into code that every browser can run. This compiler is very often used, including here to compile Vue code. Since Vue allows placing CSS in \texttt{.vue} files another loader is required; one that will look for CSS and bundle it within the JavaScript file.
+Loaders are transformers, they scan files in the \texttt{srcjs} directory and pre-process them. That allows using, for instance, the Babel compiler that will transform the latest version of JavaScript into code that every browser can run. This compiler is very often used, including here, to compile Vue code. Since Vue allows placing CSS in \texttt{.vue} files, another loader is required; one that will look for CSS and bundle it within the JavaScript file.
 
-Plugins are a feature of webpack that allow extending its functionalities; there is one for Vue which the function will install and configure for you.
+Plugins are a feature of webpack that allow extending its functionalities; there is one for Vue, which the function will install and configure for you.
 
-Also, when creating a scaffold for \texttt{vue} or \texttt{react}, one can choose whether to rely on the CDN in which case they are installed as developer dependencies or install them for production in which case they are included in the bundle. It defaults to using the CDN; this is often advised as the CDN will serve the required files faster.
+Also, when creating a scaffold for \texttt{vue} or \texttt{react}, one can choose whether to rely on the CDN, in which case they are installed as developer dependencies, or install them for production, in which case they are included in the bundle. It defaults to using the CDN; this is often advised as the CDN will serve the required files faster.
 
-The scaffold also sets up webpack with Babel; the transpiler that allows writing the latest JavaScript and ensure it will run on (almost) any web browser. Hence we can use ES6 notation in places.
+The scaffold also sets up webpack with Babel, the transpiler that allows writing the latest JavaScript, and ensures it will run on (almost) any web browser. Hence, we can use ES6 notation in places.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10613,7 +10620,7 @@ tagList(
 ℹ Run `bundle` to build the JavaScript files
 \end{verbatim}
 
-Note the first instruction that was printed in the console; it states that a \texttt{tagList} to be placed in the Shiny UI of the application. It imports the Vue dependency using via the CDN with \texttt{vueCDN()}, which is a function created by packer, creates a \texttt{\textless{}DIV\textgreater{}} with an id attribute of \texttt{app} that will be used as root of the Vue application; where the application generated by Vue will be placed. It also imports the bundled JavaScript (\texttt{index.js}). So let us place that in the Shiny UI, which is in the \texttt{R/app\_ui.R} file.
+Note the first instruction that was printed in the console; it states a \texttt{tagList} must be placed in the Shiny UI of the application. It imports the Vue dependency via the CDN with \texttt{vueCDN()}, which is a function created by packer, creates a \texttt{\textless{}DIV\textgreater{}} with an id attribute of \texttt{app} that will be used as root of the Vue application; where the application generated by Vue will be placed. It also imports the bundled JavaScript (\texttt{index.js}). So let us place that in the Shiny UI, which is in the \texttt{R/app\_ui.R} file.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10632,7 +10639,7 @@ Note the first instruction that was printed in the console; it states that a \te
 \end{Highlighting}
 \end{Shaded}
 
-To ensure all is correct up to this point we can test the application; the JavaScript can be bundled and the app test with \texttt{run\_app()}, a function that is part of the golem package we created.
+To ensure all is correct up to this point we can test the application; the JavaScript can be bundled with \texttt{packer::bundle()} then the app tested by running \texttt{run\_app()}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10643,7 +10650,7 @@ To ensure all is correct up to this point we can test the application; the JavaS
 \end{Shaded}
 
 \hypertarget{packer-adv-shiny-vue-bs4}{%
-\subsection{Bootstrap 4 installation}\label{packer-adv-shiny-vue-bs4}}
+\subsection{Bootstrap 4 Installation}\label{packer-adv-shiny-vue-bs4}}
 
 Next, we can install Bootstrap 4; we'll use \href{https://bootstrap-vue.org/}{bootstrap-vue} which contains a lot of Bootstrap 4 components for Vue. We won't be using any CDN here, so we install those dependencies as production.
 
@@ -10660,6 +10667,7 @@ This will cause some issues though, as the Shiny application will have two diffe
 \NormalTok{app_ui <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(request) \{}
   \KeywordTok{tagList}\NormalTok{(}
     \KeywordTok{golem_add_external_resources}\NormalTok{(),}
+    \CommentTok{# remove default bootstrap 3}
 \NormalTok{    htmltools}\OperatorTok{::}\KeywordTok{suppressDependencies}\NormalTok{(}\StringTok{"bootstrap"}\NormalTok{),}
     \KeywordTok{fluidPage}\NormalTok{(}
       \KeywordTok{tagList}\NormalTok{(}
@@ -10674,7 +10682,7 @@ This will cause some issues though, as the Shiny application will have two diffe
 \end{Shaded}
 
 \hypertarget{packer-adv-shiny-vue-code}{%
-\subsection{Vue code}\label{packer-adv-shiny-vue-code}}
+\subsection{Vue Code}\label{packer-adv-shiny-vue-code}}
 
 Let us now explore the contents of \texttt{srcjs} and code a basic functionality. It's relatively straightforward; it consists of two files. The first, \texttt{index.js}, creates the Vue application and places it in the \texttt{div(id\ =\ "app")}. The code for the app itself is in a \texttt{.vue} file, which it imports with \texttt{import\ App\ from\ "./Home.vue";}.
 
@@ -10697,10 +10705,12 @@ The first order of business is to import the Bootstrap dependencies that were in
 \begin{Highlighting}[]
 \ImportTok{import}\NormalTok{ Vue }\ImportTok{from} \StringTok{"vue"}\OperatorTok{;}
 \ImportTok{import} \OperatorTok{\{}\NormalTok{ BootstrapVue}\OperatorTok{,}\NormalTok{ IconsPlugin }\OperatorTok{\}} \ImportTok{from} \StringTok{'bootstrap-vue'}
+\CommentTok{// import dependencies}
 \ImportTok{import} \StringTok{'bootstrap/dist/css/bootstrap.css'}
 \ImportTok{import} \StringTok{'bootstrap-vue/dist/bootstrap-vue.css'}
 \ImportTok{import}\NormalTok{ App }\ImportTok{from} \StringTok{"./Home.vue"}\OperatorTok{;}
 
+\CommentTok{// attach dependencies}
 \VariableTok{Vue}\NormalTok{.}\AttributeTok{use}\NormalTok{(BootstrapVue)}
 \VariableTok{Vue}\NormalTok{.}\AttributeTok{use}\NormalTok{(IconsPlugin)}
 
@@ -10739,7 +10749,7 @@ The \texttt{Home.vue} file is where the meat of the application is placed. By de
 \end{Highlighting}
 \end{Shaded}
 
-Below we make changes to the application, so it features a Boostrap 4 text input, after having entered some text and hitting enter the text entered is displayed below and cleared from the input. We also provide a button that sends the input data to the R server.
+Below we make changes to the application, so it features a Boostrap 4 text input. After having entered some text and hitting enter the text entered is displayed below and cleared from the input. We also provide a button that sends the input data to the R server.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10798,7 +10808,7 @@ Finally, we can bundle the JavaScript, and run the application.
 \caption{Shiny application with Vue and Bootstrap 4}\label{fig:vue-bs4}
 \end{figure}
 
-Note how little code was written in order to provide these functionalities. It is one of the most powerful features of frameworks like Vue and React; they are not necessary, these could have coded in vanilla JavaScript, but would admittedly require much more (difficult to read) code.
+Note how little code was written in order to provide these functionalities. It is one of the most powerful features of frameworks like Vue and React. They are not necessary; this could have been coded in vanilla JavaScript, but would admittedly require much more (difficult to read) code.
 
 \hypertarget{part-closing-remarks}{%
 \part{Closing Remarks}\label{part-closing-remarks}}
@@ -10806,14 +10816,14 @@ Note how little code was written in order to provide these functionalities. It i
 \hypertarget{conclusion}{%
 \chapter{Conclusion}\label{conclusion}}
 
-The book covered a few topics and introduced many concepts probably new to many; these are sometimes difficult to fully understand at first and will likely require some more exploring. So here, we wrap up with some heartening thoughts to encourage the reader to persevere as much of what was covered in the book requires practice to be fully comprehended.
+The book covered a few topics and introduced many concepts probably new to many; these are sometimes difficult to fully understand at first and will likely require some more exploring. So here, we wrap up with some heartening thoughts to encourage the reader to persevere, as much of what was covered in the book requires practice to be fully comprehended.
 
 \hypertarget{conclusion-performances}{%
 \section{Performances}\label{conclusion-performances}}
 
 As mentioned in the opening of this book some of the code presented is not entirely optimal as we need to make use of R as much as possible to limit any confusion caused by the fresh-to-the-eyes JavaScript code. In places, this involves making use of R where it is in fact not needed, namely within Shiny applications where data is sent from the front end to R, only to be sent back to JavaScript again. For instance, when the click of a button triggers something in the Shiny UI but uses the server as an intermediary, oftentimes it is not necessary to involve the server.
 
-This, though has little impact on performances in most cases, can be improved upon by not involving R in the process, handling everything in the front end with JavaScript but this was judged outside the scope of the book as it focuses on interactions between the two languages. Nonetheless, somewhat interestingly, the book covered all the code necessary to do so, only not in the same section or chapter. It might therefore take some practice to make the connection.
+This, though, has little impact on performances in most cases, and can be improved upon by not involving R in the process and handling everything in the front end with JavaScript. This was judged outside the scope of the book as it focuses on interactions between the two languages. Nonetheless, somewhat interestingly, the book covered all the code necessary to do so, only not in the same section or chapter. It might, therefore, take some practice to make the connection.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -10827,22 +10837,22 @@ This, though has little impact on performances in most cases, can be improved up
 Note, however, that placing much of the business logic server-side rather than on the front end might create more secure applications since said logic remains internal and cannot be interfered with.
 
 \hypertarget{conclusion-trial-and-error}{%
-\section{Trial \& Error}\label{conclusion-trial-and-error}}
+\section{Trial and Error}\label{conclusion-trial-and-error}}
 
-We hope the book demonstrated how well JavaScript works with R as well as how much of a difference it has the potential to have on your data science projects. Making JavaScript work \emph{for R} is fascinating because they are so far removed from one another; while one excels at data wrangling and statistics, the other runs in the browser and focuses on aesthetics and functionalities of web pages.
+We hope the book demonstrated how well JavaScript works with R, as well as how much of a difference it has the potential to have on your data science projects. Making JavaScript work \emph{for R} is fascinating because they are so far removed from one another; while one excels at data wrangling and statistics, the other runs in the browser and focuses on aesthetics and functionalities of web pages.
 
-However, being so different, JavaScript introduces numerous concepts likely to be new to many R developers. The only way one can truly grasp how it all works, and become at ease with using custom JavaScript code in Shiny applications and packages is to practice. Repeated trial and error is fundamental to approaching new programming languages and notions.
+However, being so different, JavaScript introduces numerous concepts likely to be new to many R developers. The only way one can truly grasp how it all works, and become at ease with using custom JavaScript code in Shiny applications and packages, is to practice. Repeated trial and error is fundamental to approaching new programming languages and notions.
 
 Some small exercises were scattered at the end of significant parts of the book; you are encouraged to attempt some of them. Like interactive visualisations? Try to build one for a straightforward library!
 
 \hypertarget{conclusion-ux}{%
-\section{Functionality \& UX}\label{conclusion-ux}}
+\section{Functionality and UX}\label{conclusion-ux}}
 
 A lot of JavaScript in the browser is about designing user experiences and better functionalities for users of your data product---never overlook those.
 
-We don't say of a chart with pleasing aesthetics that's just a pretty plot; a great chart does a better job of communicating insights, and the same is true of many other data products, including web applications. Hopefully, the learnings contained in this book will help you create much more engaging and compelling products thanks to JavaScript.
+We don't say of a chart with pleasing aesthetics ``that's just a pretty plot''; a great chart does a better job of communicating insights, and the same is true of many other data products, including web applications. Hopefully, the learnings contained in this book will help you create much more engaging and compelling products thanks to JavaScript.
 
-Sadly, in the fields where R is popular, things like aesthetics, or great user experience are perceived as superfluous. You might be told that ``the only thing that matters is the analysis or the model,'' anything else is often seen as make-up to cover up flawed science. This could not be further from the truth. First, put to rest the false dichotomy that it's either a great front end or a great back-end; both can (and must) be done. Second, while it could be said that spending two hours looking for a fun colour palette for a chart is ``a waste of time.'' Spending the same amount of time developing new JavaScript functionalities to allow users to interrogate your model better, or visualise (and therefore understand) the outcome of an analysis is not. Also, if your visualisations and web applications are engaging, users will gladly spend more time clicking away, filtering results, and use your product.
+Sadly, in the fields where R is popular, things like aesthetics, or great user experience are perceived as superfluous. You might be told that ``the only thing that matters is the analysis or the model''; anything else is often seen as make-up to cover up flawed science. This could not be further from the truth. First, put to rest the false dichotomy that it's either a great front end or a great back end; both can (and must) be done. Second, while it could be said that spending two hours looking for a fun colour palette for a chart is ``a waste of time,'' spending the same amount of time developing new JavaScript functionalities to allow users to interrogate your model better, or visualise (and therefore understand) the outcome of an analysis is not. Also, if your visualisations and web applications are engaging, users will gladly spend more time clicking away, interrogating results, and using your product.
 
 \bibliography{book.bib,packages.bib}
 

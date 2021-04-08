@@ -2,7 +2,7 @@
 
 # The V8 Engine {#v8}
 
-V8 is an R interface to Google's open-source JavaScript engine of the same name; it powers Google Chrome, node.js and many other things. It is the last integration of JavaScript with R that is covered in this book. Both the V8 package and the engine it wraps are straightforward yet amazingly powerful.
+V8 is an R interface to Google's open-source JavaScript engine of the same name; it powers Google Chrome, Node.js, and many other things. It is the last integration of JavaScript with R that is covered in this book. Both the V8 package and the engine it wraps are straightforward yet amazingly powerful.
 
 ## Installation {#v8-installation}
 
@@ -53,7 +53,7 @@ engine$eval("x")
 #> [1] "7"
 ```
 
-Two observations worth making on the above snippet of code. First, the variable we got back in R is a character vector when it should have been either an integer or a numeric. This is because we used the `eval` method, which returns what is printed in the v8 console, `get` is more appropriate; it converts the output to its appropriate R equivalent.
+Two observations are worth making on the above snippet of code. First, the variable we got back in R is a character vector when it should have been either an integer or a numeric. This is because we used the `eval` method, which returns what is printed in the V8 console, but `get` is more appropriate; it converts the output to its appropriate R equivalent.
 
 
 ```r
@@ -77,7 +77,7 @@ engine$get("vehicles")
 #> 3     7    4
 ```
 
-All of the conversion is handled by V8 internally with jsonlite, as demonstrated in the previous chapter. We can confirm that the data frame was converted to a list row-wise; using `JSON.stringify` to display how the object is stored in V8.
+All of the conversion is handled by V8 internally with jsonlite, as demonstrated in the previous chapter. We can confirm that the data frame was converted to a list row-wise, using `JSON.stringify` to display how the object is stored in V8.
 
 
 ```r
@@ -98,7 +98,7 @@ cat(engine$eval("JSON.stringify(vehicles, null, 2);"))
 #> ]
 ```
 
-However this reveals a tedious cyclical loop: 1) creating an object in JavaScript to 2) run a function on the aforementioned object 3) get the results back in R, and repeat. So V8 also allows calling JavaScript functions on R objects directly with the `call` method and obtain the results back in R. 
+However this reveals a tedious cyclical loop: 1) creating an object in JavaScript to 2) run a function on the aforementioned object, 3) get the results back in R, and repeat. So V8 also allows calling JavaScript functions on R objects directly with the `call` method and obtains the results back in R. 
 
 ```r
 engine$eval("new Date();") # using eval
@@ -118,13 +118,13 @@ engine$call("Date", Sys.Date()) # using call
   (Central European Summer Time)"
 ```
 
-Finally, one can run code interactively rather than as strings by calling the console from the engine with `engine$console()` you can then exit the console by typing `exit` or hitting the <kbd>ESC</kbd> key.
+Finally, one can run code interactively rather than as strings by calling the console from the engine with `engine$console()`. You can then exit the console by typing `exit` or hitting the <kbd>ESC</kbd> key.
 
 ## External Libraries {#v8-external}
 
-V8 is quite bare in and of itself; there is, for instance, no functionalities built-in to read or write files from disk, it thus becomes truly interesting when you can use it JavaScript libraries. We'll demonstrate this using [fuse.js](https://fusejs.io/) a fuzzy-search library. 
+V8 is quite bare in and of itself; there is, for instance, no functionalities built in to read or write files from disk. It thus becomes truly interesting when you can leverage JavaScript libraries. We'll demonstrate this using [fuse.js](https://fusejs.io/) a fuzzy-search library. 
 
-The very first step of integrating any external library is to look at the code, often examples, to grasp an idea of what is to be achieved from R. Below is an example from the official documentation. First, an array of two `books` is defined; this is later used to test the search. Then another array of options is defined, this should at the very least include the key(s) that should be searched, here it is set to search through the title and authors. Then, the fuse object is initialised based on the array of books and the options. Finally, the `search` method is used to retrieve all books, the title or author of which, partially match the term `tion`.
+The very first step of integrating any external library is to look at the code (often examples) to grasp an idea of what is to be achieved from R. Below is an example from the official documentation. First, an array of two `books` is defined; this is later used to test the search. Then another array of options is defined. This should at the very least include the key(s) that should be searched; here it is set to search through the title and authors. Then, the fuse object is initialised based on the array of books and the options. Finally, the `search` method is used to retrieve all books, the title or author of which partially match the term `tion`.
 
 ```js
 // books to search through
@@ -150,7 +150,7 @@ const fuse = new Fuse(books, options)
 const result = fuse.search('tion')
 ```
 
-With some understanding of what is to be reproduced in R, we can import the library with the `source` method which takes a `file` argument that will accept a path or URL to a JavaScript file to source, below we use the handy CDN (Content Delivery Network) to avoid downloading a file.
+With some understanding of what is to be reproduced in R, we can import the library with the `source` method, which takes a `file` argument that will accept a path or URL to a JavaScript file to source. Below we use the handy CDN (Content Delivery Network) to avoid downloading a file.
 
 
 
@@ -220,7 +220,7 @@ cat(engine$eval("JSON.stringify(books, null, 2);"))
 #> ]
 ```
 
-Now we can define options for the search; we don't get into the details of fuse.js here as this is not the purpose of this book, you can read more about the options in the [examples section](https://fusejs.io/#Examples) of the site. We can mimic the format of the JSON options shown on the website with a simple list and assign that to a new variable in the engine. Note that we wrap the title in a `list` to ensure it is converted to an array of length 1: `list("title")` should be converted to a `["title"]` array and not a `"title"` scalar.
+Now we can define options for the search; we don't get into the details of fuse.js here as this is not the purpose of this book. You can read more about the options in the [examples section](https://fusejs.io/#Examples) of the site. We can mimic the format of the JSON options shown on the website with a simple list and assign that to a new variable in the engine. Note that we wrap the title in a `list` to ensure it is converted to an array of length 1: `list("title")` should be converted to a `["title"]` array and not a `"title"` scalar.
 
 ```js
 // JavaScript
@@ -251,7 +251,7 @@ engine$get("results")
 #> [1] "d" "c"
 ```
 
-A search for "sense" returns a vector of ids where the term "sense" was found; `c` and `d` or the books Common Sense, Sense and Sensibility. We could perhaps make that last code simpler using the `call` method.
+A search for "sense" returns a vector of ids where the term "sense" was found; `c` and `d` or the books *Common Sense*, *Sense and Sensibility*. We could perhaps make that last code simpler using the `call` method.
 
 
 ```r
@@ -261,11 +261,11 @@ engine$call("fuse.search", "sense")
 
 ## NPM Packages {#v8-npm}
 
-We can also use [npm](https://www.npmjs.com/) packages, though not all will work. NPM is node's Package Manager, or in a sense Node's equivalent of CRAN.
+We can also use [npm](https://www.npmjs.com/) packages, though not all will work. NPM is Node's package manager, or in a sense Node's equivalent of CRAN.
 
-To use NPM packages we need [browserify](http://browserify.org/), a node library to bundle all dependencies of an NPM package into a single file which can subsequently be imported in V8. Browserify is itself an NPM package, and therefore requires Node.js to be installed. The reason browserify is required is that the JavaScript code written for Node.js is different from that which should be written for web browsers, therefore importing a Javascript file built with node.js in a browser may not work: browserify will translate node.js code (where necessary) into JavaScript code the browser can run.
+To use NPM packages we need [browserify](http://browserify.org/), a node library to bundle all dependencies of an NPM package into a single file, which can subsequently be imported in V8. Browserify is itself an NPM package, and therefore requires Node.js to be installed. The reason browserify is required will be covered in more depth in chapter 20, in essence, NPM assumes disk access to load dependencies in `require()` (JavaScript) statements. This will not work with V8. Browserify will bundle all the files that comprise an NPM module into a single file that does not require disk access.
 
-You can install browserify globally with the following the `g` flag. Install node.js and type the following the terminal.
+You can install browserify globally with the following the `g` flag. Once Node.js installed, browserify can be installed from the _terminal_ (not R console) with the `npm` command.
 
 ```bash
 npm install -g browserify
@@ -284,7 +284,7 @@ echo "global.ms = require('ms');" > in.js
 browserify in.js -o ms.js
 ```
 
-We can now source `ms.js` with v8, before we do so we ought to look at example code to see what has to be reproduced using V8. Luckily the library is very straightforward: it includes a single function for all conversions, e.g.: `ms('2 days')` to convert two days in milliseconds.
+We can now source `ms.js` with V8. Before we do so we ought to look at example code to see what has to be reproduced using V8. Luckily the library is very straightforward: it includes a single function for all conversions, e.g.: `ms('2 days')` to convert two days in milliseconds.
 
 
 ```r
@@ -306,7 +306,7 @@ ms$call("ms", "2s") # 2 seconds
 
 ## Use in Packages {#v8-pkg}
 
-In this section, we detail how one should go about using V8 in an R package if you are not familiar with package development you can skip ahead. We start by creating a package called "ms" that will hold functionalities we explored in the previous section on NPM packages.
+In this section, we detail how one should go about using V8 in an R package. If you are not familiar with package development you can skip ahead. We start by creating a package called "ms" that will hold functionalities we explored in the previous section on NPM packages.
 
 ```r
 usethis::create_package('ms')
@@ -319,17 +319,17 @@ The package is going to rely on V8 so it needs to be added under `Imports` in th
 usethis::use_package("V8")
 ```
 
-The package should also include the external library `ms.js` browserified from the NPM package which should be placed it in the `inst` directory. Create it and place the `ms.js` file within the latter.
+The package should also include the external library `ms.js` browserified from the NPM package, which should be placed it in the `inst` directory. Create it and place the `ms.js` file within the latter.
 
 ```r
 dir.create("inst")
 ```
 
-As explored, the core of the V8 package is the execution environment(s) that are spawned using the `v8` function. One could perhaps provide a function that returns the object created by `v8`, but it would not be convenient: this function would need to be called explicitly by the users of the package and the output of it would need to be passed to every subsequent function. Thankfully there is a better way.
+As explored, the core of the V8 package is the execution environment(s) that are spawned using the `v8` function. One could perhaps provide a function that returns the object created by `v8`, but it would not be convenient: this function would need to be called explicitly by the users of the package, and the output of it would need to be passed to every subsequent function. Thankfully there is a better way.
 
 Instead, we can use the function `.onLoad`, to create the execution environment and import the dependency when the package is loaded by the user.
 
-You can read more about this function in Hadley Wickham's [Advanced R book](http://r-pkgs.had.co.nz/r.html). This is in effect very similar to how the Python integration of R, [reticulate](https://rstudio.github.io/reticulate) [@R-reticulate] is [used in packages](https://rstudio.github.io/reticulate/articles/package.html). This function is often placed in a `zzz.R` file.
+You can read more about this function in Hadley Wickham's [*Advanced R* book](http://r-pkgs.had.co.nz/r.html). This is, in effect, very similar to how the Python integration of R, [reticulate](https://rstudio.github.io/reticulate) [@R-reticulate], is [used in packages](https://rstudio.github.io/reticulate/articles/package.html). This function is often placed in a `zzz.R` file.
 
 ```r
 # zzz.R
@@ -367,7 +367,7 @@ ms <- NULL
 }
 ```
 
-We can then create a `to_ms` function, it will have access the `ms` object we instantiated in `.onLoad`. 
+We can then create a `to_ms` function. It will have access to the `ms` object we instantiated in `.onLoad`. 
 
 
 ```r
@@ -377,7 +377,7 @@ to_ms <- function(string){
 }
 ```
 
-After running `devtools::document()` and installing the package with `devtools::install()` it's ready to used. 
+After running `devtools::document()` and installing the package with `devtools::install()`, it's ready to be used. 
 
 
 ```r

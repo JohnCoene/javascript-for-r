@@ -1,7 +1,7 @@
 --- 
 title: "JavaScript for R"
 author: "John Coene"
-date: "2021-04-07"
+date: "2021-04-08"
 documentclass: krantz
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
@@ -51,7 +51,7 @@ Notably, the focus of the book truly is the integration of JavaScript with R, wh
 
 4. The fourth part of the book details how JavaScript can work with Shiny. Once the basics are out of the way, the second chapter builds the first utility to display notifications programmatically. Then we create a Shiny application that runs an image classification algorithm in the browser. This is then followed by the creation of custom Shiny inputs and outputs. Finally, Shiny and htmlwidgets are (literally) connected by including additional functionalities in interactive visualisations when used with the Shiny framework.
 
-5. Then the book delves into using JavaScript for computations, namely via the V8 engine and node.js. After a short introduction, chapters will walk the reader through various examples: a fuzzy search, a time format converter, and some basic natural language operations.
+5. Then the book delves into using JavaScript for computations, namely via the V8 engine and Node.js. After a short introduction, chapters will walk the reader through various examples: a fuzzy search, a time format converter, and some basic natural language operations.
 
 6. Finally, we look at how one can use some of the more modern JavaScript technologies such as Vue, React, and webpack with R---these can make the use of JavaScript more agile and robust.
 
