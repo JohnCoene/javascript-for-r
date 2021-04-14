@@ -24,7 +24,7 @@ Before going down the rabbit hole, let us explore the types of libraries you wil
 
 [Plotly.js](https://plotly.com/javascript/) is probably one of the more popular out there; it provides over 40 fully customisable chart types, many of which are very sophisticated. That is indeed the JavaScript library used by the R package of the same name: plotly.
 
-Looking at the code presented in the "Get Started" guide reveals just how convenient the library is. One must import plotly, of course, then have a `<div>` where the visualisation will be placed. Then, using `Plotly.newPlot`, create the actual visualisation by passing it first the element previously mentioned and a \index{JSON} of options that describe the chart.
+Looking at the code presented in the "Get Started" guide reveals just how convenient the library is. In Figure \@ref(fig:candidate-plotly) we import plotly, of course, then have a `<div>` where the visualisation will be placed. Then, using `Plotly.newPlot`, create the actual visualisation by passing it first the element previously mentioned and a \index{JSON} of options that describe the chart.
 
 ```html
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
@@ -91,7 +91,7 @@ Now let's look at how another popular library does it.
 <p class="caption">(\#fig:candidate-highcharts)Highcharts example</p>
 </div>
 
-The above is very similar to what plotly.js requires: import libraries, create a `<div>` where to put the visualisation. Then, to create the chart, run a function which also takes the id of the div where to place said chart and a JSON of options defining the actual chart, including the data.
+Figure \@ref(fig:candidate-highcharts) is very similar to what plotly.js requires: import libraries, create a `<div>` where to put the visualisation. Then, to create the chart, run a function which also takes the id of the div where to place said chart and a JSON of options defining the actual chart, including the data.
 
 ### Chart.js {#widgets-basics-candidates-chart.js}
 
@@ -131,7 +131,7 @@ The above is very similar to what plotly.js requires: import libraries, create a
 <p class="caption">(\#fig:candidate-chartjs)Chart.js example</p>
 </div>
 
-We again observe a very similar structure as with previous libraries. The library is imported; instead of a `div` chart.js uses a `canvas`, the \index{visualisation} is also created from a single function which takes the canvas as first argument and a JSON of options as second.
+In Figure \@ref(fig:candidate-chartjs), we again observe a very similar structure as with previous libraries. The library is imported; instead of a `div` chart.js uses a `canvas`, the \index{visualisation} is also created from a single function which takes the canvas as first argument and a JSON of options as second.
 
 Hopefully, this reveals the repeating structure such libraries tend to follow as well as demonstrate how little JavaScript code is involved. It also hints at what should be reproduced, to some extent at least, using R.
 
@@ -141,7 +141,7 @@ Imagine there is no such package as \index{htmlwidgets} to help create interacti
 
 As observed, an interactive visualisation using JavaScript will be contained within an \index{HTML} document. Therefore it would probably have to be created first. Secondly, the visualisation that is yet to be created likely relies on external libraries; these would need to be imported in the document. The document should also include an HTML element (e.g.: `<div>`) to host said \index{visualisation}. Then data would have to be serialised in R and embedded into the document, where it should be read by JavaScript code that uses it to create the visualisation. Finally, all should be managed to work seamlessly across R markdown, \index{Shiny}, and other environments.
 
-This gives the following basic diagram; it will be broken down further in the next chapter as the first widget is built.
+This gives the basic diagram shown in Figure \@ref(fig:widget-inner-diagram); it will be broken down further in the next chapter as the first widget is built.
 
 <div class="figure" style="text-align: center">
 

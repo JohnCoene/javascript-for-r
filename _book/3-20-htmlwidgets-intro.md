@@ -16,7 +16,9 @@ The objective of this chapter is to explore existing widgets available on CRAN, 
 
 The plotly [@R-plotly] R package is probably one of the first and the most popular widget built thus far; it has been downloaded from CRAN 4.9 million times at the time of writing this. 
 
-Plotly.js is a substantial library that provides over 40 chart types, including 3D charts, statistical graphs, and maps, all of which are available from the R interface. There is so much depth to plotly that there is an entire [book](https://plotly-r.com/) on the topic.
+Plotly.js is a substantial library that provides over 40 chart types, including 3D charts, statistical graphs, and maps, all of which are available from the R interface. There is so much depth to plotly that there is an entire [book](https://plotly-r.com/) on the topic: *Interactive web-based data visualization with R, plotly, and shiny.*
+
+The very short snippet of code below creates Figure \@ref(fig:plotly-scatter-diagram), an interactive scatter plot.
 
 
 ```r
@@ -36,7 +38,7 @@ plot_ly(cars, x = ~speed, y = ~dist) %>%
 <p class="caption">(\#fig:plotly-scatter-diagram)plotly scatter plot</p>
 </div>
 
-Plotly also has the ability to translate static ggplot2 [@R-ggplot2] charts to interactive plotly charts with the `ggplotly` function.
+Plotly also has the ability to translate static ggplot2 [@R-ggplot2] charts to interactive plotly charts with the `ggplotly` function, as demonstrated in Figure \@ref(fig:plotly-ggplotly-diagram).
 
 
 ```r
@@ -63,7 +65,7 @@ p <- plot_ly(cars, x = ~speed, y = ~dist)
 p <- add_markers(p)
 ```
 
-Plotly implements geoms in a similar fashion as ggplot2, functions that start in `add_` add a layer to the plot (e.g.: `add_lines`, `add_bars`).
+Plotly implements geoms in a similar fashion as ggplot2, functions that start in `add_` add a layer to the plot (e.g.: `add_lines`, `add_bars`), making it easy to combine series into a single chart, as in Figure \@ref(fig:plotly-layers-diagram).
 
 
 ```r
@@ -84,7 +86,7 @@ plot_ly(mtcars, x = ~disp) %>%
 
 ## DT package {#widgets-intro-dt}
 
-The DT package [@R-DT] is a wrapper for the [DataTables](https://datatables.net/) jQuery plug-in, which allows creating interactive tables from R `data.frame` objects.
+The DT package [@R-DT] is a wrapper for the [DataTables](https://datatables.net/) jQuery plug-in, which allows creating interactive tables from R `data.frame` objects, it's as simple as a single line of code (see Figure \@ref(fig:plotly-dt-diagram)).
 
 
 ```r
@@ -101,7 +103,7 @@ DT::datatable(cars)
 <p class="caption">(\#fig:plotly-dt-diagram)Interactive table with DT</p>
 </div>
 
-DT has grown very popular amongst Shiny developers as it allows capturing server-side many of the users' interactions with the table, such as the selected row.
+DT has grown very popular amongst Shiny developers as it allows capturing server-side many of the users' interactions with the table, such as the selected row, as demonstrated in Figure \@ref(fig:dt-example).
 
 ```r
 library(DT)
@@ -140,7 +142,7 @@ shinyApp(ui, server)
 
 ## Crosstalk {#widgets-intro-crosstalk}
 
-DT and plotly both fully support the crosstalk package [@R-crosstalk], a package to enable two widgets to communicate. In the example below, we use crosstalk to create a "shared dataset" that can be used to create 1) a table with DT, and 2) a scatter plot with plotly. Rows selected in the table are highlighted in the plot and vice versa.
+DT and plotly both fully support the crosstalk package [@R-crosstalk], a package to enable two widgets to communicate. In the Figure \@ref(fig:dt-example-crosstalk), we use crosstalk to create a "shared dataset" that can be used to create 1) a table with DT, and 2) a scatter plot with plotly. Rows selected in the table are highlighted in the plot and vice versa.
 
 The `bscols` function is just a convenience function that makes it easy to put the visualisation and table side-by-side.
 

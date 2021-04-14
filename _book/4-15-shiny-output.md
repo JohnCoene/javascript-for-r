@@ -335,7 +335,7 @@ $.extend(boxxyBinding, {
 
 ### Boxxy Background Color {#shiny-output-boxxy-bg-color}
 
-Then we can set the background color that was passed to `boxxy` (`data.color`).
+Then we can set the background colour that was passed to `boxxy` (`data.color`).
 
 ```js
 var boxxyBinding = new Shiny.OutputBinding();

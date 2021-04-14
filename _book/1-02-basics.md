@@ -24,7 +24,7 @@ install.packages(c("devtools", "usethis"))
 
 There are multiple ways to create a package. One could manually create every file, use the RStudio IDE, or create it from the R console with the usethis [@R-usethis] package.
 
-From the RStudio IDE go to `File > New Project > New Directory > R Package` then select "R package" and fill in the small form, namely name the package and specify the directory where it should be created. 
+From the RStudio IDE go to `File > New Project > New Directory > R Package` then select "R package" and fill in the small form, namely name the package and specify the directory where it should be created, as shown in Figure \@ref(fig:rstudio-create-package). 
 
 <div class="figure" style="text-align: center">
 <img src="images/rstudio-create-package.png" alt="Package creation wizard" width="100%" />
@@ -306,7 +306,7 @@ toJSON(df, pretty = TRUE)
 #> ]
 ```
 
-What jsonlite does internally is essentially turn the data.frame into a list _row-wise_ to produce a sub-list for every row then it serialises to JSON. This is generally how rectangular data is represented in lists. For instance, `purrr::transpose` does the same. Another great example is to use `console.table` in the JavaScript console (more on that later) to display the table JSON as a table (see figure 2.2).
+What jsonlite does internally is essentially turn the data.frame into a list _row-wise_ to produce a sub-list for every row then it serialises to JSON. This is generally how rectangular data is represented in lists. For instance, `purrr::transpose` does the same. Another great example is to use `console.table` in the JavaScript console (more on that later) to display the table JSON as a table (see Figure \@ref(fig:console-table)).
 
 <div class="figure" style="text-align: center">
 <img src="images/console-table.png" alt="console.table output" width="100%" />
@@ -363,7 +363,7 @@ Jsonlite provides many more options and functions that will let you tune how JSO
 
 The book is not meant to teach JavaScript, only to show how graciously it can work with R. Let us thus go through the very basics to ensure we know enough to get started with the coming chapters.
 
-The easiest way to run JavaScript interactively is probably to create an \index{HTML} file (e.g.: `try.html`), write your code within a `<script>` tag and open the file in your web browser. The console output can be observed in the console of the browser, developer tools (see figure 2.3).
+The easiest way to run JavaScript interactively is probably to create an \index{HTML} file (e.g.: `try.html`), write your code within a `<script>` tag and open the file in your web browser. The console output can be observed in the console of the browser, developer tools (see Figure \@ref(fig:trying-js)).
 
 ```html
 <!–– index.html ––>
@@ -393,7 +393,7 @@ Most of the JavaScript code written in this book is intended to be run in web br
 <p>The RStudio IDE is built on Chromium, some of these tools will therefore also work in RStudio.</p>
 </div>
 
-The easiest way to access the developer tools from the browser is by "inspecting": right-click on an element on a webpage and select "inspect." This will open the developer tools either at the bottom or on the right of the page.
+The easiest way to access the developer tools from the browser is by "inspecting": right-click on an element on a webpage and select "inspect." This will open the developer tools either at the bottom or on the right (Figure \@ref(fig:chrome-devtools)) of the page depending on the defaults.
 
 <div class="figure" style="text-align: center">
 <img src="images/devtools.png" alt="Google Chrome devtools" width="100%" />
@@ -487,7 +487,7 @@ foo();
 
 ### Document Object Model {#basics-object-model}
 
-One concept does not exist in R is that of the "\index{DOM}" which stands for Document Object Model; this is also often referred to as the DOM tree as it very much follows a tree-like structure.
+One concept does not exist in R is that of the "DOM" which stands for Document Object Model; this is also often referred to as the \index{DOM} tree (represented in Figure \@ref(fig:dom-viz)) as it very much follows a tree-like structure.
 
 <div class="figure" style="text-align: center">
 

@@ -1,6 +1,6 @@
 \mainmatter
 
-# (PART) Basics Roadmap {-}
+# (PART) Basics and Roadmap {-}
 
 # Overview {#intro-overview}
 
@@ -45,7 +45,7 @@ print(object.size(states_sm), units = "Mb")
 #> 0.2 Mb
 ```
 
-Another great reason is that JavaScript can do things that R cannot, e.g., run in the browser. Therefore, one cannot natively create interactive visualisations with R. [Plotly](https://plotly-r.com/) [@R-plotly] by Carson Sievert packages the [plotly JavaScript library](https://plot.ly/) to let one create interactive visualisations solely from R code.
+Another great reason is that JavaScript can do things that R cannot, e.g., run in the browser. Therefore, one cannot natively create interactive visualisations with R. [Plotly](https://plotly-r.com/) [@R-plotly] by Carson Sievert packages the [plotly JavaScript library](https://plot.ly/) to let one create interactive visualisations solely from R code as shown in Figure \@ref(fig:plotly-basic-example).
 
 
 ```r
@@ -64,7 +64,7 @@ plot_ly(diamonds, x = ~cut, color = ~clarity, width = "100%")
 <p class="caption">(\#fig:plotly-basic-example)Basic htmlwidget example</p>
 </div>
 
-Finally, JavaScript can work together with R to improve how we communicate insights. One of the many ways in which Shiny stands out is that it lets one create web applications solely from R code with no knowledge of HTML, CSS, or JavaScript, but that does not mean they can't extend Shiny quite the contrary. The [waiter package](http://waiter.john-coene.com/) [@R-waiter] integrates a variety of JavaScript libraries to display loading screens in Shiny applications.
+Finally, JavaScript can work together with R to improve how we communicate insights. One of the many ways in which Shiny stands out is that it lets one create web applications solely from R code with no knowledge of HTML, CSS, or JavaScript, but that does not mean they can't extend Shiny quite the contrary. The [waiter package](http://waiter.john-coene.com/) [@R-waiter] integrates a variety of JavaScript libraries to display loading screens in Shiny applications as in Figure \@ref(fig:intro-waiter).
 
 ```r
 library(shiny)
@@ -133,7 +133,7 @@ Note that there are also two other prominent ways one can use JavaScript with R 
 
 ### reactR & vueR {#intro-reactr-vuer}
 
-[ReactR](https://react-r.github.io/reactR/) [@R-reactR] is an R package that emulates very well htmlwidgets but specifically for the [React framework](https://reactjs.org/). Unlike htmlwidgets, it is not limited to visual outputs and also provides functions to build inputs, e.g., a drop-down menu (like `shiny::selectInput`). The [reactable package](https://glin.github.io/reactable/) [@R-reactable] uses reactR to enable building interactive tables solely from R code.
+[ReactR](https://react-r.github.io/reactR/) [@R-reactR] is an R package that emulates very well htmlwidgets but specifically for the [\index{React} framework](https://reactjs.org/). Unlike htmlwidgets, it is not limited to visual outputs and also provides functions to build inputs, e.g., a drop-down menu (like `shiny::selectInput`). The [reactable package](https://glin.github.io/reactable/) [@R-reactable] uses reactR to enable building interactive tables solely from R code as shown in Figure \@ref(fig:reactable-example).
 
 
 ```r
@@ -150,11 +150,11 @@ reactable::reactable(iris[1:5, ], showPagination = TRUE)
 <p class="caption">(\#fig:reactable-example)reactable package example</p>
 </div>
 
-There is also the package vueR [@R-vueR], which brings some of Vue.js to R.
+There is also the package vueR [@R-vueR], which brings some of \index{Vue} to R.
 
 ### r2d3 {#intro-r2d3}
 
-[r2d3](https://rstudio.github.io/r2d3/) [@R-r2d3] by RStudio is an R package designed specifically to work with [d3.js](https://d3js.org/). It is similar to htmlwidgets but works rather differently.
+[r2d3](https://rstudio.github.io/r2d3/) [@R-r2d3] by RStudio is an R package designed specifically to work with [d3.js](https://d3js.org/). It is similar to htmlwidgets but works rather differently, it allows create visualisations such as Figure \@ref(fig:r2d3).
 
 
 ```r
