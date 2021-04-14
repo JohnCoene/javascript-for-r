@@ -299,7 +299,7 @@ Note the use of the `change` method, which ensures the event is fired. Otherwise
 
 ### Receive Input Messages {#shiny-input-receive-msg}
 
-The `setValue` method previously defined is only beneficial when combined with `receiveMessage`; the latter handles messages sent to the input, and these are generally sent from the server via functions the likes of `updateSelectInput`. Internally it uses the `setValue` method to define the value of the input received from the server. Note that the `value` is, therefore, a serialised JSON input coming from the R server and can be of any complexity you desire. Below we use it such that it expects a simple boolean as the checkbox (switch) can be either on (`true`) or off (`false`).
+The `setValue` method previously defined is only beneficial when combined with `receiveMessage`; the latter handles messages sent to the input, and these are generally sent from the server via functions the likes of `updateSelectInput`. Internally it uses the `setValue` method to define the value of the input received from the server. Note that the `value` is, therefore, a serialised \index{JSON} input coming from the R server and can be of any complexity you desire. Below we use it such that it expects a simple boolean as the checkbox (switch) can be either on (`true`) or off (`false`).
 
 ```js
 var switchInput = new Shiny.InputBinding();
@@ -546,7 +546,7 @@ shinyApp(ui, server)
 
 The diagram below attempts to summarize the various elements that were put together and used in the last application.
 
-It all starts from the `switchInput` function, which generates the HTML defining the switch input and its initial state. In the `subscribe` method, an event listener checks for changes on this HTML element (`$(el).on('change', ...)`). Every time it changes (check/uncheck) it fires the Shiny `callback`, which sends the value of the input obtained from `getValue` through the WebSocket. When the value of the input is changed from the server this value travels through the WebSocket to the front end, where `receiveMessage` uses `setValue` to programmatically change the check-box, which incidentally triggers the change event, and back we go.
+It all starts from the `switchInput` function, which generates the \index{HTML} defining the switch input and its initial state. In the `subscribe` method, an event listener checks for changes on this HTML element (`$(el).on('change', ...)`). Every time it changes (check/uncheck) it fires the Shiny `callback`, which sends the value of the input obtained from `getValue` through the \index{WebSocket}. When the value of the input is changed from the server this value travels through the \index{WebSocket} to the front end, where `receiveMessage` uses `setValue` to programmatically change the check-box, which incidentally triggers the change event, and back we go.
 
 <div class="figure" style="text-align: center">
 

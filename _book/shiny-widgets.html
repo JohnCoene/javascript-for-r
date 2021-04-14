@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2021-04-08" />
+<meta name="date" content="2021-04-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -292,7 +292,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="part"><span><b>III Web Development with Shiny</b></span></li>
 <li class="chapter" data-level="11" data-path="shiny-intro.html"><a href="shiny-intro.html"><i class="fa fa-check"></i><b>11</b> Bidirectional Communication</a><ul>
-<li class="chapter" data-level="11.1" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-websocket"><i class="fa fa-check"></i><b>11.1</b> Websocket an Shiny</a></li>
+<li class="chapter" data-level="11.1" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-websocket"><i class="fa fa-check"></i><b>11.1</b> WebSocket an Shiny</a></li>
 <li class="chapter" data-level="11.2" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-sessions"><i class="fa fa-check"></i><b>11.2</b> Sessions</a></li>
 <li class="chapter" data-level="11.3" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-example"><i class="fa fa-check"></i><b>11.3</b> Alerts, an example</a><ul>
 <li class="chapter" data-level="11.3.1" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-explore"><i class="fa fa-check"></i><b>11.3.1</b> Explore</a></li>
@@ -484,7 +484,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb317-5" title="5">  <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&#39;selected&#39;</span><span class="op">,</span> selectedCountry)<span class="op">;</span></a>
 <a class="sourceLine" id="cb317-6" title="6">  <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&#39;related&#39;</span><span class="op">,</span> relatedCountries)<span class="op">;</span></a>
 <a class="sourceLine" id="cb317-7" title="7"><span class="op">}</span></a></code></pre></div>
-<p>However, this will generate an issue experienced in a previous chapter; multiple gio visualisations in a single Shiny application would be defining the values of a single input. This can be remedied to by using the id of the visualisation to generate the input name dynamically.</p>
+<p>However, this will generate an issue experienced in a previous chapter; multiple gio visualisations in a single Shiny application would be defining the values of a single input. This can be remedied to by using the id of the  to generate the input name dynamically.</p>
 <div class="sourceCode" id="cb318"><pre class="sourceCode js"><code class="sourceCode javascript"><a class="sourceLine" id="cb318-1" title="1">renderValue<span class="op">:</span> <span class="kw">function</span>(x) <span class="op">{</span></a>
 <a class="sourceLine" id="cb318-2" title="2"></a>
 <a class="sourceLine" id="cb318-3" title="3">  <span class="kw">var</span> controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(el)<span class="op">;</span></a>
@@ -623,7 +623,7 @@ FIGURE 17.2: Gio input data transformed to a data frame
 </div>
 <div id="shiny-widgets-r-to-widgets" class="section level2">
 <h2><span class="header-section-number">17.3</span> R to Widgets</h2>
-<p>This book previously explored how to send data from the Shiny server to the front end; this section applies this to htmlwidgets. Currently, using gio in Shiny consists of generating the globe with the <code>renderGio</code> and complimentary <code>gioOutput</code> functions. This generates the complete visualisation, it creates the HTML element where it places the globe, draws the arcs based on the data, sets the style, etc.</p>
+<p>This book previously explored how to send data from the Shiny server to the front end; this section applies this to htmlwidgets. Currently, using gio in Shiny consists of generating the globe with the <code>renderGio</code> and complimentary <code>gioOutput</code> functions. This generates the complete visualisation, it creates the  element where it places the globe, draws the arcs based on the data, sets the style, etc.</p>
 <p>Now imagine that only one of those aspects needs changing, say the data, or the style, given the functions currently at hand one would have to redraw the entire visualisation, only this time changing the data or the style. This is inelegant and not efficient, most JavaScript visualisation libraries, including gio.js, will enable changing only certain aspects of the output without having to redraw it all from scratch.</p>
 <p>Before we look into the implementation, let us create a Shiny application which would benefit from such a feature. The Shiny application below provides a drop-down menu to select between two datasets to draw on the globe, running it reveals an issue with gio though. Upon selecting a dataset with the drop down a second globe appears underneath the original one. This is because internally gio.js creates a new element (<code>&lt;canvas&gt;</code>) within the <code>&lt;div&gt;</code> created by <code>htmlwidgets</code> when running <code>init</code> regardless of whether one was already created. Therefore, every call to <code>init</code> creates a new <code>&lt;canvas&gt;</code> with a different globe. Note that most visualisation libraries <em>will not have that issue</em>, they will detect the existing output and override it instead.</p>
 <div class="sourceCode" id="cb326"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb326-1" title="1"><span class="kw">library</span>(gio)</a>
@@ -676,7 +676,7 @@ FIGURE 17.3: Gio issue in shiny
 <a class="sourceLine" id="cb327-2" title="2"><span class="va">el</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="st">&#39;&#39;</span><span class="op">;</span> <span class="co">// empty el</span></a>
 <a class="sourceLine" id="cb327-3" title="3">controller <span class="op">=</span> <span class="kw">new</span> <span class="va">GIO</span>.<span class="at">Controller</span>(el)<span class="op">;</span></a></code></pre></div>
 <p>Now, using the dropdown to switch between dataset does not generate a new visualisation.</p>
-<p>We got sidetracked, but this had to be fixed. Ideally, when the user selects a dataset from the dropdown the entire visualisation is not redrawn, only the underlying data (the arcs) changes. To do so, a new set of functions divorced from the ones currently at hand needs to be created. This separation will allow leaving the already created functions as-is, using <code>gio</code> and its corresponding <code>renderValue</code> JavaScript function to initialise a visualisation, and have a separate family of functions dedicated to working with different JavaScript functions which circumvent <code>renderValue</code> and directly change aspects of the visualisation, such as the underlying dataset.</p>
+<p>We got sidetracked, but this had to be fixed. Ideally, when the user selects a dataset from the dropdown the entire  is not redrawn, only the underlying data (the arcs) changes. To do so, a new set of functions divorced from the ones currently at hand needs to be created. This separation will allow leaving the already created functions as-is, using <code>gio</code> and its corresponding <code>renderValue</code> JavaScript function to initialise a visualisation, and have a separate family of functions dedicated to working with different JavaScript functions which circumvent <code>renderValue</code> and directly change aspects of the visualisation, such as the underlying dataset.</p>
 <p>This involves a few moving parts, thankfully some of them were already explored, just not in the context of htmlwidgets. The scheme is to send data from R to JavaScript using the formerly exploited <code>session$sendCustomMessage</code>, then in JavaScript fetch the instance of the visualisation (<code>controller</code> in the case of gio) to interact with it (<code>e.g. controller.addData(data);</code>).</p>
 <div id="shiny-widgets-send-data" class="section level3">
 <h3><span class="header-section-number">17.3.1</span> Send Data from Widgets</h3>
@@ -699,7 +699,7 @@ FIGURE 17.3: Gio issue in shiny
 <div class="sourceCode" id="cb329"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb329-1" title="1"><span class="co"># preview shiny serialisation</span></a>
 <a class="sourceLine" id="cb329-2" title="2">shiny<span class="op">:::</span><span class="kw">toJSON</span>(arcs)</a>
 <a class="sourceLine" id="cb329-3" title="3"><span class="co">#&gt; {&quot;e&quot;:[&quot;CN&quot;,&quot;CN&quot;],&quot;i&quot;:[&quot;US&quot;,&quot;RU&quot;],&quot;v&quot;:[3300000,10000]}</span></a></code></pre></div>
-<p>Unfortunately this serialiser cannot be changed, therefore we have to reformat the data to a list which resembles the JSON output desired, using <code>apply</code> to turn every row into a list will do the job in most cases.</p>
+<p>Unfortunately this serialiser cannot be changed, therefore we have to reformat the data to a list which resembles the  output desired, using <code>apply</code> to turn every row into a list will do the job in most cases.</p>
 <div class="sourceCode" id="cb330"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb330-1" title="1"><span class="co">#&#39; @export</span></a>
 <a class="sourceLine" id="cb330-2" title="2">gio_send_data &lt;-<span class="st"> </span><span class="cf">function</span>(id, data, source, target, value, </a>
 <a class="sourceLine" id="cb330-3" title="3">  <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()){</a>
@@ -890,7 +890,7 @@ FIGURE 17.3: Gio issue in shiny
 <div id="shiny-widgets-proxy" class="section level2">
 <h2><span class="header-section-number">17.4</span> Proxy Function</h2>
 <p>Before we add other similar functions, we ought to pause and consider the API this provides the user. There are two points, every function such as <code>gio_send_data</code>, will need to accept the <code>id</code> and <code>session</code> arguments. It will be tedious to so every time, following the old “don’t repeat yourself” adage we ought to abstract this further.</p>
-<p>This can be remedied to by introducing what is often referred to as a “proxy.” A proxy is just a representation of the graph, or pragmatically, an object that contains the id of the visualisation and a Shiny session. This object can subsequently be piped to other functions, thereby providing not only a cleaner but also a more consistent API.</p>
+<p>This can be remedied to by introducing what is often referred to as a “proxy.” A proxy is just a representation of the graph, or pragmatically, an object that contains the id of the  and a Shiny session. This object can subsequently be piped to other functions, thereby providing not only a cleaner but also a more consistent API.</p>
 <div class="sourceCode" id="cb336"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb336-1" title="1"><span class="co">#&#39; @export</span></a>
 <a class="sourceLine" id="cb336-2" title="2">gio_proxy &lt;-<span class="st"> </span><span class="cf">function</span>(id, </a>
 <a class="sourceLine" id="cb336-3" title="3">  <span class="dt">session =</span> shiny<span class="op">::</span><span class="kw">getDefaultReactiveDomain</span>()</a>

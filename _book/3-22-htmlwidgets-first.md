@@ -18,13 +18,13 @@ Then, from the root of the package created, we scaffold a widget which we call "
 htmlwidgets::scaffoldWidget("play")
 ```
 
-This function puts together the minimalistic structure necessary to implement an HTML widget and opens `play.R`, `play.js`, and `play.yaml` in the RStudio IDE or the default text editor. 
+This function puts together the minimalistic structure necessary to implement an htmlwidget and opens `play.R`, `play.js`, and `play.yaml` in the RStudio IDE or the default text editor. 
 
 <div class="rmdnote">
 <p>You can scaffold multiple widgets in a single package.</p>
 </div>
 
-These files are named after the widget and will form the core of the package. The R file contains core functions of the R API, namely the `play` function, which creates the widget itself, and the `render*` and `*output` functions that handle the widget in the Shiny server and UI, respectively. The `.js` file contains JavaScript functions that generate the visual output. 
+These files are named after the widget and will form the core of the package. The R file contains core functions of the R API, namely the `play` function, which creates the widget itself, and the `render*` and `*output` functions that handle the widget in the \index{Shiny} server and UI, respectively. The `.js` file contains JavaScript functions that generate the visual output. 
 
 ```r
 devtools::document()
@@ -46,7 +46,7 @@ This displays the message in the RStudio "Viewer," or your default browser; indi
 
 ## The HTML Output {#widgets-first-htmloutput}
 
-With an out-of-the-box HTML widget package, one can start exploring the internals to understand how it works. Let us start by retracing the path taken by the message written in R to its seemingly magical appearance in HTML. The `play` function previously used, takes the `message` wraps it into a list which is then used in `htmlwidgets::createWidget`.
+With an out-of-the-box htmlwidget package, one can start exploring the internals to understand how it works. Let us start by retracing the path taken by the message written in R to its seemingly magical appearance in \index{HTML}. The `play` function previously used, takes the `message` wraps it into a list which is then used in `htmlwidgets::createWidget`.
 
 ```r
 # forward options using x
@@ -147,7 +147,7 @@ HTMLWidgets.widget({
 });
 ```
 
-However convoluted this may appear at first, do not let that intimidate you. The name of the widget (`play`) corresponds to the name used to generate the scaffold, it can also be seen in the `createWidget` function used inside the `play.R` file.
+However convoluted this may appear at first, do not let that intimidate you. The name of the widget (`play`) corresponds to the name used to generate the \index{scaffold}, it can also be seen in the `createWidget` function used inside the `play.R` file.
 
 ```r
 htmlwidgets::createWidget(
@@ -160,7 +160,7 @@ htmlwidgets::createWidget(
 )
 ```
 
-This is so htmlwidgets can internally match the output of `createWidget` to its JavaScript function. At this stage, it is probably fair to take a look at the diagram of what is happening.
+This is so \index{htmlwidgets} can internally match the output of `createWidget` to its JavaScript function. At this stage, it is probably fair to take a look at the diagram of what is happening.
 
 <div class="figure" style="text-align: center">
 
@@ -172,7 +172,7 @@ This is so htmlwidgets can internally match the output of `createWidget` to its 
 <p class="caption">(\#fig:widget-internals-diagram)htmlwidgets internals visualised</p>
 </div>
 
-The `factory` function returns two functions, `resize` and `renderValue`. The first is used to resize the output dynamically; it is not relevant to this widget and is thus tackled later on. Let us focus on `renderValue`, the function that renders the output. It takes an object `x` from which the "message" variable is used as the text for object `el` (`el.innerText`). The object `x` passed to this function is actually the list of the same name that was built in the R function `play`! While in R one would access the `message` in list `x` with `x$message` in JavaScript to access the `message` in the JSON `x` one writes `x.message`, only changing the dollar sign to a dot. Let us show this perhaps more clearly by printing the content of `x`.
+The `factory` function returns two functions, `resize` and `renderValue`. The first is used to \index{resize} the output dynamically; it is not relevant to this widget and is thus tackled later on. Let us focus on `renderValue`, the function that renders the output. It takes an object `x` from which the "message" variable is used as the text for object `el` (`el.innerText`). The object `x` passed to this function is actually the list of the same name that was built in the R function `play`! While in R one would access the `message` in list `x` with `x$message` in JavaScript to access the `message` in the \index{JSON} `x` one writes `x.message`, only changing the dollar sign to a dot. Let us show this perhaps more clearly by printing the content of `x`.
 
 ```js
 console.log(x);
@@ -186,7 +186,7 @@ We place `console.log` to print the content of `x` in the console, reload the pa
 <p class="caption">(\#fig:playground-console)Console log JavaScript object</p>
 </div>
 
-This displays the JSON object containing the message: it looks eerily similar to the list that was created in R (`x = list(message = "This is a widget!")`). What one should take away from this is that data that needs to be communicated from R to the JavaScript function should be placed in the R list `x`. This list is serialised to JSON and placed in the HTML output in a `script` tag bearing a `data-for` attribute that indicates which widget the data is destined for. This effectively enables htmlwidgets to match the serialised data with the output elements: data in `<script data-for='viz'>` is to be used to create a visualisation in `<div id='viz'>`.
+This displays the JSON object containing the message: it looks eerily similar to the list that was created in R (`x = list(message = "This is a widget!")`). What one should take away from this is that data that needs to be communicated from R to the JavaScript function should be placed in the R list `x`. This list is serialised to JSON and placed in the \index{HTML} output in a `script` tag bearing a `data-for` attribute that indicates which widget the data is destined for. This effectively enables htmlwidgets to match the serialised data with the output elements: data in `<script data-for='viz'>` is to be used to create a \index{visualisation} in `<div id='viz'>`.
 
 <div class="rmdnote">
 <p>Serialisation will make for an important section in a later chapter.</p>

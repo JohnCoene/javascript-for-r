@@ -23,7 +23,7 @@ There is also the possibility to pass additional options when defining the cooki
 
 ## Setup Project {#shiny-cookies-setup}
 
-Then again, it starts with the creation of a directory where we'll place a JavaScript file containing the message handlers; we won't download the dependency and use the CDN instead but feel free to do differently.
+Then again, it starts with the creation of a directory where we'll place a JavaScript file containing the message handlers; we won't download the dependency and use the \index{CDN} instead but feel free to do differently.
 
 ```r
 dir.create("www")

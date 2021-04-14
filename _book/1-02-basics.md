@@ -12,7 +12,7 @@ It is highly recommended to use the freely available [RStudio IDE](https://rstud
 
 ## R Package Development {#basics-package-dev}
 
-Developing packages used to be notoriously tricky, but things have considerably changed in recent years, namely thanks to the devtools [@R-devtools], roxygen2 [@R-roxygen2], and more recent [usethis](https://usethis.r-lib.org/) [@R-usethis] packages. Devtools is short for "developer tools," it is specifically designed to help creating packages; setting up tests, running checks, building and installing packages, etc. The second provides an all too convenient way to generate the documentation of packages, and usethis, more broadly, helps setting up projects, and automating repetitive tasks. Here, we only skim over the fundamentals, there is an entire book by Hadley Wickham called [*R Packages*](http://r-pkgs.had.co.nz/) solely dedicated to the topic.
+Developing R packages used to be notoriously tricky, but things have considerably changed in recent years, namely thanks to the devtools [@R-devtools], roxygen2 [@R-roxygen2], and more recent [usethis](https://usethis.r-lib.org/) [@R-usethis] packages. Devtools is short for "developer tools," it is specifically designed to help creating packages; setting up tests, running checks, building and installing packages, etc. The second provides an all too convenient way to generate the documentation of packages, and usethis, more broadly, helps setting up projects, and automating repetitive tasks. Here, we only skim over the fundamentals, there is an entire book by Hadley Wickham called [*R Packages*](http://r-pkgs.had.co.nz/) solely dedicated to the topic.
 
 Start by installing those packages from CRAN the roxygen2 package does not need to be explicitly installed as it is a dependency of devtools.
 
@@ -224,7 +224,7 @@ Note whilst this short guide will help you develop packages good enough for your
 
 ## JSON {#basics-json}
 
-JSON (JavaScript Object Notation) is a prevalent data _interchange_ format with which we will work extensively throughout this book; it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together, we must have a data format that can be understood by both---JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the [jsonlite package](https://CRAN.R-project.org/package=jsonlite) [@R-jsonlite] it is the serialiser used internally by all R packages that we explore in this book.
+\index{JSON} (JavaScript Object Notation) is a prevalent data _interchange_ format with which we will work extensively throughout this book; it is thus crucial that we have a good understanding of it before we plunge into the nitty-gritty. As one might foresee, if we want two languages to work together, we must have a data format that can be understood by both---JSON lets us harmoniously pass data from one to the other. While it is natively supported in JavaScript, it can be graciously handled in R with the [jsonlite package](https://CRAN.R-project.org/package=jsonlite) [@R-jsonlite] it is the serialiser used internally by all R packages that we explore in this book.
 
 <div class="rmdnote">
 <p>“To serialise” is just jargon for converting data to JSON.</p>
@@ -363,7 +363,7 @@ Jsonlite provides many more options and functions that will let you tune how JSO
 
 The book is not meant to teach JavaScript, only to show how graciously it can work with R. Let us thus go through the very basics to ensure we know enough to get started with the coming chapters.
 
-The easiest way to run JavaScript interactively is probably to create an HTML file (e.g.: `try.html`), write your code within a `<script>` tag and open the file in your web browser. The console output can be observed in the console of the browser, developer tools (see figure 2.3).
+The easiest way to run JavaScript interactively is probably to create an \index{HTML} file (e.g.: `try.html`), write your code within a `<script>` tag and open the file in your web browser. The console output can be observed in the console of the browser, developer tools (see figure 2.3).
 
 ```html
 <!–– index.html ––>
@@ -407,7 +407,7 @@ The developer tools pane consists of several tabs but we will mainly use:
 
 ### Variable Declaration and Scope {#basics-var-scope}
 
-One significant way JavaScript differs from R is that variables must be declared using one of three keywords, `var`, `let`, or `const`, which mainly affect the scope where the declared variable will be accessible.
+One significant way JavaScript differs from R is that variables must be declared using one of three keywords, `var`, `let`, or `const`, which mainly affect the \index{scope} where the declared variable will be accessible.
 
 ```js
 x = 1; // error
@@ -441,7 +441,7 @@ x <- 2 # works
 
 Notably, `const` is mainly protecting yourself (the developer) against yourself; if something important is defined and should not change later in the code use `const` to avoid accidentally reassigning something to it later in the project.
 
-The `let` keyword is akin to declaring a variable with the `var` keyword. However, `let` (and `const`) will declare the variable in the "block scope." In effect, this further narrows down the scope where the variable will be accessible. A block scope is generally the area within `if`, `switch` conditions or `for` and `while` loops: areas within curly brackets.
+The `let` keyword is akin to declaring a variable with the `var` keyword. However, `let` (and `const`) will declare the variable in the "block scope." In effect, this further narrows down the scope where the variable will be accessible. A block \index{scope} is generally the area within `if`, `switch` conditions or `for` and `while` loops: areas within curly brackets.
 
 ```js
 if(true){
@@ -487,7 +487,7 @@ foo();
 
 ### Document Object Model {#basics-object-model}
 
-One concept does not exist in R is that of the "DOM" which stands for Document Object Model; this is also often referred to as the DOM tree as it very much follows a tree-like structure.
+One concept does not exist in R is that of the "\index{DOM}" which stands for Document Object Model; this is also often referred to as the DOM tree as it very much follows a tree-like structure.
 
 <div class="figure" style="text-align: center">
 
@@ -562,7 +562,7 @@ This, of course, only scratches the surface of JavaScript; thus, this provides a
 
 ## Shiny {#basics-shiny}
 
-It is assumed that the reader has basic knowledge of the Shiny framework and already used it to build applications. However, there are some more obscure functionalities that one may not know, but that becomes essential when introducing JavaScript to applications. Chiefly, how to import external dependencies; JavaScript or otherwise.
+It is assumed that the reader has basic knowledge of the \index{Shiny} framework and already used it to build applications. However, there are some more obscure functionalities that one may not know, but that becomes essential when introducing JavaScript to applications. Chiefly, how to import external dependencies; JavaScript or otherwise.
 
 There are two ways to import dependencies: using the htmltools [@R-htmltools] package to create a dependency object that Shiny can understand, or manually serving and importing the files with Shiny.
 
@@ -641,7 +641,7 @@ At this stage, we have made the JavaScript file we created accessible by the cli
 </html>
 ```
 
-In Shiny we write the UI in R and not in HTML (though this is also supported). Given the resemblance between the names of HTML tags and Shiny UI functions, it is pretty straightforward; the html page above would look something like the Shiny `ui` below. 
+In \index{Shiny} we write the UI in R and not in HTML (though this is also supported). Given the resemblance between the names of HTML tags and Shiny UI functions, it is pretty straightforward; the html page above would look something like the Shiny `ui` below. 
 
 ```r
 library(shiny)
@@ -656,7 +656,7 @@ ui <- fluidPage(
 )
 ```
 
-The dependency is used in the `htmltools::singleton` function ensures that its content is _only imported in the document once._ 
+The \index{dependency} is used in the `htmltools::singleton` function ensures that its content is _only imported in the document once._ 
 
 Note that we use the `tags` object, which comes from the Shiny package and includes HTML tags that are not exported as standalone functions. For instance, you can create a `<div>` in Shiny with the `div` function, but `tags$div` will also work. This can now be applied to the Shiny application; the `path/to/script.js` should be changed to `files/script.js`, where `files` is the prefix we defined in `addResourcePath`.
 
@@ -730,7 +730,7 @@ dependency <- htmltools::htmlDependency(
 )
 ```
 
-About the above, the `src` argument points to the directory that contains the dependencies (`script` and `stylesheet`); this is done with a named vector where `file` indicates the path is a local directory and `href` indicates it is a remote server, generally a CDN. Note that one can also pass multiple `script` and `stylesheet` by using vectors, e.g.: `c("script.js", "anotherScript.js")`
+About the above, the `src` argument points to the directory that contains the dependencies (`script` and `stylesheet`); this is done with a named vector where `file` indicates the path is a local directory and `href` indicates it is a remote server, generally a \index{CDN}. Note that one can also pass multiple `script` and `stylesheet` by using vectors, e.g.: `c("script.js", "anotherScript.js")`
 
 <div class="rmdnote">
 <p>CDN stands for Content Delivery Network, a geographically distributed group of servers that provide fast transfer of dependencies.</p>

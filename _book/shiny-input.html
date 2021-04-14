@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2021-04-08" />
+<meta name="date" content="2021-04-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -292,7 +292,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="part"><span><b>III Web Development with Shiny</b></span></li>
 <li class="chapter" data-level="11" data-path="shiny-intro.html"><a href="shiny-intro.html"><i class="fa fa-check"></i><b>11</b> Bidirectional Communication</a><ul>
-<li class="chapter" data-level="11.1" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-websocket"><i class="fa fa-check"></i><b>11.1</b> Websocket an Shiny</a></li>
+<li class="chapter" data-level="11.1" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-websocket"><i class="fa fa-check"></i><b>11.1</b> WebSocket an Shiny</a></li>
 <li class="chapter" data-level="11.2" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-sessions"><i class="fa fa-check"></i><b>11.2</b> Sessions</a></li>
 <li class="chapter" data-level="11.3" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-example"><i class="fa fa-check"></i><b>11.3</b> Alerts, an example</a><ul>
 <li class="chapter" data-level="11.3.1" data-path="shiny-intro.html"><a href="shiny-intro.html#shiny-intro-explore"><i class="fa fa-check"></i><b>11.3.1</b> Explore</a></li>
@@ -705,7 +705,7 @@ Ensure the <code>getValue</code> method actually <code>return</code>s the value.
 </div>
 <div id="shiny-input-receive-msg" class="section level3">
 <h3><span class="header-section-number">15.4.5</span> Receive Input Messages</h3>
-<p>The <code>setValue</code> method previously defined is only beneficial when combined with <code>receiveMessage</code>; the latter handles messages sent to the input, and these are generally sent from the server via functions the likes of <code>updateSelectInput</code>. Internally it uses the <code>setValue</code> method to define the value of the input received from the server. Note that the <code>value</code> is, therefore, a serialised JSON input coming from the R server and can be of any complexity you desire. Below we use it such that it expects a simple boolean as the checkbox (switch) can be either on (<code>true</code>) or off (<code>false</code>).</p>
+<p>The <code>setValue</code> method previously defined is only beneficial when combined with <code>receiveMessage</code>; the latter handles messages sent to the input, and these are generally sent from the server via functions the likes of <code>updateSelectInput</code>. Internally it uses the <code>setValue</code> method to define the value of the input received from the server. Note that the <code>value</code> is, therefore, a serialised  input coming from the R server and can be of any complexity you desire. Below we use it such that it expects a simple boolean as the checkbox (switch) can be either on (<code>true</code>) or off (<code>false</code>).</p>
 <div class="sourceCode" id="cb299"><pre class="sourceCode js"><code class="sourceCode javascript"><a class="sourceLine" id="cb299-1" title="1"><span class="kw">var</span> switchInput <span class="op">=</span> <span class="kw">new</span> <span class="va">Shiny</span>.<span class="at">InputBinding</span>()<span class="op">;</span></a>
 <a class="sourceLine" id="cb299-2" title="2"></a>
 <a class="sourceLine" id="cb299-3" title="3"><span class="va">$</span>.<span class="at">extend</span>(switchInput<span class="op">,</span> <span class="op">{</span></a>
@@ -911,7 +911,7 @@ FIGURE 15.2: Switch input example
 <a class="sourceLine" id="cb308-24" title="24"></a>
 <a class="sourceLine" id="cb308-25" title="25"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>The diagram below attempts to summarize the various elements that were put together and used in the last application.</p>
-<p>It all starts from the <code>switchInput</code> function, which generates the HTML defining the switch input and its initial state. In the <code>subscribe</code> method, an event listener checks for changes on this HTML element (<code>$(el).on('change', ...)</code>). Every time it changes (check/uncheck) it fires the Shiny <code>callback</code>, which sends the value of the input obtained from <code>getValue</code> through the WebSocket. When the value of the input is changed from the server this value travels through the WebSocket to the front end, where <code>receiveMessage</code> uses <code>setValue</code> to programmatically change the check-box, which incidentally triggers the change event, and back we go.</p>
+<p>It all starts from the <code>switchInput</code> function, which generates the  defining the switch input and its initial state. In the <code>subscribe</code> method, an event listener checks for changes on this HTML element (<code>$(el).on('change', ...)</code>). Every time it changes (check/uncheck) it fires the Shiny <code>callback</code>, which sends the value of the input obtained from <code>getValue</code> through the . When the value of the input is changed from the server this value travels through the  to the front end, where <code>receiveMessage</code> uses <code>setValue</code> to programmatically change the check-box, which incidentally triggers the change event, and back we go.</p>
 <div class="figure" style="text-align: center"><span id="fig:shiny-input-diagram"></span>
 <div id="htmlwidget-076b26e381da596b9e89" style="width:100%;height:250px;" class="grViz html-widget"></div>
 <script type="application/json" data-for="htmlwidget-076b26e381da596b9e89">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR]\n  node [shape=record fontsize=12];\n\n  subgraph cluster_r {\n    node [color=royalBlue];\n    \"update_switch_input\"\n    \"switchInput\"\n    \"Input list\"\n\n    label = \"R server\"\n  }\n\n  subgraph cluster_js {\n    node [color=gold];\n    \"receiveMessage\"\n    \"setValue\"\n    \"HTML input\"\n    \"subscribe\"\n    \"getValue\"\n\n    label = \"Front-end\"\n  }\n\n  edge [fontsize=10]\n  \"update_switch_input\" -> \"receiveMessage\" [xlabel=\"websocket\"]\n  \"receiveMessage\" -> \"setValue\" [label=\"value\"]\n  \"switchInput\" -> \"HTML input\" \n  \"setValue\" -> \"HTML input\" [label=\"value\"]\n  \"HTML input\" -> \"subscribe\" [label=\"event listener\"]\n  \"subscribe\" -> \"getValue\" [label=\"callback\"]\n  \"getValue\" -> \"Input list\" [label=\"websocket\"]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>

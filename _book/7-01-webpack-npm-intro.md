@@ -90,7 +90,7 @@ Moreover, webpack does not limit itself to the previously-mentioned processes. I
 
 Another new piece of software that we need to be introduce is Node's Package Manager, hereafter referred to as NPM. As indicated by the name, it's a package manager for Node.js, or translated for the R user it's Node's loose equivalent of CRAN. One first significant difference is that while CRAN performs very rigorous checks on any package submitted, NPM does not; one can publish almost anything.
 
-Notice how every dependency used in this book had to be either found through a CDN or manually downloaded, only to be imported in the final document. Again, this is useful for the smaller projects but may become a hindrance when multiple dependencies have to be managed and updated, added and removed, etc.
+Notice how every dependency used in this book had to be either found through a \index{CDN} or manually downloaded, only to be imported in the final document. Again, this is useful for the smaller projects but may become a hindrance when multiple dependencies have to be managed and updated, added and removed, etc.
 
 NPM has wholly changed how dependencies can be managed and imported in JavaScript. It is designed for Node.js code, but many (if not all) libraries that are meant to run in web browsers are published on NPM: it's just too convenient.
 

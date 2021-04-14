@@ -108,7 +108,7 @@ shiny::plotOutput(id = "myPlotId")
 </div>
 ```
 
-The `class` is used JavaScript-side to "find" the outputs in the DOM and generate the output. The function `boxxyOutput` could thus be as shown, the `id` is passed along to the `<div>`, which is created with a `boxxy` class that will be used in the output binding to find that element and generate the output within that very `<div>` using data that will be passed from the server.
+The `class` is used JavaScript-side to "find" the outputs in the \index{DOM} and generate the output. The function `boxxyOutput` could thus be as shown, the `id` is passed along to the `<div>`, which is created with a `boxxy` class that will be used in the output binding to find that element and generate the output within that very `<div>` using data that will be passed from the server.
 
 ```r
 boxxyOutput <- function(id){
@@ -195,7 +195,7 @@ boxxyOutput <- function(id){
 }
 ```
 
-Running the function reveals the HTML it generates at the exception of the dependencies which htmltools does not print to the console.
+Running the function reveals the \index{HTML} it generates at the exception of the dependencies which htmltools does not print to the console.
 
 ```r
 boxxyOutput("myID")
@@ -577,7 +577,7 @@ Within the `if` statement, the dependency can be created with the htmltools as d
 <p>Make sure dependencies bear different names or Shiny thinks it’s the same and only renders one of them.</p>
 </div>
 
-The dependency generated with htmltools is then passed to the `shiny::createWebDependency` function, which internally uses `shiny::addResourcePath` to serve the dependency. This is necessary here as, at this stage, the countup dependency is not actually rendered; below we merely add it to the list of options that serialised to JSON. Indeed, this will actually be injected JavaScript-side. Therefore the front end needs to be able to access this file, hence it is served.
+The dependency generated with htmltools is then passed to the `shiny::createWebDependency` function, which internally uses `shiny::addResourcePath` to serve the dependency. This is necessary here as, at this stage, the countup dependency is not actually rendered; below we merely add it to the list of options that serialised to \index{JSON}. Indeed, this will actually be injected JavaScript-side. Therefore the front end needs to be able to access this file, hence it is served.
 
 ```r
 renderBoxxy <- function(expr, env = parent.frame(), 

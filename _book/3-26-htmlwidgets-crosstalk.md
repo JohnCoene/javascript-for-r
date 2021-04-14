@@ -12,7 +12,7 @@ Crosstalk provides a straightforward interface to the users and instead requires
 
 Both the plotly and DT packages support crosstalk, therefore using a shared dataset we can produce a scatter plot with the former and a table with the latter, so that selection of data in one is reflected in the other.
 
-As alluded to earlier on, this can be achieved by using a shared dataset, which can be created with the `SharedData` R6 class from the crosstalk package. This dataset is then used as one would use a standard dataframe in plotly and DT. The `bscols` function is just a helper to create columns from HTML elements (using bootstrap). It is ideal for examples, but one should not have to use it in Shiny---crosstalk will work without `bscols`.
+As alluded to earlier on, this can be achieved by using a shared dataset, which can be created with the `SharedData` R6 class from the crosstalk package. This dataset is then used as one would use a standard dataframe in plotly and DT. The `bscols` function is just a helper to create columns from HTML elements (using bootstrap). It is ideal for examples, but one should not have to use it in \index{Shiny}---crosstalk will work without `bscols`.
 
 ```r
 library(DT)
@@ -306,7 +306,7 @@ shared_arcs$key()
 #> [1] "US" "RU"
 ```
 
-The methods `origData` and `groupName` must be used in every widget, the `key` method may not be of use to every widget, it can be immensely useful if the visualisation library also comes with a key/id system so one can use it internally. Gio.js does not, and we thus will not be using it. The name of the group is passed to the `x` object, so it is accessible JavaScript-side where it is needed; we also add the JavaScript dependency required to run crosstalk with `crosstalkLibs`.
+The methods `origData` and `groupName` must be used in every widget, the `key` method may not be of use to every widget, it can be immensely useful if the \index{visualisation} library also comes with a key/id system so one can use it internally. Gio.js does not, and we thus will not be using it. The name of the group is passed to the `x` object, so it is accessible JavaScript-side where it is needed; we also add the JavaScript dependency required to run crosstalk with `crosstalkLibs`.
 
 ```r
 gio <- function(data, width = NULL, height = NULL, 
