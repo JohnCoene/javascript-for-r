@@ -160,10 +160,14 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/shiny-complete-skeleton.png" alt="Shiny app skeleton" width="100%" />
-<p class="caption">(\#fig:shiny-complete-skeleton)Shiny app skeleton</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/shiny-complete-skeleton} 
+
+}
+
+\caption{Shiny app skeleton}(\#fig:shiny-complete-skeleton)
+\end{figure}
 
 ## From R to JavaScript {#shiny-complete-r2js}
 
@@ -193,9 +197,10 @@ function modelLoaded() {
 const classifier = ml5.imageClassifier('MobileNet', modelLoaded);
 ```
 
-<div class="rmdnote">
-<p>There is no need to repeatedly initialise the classifier every time a user hits the “classify” button: this should only be done once.</p>
-</div>
+\begin{rmdnote}
+There is no need to repeatedly initialise the classifier every time a
+user hits the ``classify'' button: this should only be done once.
+\end{rmdnote}
 
 Finally, we can take care of the message handler. Remember the message sent from the R server bears the `classify` unique identifier. The handler function runs the `classify` method on the previously instantiated `classifier` object. This takes 1) the image to classify and 2) a callback function to handle the results of the classification. Here we genuinely get to why we gave the generated `<img>` of the selected bird and `id`: it helps us quickly select that image from JavaScript to use in the classifier with `document.getElementById("bird")`.
 
@@ -222,10 +227,14 @@ As mentioned at the start of the chapter, the results of the classification shou
 
 Running the application and opening the console already gives us encouraging results! The classifier gives "flamingo" the greatest confidence (albeit at `0.48`).
 
-<div class="figure" style="text-align: center">
-<img src="images/shiny-complete-classify-console.png" alt="Results logged to the console" width="100%" />
-<p class="caption">(\#fig:shiny-complete-classify-console)Results logged to the console</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/shiny-complete-classify-console} 
+
+}
+
+\caption{Results logged to the console}(\#fig:shiny-complete-classify-console)
+\end{figure}
 
 ## From JavaScript to R {#shiny-complete-js2r}
 
@@ -302,10 +311,14 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/ml5-output.png" alt="Classifier basic output" width="100%" />
-<p class="caption">(\#fig:shiny-complete-ml5-output)Classifier basic output</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/ml5-output} 
+
+}
+
+\caption{Classifier basic output}(\#fig:shiny-complete-ml5-output)
+\end{figure}
 
 ## Input handler {#shiny-complete-input-handler}
 
@@ -329,9 +342,9 @@ shiny::registerInputHandler("ml5.class", process_results)
 
 Note that handlers can only be registered once; running the above twice will fail the second time, even if the handler function has changed. This is to ensure one does not accidentally overwrite handlers brought in by other packages. These can be overwritten by explicitly setting `force` to `TRUE`, but it is not advised. 
 
-<div class="rmdnote">
-<p>It is not advised to overwrite the registered handler.</p>
-</div>
+\begin{rmdnote}
+It is not advised to overwrite the registered handler.
+\end{rmdnote}
 
 ```r
 # register with shiny
@@ -408,10 +421,14 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/shiny-complete-table.png" alt="Classifier table output" width="100%" />
-<p class="caption">(\#fig:shiny-complete-table-output)Classifier table output</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/shiny-complete-table} 
+
+}
+
+\caption{Classifier table output}(\#fig:shiny-complete-table-output)
+\end{figure}
 
 ## As a Package {#shiny-complete-pkg}
 
