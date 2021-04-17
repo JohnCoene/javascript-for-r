@@ -164,7 +164,7 @@ engine$source(uri)
 #> [1] "true"
 ```
 
-You can think of it as using the `script` tag in \index{HTML} to source (`src`) said file from disk or \index{CDN}.
+You can think of it as using the `script` tag in HTML\index{HTML} to source (`src`) said file from disk or CDN\index{CDN}.
 
 ```html
 <html>
@@ -195,7 +195,7 @@ books <- data.frame(
 engine$assign("books", books)
 ```
 
-Then again, we can make sure that the data frame was turned into a row-wise \index{JSON} object.
+Then again, we can make sure that the data frame was turned into a row-wise JSON\index{JSON} object.
 
 
 ```r

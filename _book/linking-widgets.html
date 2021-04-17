@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2021-04-14" />
+<meta name="date" content="2021-04-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -468,7 +468,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="linking-widgets-examples" class="section level2">
 <h2><span class="header-section-number">9.1</span> Crosstalk Examples</h2>
 <p>Both the plotly and DT packages support crosstalk, therefore using a shared dataset we can produce a scatter plot with the former and a table with the latter, so that selection of data in one is reflected in the other.</p>
-<p>As alluded to earlier on, this can be achieved by using a shared dataset, which can be created with the <code>SharedData</code> R6 class from the crosstalk package. This dataset is then used as one would use a standard dataframe in plotly and DT. The <code>bscols</code> function is just a helper to create columns from HTML elements (using bootstrap). It is ideal for examples, but one should not have to use it in —crosstalk will work without <code>bscols</code>.</p>
+<p>As alluded to earlier on, this can be achieved by using a shared dataset, which can be created with the <code>SharedData</code> R6 class from the crosstalk package. This dataset is then used as one would use a standard dataframe in plotly and DT. The <code>bscols</code> function is just a helper to create columns from HTML elements (see Figure <a href="linking-widgets.html#fig:crosstalk-1">9.1</a>). It is ideal for examples, but one should not have to use it in Shiny—crosstalk will work without <code>bscols</code>.</p>
 <div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb167-1" title="1"><span class="kw">library</span>(DT)</a>
 <a class="sourceLine" id="cb167-2" title="2"><span class="kw">library</span>(plotly)</a>
 <a class="sourceLine" id="cb167-3" title="3"><span class="kw">library</span>(crosstalk)</a>
@@ -485,7 +485,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 FIGURE 9.1: Crosstalk example
 </p>
 </div>
-<p>Basic usage of crosstalk datasets in shiny is also straightforward since it accepts reactive expressions to create shared datasets. Note that it takes the expression itself (<code>expression</code>) not the output of the expression (<code>expression()</code>); the crosstalk documentation explains it best:</p>
+<p>Basic usage of crosstalk datasets in shiny (Figure <a href="linking-widgets.html#fig:crosstalk-shiny">9.2</a>) is also straightforward since it accepts reactive expressions to create shared datasets. Note that it takes the expression itself (<code>expression</code>) not the output of the expression (<code>expression()</code>); the crosstalk documentation explains it best:</p>
 <blockquote>
 <p>If this feels foreign to you, think of how you pass a function name, not a function call, to <code>lapply</code>; that’s exactly analogous to what we’re doing here.</p>
 <p>— Official crosstalk documentation</p>
@@ -602,7 +602,7 @@ FIGURE 9.2: Shiny with crosstalk
 </div>
 <div id="linking-widgets-inner-workings" class="section level2">
 <h2><span class="header-section-number">9.3</span> How it Works</h2>
-<p>As will be discovered later when support for crosstalk is brought to gio, minimal changes of the R code is required. As might be expected, crosstalk enables the communication between widgets via JavaScript. Hence much of what must be adapted by widgets developers happens in JavaScript too.</p>
+<p>As will be discovered later when support for crosstalk is brought to gio, minimal changes of the R code is required. As might be expected, crosstalk enables the communication between widgets via JavaScript. Hence much of what must be adapted by widgets developers happens in JavaScript too as shown in Figure <a href="linking-widgets.html#fig:crosstalk-diagram">9.3</a>.</p>
 <div class="figure" style="text-align: center"><span id="fig:crosstalk-diagram"></span>
 <div id="htmlwidget-730ed54ee2177bdd1cf6" style="width:100%;height:250px;" class="grViz html-widget"></div>
 <script type="application/json" data-for="htmlwidget-730ed54ee2177bdd1cf6">{"x":{"diagram":"\ndigraph G {\n\n  graph [compound=true rankdir = LR]\n  node [shape=record fontsize=10];\n\n  # r stuff\n  subgraph cluster_1 { \n    \"Widget 1\" \"Widget 2\";\n    label = \"JavaScript\";\n    color=gold;\n  }\n\n  # js\n  subgraph cluster_0 {\n    node [width = 0.9]\n    Dataframe \"Shared Dataset\"; \n    label=\"R\";\n    color=royalBlue;\n  }\n\n  \"Dataframe\" -> \"Shared Dataset\";\n  \"Widget 1\" -> \"Widget 2\" [dir=both color=dimGray];\n\n  # connect subgraphs\n  \"Shared Dataset\" -> \"Widget 1\" [lhead=cluster_1 ltail=cluster_0];\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
@@ -670,7 +670,7 @@ FIGURE 9.3: Crosstalk visualised
 </div>
 <div id="linking-widgets-groups" class="section level3">
 <h3><span class="header-section-number">9.3.3</span> Groups</h3>
-<p>Internally crosstalk knows what to share across widgets; with <code>group</code>s groups share <code>key</code>s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other.</p>
+<p>Internally crosstalk knows what to share across widgets; with <code>group</code>s that share <code>key</code>s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other (see Figure <a href="linking-widgets.html#fig:crosstalk-groups-diagram">9.4</a>).</p>
 <div class="figure" style="text-align: center"><span id="fig:crosstalk-groups-diagram"></span>
 <div id="htmlwidget-e0490ccb372f4392a777" style="width:100%;height:250px;" class="grViz html-widget"></div>
 <script type="application/json" data-for="htmlwidget-e0490ccb372f4392a777">{"x":{"diagram":"\ndigraph G {\n\n  subgraph cluster_g1 {\n    node [shape=record fontsize=7]\n    d1 [label=\"Dataset\"]\n    d3 [label=\"Dataset\"]\n    k1 [label=\"Keys\"]\n    label=\"Group 1\"\n    fontsize=9\n    color=royalBlue\n  }\n\n  subgraph cluster_g2 {\n    node [shape=record fontsize=7]\n    d2 [label=\"Dataset\"] \n    k2 [label=\"Keys\"]\n    label=\"Group 2\"\n    fontsize=9\n    color=royalBlue\n  }\n\n  node [shape=record fontsize=7 color=gold]\n  w1 [label=\"widget 1\"]\n  w2 [label=\"widget 2\"]\n  w3 [label=\"widget 3\"]\n  w4 [label=\"widget 4\"]\n  w5 [label=\"widget 5\"]\n\n  w1 -> k1 [dir=both arrowsize=.5]\n  w2 -> k1 [dir=both arrowsize=.5]\n  w3 -> k2 [dir=both arrowsize=.5]\n  w4 -> k2 [dir=both arrowsize=.5]\n  w5 -> k2 [dir=both arrowsize=.5]\n\n  d2 -> k2 [arrowsize=.5]\n  d1 -> k1 [arrowsize=.5]\n  d3 -> k1 [arrowsize=.5]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
@@ -725,7 +725,7 @@ Crosstalk groups share keys.
 <a class="sourceLine" id="cb178-5" title="5"><span class="co"># keys</span></a>
 <a class="sourceLine" id="cb178-6" title="6">shared_arcs<span class="op">$</span><span class="kw">key</span>()</a>
 <a class="sourceLine" id="cb178-7" title="7"><span class="co">#&gt; [1] &quot;US&quot; &quot;RU&quot;</span></a></code></pre></div>
-<p>The methods <code>origData</code> and <code>groupName</code> must be used in every widget, the <code>key</code> method may not be of use to every widget, it can be immensely useful if the  library also comes with a key/id system so one can use it internally. Gio.js does not, and we thus will not be using it. The name of the group is passed to the <code>x</code> object, so it is accessible JavaScript-side where it is needed; we also add the JavaScript dependency required to run crosstalk with <code>crosstalkLibs</code>.</p>
+<p>The methods <code>origData</code> and <code>groupName</code> must be used in every widget, the <code>key</code> method may not be of use to every widget, it can be immensely useful if the visualisation library also comes with a key/id system so one can use it internally. Gio.js does not, and we thus will not be using it. The name of the group is passed to the <code>x</code> object, so it is accessible JavaScript-side where it is needed; we also add the JavaScript dependency required to run crosstalk with <code>crosstalkLibs</code>.</p>
 <div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb179-1" title="1">gio &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">width =</span> <span class="ot">NULL</span>, <span class="dt">height =</span> <span class="ot">NULL</span>, </a>
 <a class="sourceLine" id="cb179-2" title="2">  <span class="dt">elementId =</span> <span class="ot">NULL</span>) {</a>
 <a class="sourceLine" id="cb179-3" title="3"></a>
@@ -845,7 +845,7 @@ One could improve upon this section by using creating methods on the <code>gio</
 <div id="linking-widgets-using" class="section level2">
 <h2><span class="header-section-number">9.7</span> Using Crosstalk with Gio</h2>
 <p>Finally, now that gio supports shared datasets, we can create a few examples to demonstrate how it can be used.</p>
-<p>The simplest way is probably to convert the edges to a shared dataset specifying either the source (<code>i</code>) or target (<code>e</code>) country codes as keys. However, this is unlikely to be used this way out in the real world. In the example below, selecting an edge highlights a node, which is somewhat confusing.</p>
+<p>The simplest way is probably to convert the edges to a shared dataset specifying either the source (<code>i</code>) or target (<code>e</code>) country codes as keys. However, this is unlikely to be used this way out in the real world. In Figure <a href="linking-widgets.html#fig:crosstalk-gio-1">9.5</a>, selecting an edge highlights a node, which is somewhat confusing.</p>
 <div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb188-1" title="1"><span class="kw">library</span>(DT)</a>
 <a class="sourceLine" id="cb188-2" title="2"><span class="kw">library</span>(gio)</a>
 <a class="sourceLine" id="cb188-3" title="3"><span class="kw">library</span>(crosstalk)</a>
@@ -870,7 +870,7 @@ One could improve upon this section by using creating methods on the <code>gio</
 FIGURE 9.5: Gio with DT using crosstalk
 </p>
 </div>
-<p>Thankfully we can use the <code>group</code> argument in order to create edges and nodes that share keys and produce a more sensible link between widgets.</p>
+<p>Thankfully we can use the <code>group</code> argument in order to create edges and nodes that share keys (see Figure <a href="linking-widgets.html#fig:crosstalk-gio-diagram">9.6</a>) and produce a more sensible link between widgets.</p>
 <div class="figure" style="text-align: center"><span id="fig:crosstalk-gio-diagram"></span>
 <div id="htmlwidget-7396454db52b95c020b7" style="width:100%;height:415.296px;" class="grViz html-widget"></div>
 <script type="application/json" data-for="htmlwidget-7396454db52b95c020b7">{"x":{"diagram":"\ndigraph {\n\n  graph[rankdir = TB]\n\n  subgraph cluster_0 {\n    label=\"sharedGroup\"\n    node [shape=record fontsize=10];\n    edges_sd nodes_sd\n    keys [color=royalBlue]\n    color=dimGray\n  }\n\n  node [shape=record fontsize=10 color=gold];\n  gio plotly\n\n  edges_sd -> keys [arrowsize=.5];\n  nodes_sd -> keys [arrowsize=.5];\n\n  gio -> keys [dir=both arrowsize=.5];\n  plotly -> keys [dir=both arrowsize=.5 constraint=false];\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
@@ -878,7 +878,7 @@ FIGURE 9.5: Gio with DT using crosstalk
 FIGURE 9.6: Crosstalk with gio
 </p>
 </div>
-<p>Below we create two shared datasets with the same group name, one for the edges and another for the nodes. Use one for the gio visualisation and the other for the plotly graph.</p>
+<p>Below we create two shared datasets with the same group name, one for the edges and another for the nodes to produce Figure <a href="linking-widgets.html#fig:crosstalk-gio-2">9.7</a>. Use one for the gio visualisation and the other for the plotly graph.</p>
 <div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb189-1" title="1"><span class="kw">library</span>(gio)</a>
 <a class="sourceLine" id="cb189-2" title="2"><span class="kw">library</span>(plotly)</a>
 <a class="sourceLine" id="cb189-3" title="3"><span class="kw">library</span>(crosstalk)</a>

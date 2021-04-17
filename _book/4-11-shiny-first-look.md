@@ -10,16 +10,17 @@ Then again, the goal is not to write a lot of convoluted JavaScript. On the cont
 
 ## WebSocket an Shiny {#shiny-intro-websocket}
 
-\index{Shiny} applications have two components: the user interface (UI) and the server function. These two components communicate via a \index{WebSocket}: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server, this connection is managed by Shiny using the httpuv [@R-httpuv] and WebSocket [@R-websocket] packages, while in clients connecting to the server this connection is managed with JavaScript.  
+Shiny\index{Shiny} applications have two components: the user interface (UI) and the server function. These two components communicate via a WebSocket\index{WebSocket}: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server, this connection is managed by Shiny using the httpuv [@R-httpuv] and WebSocket [@R-websocket] packages, while in clients connecting to the server this connection is managed with JavaScript.  
 
-\begin{figure}[H]
+<div class="figure" style="text-align: center">
 
-{\centering \includegraphics[width=1\linewidth]{images/04-websocket} 
+```{=html}
+<div id="htmlwidget-81f877482b7b9336dfe8" style="width:100%;height:576px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-81f877482b7b9336dfe8">{"x":{"diagram":"\ndigraph{\n  node [shape=record fontsize=10];\n\n  w1 [label=Websocket];\n  w2 [label=Websocket];\n  w3 [label=Websocket];\n  w4 [label=Websocket];\n\n  b1 [label=\"Browser\" color=gold];\n  b2 [label=\"Browser\" color=gold];\n  b3 [label=\"Browser\" color=gold];\n  b4 [label=\"Browser\" color=gold];\n\n  s [label=\"R server\" color=royalBlue];\n\n  s -> w1 -> b1 [dir=both color=dimGray arrowsize=.3];\n  s -> w2 -> b2 [dir=both color=dimGray arrowsize=.3];\n  s -> w3 -> b3 [dir=both color=dimGray arrowsize=.3];\n  s -> w4 -> b4 [dir=both color=dimGray arrowsize=.3];\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+```
 
-}
-
-\caption{Websocket visualised}(\#fig:unnamed-chunk-2)
-\end{figure}
+<p class="caption">(\#fig:unnamed-chunk-2)Websocket visualised</p>
+</div>
 
 With that in mind, we can put together a Shiny application, which though simple. Exploits bi-directional communication. The application takes a text input, sends the value of the input to the R server, which sends it back to the UI.
 
@@ -42,14 +43,15 @@ shinyApp(ui, server)
 
 Drawing a diagram of the communication between the UI and the server reveals that though this is a simple application a lot is happening.
 
-\begin{figure}[H]
+<div class="figure" style="text-align: center">
 
-{\centering \includegraphics[width=1\linewidth]{images/04-shiny-websocket} 
+```{=html}
+<div id="htmlwidget-84ac76661e8f7ebce810" style="width:100%;height:576px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-84ac76661e8f7ebce810">{"x":{"diagram":"\ndigraph {\n  graph[rankdir=LR fontsize = 10]\n  node[shape=record fontsize = 9]\n\n  subgraph cluster_0 {\n    textInput\n    textOutput\n    label=\"User Interface\"\n    color=gold\n  }\n\n  subgraph cluster_1 {\n    \"input list\"\n    renderOutput\n    label=\"R server\"\n    color=royalBlue\n  }\n\n  textInput -> \"input list\" [xlabel=websocket fontsize = 8]\n  \"input list\" -> renderOutput\n  renderOutput -> textOutput [label=websocket fontsize = 8]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+```
 
-}
-
-\caption{Shiny websocket visualised}(\#fig:shiny-websocket-diagram)
-\end{figure}
+<p class="caption">(\#fig:shiny-websocket-diagram)Shiny websocket visualised</p>
+</div>
 
 Communicating between the R server and the user interface requires JavaScript and thus makes a reasonable chunk of this part of the book on web development with Shiny.
 
@@ -59,9 +61,9 @@ Note that shiny isolate each client connecting to the server in what it refers t
 
 It would indeed be strange if when one of two concurrent users enters text in a box and that is reflected on the other user's screen.
 
-This is good to know because \index{WebSocket} are in fact often use for precisely that effect. For instance, in a chat application where someone posting a message to a group chat is sent to the server which then, via the WebSocket, _broadcasts_ the message to all other users in the group chat.
+This is good to know because WebSocket\index{WebSocket} are in fact often use for precisely that effect. For instance, in a chat application where someone posting a message to a group chat is sent to the server which then, via the WebSocket, _broadcasts_ the message to all other users in the group chat.
 
-\index{Shiny} does not allow this, users are isolated from one another.
+Shiny\index{Shiny} does not allow this, users are isolated from one another.
 
 ## Alerts, an example {#shiny-intro-example}
 
@@ -136,14 +138,10 @@ server <- function(input, output) {}
 shinyApp(ui, server)
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/jbox-init} 
-
-}
-
-\caption{A basic jBox notice}(\#fig:jbox-init)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/jbox-init.png" alt="A basic jBox notice" width="100%" />
+<p class="caption">(\#fig:jbox-init)A basic jBox notice</p>
+</div>
 
 The application above essentially reproduces the basic HTML example that was shared; the dependencies are imported, and a script displays a notification. Since all of that takes place in the front end, the body of the server function is empty.
 
@@ -225,27 +223,24 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/jbox-r2js} 
-
-}
-
-\caption{A notice triggered by the server}(\#fig:jbox-r2js)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/jbox-r2js.png" alt="A notice triggered by the server" width="100%" />
+<p class="caption">(\#fig:jbox-r2js)A notice triggered by the server</p>
+</div>
 
 In the application above, notice the path that the message follows: it goes from the client (user input) to the server (`observeEvent`), which sends (`sendCustomMessage`) it back to the client. 
 
-\begin{figure}[H]
+<div class="figure" style="text-align: center">
 
-{\centering \includegraphics[width=1\linewidth]{images/04-custom-msg} 
+```{=html}
+<div id="htmlwidget-ffdb2aa7317dea16b988" style="width:100%;height:576px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ffdb2aa7317dea16b988">{"x":{"diagram":"\ndigraph{\n  graph [rankdir=LR]\n  node [shape=record fontsize=10];\n\n  subgraph cluster_0 {\n    textInput\n    handler [label=\"message handler\"]\n    notice [label = \"show notice\"]\n    label=\"Client\"\n    color=gold\n  }\n\n  subgraph cluster_1 {\n    send[label=\"sendCustomMessage\"]\n    label=\"Server\"\n    color=royalBlue\n  }\n\n  textInput -> send [label=\"value\"];\n  send -> handler [label=\"message\"];\n  handler -> notice;\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+```
 
-}
+<p class="caption">(\#fig:shiny-alert-diagram)Shiny alert with custom messages</p>
+</div>
 
-\caption{Shiny alert with custom messages}(\#fig:shiny-alert-diagram)
-\end{figure}
-
-This might be considered suboptimal by some as it is not necessary to use the server as an intermediary (in this example at least). Though there is some truth to this, the above will work perfectly fine---and the aim here is to make JavaScript work with R---not alongside it. The \index{WebSocket} is very efficient, and this will not have much overhead at all.
+This might be considered suboptimal by some as it is not necessary to use the server as an intermediary (in this example at least). Though there is some truth to this, the above will work perfectly fine---and the aim here is to make JavaScript work with R---not alongside it. The WebSocket\index{WebSocket} is very efficient, and this will not have much overhead at all.
 
 ### Serialisation {#shiny-intro-serialise}
 
@@ -258,7 +253,7 @@ new jBox('Notice', {
 });
 ```
 
-The jBox notice is configured using a JSON object containing the options that define said notice to display (example above), including but not limited to the message. The most straightforward way to make all those options accessible to the server is to construct that list of options server-side before sending it to the front end. For instance, the \index{JSON} of options displayed above would look like the R list below.
+The jBox notice is configured using a JSON object containing the options that define said notice to display (example above), including but not limited to the message. The most straightforward way to make all those options accessible to the server is to construct that list of options server-side before sending it to the front end. For instance, the JSON\index{JSON} of options displayed above would look like the R list below.
 
 
 ```r
@@ -316,14 +311,10 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/jbox-custom} 
-
-}
-
-\caption{Customised jBox notice}(\#fig:jbox-custom)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/jbox-custom.png" alt="Customised jBox notice" width="100%" />
+<p class="caption">(\#fig:jbox-custom)Customised jBox notice</p>
+</div>
 
 ### JavaScript to R {#shiny-intro-js2r}
 
@@ -392,7 +383,7 @@ message$onClose("Closing!")
 
 This explains how the event is used in jBox (and many other libraries), but the body of the callback used previously is empty and therefore will not do anything: we need it to send data back to the R server so it can be notified when the notice is closed. 
 
-This can be done by defining a simplified Shiny input. While the book will eventually cover fully-fledged \index{Shiny} inputs that can be registered, updated, and more, there is also a simplified version of the latter, which allows sending reactive input values to the server, where it can be used just like any other inputs (`input$id`). The value of the input can be defined using the `setInputValue` method, which takes the `id` of the input and the `value` to give it.
+This can be done by defining a simplified Shiny input. While the book will eventually cover fully-fledged Shiny\index{Shiny} inputs that can be registered, updated, and more, there is also a simplified version of the latter, which allows sending reactive input values to the server, where it can be used just like any other inputs (`input$id`). The value of the input can be defined using the `setInputValue` method, which takes the `id` of the input and the `value` to give it.
 
 Below place `Shiny.setInputValue('notice_close', true)` in the body of the function so the input `input$notice_close` will be set to `TRUE` when the notice closes.
 
@@ -488,13 +479,9 @@ shinyApp(ui, server)
 #> [1] TRUE
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/jbox-end} 
-
-}
-
-\caption{jBox final application}(\#fig:jbox-end)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/jbox-end.png" alt="jBox final application" width="100%" />
+<p class="caption">(\#fig:jbox-end)jBox final application</p>
+</div>
 
 In the next chapter, we will build another application that makes use of bidirectional communication but also introduces a few more concepts to improve how such communication takes place and allows passing more complex messages from R to JavaScript and vice versa. 

@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2021-04-14" />
+<meta name="date" content="2021-04-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -464,7 +464,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="widgets-full" class="section level1">
 <h1><span class="header-section-number">Chapter 7</span> The Full Monty</h1>
 <p>With a first widget built, one can jump onto another one: <a href="https://giojs.org/">gio.js</a>, a library to draw arcs between countries on a three-dimensional globe. This will include many more functionalities such packages can comprise.</p>
-<p>Then again, the first order of business when looking to integrate a library is to look at the documentation to understand what should be reproduced in R.</p>
+<p>Then again, the first order of business when looking to integrate a library is to look at the documentation to understand what should be reproduced in R. Figure <a href="widgets-full.html#fig:gio-example">7.1</a> is a very basic example of using Gio.js in HTML.</p>
 <div class="sourceCode" id="cb110"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb110-1" title="1"><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span></a>
 <a class="sourceLine" id="cb110-2" title="2"><span class="kw">&lt;html</span><span class="ot"> xmlns=</span><span class="st">&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="ot"> lang=</span><span class="st">&quot;&quot;</span><span class="ot"> xml:lang=</span><span class="st">&quot;&quot;</span><span class="kw">&gt;</span></a>
 <a class="sourceLine" id="cb110-3" title="3"></a>
@@ -585,7 +585,7 @@ FIGURE 7.1: Gio.js example
 <a class="sourceLine" id="cb116-7" title="7">  <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></a>
 <a class="sourceLine" id="cb116-8" title="8"></a>
 <a class="sourceLine" id="cb116-9" title="9"><span class="op">}</span></a></code></pre></div>
-<p>At this stage, the widget should generate a visualisation.</p>
+<p>At this stage, the widget should generate a visualisation (see Figure <a href="widgets-full.html#fig:gio-init">7.2</a>).</p>
 <div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb117-1" title="1">devtools<span class="op">::</span><span class="kw">document</span>()</a>
 <a class="sourceLine" id="cb117-2" title="2">devtools<span class="op">::</span><span class="kw">load_all</span>()</a>
 <a class="sourceLine" id="cb117-3" title="3"><span class="kw">gio</span>(<span class="dt">message =</span> <span class="st">&quot;This required but not used&quot;</span>)</a></code></pre></div>
@@ -803,11 +803,12 @@ FIGURE 7.2: Gio output without data
 FIGURE 7.3: Gio output with correct serialisation
 </p>
 </div>
+<p>Figure <a href="widgets-full.html#fig:gio-data">7.3</a> shows that the arcs correctly appear on the globe once the default serialiser has been modified.</p>
 </div>
 </div>
 <div id="widgets-full-on-print" class="section level2">
 <h2><span class="header-section-number">7.5</span> On Print Method</h2>
-<p>Let us add the option to style the globe: gio.js provides multiple <a href="https://giojs.org/html/docs/colorStyle.html">themes</a> but they are currently not applicable from R. As a matter of fact, gio.js provides dozens of customisation options that should be available in the package as well. These, however, probably should be split across different functions, just like they are in gio.js, rather than all be accessible from a single function containing hundreds of arguments. This begs the question, when would one use another function given the function <code>gio</code> generates the visualisation? As it happens <code>gio</code> itself (or rather the function <code>htmlwidgets::createWidget</code> it contains) does not render the output; it returns an object of class “htmlwidget,” which renders the  on print (literally <code>htmlwidget.print</code> method).</p>
+<p>Let us add the option to style the globe: gio.js provides multiple <a href="https://giojs.org/html/docs/colorStyle.html">themes</a> but they are currently not applicable from R. As a matter of fact, gio.js provides dozens of customisation options that should be available in the package as well. These, however, probably should be split across different functions, just like they are in gio.js, rather than all be accessible from a single function containing hundreds of arguments. This begs the question, when would one use another function given the function <code>gio</code> generates the visualisation? As it happens <code>gio</code> itself (or rather the function <code>htmlwidgets::createWidget</code> it contains) does not render the output; it returns an object of class “htmlwidget,” which renders the visualisation on print (literally <code>htmlwidget.print</code> method).</p>
 <div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb132-1" title="1">g &lt;-<span class="st"> </span><span class="kw">gio</span>(arcs) <span class="co"># nothing renders</span></a>
 <a class="sourceLine" id="cb132-2" title="2">g <span class="co"># visualisation renders</span></a></code></pre></div>
 <p>Therefore, one can use functions on the object returned by <code>gio</code>, which contains, amongst other things, the <code>x</code> list to which we can make changes, append data, or do any other operation that standard R lists allow.</p>
@@ -839,7 +840,7 @@ FIGURE 7.3: Gio output with correct serialisation
 <a class="sourceLine" id="cb135-9" title="9">  <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></a>
 <a class="sourceLine" id="cb135-10" title="10"></a>
 <a class="sourceLine" id="cb135-11" title="11"><span class="op">}</span></a></code></pre></div>
-<p>We can now run <code>devtools::load_all</code> to export the newly written function and load the functions in the environment with <code>devtools::load_all</code>.</p>
+<p>We can now run <code>devtools::load_all</code> to export the newly written function and load the functions in the environment with <code>devtools::load_all</code> as shown in Figure <a href="widgets-full.html#fig:gio-style">7.4</a>.</p>
 <div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb136-1" title="1">g1 &lt;-<span class="st"> </span><span class="kw">gio</span>(arcs)</a>
 <a class="sourceLine" id="cb136-2" title="2">g2 &lt;-<span class="st"> </span><span class="kw">gio_style</span>(g1, <span class="st">&quot;juicyCake&quot;</span>)</a>
 <a class="sourceLine" id="cb136-3" title="3"></a>

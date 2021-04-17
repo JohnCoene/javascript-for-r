@@ -33,7 +33,7 @@ arcs <- jsonlite::fromJSON(
 
 Both the plotly and DT packages support crosstalk, therefore using a shared dataset we can produce a scatter plot with the former and a table with the latter, so that selection of data in one is reflected in the other.
 
-As alluded to earlier on, this can be achieved by using a shared dataset, which can be created with the `SharedData` R6 class from the crosstalk package. This dataset is then used as one would use a standard dataframe in plotly and DT. The `bscols` function is just a helper to create columns from HTML elements (using bootstrap). It is ideal for examples, but one should not have to use it in \index{Shiny}---crosstalk will work without `bscols`.
+As alluded to earlier on, this can be achieved by using a shared dataset, which can be created with the `SharedData` R6 class from the crosstalk package. This dataset is then used as one would use a standard dataframe in plotly and DT. The `bscols` function is just a helper to create columns from HTML elements (see Figure \@ref(fig:crosstalk-1)). It is ideal for examples, but one should not have to use it in Shiny\index{Shiny}---crosstalk will work without `bscols`.
 
 ```r
 library(DT)
@@ -52,7 +52,7 @@ bscols(
 knitr::include_graphics("images/crosstalk.png")
 ```
 
-Basic usage of crosstalk datasets in shiny is also straightforward since it accepts reactive expressions to create shared datasets. Note that it takes the expression itself (`expression`) not the output of the expression (`expression()`); the crosstalk documentation explains it best:
+Basic usage of crosstalk datasets in shiny (Figure \@ref(fig:crosstalk-shiny)) is also straightforward since it accepts reactive expressions to create shared datasets. Note that it takes the expression itself (`expression`) not the output of the expression (`expression()`); the crosstalk documentation explains it best:
 
 > If this feels foreign to you, think of how you pass a function name, not a function call, to `lapply`; that’s exactly analogous to what we’re doing here. 
 > 
@@ -179,7 +179,7 @@ Other than tabular data, crosstalk will require the widget to have the necessary
 
 ## How it Works {#linking-widgets-inner-workings}
 
-As will be discovered later when support for crosstalk is brought to gio, minimal changes of the R code is required. As might be expected, crosstalk enables the communication between widgets via JavaScript. Hence much of what must be adapted by widgets developers happens in JavaScript too.
+As will be discovered later when support for crosstalk is brought to gio, minimal changes of the R code is required. As might be expected, crosstalk enables the communication between widgets via JavaScript. Hence much of what must be adapted by widgets developers happens in JavaScript too as shown in Figure \@ref(fig:crosstalk-diagram).
 
 ```{r crosstalk-diagram, fig.pos="H", echo=FALSE, fig.cap='Crosstalk visualised'}
 d <- DiagrammeR::grViz("
@@ -258,7 +258,7 @@ In JavaScript, a widget "receives" the keys of selected and filtered data points
 
 ### Groups {#linking-widgets-groups}
 
-Internally crosstalk knows what to share across widgets; with `group`s groups share `key`s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other. 
+Internally crosstalk knows what to share across widgets; with `group`s that share `key`s and are isolated from each other so one can use multiple different shared datasets without them interfering with each other (see Figure \@ref(fig:crosstalk-groups-diagram)). 
 
 ```{r crosstalk-groups-diagram, fig.pos="H", echo=FALSE, fig.cap='Crosstalk groups visualised'}
 d <- DiagrammeR::grViz("
@@ -367,7 +367,7 @@ shared_arcs$groupName()
 shared_arcs$key()
 ```
 
-The methods `origData` and `groupName` must be used in every widget, the `key` method may not be of use to every widget, it can be immensely useful if the \index{visualisation} library also comes with a key/id system so one can use it internally. Gio.js does not, and we thus will not be using it. The name of the group is passed to the `x` object, so it is accessible JavaScript-side where it is needed; we also add the JavaScript dependency required to run crosstalk with `crosstalkLibs`.
+The methods `origData` and `groupName` must be used in every widget, the `key` method may not be of use to every widget, it can be immensely useful if the visualisation\index{visualisation} library also comes with a key/id system so one can use it internally. Gio.js does not, and we thus will not be using it. The name of the group is passed to the `x` object, so it is accessible JavaScript-side where it is needed; we also add the JavaScript dependency required to run crosstalk with `crosstalkLibs`.
 
 ```r
 gio <- function(data, width = NULL, height = NULL, 
@@ -523,7 +523,7 @@ sel_handle.on("change", function(e) {
 
 Finally, now that gio supports shared datasets, we can create a few examples to demonstrate how it can be used. 
 
-The simplest way is probably to convert the edges to a shared dataset specifying either the source (`i`) or target (`e`) country codes as keys. However, this is unlikely to be used this way out in the real world. In the example below, selecting an edge highlights a node, which is somewhat confusing.
+The simplest way is probably to convert the edges to a shared dataset specifying either the source (`i`) or target (`e`) country codes as keys. However, this is unlikely to be used this way out in the real world. In Figure \@ref(fig:crosstalk-gio-1), selecting an edge highlights a node, which is somewhat confusing.
 
 ```r
 library(DT)
@@ -550,7 +550,7 @@ bscols(
 knitr::include_graphics("images/crosstalk-gio-1.png")
 ```
 
-Thankfully we can use the `group` argument in order to create edges and nodes that share keys and produce a more sensible link between widgets. 
+Thankfully we can use the `group` argument in order to create edges and nodes that share keys (see Figure \@ref(fig:crosstalk-gio-diagram)) and produce a more sensible link between widgets. 
 
 ```{r crosstalk-gio-diagram, fig.pos="H", echo=FALSE, fig.cap='Crosstalk with gio'}
 d <- DiagrammeR::grViz("
@@ -580,7 +580,7 @@ digraph {
 include_widget(d, "03-crosstalk-gio.png")
 ```
 
-Below we create two shared datasets with the same group name, one for the edges and another for the nodes. Use one for the gio visualisation and the other for the plotly graph.
+Below we create two shared datasets with the same group name, one for the edges and another for the nodes to produce Figure \@ref(fig:crosstalk-gio-2). Use one for the gio visualisation and the other for the plotly graph.
 
 ```r
 library(gio)

@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2021-04-14" />
+<meta name="date" content="2021-04-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -463,7 +463,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="shiny-complete" class="section level1">
 <h1><span class="header-section-number">Chapter 12</span> A Complete Integration</h1>
-<p>Thus far, this part of the book has covered both ways data travels between JavaScript and R in . However, the notices displayed in the previous chapter, though they demonstrate how both languages can work together within Shiny, come short of illustrating some more advanced use cases, how to package such code and more.</p>
+<p>Thus far, this part of the book has covered both ways data travels between JavaScript and R in Shiny. However, the notices displayed in the previous chapter, though they demonstrate how both languages can work together within Shiny, come short of illustrating some more advanced use cases, how to package such code and more.</p>
 <p>We shall introduce a fascinating JavaScript library that enables running machine learning models in web browsers: <a href="https://learn.ml5js.org/">ml5.js</a>. The library is a high-level interface to <a href="https://www.tensorflow.org/js">tensorflow.js</a> but very extensive as it includes a multitude of models to deal with sound, image, text, and more. In this chapter, one of those models is implemented, an image classifier using <a href="https://arxiv.org/abs/1704.04861">mobileNet</a> but the method shown can be used to integrate any other model later on.</p>
 <p>This is not a gimmick; running a model this way means it runs in the client (web browsers) and not on the Shiny server, leaving it free to compute anything else and serve other concurrent users. It’s also fast; JavaScript is often wrongly believed to be slow, on the contrary. Finally, the JavaScript API provided is straightforward; it’s impressive how ml5.js exposes complex models through such a simple API.</p>
 <p>For those who may already know TensorFlow and want to use a lower-level library, the genius of <a href="https://www.tensorflow.org/js">tensorflow.js</a> is that it runs on WebGL and is therefore GPU-accelerated; i.e., it’s not slow, and has a very similar API to the TensorFlow Python library.</p>
@@ -485,13 +485,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb214-12" title="12">    <span class="va">console</span>.<span class="at">log</span>(results)<span class="op">;</span></a>
 <a class="sourceLine" id="cb214-13" title="13">  <span class="op">}</span></a>
 <a class="sourceLine" id="cb214-14" title="14">)<span class="op">;</span></a></code></pre></div>
-<p>First, the image <code>classifier</code> is initialised from the <code>ml5</code> object with the <code>imageClassifier</code> method. This method takes two arguments: the name of the pre-trained model to use (<code>MobileNet</code>) and a callback function that is run when the model is loaded. The <code>classify</code> method from the <code>classifier</code> is used with, again, two arguments: 1) the  element that contains the image (<code>&lt;img /&gt;</code>) and 2) a callback function to do something with the results of the classification.</p>
-<p>Now we can jump to the next section to think about how this can be implemented in .</p>
+<p>First, the image <code>classifier</code> is initialised from the <code>ml5</code> object with the <code>imageClassifier</code> method. This method takes two arguments: the name of the pre-trained model to use (<code>MobileNet</code>) and a callback function that is run when the model is loaded. The <code>classify</code> method from the <code>classifier</code> is used with, again, two arguments: 1) the DOM element that contains the image (<code>&lt;img /&gt;</code>) and 2) a callback function to do something with the results of the classification.</p>
+<p>Now we can jump to the next section to think about how this can be implemented in Shiny.</p>
 </div>
 <div id="shiny-complete-setup" class="section level2">
 <h2><span class="header-section-number">12.2</span> Setup</h2>
 <p>In Shiny, a dropdown menu could be provided to choose from pre-selected images, and upon selection, the server renders the selected image. At the click of a button the model then runs and sends the results to the R server, which prints them in the UI.</p>
-<p>This makes for what is probably a signature of Shiny: a considerable amount of bi-directional communication between the server and client as Shiny makes the most of the . Some readers with more advanced knowledge in JavaScript will find ways to avoid the use of the server in places to do more in the client; either way works.</p>
+<p>This makes for what is probably a signature of Shiny: a considerable amount of bi-directional communication between the server and client as Shiny makes the most of the WebSocket. Some readers with more advanced knowledge in JavaScript will find ways to avoid the use of the server in places to do more in the client; either way works.</p>
 </div>
 <div id="shiny-complete-dependencies" class="section level2">
 <h2><span class="header-section-number">12.3</span> Dependencies</h2>
@@ -544,7 +544,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="shiny-complete-skeleton" class="section level2">
 <h2><span class="header-section-number">12.5</span> Skeleton</h2>
 <p>At this stage, it’s probably good to build a skeleton of the application.</p>
-<p>After loading the  package, we use the <code>addResourcePath</code> function to serve the images so they can be made accessible by the Shiny UI to display. At this stage, the application itself only provides a dropdown to select one of the two images previously downloaded, and a button to trigger the classification, which currently does not do anything, we’ll delve into this next. Since we placed the <code>classify.js</code> JavaScript file in the <code>assets</code> directory we can also import it in the UI with a <code>script</code> tag; importantly this is done <em>after</em> the ml5.js dependency as it will depend on it. Another crucial thing that the app does is set the attribute <code>id</code> of the <code>&lt;img&gt;</code> to <code>bird</code> it is essential to have a convenient way to uniquely identify the image later on as ml5.js will need to read this image in order to classify it.</p>
+<p>After loading the Shiny package, we use the <code>addResourcePath</code> function to serve the images so they can be made accessible by the Shiny UI to display. At this stage, the application itself only provides a dropdown to select one of the two images previously downloaded, and a button to trigger the classification, which currently does not do anything, we’ll delve into this next. Since we placed the <code>classify.js</code> JavaScript file in the <code>assets</code> directory we can also import it in the UI with a <code>script</code> tag; importantly this is done <em>after</em> the ml5.js dependency as it will depend on it. Another crucial thing that the app does is set the attribute <code>id</code> of the <code>&lt;img&gt;</code> to <code>bird</code> it is essential to have a convenient way to uniquely identify the image later on as ml5.js will need to read this image in order to classify it.</p>
 <div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb220-1" title="1"><span class="kw">library</span>(shiny)</a>
 <a class="sourceLine" id="cb220-2" title="2"></a>
 <a class="sourceLine" id="cb220-3" title="3"><span class="co"># serve images</span></a>
@@ -712,7 +712,7 @@ FIGURE 12.3: Classifier basic output
 </div>
 <div id="shiny-complete-input-handler" class="section level2">
 <h2><span class="header-section-number">12.8</span> Input handler</h2>
-<p>In the previous section on sending data from R to JavaScript, we used a “message handler” in JavaScript to handle the data coming from the server. There is also the corollary, an “input handler” to preprocess the data coming from JavaScript before it is made accessible by the input. In R, this is a function that must accept three arguments: the data coming to JavaScript, a  session, and the name of the input. Note that all of these arguments are mandatory if they are not used in the function we can use the three-dot construct instead.</p>
+<p>In the previous section on sending data from R to JavaScript, we used a “message handler” in JavaScript to handle the data coming from the server. There is also the corollary, an “input handler” to preprocess the data coming from JavaScript before it is made accessible by the input. In R, this is a function that must accept three arguments: the data coming to JavaScript, a Shiny session, and the name of the input. Note that all of these arguments are mandatory if they are not used in the function we can use the three-dot construct instead.</p>
 <p>Input handlers are most often used to reshape or change the type of the data coming in. To demonstrate how to use them, we will reshape the classification results sent to R as looking at the results of the classification in the R server one might notice a row-wise list, which can be transformed into a <code>data.frame</code>. The function below makes use of the <a href="https://github.com/tidyverse/purrr/">purrr</a> <span class="citation">(Henry and Wickham <a href="#ref-R-purrr">2020</a>)</span> package to loop over every result and transform them into data.frames and return a single data.frame.</p>
 <div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb226-1" title="1"><span class="co"># create handler</span></a>
 <a class="sourceLine" id="cb226-2" title="2">process_results &lt;-<span class="st"> </span><span class="cf">function</span>(data, ...){</a>
@@ -807,7 +807,7 @@ FIGURE 12.4: Classifier table output
 <div id="shiny-complete-pkg-deps" class="section level3">
 <h3><span class="header-section-number">12.9.1</span> Dependencies</h3>
 <p>In the application, the web-hosted dependencies (CDN) were used. There are two advantages to using CDNs: 1) it’s just convenient as one does not have to download them, 2) it’s fast—CDNs are distributed geographically to improve the speed at which they serve the dependencies and will therefore generally outperform the alternative, serving the files locally. This may raise questions when building a package though, as one generally wants these to be as modular, self-contained, and reproducible as possible, and none of these things go well with the idea of a remotely served dependency that is absolutely central to the package. The package should therefore provide both ways of importing dependencies: via the CDN or using locally-stored files. The former will be faster while the latter can be used as a fallback in the event there is an issue with the CDN or one does not have internet for instance.</p>
-<p>We can download the dependency hosted on the  and place it in the <code>inst</code> directory of the package. We also create another JavaScript <code>classify.js</code> that will contain the custom JavaScript code (message handler, etc.) as was done for the application.</p>
+<p>We can download the dependency hosted on the CDN and place it in the <code>inst</code> directory of the package. We also create another JavaScript <code>classify.js</code> that will contain the custom JavaScript code (message handler, etc.) as was done for the application.</p>
 <div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb232-1" title="1"><span class="co"># create directory</span></a>
 <a class="sourceLine" id="cb232-2" title="2"><span class="kw">dir.create</span>(<span class="st">&quot;inst&quot;</span>)</a>
 <a class="sourceLine" id="cb232-3" title="3"></a>

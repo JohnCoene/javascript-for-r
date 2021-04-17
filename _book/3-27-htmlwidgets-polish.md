@@ -79,7 +79,7 @@ This small change makes the package a great deal more comfortable to use and und
 
 Some JavaScript libraries can be extensive and come with thousands of options that can make the port to R rather bulky. Never hesitate to make use of the three dots construct (`...`) to make these accessible yet saving you from having to hard-code thousands of arguments.
 
-For instance, gio.js accepts a \index{JSON} of options to customise the globe further. One could port all of these manually, or allow users to specify those configurations via the three-dot construct.
+For instance, gio.js accepts a JSON\index{JSON} of options to customise the globe further. One could port all of these manually, or allow users to specify those configurations via the three-dot construct.
 
 ```js
 var configs = {
@@ -138,7 +138,7 @@ In JavaScript, use the `configs` when initialising the visualisation.
 controller = new GIO.Controller(el, x.configs);
 ```
 
-Below those configuration options are now used to set the initially selected country to the United States and change the colour of the selected country to red.
+Below those configuration options are now used to set the initially selected country to the United States and change the colour of the selected country to red in Figure \@ref(fig:crosstalk-three-dots).
 
 ```r
 gio(
@@ -148,14 +148,10 @@ gio(
 ) 
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/crosstalk-three-dots} 
-
-}
-
-\caption{Gio and plenty of options}(\#fig:crosstalk-three-dots)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/crosstalk-three-dots.png" alt="Gio and plenty of options" width="100%" />
+<p class="caption">(\#fig:crosstalk-three-dots)Gio and plenty of options</p>
+</div>
 
 ## Interface Design {#widgets-final-interface}
 
@@ -163,14 +159,13 @@ As you develop a wrapper to an external visualisation library, you will have to 
 
 As observed, the gio.js library has a function named `setStyle` to change the theme of the visualisation, but it has numerous others, `setSurfaceColor`, `addHalo`, `setHaloColor`, `removeHalo`, and plenty more. We might want to wrap all or some of these in a single function to provide a more convenient API to the R user. 
 
-\begin{rmdnote}
-Design for humans: always keep in mind the interface you make available
-to users as you develop the package.
-\end{rmdnote}
+<div class="rmdnote">
+<p>Design for humans: always keep in mind the interface you make available to users as you develop the package.</p>
+</div>
 
 You can always go beyond what the underlying library provides. For instance, the country selected by default is always China, regardless of whether the data includes that country or not. This can lead to creating underwhelming visualisations as no arcs appear. One can consider adding simple heiristics to the `gio` function to ensure that is not the case, or have the function throw a warning when the initial country is not present in the dataset.
 
-Finally, consider R users' expectations. There are many prominent \index{visualisation} packages on CRAN already, users of the gio package will likely have used ggplot2 [@R-ggplot2], plotly, or highcharter before. Though these provide somewhat different APIs, they set precedents. The more the API of gio resembles those, the easier it will be for new users to start using gio. However, do not let this restrict the package either. Never hesitate to do differently than ggplot2 if you think it will provide a better interface to your users.
+Finally, consider R users' expectations. There are many prominent visualisation\index{visualisation} packages on CRAN already, users of the gio package will likely have used ggplot2 [@R-ggplot2], plotly, or highcharter before. Though these provide somewhat different APIs, they set precedents. The more the API of gio resembles those, the easier it will be for new users to start using gio. However, do not let this restrict the package either. Never hesitate to do differently than ggplot2 if you think it will provide a better interface to your users.
 
 ## Exercises {#widgets-final-exercises}
 

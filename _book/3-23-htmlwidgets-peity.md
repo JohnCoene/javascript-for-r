@@ -34,13 +34,13 @@ As done with candidate libraries, as explained in an earlier chapter, there is n
 </html>
 ```
 
-Peity.js depends on jQuery. Hence the latter is imported first; the data for the chart is placed in a `<span>`, and the `peity` method is then used on the element containing the data. Peity.js uses `<span>` \index{HTML} tags as these work inline, using a `<div>` the chart will still display, but the purpose of using peity.js would be defeated.
+Peity.js depends on jQuery. Hence the latter is imported first; the data for the chart is placed in a `<span>`, and the `peity` method is then used on the element containing the data. Peity.js uses `<span>` HTML\index{HTML} tags as these work inline, using a `<div>` the chart will still display, but the purpose of using peity.js would be defeated.
 
 ## Dependencies {#widgets-realistic-deps}
 
 Once the package is created and the widget scaffold laid down, we need to add the JavaScript dependencies without which nothing can move forward.
 
-Two dependencies are required in order for peity.js to run: peity.js and jQuery. Instead of using the \index{CDN} those are downloaded as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Each of the two libraries is placed in its own respective directory.
+Two dependencies are required in order for peity.js to run: peity.js and jQuery. Instead of using the CDN\index{CDN} those are downloaded as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Each of the two libraries is placed in its own respective directory.
 
 ```r
 dir.create("./inst/htmlwidgets/jquery")
@@ -106,10 +106,9 @@ dependencies:
     script: jquery.peity.min.js
 ```
 
-\begin{rmdnote}
-The order of the dependencies matters. Peity.js depends on jQuery hence
-the latter comes first in the \texttt{.yaml}.
-\end{rmdnote}
+<div class="rmdnote">
+<p>The order of the dependencies matters. Peity.js depends on jQuery hence the latter comes first in the <code>.yaml</code>.</p>
+</div>
 
 The order in which one specifies the dependencies matters, just like it does in an HTML file, therefore jQuery is listed first. The `stylesheet` entries were removed as none of these libraries require CSS files. The `src` path points to the directory containing the JavaScript files and stylesheets relative to the `inst` directory of the package; this is akin to using the `system.file` function to return the full path to a file or directory within the package.
 
@@ -314,16 +313,12 @@ browsable(
 
 
 
-\begin{figure}[H]
+<div class="figure" style="text-align: center">
+<img src="images/peity-div.png" alt="Peity output with DIV" width="100%" />
+<p class="caption">(\#fig:peity-divs)Peity output with DIV</p>
+</div>
 
-{\centering \includegraphics[width=1\linewidth]{images/peity-div} 
-
-}
-
-\caption{Peity output with DIV}(\#fig:peity-divs)
-\end{figure}
-
-There is nonetheless one remaining issue: peity.js is meant to create inline charts within `<span>` HTML tags but these are created within `<div>` hence each chart appears on a new line.
+There is nonetheless one remaining issue in Figure \@ref(fig:peity-divs): peity.js is meant to create inline charts within `<span>` HTML tags but these are created within `<div>` hence each chart appears on a new line.
 
 ## HTML Element {#widgets-realistic-html-element}
 
@@ -345,7 +340,7 @@ myWidget_html <- function(..., class){
 }
 ```
 
-Reloading the package after placing the function above anywhere in the package will produce inline charts.
+Reloading the package after placing the function above anywhere in the package will produce inline charts, as show in Figure \@ref(fig:peity-spans).
 
 ```r
 browsable(
@@ -360,11 +355,7 @@ browsable(
 )
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/peity-span} 
-
-}
-
-\caption{Peity output with SPAN}(\#fig:peity-spans)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/peity-span.png" alt="Peity output with SPAN" width="100%" />
+<p class="caption">(\#fig:peity-spans)Peity output with SPAN</p>
+</div>

@@ -1,6 +1,6 @@
 # Basics of Building Widgets {#widgets-basics}
 
-Having explored existing packages that build on top of the \index{htmlwidgets} package gives some idea of the end product, but much of how it works and where to start probably remains somewhat mysterious. 
+Having explored existing packages that build on top of the htmlwidgets\index{htmlwidgets} package gives some idea of the end product, but much of how it works and where to start probably remains somewhat mysterious. 
 
 
 
@@ -24,7 +24,7 @@ Before going down the rabbit hole, let us explore the types of libraries you wil
 
 [Plotly.js](https://plotly.com/javascript/) is probably one of the more popular out there; it provides over 40 fully customisable chart types, many of which are very sophisticated. That is indeed the JavaScript library used by the R package of the same name: plotly.
 
-Looking at the code presented in the "Get Started" guide reveals just how convenient the library is. In Figure \@ref(fig:candidate-plotly) we import plotly, of course, then have a `<div>` where the visualisation will be placed. Then, using `Plotly.newPlot`, create the actual visualisation by passing it first the element previously mentioned and a \index{JSON} of options that describe the chart.
+Looking at the code presented in the "Get Started" guide reveals just how convenient the library is. In Figure \@ref(fig:candidate-plotly) we import plotly, of course, then have a `<div>` where the visualisation will be placed. Then, using `Plotly.newPlot`, create the actual visualisation by passing it first the element previously mentioned and a JSON\index{JSON} of options that describe the chart.
 
 ```html
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
@@ -47,20 +47,16 @@ Looking at the code presented in the "Get Started" guide reveals just how conven
 </html>
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/candidate-plotly} 
-
-}
-
-\caption{Plotly example}(\#fig:candidate-plotly)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/candidate-plotly.png" alt="Plotly example" width="100%" />
+<p class="caption">(\#fig:candidate-plotly)Plotly example</p>
+</div>
 
 Now let's look at how another popular library does it.
 
 ### Highchart.js {#widgets-basics-candidates-highcharts}
 
-[Highcharts](https://www.highcharts.com/) is another library that allows creating gorgeous \index{visualisation}, maps, and more; it's also very popular, albeit not being entirely free.
+[Highcharts](https://www.highcharts.com/) is another library that allows creating gorgeous visualisation\index{visualisation}, maps, and more; it's also very popular, albeit not being entirely free.
 
 ```html
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
@@ -90,14 +86,10 @@ Now let's look at how another popular library does it.
 </html>
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/candidate-highcharts} 
-
-}
-
-\caption{Highcharts example}(\#fig:candidate-highcharts)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/candidate-highcharts.png" alt="Highcharts example" width="100%" />
+<p class="caption">(\#fig:candidate-highcharts)Highcharts example</p>
+</div>
 
 Figure \@ref(fig:candidate-highcharts) is very similar to what plotly.js requires: import libraries, create a `<div>` where to put the visualisation. Then, to create the chart, run a function which also takes the id of the div where to place said chart and a JSON of options defining the actual chart, including the data.
 
@@ -134,34 +126,31 @@ Figure \@ref(fig:candidate-highcharts) is very similar to what plotly.js require
 </html>
 ```
 
-\begin{figure}[H]
+<div class="figure" style="text-align: center">
+<img src="images/candidate-chartjs.png" alt="Chart.js example" width="100%" />
+<p class="caption">(\#fig:candidate-chartjs)Chart.js example</p>
+</div>
 
-{\centering \includegraphics[width=1\linewidth]{images/candidate-chartjs} 
-
-}
-
-\caption{Chart.js example}(\#fig:candidate-chartjs)
-\end{figure}
-
-In Figure \@ref(fig:candidate-chartjs), we again observe a very similar structure as with previous libraries. The library is imported; instead of a `div` chart.js uses a `canvas`, the \index{visualisation} is also created from a single function which takes the canvas as first argument and a JSON of options as second.
+In Figure \@ref(fig:candidate-chartjs), we again observe a very similar structure as with previous libraries. The library is imported; instead of a `div` chart.js uses a `canvas`, the visualisation\index{visualisation} is also created from a single function which takes the canvas as first argument and a JSON of options as second.
 
 Hopefully, this reveals the repeating structure such libraries tend to follow as well as demonstrate how little JavaScript code is involved. It also hints at what should be reproduced, to some extent at least, using R.
 
 ## How It Works {#widgets-basics-inner-workings}
 
-Imagine there is no such package as \index{htmlwidgets} to help create interactive visualisations from R: how would one attempt to go about it?
+Imagine there is no such package as htmlwidgets\index{htmlwidgets} to help create interactive visualisations from R: how would one attempt to go about it?
 
-As observed, an interactive visualisation using JavaScript will be contained within an \index{HTML} document. Therefore it would probably have to be created first. Secondly, the visualisation that is yet to be created likely relies on external libraries; these would need to be imported in the document. The document should also include an HTML element (e.g.: `<div>`) to host said \index{visualisation}. Then data would have to be serialised in R and embedded into the document, where it should be read by JavaScript code that uses it to create the visualisation. Finally, all should be managed to work seamlessly across R markdown, \index{Shiny}, and other environments.
+As observed, an interactive visualisation using JavaScript will be contained within an HTML\index{HTML} document. Therefore it would probably have to be created first. Secondly, the visualisation that is yet to be created likely relies on external libraries; these would need to be imported in the document. The document should also include an HTML element (e.g.: `<div>`) to host said visualisation\index{visualisation}. Then data would have to be serialised in R and embedded into the document, where it should be read by JavaScript code that uses it to create the visualisation. Finally, all should be managed to work seamlessly across R markdown, Shiny\index{Shiny}, and other environments.
 
 This gives the basic diagram shown in Figure \@ref(fig:widget-inner-diagram); it will be broken down further in the next chapter as the first widget is built.
 
-\begin{figure}[H]
+<div class="figure" style="text-align: center">
 
-{\centering \includegraphics[width=1\linewidth]{images/03-htmlwidget-viz} 
+```{=html}
+<div id="htmlwidget-e4c68eb61b801bb14155" style="width:100%;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e4c68eb61b801bb14155">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR]\n\n  subgraph cluster_0 {\n    node [shape=box]\n    \"HTML element\"\n    \"JSON\"\n    \"JavaScript\"\n    \"Dependencies\"\n    label=\"HTML\"\n    color=gold\n  }\n\n  subgraph cluster_1 {\n    node [shape=box]\n    \"Data\"\n    \"Chart options\"\n    label = \"R environment\"\n    color=royalBlue\n  }\n\n  \"Data\" -> \"JSON\" \n  \"Chart options\" -> \"JSON\" [label=\"serialise\" constraint=false]\n  \"JSON\" -> \"JavaScript\"\n  \"JavaScript\" -> \"HTML element\"\n  \"Dependencies\" -> \"JavaScript\"\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+```
 
-}
-
-\caption{htmlwidgets inner-workings visualised}(\#fig:widget-inner-diagram)
-\end{figure}
+<p class="caption">(\#fig:widget-inner-diagram)htmlwidgets inner-workings visualised</p>
+</div>
 
 Thankfully the htmlwidgets package is there to handle most of this. Nonetheless, it is essential to understand that these operations are undertaken (to some degree) by htmlwidgets.

@@ -1,6 +1,6 @@
 # Advanced Topics {#widgets-adv}
 
-In the previous chapter, we put together an attractive, fully-functioning widget, but it lacks polish and does not use all the features htmlwidgets provides; this chapter explores those. We look into handling the size of widgets to ensure they are responsive as well as discuss potential security concerns and how to address them. Finally, we show how to pass JavaScript code from R to JavaScript and how to add \index{HTML} content before and after the widget.
+In the previous chapter, we put together an attractive, fully-functioning widget, but it lacks polish and does not use all the features htmlwidgets provides; this chapter explores those. We look into handling the size of widgets to ensure they are responsive as well as discuss potential security concerns and how to address them. Finally, we show how to pass JavaScript code from R to JavaScript and how to add HTML\index{HTML} content before and after the widget.
 
 ## Shared Variables {#widgets-adv-shared}
 
@@ -50,7 +50,7 @@ HTMLWidgets.widget({
 
 ### Sizing {#widgets-adv-sizing}
 
-The `gio` function of the package we developed in the previous chapter has arguments to specify the dimensions of the visualisation (width and height). However, think how rarely (if ever) one specifies these parameters when using plotly, highcharter, or leaflet. Indeed HTML visualisations should be responsive and fit the container they are placed in---not to be confused though; these are two different things. This enables creating visualisations that look great on large desktop screens as well as the smaller mobile phones or iPad screens. Pre-defining the dimensions of the \index{visualisation} (e.g.: `400px`), breaks all responsiveness as the width is no longer relative to its container. Using a relative width like `100%` ensures the visualisation always fits in the container edge to edge and enables responsiveness.
+The `gio` function of the package we developed in the previous chapter has arguments to specify the dimensions of the visualisation (width and height). However, think how rarely (if ever) one specifies these parameters when using plotly, highcharter, or leaflet. Indeed HTML visualisations should be responsive and fit the container they are placed in---not to be confused though; these are two different things. This enables creating visualisations that look great on large desktop screens as well as the smaller mobile phones or iPad screens. Pre-defining the dimensions of the visualisation\index{visualisation} (e.g.: `400px`), breaks all responsiveness as the width is no longer relative to its container. Using a relative width like `100%` ensures the visualisation always fits in the container edge to edge and enables responsiveness.
 
 ```r
 arcs <- jsonlite::fromJSON(
@@ -71,16 +71,12 @@ arcs <- jsonlite::fromJSON(
 gio(arcs)
 ```
 
-\begin{figure}[H]
+<div class="figure" style="text-align: center">
+<img src="images/gio-size-issue.png" alt="Gio with no sizing management" width="100%" />
+<p class="caption">(\#fig:gio-size-issue)Gio with no sizing management</p>
+</div>
 
-{\centering \includegraphics[width=1\linewidth]{images/gio-size-issue} 
-
-}
-
-\caption{Gio with no sizing management}(\#fig:gio-size-issue)
-\end{figure}
-
-When this is not specified, htmlwidgets sets the width of the visualisation to 400 pixels.
+When this is not specified, htmlwidgets sets the width of the visualisation to 400 pixels (see Figure \@ref(fig:gio-size-issue)).
 
 ```r
 gio(arcs, width = 500) # 500 pixels wide
@@ -119,18 +115,16 @@ htmlwidgets::createWidget(
 )
 ```
 
-\begin{figure}[H]
+<div class="figure" style="text-align: center">
+<img src="images/gio-fit.png" alt="Gio with sizing policy" width="100%" />
+<p class="caption">(\#fig:gio-fit)Gio with sizing policy</p>
+</div>
 
-{\centering \includegraphics[width=1\linewidth]{images/gio-fit} 
-
-}
-
-\caption{Gio with sizing policy}(\#fig:gio-fit)
-\end{figure}
+Figure \@ref(fig:gio-fit) shows the modified `sizingPolicy` produces a visualisation that fills the browser.
 
 ## Resizing {#widgets-adv-resizing}
 
-In the first widget built in this book (`playground`), we deconstructed the JavaScript `factory` function but omitted the `resize` function. The `resize` function does what it says on the tin: it is called when the widget is resized. What this function will contain entirely depends on the JavaScript library one is working with. Some are very easy to resize, other less so, that is for the developer to discover in the documentation of the library. Some libraries, like gio, do not even require using a resizing function and handle that automatically under the hood; resize the width of the RStudio viewer or web browser, and gio.js resizes too. This said, there is a function to force gio to \index{resize}. Though it is not in the official documentation, it can be found in the source code: `resizeUpdate` is a method of the controller and does not take any argument. 
+In the first widget built in this book (`playground`), we deconstructed the JavaScript `factory` function but omitted the `resize` function. The `resize` function does what it says on the tin: it is called when the widget is resized. What this function will contain entirely depends on the JavaScript library one is working with. Some are very easy to resize, other less so, that is for the developer to discover in the documentation of the library. Some libraries, like gio, do not even require using a resizing (see \@ref(fig:gio-small)) function and handle that automatically under the hood; resize the width of the RStudio viewer or web browser, and gio.js resizes too. This said, there is a function to force gio to resize\index{resize}. Though it is not in the official documentation, it can be found in the source code: `resizeUpdate` is a method of the controller and does not take any argument. 
 
 ```js
 ...
@@ -140,14 +134,10 @@ resize: function(width, height) {
 ...
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/gio-small} 
-
-}
-
-\caption{Gio resized}(\#fig:gio-small)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/gio-small.png" alt="Gio resized" width="100%" />
+<p class="caption">(\#fig:gio-small)Gio resized</p>
+</div>
 
 To give the reader a better idea of what these tend to look like below are the ways plotly, highcharts, and chart.js do it.
 
@@ -236,13 +226,13 @@ htmlwidgets::JS("var x = 3;")
 
 This can be useful where the library requires the use of callback functions, for instance.
 
-\begin{rmdnote}
-Replacing the serialiser will break this feature.
-\end{rmdnote}
+<div class="rmdnote">
+<p>Replacing the serialiser will break this feature.</p>
+</div>
 
 ## Prepend and Append Content {#widgets-adv-prepend-append}
 
-There is the ability to append or prepend HTML content to the widget (\index{Shiny}, htmltools tags, or a list of those). For instance, we could use `htmlwidgets::prependContent` to allow displaying a title to the visualisation, as shown below.
+There is the ability to append or prepend HTML content to the widget (Shiny\index{Shiny}, htmltools tags, or a list of those). For instance, we could use `htmlwidgets::prependContent` to allow displaying a title to the visualisation, as shown in Figure \@ref(fig:gio-title).
 
 ```r
 #' @export
@@ -257,37 +247,29 @@ gio(arcs) %>%
   gio_title("Gio.js htmlwidget!")
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/gio-title} 
-
-}
-
-\caption{Gio output with title}(\#fig:gio-title)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/gio-title.png" alt="Gio output with title" width="100%" />
+<p class="caption">(\#fig:gio-title)Gio output with title</p>
+</div>
 
 While the `prependContent` function places the content above the visualisation, the `appendContent` function places it below, as they accept any valid htmltools or Shiny tag they can also be used for conditional CSS styling for instance. 
 
-\begin{rmdnote}
-\texttt{prependContent} and \texttt{appendContent} do not work in Shiny.
-\end{rmdnote}
+<div class="rmdnote">
+<p><code>prependContent</code> and <code>appendContent</code> do not work in Shiny.</p>
+</div>
 
 ## Dependencies {#widgets-adv-dependencies}
 
-Thus far, this book has only covered one of two ways dependencies can be included in htmlwidgets. Though the one covered, using the `.yml` file will likely be necessary for every widget it has one drawback: all dependencies listed in the file are always included with the output. Dependencies can significantly affect the load time of the output (be it a standalone visualisation, an R markdown document, or a \index{Shiny} application) as these files may be large. Most large visualisation libraries will therefore allow bundling those dependencies in separate files. For instance, ECharts.js provides a way to customise the bundle to only include dependencies for charts that one wants to draw (e.g., bar chart, or boxplot), highcharts also allows splitting dependencies so one can load those needed for maps, stock charts, and more, separately. It is thus good practice to do the same in widgets, so only the required dependencies are loaded, e.g.: when the user produces a map, only the dependency for that map is loaded. It is used in the leaflet package to load map tiles, for instance.
+Thus far, this book has only covered one of two ways dependencies can be included in htmlwidgets. Though the one covered, using the `.yml` file will likely be necessary for every widget it has one drawback: all dependencies listed in the file are always included with the output. Dependencies can significantly affect the load time of the output (be it a standalone visualisation, an R markdown document, or a Shiny\index{Shiny} application) as these files may be large. Most large visualisation libraries will therefore allow bundling those dependencies in separate files. For instance, ECharts.js provides a way to customise the bundle to only include dependencies for charts that one wants to draw (e.g., bar chart, or boxplot), highcharts also allows splitting dependencies so one can load those needed for maps, stock charts, and more, separately. It is thus good practice to do the same in widgets, so only the required dependencies are loaded, e.g.: when the user produces a map, only the dependency for that map is loaded. It is used in the leaflet package to load map tiles, for instance.
 
-The Google Chrome network tab shows the information on resources downloaded by the browser (including dependencies) including how long it takes. It is advisable to take a look at it to ensure no dependency drags load time.
+The Google Chrome network tab (see Figure \@ref(fig:htmlwidgets-performances)) shows the information on resources downloaded by the browser (including dependencies) including how long it takes. It is advisable to take a look at it to ensure no dependency drags load time.
 
-\begin{figure}[H]
+<div class="figure" style="text-align: center">
+<img src="images/htmlwidgets-performances.png" alt="Google Chrome network tab" width="100%" />
+<p class="caption">(\#fig:htmlwidgets-performances)Google Chrome network tab</p>
+</div>
 
-{\centering \includegraphics[width=1\linewidth]{images/htmlwidgets-performances} 
-
-}
-
-\caption{Google Chrome network tab}(\#fig:htmlwidgets-performances)
-\end{figure}
-
-To demonstrate, we will add a function in gio to optionally include [stats.js](https://github.com/mrdoob/stats.js/), a JavaScript performance monitor which displays information such as the number of frames per second (FPS) rendered, or the number of milliseconds needed to render the \index{visualisation}. Gio.js natively supports stats.js, but the dependency needs to be imported, and that option needs to be enabled on the `controller` as shown in the [documentation](https://giojs.org/html/docs/interfaceStats.html).
+To demonstrate, we will add a function in gio to optionally include [stats.js](https://github.com/mrdoob/stats.js/), a JavaScript performance monitor which displays information such as the number of frames per second (FPS) rendered, or the number of milliseconds needed to render the visualisation\index{visualisation}. Gio.js natively supports stats.js, but the dependency needs to be imported, and that option needs to be enabled on the `controller` as shown in the [documentation](https://giojs.org/html/docs/interfaceStats.html).
 
 ```js
 // enable stats
@@ -334,7 +316,7 @@ gio_stats <- function(g){
 }
 ```
 
-Then we use the htmltools package to create a dependency, the `htmltools::htmlDependency` function returns an object of class `html_dependency`, which htmlwidgets can understand and subsequently insert in the output. On the `src` parameter, since we reference a dependency from the filesystem we name the character string `file`, but we could use the \index{CDN} (web-hosted file) and name it `href` instead.
+Then we use the htmltools package to create a dependency, the `htmltools::htmlDependency` function returns an object of class `html_dependency`, which htmlwidgets can understand and subsequently insert in the output. On the `src` parameter, since we reference a dependency from the filesystem we name the character string `file`, but we could use the CDN\index{CDN} (web-hosted file) and name it `href` instead.
 
 ```r
 # stats.R
@@ -412,7 +394,7 @@ if(x.stats)
 controller.init();
 ```
 
-Then the package can be documented to export the newly-created function and loaded in the environment to test the feature.
+Then the package can be documented to export the newly-created function and loaded in the environment to test the feature, as shown in FIgure \@ref(fig:gio-stats).
 
 ```r
 # create gio object
@@ -421,14 +403,10 @@ arcs %>%
   gio_stats()
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/stats} 
-
-}
-
-\caption{Gio with stats output}(\#fig:gio-stats)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/stats.png" alt="Gio with stats output" width="100%" />
+<p class="caption">(\#fig:gio-stats)Gio with stats output</p>
+</div>
 
 In brief, it is better to only place the hard dependencies in the `.yml` file; dependencies that are necessary to produce the visualisation and use dynamic dependencies where ever possible. Perhaps one can think of it as the difference between `Imports` and `Suggests` in an R package `DESCRIPTION` file.
 
@@ -498,7 +476,7 @@ test_that("gio has correct data", {
 
 A few hints have already been given to ensure one does not drain the browser; consider assessing the performances of the widget as it is being built. Always try and imagine what happens under the hood of the htmlwidget as you build it; it often reveals potential bottlenecks and solutions.
 
-Remember that data passed to `htmlwidgets::createWidget` is 1) loaded into R, 2) serialised to \index{JSON}, 3) embedded into the HTML output, 4) read back in with JavaScript, which adds some overhead considering it might be read into JavaScript directly. This will not be a problem for most visualisations but might become one when that data is large. Indeed, there are sometimes more efficient ways to load data into web browsers where it is needed for the visualisation.
+Remember that data passed to `htmlwidgets::createWidget` is 1) loaded into R, 2) serialised to JSON\index{JSON}, 3) embedded into the HTML output, 4) read back in with JavaScript, which adds some overhead considering it might be read into JavaScript directly. This will not be a problem for most visualisations but might become one when that data is large. Indeed, there are sometimes more efficient ways to load data into web browsers where it is needed for the visualisation.
 
 Consider for instance, geographic features (topoJSON and GeoJSON), why load them into R if it is to then re-serialise it to JSON?
 
@@ -526,6 +504,6 @@ load_json_from_ui <- function(path_to_json){
 }
 ```
 
-Using the above the data loaded would be accessible from the htmlwidgets JavaScript (e.g.: `gio.js`) with `window.globalData`. The `window` object is akin to the `document` object, while the latter pertains to the Document Object Model (\index{DOM}) and represents the page, the former pertains to the Browser Object Model (BOM) and represents the browser window. While `var x;` will only be accessible within the script where it is declared, `window.x` will be accessible anywhere.
+Using the above the data loaded would be accessible from the htmlwidgets JavaScript (e.g.: `gio.js`) with `window.globalData`. The `window` object is akin to the `document` object, while the latter pertains to the Document Object Model (DOM\index{DOM}) and represents the page, the former pertains to the Browser Object Model (BOM) and represents the browser window. While `var x;` will only be accessible within the script where it is declared, `window.x` will be accessible anywhere.
 
 Note this means the data is read from the web browser, and therefore the data must be accessible to the web browser; the `path_to_json` must thus be a served static file, e.g.: `www` directory in Shiny.

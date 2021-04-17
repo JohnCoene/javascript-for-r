@@ -56,7 +56,7 @@ packer::scaffold_widget("countup")
 ℹ Run `bundle` to build the JavaScript files
 ```
 
-Importantly, it runs `htmlwidgets::scaffoldWidget` internally, there is thus no need to run this function. About the widget itself, there is very little difference between what `htmlwidgets::scaffoldWidget` and `packer::scaffold_widget`. While, if you remember, the initial scaffold of htmlwidgets includes a simple function to display a message in HTML using `innerText`. The scaffold produced by packer differs only in that this message is displayed in `<h1>` \index{HTML} tags. That is so it can, from the get-go, demonstrate how to modularise a widget. We'll cover that in just a minute, before we do so, bundle the JavaScript and run the `counter` function to observe the output it generates.
+Importantly, it runs `htmlwidgets::scaffoldWidget` internally, there is thus no need to run this function. About the widget itself, there is very little difference between what `htmlwidgets::scaffoldWidget` and `packer::scaffold_widget`. While, if you remember, the initial scaffold of htmlwidgets includes a simple function to display a message in HTML using `innerText`. The scaffold produced by packer differs only in that this message is displayed in `<h1>` HTML\index{HTML} tags. That is so it can, from the get-go, demonstrate how to modularise a widget. We'll cover that in just a minute, before we do so, bundle the JavaScript and run the `counter` function to observe the output it generates.
 
 ```r
 packer::bundle()
@@ -206,7 +206,7 @@ Loaders are transformers, they scan files in the `srcjs` directory and pre-proce
 
 Plugins are a feature of webpack that allow extending its functionalities; there is one for Vue, which the function will install and configure for you.
 
-Also, when creating a scaffold for `vue` or `react`, one can choose whether to rely on the \index{CDN}, in which case they are installed as developer dependencies, or install them for production, in which case they are included in the bundle. It defaults to using the CDN; this is often advised as the CDN will serve the required files faster.
+Also, when creating a scaffold for `vue` or `react`, one can choose whether to rely on the CDN\index{CDN}, in which case they are installed as developer dependencies, or install them for production, in which case they are included in the bundle. It defaults to using the CDN; this is often advised as the CDN will serve the required files faster.
 
 The scaffold also sets up webpack with Babel, the transpiler that allows writing the latest JavaScript, and ensures it will run on (almost) any web browser. Hence, we can use ES6 notation in places.
 
@@ -427,13 +427,9 @@ devtools::load_all()
 run_app()
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/vue-bs4} 
-
-}
-
-\caption{Shiny application with Vue and Bootstrap 4}(\#fig:vue-bs4)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/vue-bs4.png" alt="Shiny application with Vue and Bootstrap 4" width="100%" />
+<p class="caption">(\#fig:vue-bs4)Shiny application with Vue and Bootstrap 4</p>
+</div>
 
 Note how little code was written in order to provide these functionalities. It is one of the most powerful features of frameworks like Vue and React. They are not necessary; this could have been coded in vanilla JavaScript, but would admittedly require much more (difficult to read) code.

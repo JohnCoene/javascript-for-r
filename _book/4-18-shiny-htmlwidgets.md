@@ -34,7 +34,7 @@ function callback (selectedCountry, relatedCountries) {
 }
 ```
 
-However, this will generate an issue experienced in a previous chapter; multiple gio visualisations in a single Shiny application would be defining the values of a single input. This can be remedied to by using the id of the \index{visualisation} to generate the input name dynamically.
+However, this will generate an issue experienced in a previous chapter; multiple gio visualisations in a single Shiny application would be defining the values of a single input. This can be remedied to by using the id of the visualisation\index{visualisation} to generate the input name dynamically.
 
 ```js
 renderValue: function(x) {
@@ -98,14 +98,10 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-input-no-handler} 
-
-}
-
-\caption{Gio with input data}(\#fig:gio-shiny-no-handler)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/gio-shiny-input-no-handler.png" alt="Gio with input data" width="100%" />
+<p class="caption">(\#fig:gio-shiny-no-handler)Gio with input data</p>
+</div>
 
 One thing to note before moving on, the data is sent from the client to the server whether the inputs are used or not, though this likely will not negatively impact gio it can reduce performances if the callback function is triggered too frequently. For instance, an input value set when the user hovers a scatter plot might lead to the event being fired very frequently and too much data being sent to the server, slowing things down and providing a poor experience.
 
@@ -200,18 +196,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/gio-input-handler} 
-
-}
-
-\caption{Gio input data transformed to a data frame}(\#fig:gio-input-handler)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/gio-input-handler.png" alt="Gio input data transformed to a data frame" width="100%" />
+<p class="caption">(\#fig:gio-input-handler)Gio input data transformed to a data frame</p>
+</div>
 
 ## R to Widgets {#shiny-widgets-r-to-widgets}
 
-This book previously explored how to send data from the Shiny server to the front end; this section applies this to htmlwidgets. Currently, using gio in Shiny consists of generating the globe with the `renderGio` and complimentary `gioOutput` functions. This generates the complete visualisation, it creates the \index{HTML} element where it places the globe, draws the arcs based on the data, sets the style, etc.
+This book previously explored how to send data from the Shiny server to the front end; this section applies this to htmlwidgets. Currently, using gio in Shiny consists of generating the globe with the `renderGio` and complimentary `gioOutput` functions. This generates the complete visualisation, it creates the HTML\index{HTML} element where it places the globe, draws the arcs based on the data, sets the style, etc.
 
 Now imagine that only one of those aspects needs changing, say the data, or the style, given the functions currently at hand one would have to redraw the entire visualisation, only this time changing the data or the style. This is inelegant and not efficient, most JavaScript visualisation libraries, including gio.js, will enable changing only certain aspects of the output without having to redraw it all from scratch.
 
@@ -259,14 +251,10 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-error} 
-
-}
-
-\caption{Gio issue in shiny}(\#fig:gio-shiny-error)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/gio-shiny-error.png" alt="Gio issue in shiny" width="100%" />
+<p class="caption">(\#fig:gio-shiny-error)Gio issue in shiny</p>
+</div>
 
 A solution to this is to ensure the container (`el`) is empty before generating the visualisation. Incidentally, this can be executed with a JavaScript method previously used in this book: `innerHTML`.
 
@@ -278,7 +266,7 @@ controller = new GIO.Controller(el);
 
 Now, using the dropdown to switch between dataset does not generate a new visualisation.
 
-We got sidetracked, but this had to be fixed. Ideally, when the user selects a dataset from the dropdown the entire \index{visualisation} is not redrawn, only the underlying data (the arcs) changes. To do so, a new set of functions divorced from the ones currently at hand needs to be created. This separation will allow leaving the already created functions as-is, using `gio` and its corresponding `renderValue` JavaScript function to initialise a visualisation, and have a separate family of functions dedicated to working with different JavaScript functions which circumvent `renderValue` and directly change aspects of the visualisation, such as the underlying dataset.
+We got sidetracked, but this had to be fixed. Ideally, when the user selects a dataset from the dropdown the entire visualisation\index{visualisation} is not redrawn, only the underlying data (the arcs) changes. To do so, a new set of functions divorced from the ones currently at hand needs to be created. This separation will allow leaving the already created functions as-is, using `gio` and its corresponding `renderValue` JavaScript function to initialise a visualisation, and have a separate family of functions dedicated to working with different JavaScript functions which circumvent `renderValue` and directly change aspects of the visualisation, such as the underlying dataset.
 
 This involves a few moving parts, thankfully some of them were already explored, just not in the context of htmlwidgets. The scheme is to send data from R to JavaScript using the formerly exploited `session$sendCustomMessage`, then in JavaScript fetch the instance of the visualisation (`controller` in the case of gio) to interact with it (`e.g. controller.addData(data);`).
 
@@ -313,7 +301,7 @@ shiny:::toJSON(arcs)
 #> {"e":["CN","CN"],"i":["US","RU"],"v":[3300000,10000]}
 ```
 
-Unfortunately this serialiser cannot be changed, therefore we have to reformat the data to a list which resembles the \index{JSON} output desired, using `apply` to turn every row into a list will do the job in most cases.
+Unfortunately this serialiser cannot be changed, therefore we have to reformat the data to a list which resembles the JSON\index{JSON} output desired, using `apply` to turn every row into a list will do the job in most cases.
 
 ```r
 #' @export
@@ -526,7 +514,7 @@ Switching dataset with the dropdown only changes the data; it makes for a much s
 
 Before we add other similar functions, we ought to pause and consider the API this provides the user. There are two points, every function such as `gio_send_data`, will need to accept the `id` and `session` arguments. It will be tedious to so every time, following the old "don't repeat yourself" adage we ought to abstract this further. 
 
-This can be remedied to by introducing what is often referred to as a "proxy." A proxy is just a representation of the graph, or pragmatically, an object that contains the id of the \index{visualisation} and a Shiny session. This object can subsequently be piped to other functions, thereby providing not only a cleaner but also a more consistent API. 
+This can be remedied to by introducing what is often referred to as a "proxy." A proxy is just a representation of the graph, or pragmatically, an object that contains the id of the visualisation\index{visualisation} and a Shiny session. This object can subsequently be piped to other functions, thereby providing not only a cleaner but also a more consistent API. 
 
 ```r
 #' @export
@@ -616,14 +604,10 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-clear} 
-
-}
-
-\caption{Gio with clear data proxy}(\#fig:giod-shiny-clear-data)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/gio-shiny-clear.png" alt="Gio with clear data proxy" width="100%" />
+<p class="caption">(\#fig:giod-shiny-clear-data)Gio with clear data proxy</p>
+</div>
 
 ## Update the Widget {#shiny-widgets-update}
 
@@ -695,11 +679,7 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-style} 
-
-}
-
-\caption{Gio with dynamic style}(\#fig:gio-shiny-style)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/gio-shiny-style.png" alt="Gio with dynamic style" width="100%" />
+<p class="caption">(\#fig:gio-shiny-style)Gio with dynamic style</p>
+</div>

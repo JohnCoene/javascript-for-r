@@ -4,7 +4,7 @@ While previous chapters on working with Shiny made use of external libraries and
 
 ## Shiny Events {#shiny-tips-events}
 
-There is a wee bit of documentation tucked away on the [shiny website](https://shiny.rstudio.com/articles/js-events.html) that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when \index{Shiny} connects, when an element become visible, and more. To demonstrate how to use those events and how handy they can be, we will create a notification which appears to indicate that the server is busy running computations. This could be as fancy as ever, but for simplicity's sake, we limit the demonstration to showing and hiding a gif.
+There is a wee bit of documentation tucked away on the [shiny website](https://shiny.rstudio.com/articles/js-events.html) that contains a useful list of events that Shiny fires to notify the developer of interesting things that happen in the application. This includes events that are fired when outputs are being recalculated, when Shiny\index{Shiny} connects, when an element become visible, and more. To demonstrate how to use those events and how handy they can be, we will create a notification which appears to indicate that the server is busy running computations. This could be as fancy as ever, but for simplicity's sake, we limit the demonstration to showing and hiding a gif.
 
 First, we create the directories and necessary files, and to indicate the server is busy. We'll be using a gif that is rather well-known in the R community. Note that we will be using some CSS, hence the `style.css` file.
 
@@ -103,18 +103,14 @@ $(document).on('shiny:idle', function(event) {
 
 The application will then display the gif when the server is busy running computations.
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/shiny-events} 
-
-}
-
-\caption{Shiny with a busy indicator}(\#fig:shiny-events)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/shiny-events.png" alt="Shiny with a busy indicator" width="100%" />
+<p class="caption">(\#fig:shiny-events)Shiny with a busy indicator</p>
+</div>
 
 ## Table Buttons {#shiny-tips-table-btn}
 
-For instance, using what was learned previously, one can place buttons inside a \index{Shiny} table and observe server-side, which is clicked. With a basic application that only includes a table to which we ultimately want to add a column containing a button on each row. Here we achieve this by having each button set a different value (e.g., an id) to an input using `shiny.setInputValue`, but one could very well create different input names for each button.
+For instance, using what was learned previously, one can place buttons inside a Shiny\index{Shiny} table and observe server-side, which is clicked. With a basic application that only includes a table to which we ultimately want to add a column containing a button on each row. Here we achieve this by having each button set a different value (e.g., an id) to an input using `shiny.setInputValue`, but one could very well create different input names for each button.
 
 ```r
 library(DT)
@@ -264,14 +260,10 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/dt-button} 
-
-}
-
-\caption{DT with custom inputs}(\#fig:dt-button)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/dt-button.png" alt="DT with custom inputs" width="100%" />
+<p class="caption">(\#fig:dt-button)DT with custom inputs</p>
+</div>
 
 ## jQuery {#shiny-tips-jQuery}
 

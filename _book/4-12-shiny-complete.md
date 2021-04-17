@@ -2,7 +2,7 @@
 
 
 
-Thus far, this part of the book has covered both ways data travels between JavaScript and R in \index{Shiny}. However, the notices displayed in the previous chapter, though they demonstrate how both languages can work together within Shiny, come short of illustrating some more advanced use cases, how to package such code and more. 
+Thus far, this part of the book has covered both ways data travels between JavaScript and R in Shiny\index{Shiny}. However, the notices displayed in the previous chapter, though they demonstrate how both languages can work together within Shiny, come short of illustrating some more advanced use cases, how to package such code and more. 
 
 We shall introduce a fascinating JavaScript library that enables running machine learning models in web browsers: [ml5.js](https://learn.ml5js.org/). The library is a high-level interface to [tensorflow.js](https://www.tensorflow.org/js) but very extensive as it includes a multitude of models to deal with sound, image, text, and more. In this chapter, one of those models is implemented, an image classifier using [mobileNet](https://arxiv.org/abs/1704.04861) but the method shown can be used to integrate any other model later on.
 
@@ -33,9 +33,9 @@ classifier.classify(
 );
 ```
 
-First, the image `classifier` is initialised from the `ml5` object with the `imageClassifier` method. This method takes two arguments: the name of the pre-trained model to use (`MobileNet`) and a callback function that is run when the model is loaded. The `classify` method from the `classifier` is used with, again, two arguments: 1) the \index{DOM} element that contains the image (`<img />`) and 2) a callback function to do something with the results of the classification.
+First, the image `classifier` is initialised from the `ml5` object with the `imageClassifier` method. This method takes two arguments: the name of the pre-trained model to use (`MobileNet`) and a callback function that is run when the model is loaded. The `classify` method from the `classifier` is used with, again, two arguments: 1) the DOM\index{DOM} element that contains the image (`<img />`) and 2) a callback function to do something with the results of the classification.
 
-Now we can jump to the next section to think about how this can be implemented in \index{Shiny}.
+Now we can jump to the next section to think about how this can be implemented in Shiny\index{Shiny}.
 
 ## Setup {#shiny-complete-setup}
 
@@ -43,7 +43,7 @@ In Shiny, a dropdown menu could be provided to choose from pre-selected images, 
 
 
 
-This makes for what is probably a signature of Shiny: a considerable amount of bi-directional communication between the server and client as Shiny makes the most of the \index{WebSocket}. Some readers with more advanced knowledge in JavaScript will find ways to avoid the use of the server in places to do more in the client; either way works.
+This makes for what is probably a signature of Shiny: a considerable amount of bi-directional communication between the server and client as Shiny makes the most of the WebSocket\index{WebSocket}. Some readers with more advanced knowledge in JavaScript will find ways to avoid the use of the server in places to do more in the client; either way works.
 
 ## Dependencies {#shiny-complete-dependencies}
 
@@ -118,7 +118,7 @@ These files will eventually need to be served (`addResourcePath`), so they are a
 
 At this stage, it's probably good to build a skeleton of the application. 
 
-After loading the \index{Shiny} package, we use the `addResourcePath` function to serve the images so they can be made accessible by the Shiny UI to display. At this stage, the application itself only provides a dropdown to select one of the two images previously downloaded, and a button to trigger the classification, which currently does not do anything, we'll delve into this next. Since we placed the `classify.js` JavaScript file in the `assets` directory we can also import it in the UI with a `script` tag; importantly this is done _after_ the ml5.js dependency as it will depend on it. Another crucial thing that the app does is set the attribute `id` of the `<img>` to `bird` it is essential to have a convenient way to uniquely identify the image later on as ml5.js will need to read this image in order to classify it.
+After loading the Shiny\index{Shiny} package, we use the `addResourcePath` function to serve the images so they can be made accessible by the Shiny UI to display. At this stage, the application itself only provides a dropdown to select one of the two images previously downloaded, and a button to trigger the classification, which currently does not do anything, we'll delve into this next. Since we placed the `classify.js` JavaScript file in the `assets` directory we can also import it in the UI with a `script` tag; importantly this is done _after_ the ml5.js dependency as it will depend on it. Another crucial thing that the app does is set the attribute `id` of the `<img>` to `bird` it is essential to have a convenient way to uniquely identify the image later on as ml5.js will need to read this image in order to classify it.
 
 ```r
 library(shiny)
@@ -160,14 +160,10 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/shiny-complete-skeleton} 
-
-}
-
-\caption{Shiny app skeleton}(\#fig:shiny-complete-skeleton)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/shiny-complete-skeleton.png" alt="Shiny app skeleton" width="100%" />
+<p class="caption">(\#fig:shiny-complete-skeleton)Shiny app skeleton</p>
+</div>
 
 ## From R to JavaScript {#shiny-complete-r2js}
 
@@ -197,10 +193,9 @@ function modelLoaded() {
 const classifier = ml5.imageClassifier('MobileNet', modelLoaded);
 ```
 
-\begin{rmdnote}
-There is no need to repeatedly initialise the classifier every time a
-user hits the ``classify'' button: this should only be done once.
-\end{rmdnote}
+<div class="rmdnote">
+<p>There is no need to repeatedly initialise the classifier every time a user hits the “classify” button: this should only be done once.</p>
+</div>
 
 Finally, we can take care of the message handler. Remember the message sent from the R server bears the `classify` unique identifier. The handler function runs the `classify` method on the previously instantiated `classifier` object. This takes 1) the image to classify and 2) a callback function to handle the results of the classification. Here we genuinely get to why we gave the generated `<img>` of the selected bird and `id`: it helps us quickly select that image from JavaScript to use in the classifier with `document.getElementById("bird")`.
 
@@ -227,14 +222,10 @@ As mentioned at the start of the chapter, the results of the classification shou
 
 Running the application and opening the console already gives us encouraging results! The classifier gives "flamingo" the greatest confidence (albeit at `0.48`).
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/shiny-complete-classify-console} 
-
-}
-
-\caption{Results logged to the console}(\#fig:shiny-complete-classify-console)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/shiny-complete-classify-console.png" alt="Results logged to the console" width="100%" />
+<p class="caption">(\#fig:shiny-complete-classify-console)Results logged to the console</p>
+</div>
 
 ## From JavaScript to R {#shiny-complete-js2r}
 
@@ -311,18 +302,14 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/ml5-output} 
-
-}
-
-\caption{Classifier basic output}(\#fig:shiny-complete-ml5-output)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/ml5-output.png" alt="Classifier basic output" width="100%" />
+<p class="caption">(\#fig:shiny-complete-ml5-output)Classifier basic output</p>
+</div>
 
 ## Input handler {#shiny-complete-input-handler}
 
-In the previous section on sending data from R to JavaScript, we used a "message handler" in JavaScript to handle the data coming from the server. There is also the corollary, an "input handler" to preprocess the data coming from JavaScript before it is made accessible by the input. In R, this is a function that must accept three arguments: the data coming to JavaScript, a \index{Shiny} session, and the name of the input. Note that all of these arguments are mandatory if they are not used in the function we can use the three-dot construct instead.
+In the previous section on sending data from R to JavaScript, we used a "message handler" in JavaScript to handle the data coming from the server. There is also the corollary, an "input handler" to preprocess the data coming from JavaScript before it is made accessible by the input. In R, this is a function that must accept three arguments: the data coming to JavaScript, a Shiny\index{Shiny} session, and the name of the input. Note that all of these arguments are mandatory if they are not used in the function we can use the three-dot construct instead.
 
 Input handlers are most often used to reshape or change the type of the data coming in. To demonstrate how to use them, we will reshape the classification results sent to R as looking at the results of the classification in the R server one might notice a row-wise list, which can be transformed into a `data.frame`. The function below makes use of the [purrr](https://github.com/tidyverse/purrr/) [@R-purrr] package to loop over every result and transform them into data.frames and return a single data.frame.
 
@@ -342,9 +329,9 @@ shiny::registerInputHandler("ml5.class", process_results)
 
 Note that handlers can only be registered once; running the above twice will fail the second time, even if the handler function has changed. This is to ensure one does not accidentally overwrite handlers brought in by other packages. These can be overwritten by explicitly setting `force` to `TRUE`, but it is not advised. 
 
-\begin{rmdnote}
-It is not advised to overwrite the registered handler.
-\end{rmdnote}
+<div class="rmdnote">
+<p>It is not advised to overwrite the registered handler.</p>
+</div>
 
 ```r
 # register with shiny
@@ -421,14 +408,10 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/shiny-complete-table} 
-
-}
-
-\caption{Classifier table output}(\#fig:shiny-complete-table-output)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/shiny-complete-table.png" alt="Classifier table output" width="100%" />
+<p class="caption">(\#fig:shiny-complete-table-output)Classifier table output</p>
+</div>
 
 ## As a Package {#shiny-complete-pkg}
 
@@ -446,7 +429,7 @@ usethis::create_package("ml5")
 
 In the application, the web-hosted dependencies (CDN) were used. There are two advantages to using CDNs: 1) it's just convenient as one does not have to download them, 2) it's fast---CDNs are distributed geographically to improve the speed at which they serve the dependencies and will therefore generally outperform the alternative, serving the files locally. This may raise questions when building a package though, as one generally wants these to be as modular, self-contained, and reproducible as possible, and none of these things go well with the idea of a remotely served dependency that is absolutely central to the package. The package should therefore provide both ways of importing dependencies: via the CDN or using locally-stored files. The former will be faster while the latter can be used as a fallback in the event there is an issue with the CDN or one does not have internet for instance.
 
-We can download the dependency hosted on the \index{CDN} and place it in the `inst` directory of the package. We also create another JavaScript `classify.js` that will contain the custom JavaScript code (message handler, etc.) as was done for the application.
+We can download the dependency hosted on the CDN\index{CDN} and place it in the `inst` directory of the package. We also create another JavaScript `classify.js` that will contain the custom JavaScript code (message handler, etc.) as was done for the application.
 
 ```r
 # create directory

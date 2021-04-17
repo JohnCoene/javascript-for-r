@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2021-04-14" />
+<meta name="date" content="2021-04-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -476,7 +476,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 You can scaffold multiple widgets in a single package.
 </p>
 </div>
-<p>These files are named after the widget and will form the core of the package. The R file contains core functions of the R API, namely the <code>play</code> function, which creates the widget itself, and the <code>render*</code> and <code>*output</code> functions that handle the widget in the  server and UI, respectively. The <code>.js</code> file contains JavaScript functions that generate the visual output.</p>
+<p>These files are named after the widget and will form the core of the package. The R file contains core functions of the R API, namely the <code>play</code> function, which creates the widget itself, and the <code>render*</code> and <code>*output</code> functions that handle the widget in the Shiny server and UI, respectively. The <code>.js</code> file contains JavaScript functions that generate the visual output.</p>
 <div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" title="1">devtools<span class="op">::</span><span class="kw">document</span>()</a>
 <a class="sourceLine" id="cb67-2" title="2">devtools<span class="op">::</span><span class="kw">load_all</span>()</a></code></pre></div>
 <p>It might be hard to believe, but at this stage one already has a fully functioning widget ready to use after documenting, and building the package. Indeed, the <code>play.R</code> file that was created contains a function named “play,” which takes, amongst other arguments, a message.</p>
@@ -487,11 +487,11 @@ You can scaffold multiple widgets in a single package.
 FIGURE 5.1: First widget
 </p>
 </div>
-<p>This displays the message in the RStudio “Viewer,” or your default browser; indicating the function does indeed create an HTML output. One can use the <img src="images/open-in-browser.png" /> button located in the top right of the RStudio “Viewer” to open the message in the web browser, which can prove very useful to look under the hood of the widgets for debugging.</p>
+<p>Figure <a href="widgets-first.html#fig:playground-1">5.1</a> displays the message in the RStudio “Viewer,” or your default browser; indicating the function does indeed create an HTML output. One can use the <img src="images/open-in-browser.png" /> button located in the top right of the RStudio “Viewer” to open the message in the web browser, which can prove very useful to look under the hood of the widgets for debugging.</p>
 </div>
 <div id="widgets-first-htmloutput" class="section level2">
 <h2><span class="header-section-number">5.2</span> The HTML Output</h2>
-<p>With an out-of-the-box htmlwidget package, one can start exploring the internals to understand how it works. Let us start by retracing the path taken by the message written in R to its seemingly magical appearance in . The <code>play</code> function previously used, takes the <code>message</code> wraps it into a list which is then used in <code>htmlwidgets::createWidget</code>.</p>
+<p>With an out-of-the-box htmlwidget package, one can start exploring the internals to understand how it works. Let us start by retracing the path taken by the message written in R to its seemingly magical appearance in HTML. The <code>play</code> function previously used, takes the <code>message</code> wraps it into a list which is then used in <code>htmlwidgets::createWidget</code>.</p>
 <div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" title="1"><span class="co"># forward options using x</span></a>
 <a class="sourceLine" id="cb69-2" title="2">x =<span class="st"> </span><span class="kw">list</span>(</a>
 <a class="sourceLine" id="cb69-3" title="3">  <span class="dt">message =</span> message</a>
@@ -563,7 +563,7 @@ FIGURE 5.1: First widget
 <a class="sourceLine" id="cb75-27" title="27">    <span class="op">};</span></a>
 <a class="sourceLine" id="cb75-28" title="28">  <span class="op">}</span></a>
 <a class="sourceLine" id="cb75-29" title="29"><span class="op">}</span>)<span class="op">;</span></a></code></pre></div>
-<p>However convoluted this may appear at first, do not let that intimidate you. The name of the widget (<code>play</code>) corresponds to the name used to generate the , it can also be seen in the <code>createWidget</code> function used inside the <code>play.R</code> file.</p>
+<p>However convoluted this may appear at first, do not let that intimidate you. The name of the widget (<code>play</code>) corresponds to the name used to generate the scaffold, it can also be seen in the <code>createWidget</code> function used inside the <code>play.R</code> file.</p>
 <div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" title="1">htmlwidgets<span class="op">::</span><span class="kw">createWidget</span>(</a>
 <a class="sourceLine" id="cb76-2" title="2">  <span class="dt">name =</span> <span class="st">&#39;play&#39;</span>,</a>
 <a class="sourceLine" id="cb76-3" title="3">  x,</a>
@@ -572,7 +572,7 @@ FIGURE 5.1: First widget
 <a class="sourceLine" id="cb76-6" title="6">  <span class="dt">package =</span> <span class="st">&#39;playground&#39;</span>,</a>
 <a class="sourceLine" id="cb76-7" title="7">  <span class="dt">elementId =</span> elementId</a>
 <a class="sourceLine" id="cb76-8" title="8">)</a></code></pre></div>
-<p>This is so  can internally match the output of <code>createWidget</code> to its JavaScript function. At this stage, it is probably fair to take a look at the diagram of what is happening.</p>
+<p>This is so htmlwidgets can internally match the output of <code>createWidget</code> to its JavaScript function. At this stage, it is probably fair to take a look at the diagram (Figure <a href="widgets-first.html#fig:widget-internals-diagram">5.2</a>) of what is happening.</p>
 <div class="figure" style="text-align: center"><span id="fig:widget-internals-diagram"></span>
 <div id="htmlwidget-3d3d22e5c777f6cb8ad9" style="width:100%;height:250px;" class="grViz html-widget"></div>
 <script type="application/json" data-for="htmlwidget-3d3d22e5c777f6cb8ad9">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR]\n\n  subgraph cluster_1 {\n    node [shape=box]\n    func [label=\"play(id)\"]\n    label = \"R\"\n    color=royalBlue\n  }\n\n  subgraph cluster_0 {\n    node [shape=box]\n    output [label=\"<div class=play id=id>\"]\n    json [label=\"<script data-for=id>\"]\n    js [label=\"JavaScript\"]\n    deps [label=\"dependencies\"]\n    label=\"HTML\"\n    color=gold\n  }\n\n  func -> output [label=\"id and class\"]\n  func -> json [label = \"id\"]\n  json -> js [label=\"import\"]\n  js -> output[label=\"Generate viz\"] \n  deps -> js [label=\"use\"]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
@@ -580,7 +580,7 @@ FIGURE 5.1: First widget
 FIGURE 5.2: htmlwidgets internals visualised
 </p>
 </div>
-<p>The <code>factory</code> function returns two functions, <code>resize</code> and <code>renderValue</code>. The first is used to  the output dynamically; it is not relevant to this widget and is thus tackled later on. Let us focus on <code>renderValue</code>, the function that renders the output. It takes an object <code>x</code> from which the “message” variable is used as the text for object <code>el</code> (<code>el.innerText</code>). The object <code>x</code> passed to this function is actually the list of the same name that was built in the R function <code>play</code>! While in R one would access the <code>message</code> in list <code>x</code> with <code>x$message</code> in JavaScript to access the <code>message</code> in the  <code>x</code> one writes <code>x.message</code>, only changing the dollar sign to a dot. Let us show this perhaps more clearly by printing the content of <code>x</code>.</p>
+<p>The <code>factory</code> function returns two functions, <code>resize</code> and <code>renderValue</code>. The first is used to resize the output dynamically; it is not relevant to this widget and is thus tackled later on. Let us focus on <code>renderValue</code>, the function that renders the output. It takes an object <code>x</code> from which the “message” variable is used as the text for object <code>el</code> (<code>el.innerText</code>). The object <code>x</code> passed to this function is actually the list of the same name that was built in the R function <code>play</code>! While in R one would access the <code>message</code> in list <code>x</code> with <code>x$message</code> in JavaScript to access the <code>message</code> in the JSON <code>x</code> one writes <code>x.message</code>, only changing the dollar sign to a dot. Let us show this perhaps more clearly by printing the content of <code>x</code>.</p>
 <div class="sourceCode" id="cb77"><pre class="sourceCode js"><code class="sourceCode javascript"><a class="sourceLine" id="cb77-1" title="1"><span class="va">console</span>.<span class="at">log</span>(x)<span class="op">;</span></a>
 <a class="sourceLine" id="cb77-2" title="2"><span class="va">el</span>.<span class="at">innerText</span> <span class="op">=</span> <span class="va">x</span>.<span class="at">message</span><span class="op">;</span></a></code></pre></div>
 <p>We place <code>console.log</code> to print the content of <code>x</code> in the console, reload the package with <code>devtools::load_all</code> and use the function <code>play</code> again, then explore the console from the browser (inspect and go to the “console” tab).</p>
@@ -590,7 +590,7 @@ FIGURE 5.2: htmlwidgets internals visualised
 FIGURE 5.3: Console log JavaScript object
 </p>
 </div>
-<p>This displays the JSON object containing the message: it looks eerily similar to the list that was created in R (<code>x = list(message = "This is a widget!")</code>). What one should take away from this is that data that needs to be communicated from R to the JavaScript function should be placed in the R list <code>x</code>. This list is serialised to JSON and placed in the  output in a <code>script</code> tag bearing a <code>data-for</code> attribute that indicates which widget the data is destined for. This effectively enables htmlwidgets to match the serialised data with the output elements: data in <code>&lt;script data-for='viz'&gt;</code> is to be used to create a  in <code>&lt;div id='viz'&gt;</code>.</p>
+<p>Firgure <a href="widgets-first.html#fig:playground-console">5.3</a> displays the JSON object containing the message: it looks eerily similar to the list that was created in R (<code>x = list(message = "This is a widget!")</code>). What one should take away from this is that data that needs to be communicated from R to the JavaScript function should be placed in the R list <code>x</code>. This list is serialised to JSON and placed in the HTML output in a <code>script</code> tag bearing a <code>data-for</code> attribute that indicates which widget the data is destined for. This effectively enables htmlwidgets to match the serialised data with the output elements: data in <code>&lt;script data-for='viz'&gt;</code> is to be used to create a visualisation in <code>&lt;div id='viz'&gt;</code>.</p>
 <div class="rmdnote">
 <p>
 Serialisation will make for an important section in a later chapter.
@@ -606,14 +606,14 @@ Serialisation will make for an important section in a later chapter.
 FIGURE 5.4: Console log HTML element
 </p>
 </div>
-<p>This displays the HTML element created by htmlwidgets that is meant to hold the visualisation or, in this case, the message. If you are familiar with JavaScript, this is the element that would be returned by <code>document.getElementById</code>. This object allows manipulating the element in pretty much any way imaginable: change its position, its colour, its size, or, as done here, insert some text within it. What’s more one can access attributes of the object just like a JSON array. Therefore, one can log the <code>id</code> of the element.</p>
+<p>Figure <a href="widgets-first.html#fig:playground-console-el">5.4</a> displays the HTML element created by htmlwidgets that is meant to hold the visualisation or, in this case, the message. If you are familiar with JavaScript, this is the element that would be returned by <code>document.getElementById</code>. This object allows manipulating the element in pretty much any way imaginable: change its position, its colour, its size, or, as done here, insert some text within it. What’s more one can access attributes of the object just like a JSON array. Therefore, one can log the <code>id</code> of the element.</p>
 <div class="sourceCode" id="cb79"><pre class="sourceCode js"><code class="sourceCode javascript"><a class="sourceLine" id="cb79-1" title="1"><span class="co">// print the id of the element</span></a>
 <a class="sourceLine" id="cb79-2" title="2"><span class="va">console</span>.<span class="at">log</span>(<span class="va">el</span>.<span class="at">id</span>)<span class="op">;</span></a>
 <a class="sourceLine" id="cb79-3" title="3"><span class="va">el</span>.<span class="at">innerText</span> <span class="op">=</span> <span class="va">x</span>.<span class="at">message</span><span class="op">;</span></a></code></pre></div>
 <p>Making the modifications above and reloading the package, one can create a widget given a specific id and see it displayed in the console, e.g.: <code>play("hello", elementId = "see-you-in-the-console")</code>.</p>
 <p>In an attempt to become more at ease with this setup, let us change something and play with the widget. Out-of-the-box htmlwidgets uses <code>innerText</code>, which does very much what it says on the tin, it places text inside an element. JavaScript comes with another function akin to <code>innerText</code>, <code>innerHTML</code>. While the former only allows inserting text, the latter lets one insert any HTML.</p>
 <div class="sourceCode" id="cb80"><pre class="sourceCode js"><code class="sourceCode javascript"><a class="sourceLine" id="cb80-1" title="1"><span class="va">el</span>.<span class="at">innerHTML</span> <span class="op">=</span> <span class="va">x</span>.<span class="at">message</span><span class="op">;</span></a></code></pre></div>
-<p>After changing the <code>play.js</code> file as above, and re-loading the package, one can use arbitrary HTML as messages.</p>
+<p>After changing the <code>play.js</code> file as above, and re-loading the package, one can use arbitrary HTML as messages as shown in Figure <a href="widgets-first.html#fig:playground-h1">5.5</a>.</p>
 <div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb81-1" title="1"><span class="kw">play</span>(<span class="st">&quot;&lt;h1&gt;Using HTML!&lt;/h1&gt;&quot;</span>)</a></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:playground-h1"></span>
 <img src="images/playground-h1.png" alt="First widget output" width="100%" />
@@ -635,7 +635,7 @@ FIGURE 5.5: First widget output
 <a class="sourceLine" id="cb83-2" title="2">x =<span class="st"> </span><span class="kw">list</span>(</a>
 <a class="sourceLine" id="cb83-3" title="3">  <span class="dt">message =</span> <span class="kw">as.character</span>(message)</a>
 <a class="sourceLine" id="cb83-4" title="4">)</a></code></pre></div>
-<p>Reloading the package with <code>devtools::load_all</code> lets one use Shiny tags as the message.</p>
+<p>Reloading the package with <code>devtools::load_all</code> lets one use Shiny tags as the message as demonstrated in Figure <a href="widgets-first.html#fig:playground-tags">5.6</a>.</p>
 <div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb84-1" title="1"><span class="kw">play</span>(</a>
 <a class="sourceLine" id="cb84-2" title="2">  shiny<span class="op">::</span><span class="kw">h2</span>(<span class="st">&quot;Chocolate is a colour&quot;</span>, <span class="dt">style =</span> <span class="st">&quot;color:chocolate;&quot;</span>)</a>
 <a class="sourceLine" id="cb84-3" title="3">)</a></code></pre></div>
