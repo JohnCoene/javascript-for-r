@@ -12,9 +12,9 @@ Then again, the goal is not to write a lot of convoluted JavaScript. On the cont
 
 ## WebSocket an Shiny {#shiny-intro-websocket}
 
-Shiny\index{Shiny} applications have two components: the user interface (UI) and the server function. These two components communicate via a WebSocket\index{WebSocket}: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server, this connection is managed by Shiny using the httpuv [@R-httpuv] and WebSocket [@R-websocket] packages, while in clients connecting to the server this connection is managed with JavaScript.  
+Shiny\index{Shiny} applications have two components: the user interface (UI) and the server function. These two components communicate via a WebSocket\index{WebSocket}: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server, this connection is managed by Shiny using the httpuv [@R-httpuv] and WebSocket [@R-websocket] packages, while in clients connecting to the server this connection is managed with JavaScript, as depicted in \@ref(fig:websocket-diag).  
 
-```{r, echo=FALSE, fig.pos="H", out.width="100%", fig.dim=c(3, 6), fig.cap='Websocket visualised'}
+```{r websocket-diag, echo=FALSE, fig.pos="H", out.width="100%", fig.dim=c(3, 6), fig.cap='Websocket visualised'}
 d <- DiagrammeR::grViz("
 digraph{
   node [shape=record fontsize=10];
@@ -61,7 +61,7 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-Drawing a diagram of the communication between the UI and the server reveals that though this is a simple application a lot is happening.
+Drawing a diagram of the communication between the UI and the server (Figure \@ref(fig:shiny-websocket-diagram)) reveals that though this is a simple application a lot is happening.
 
 ```{r shiny-websocket-diagram, fig.pos="H", echo=FALSE, fig.align='center', out.width="100%", fig.dim=c(3, 6), fig.cap='Shiny websocket visualised'}
 d <- DiagrammeR::grViz("
@@ -181,7 +181,7 @@ shinyApp(ui, server)
 knitr::include_graphics("images/jbox-init.png")
 ```
 
-The application above essentially reproduces the basic HTML example that was shared; the dependencies are imported, and a script displays a notification. Since all of that takes place in the front end, the body of the server function is empty.
+Figure \@ref(fig:jbox-init), and the application above essentially reproduce the basic HTML example that was shared; the dependencies are imported, and a script displays a notification. Since all of that takes place in the front end, the body of the server function is empty.
 
 ### From R to JavaScript {#shiny-intro-r-to-js}
 
@@ -265,7 +265,7 @@ shinyApp(ui, server)
 knitr::include_graphics("images/jbox-r2js.png")
 ```
 
-In the application above, notice the path that the message follows: it goes from the client (user input) to the server (`observeEvent`), which sends (`sendCustomMessage`) it back to the client. 
+In the previous application that produces Figure \@ref(fig:shiny-alert-diagram), notice the path that the message follows: it goes from the client (user input) to the server (`observeEvent`), which sends (`sendCustomMessage`) it back to the client. 
 
 ```{r shiny-alert-diagram, fig.pos="H", echo=FALSE, fig.align='center', out.width="100%", fig.dim=c(3, 6), fig.cap='Shiny alert with custom messages'}
 d <- DiagrammeR::grViz("
@@ -320,7 +320,7 @@ options <- list(
 jsonlite::toJSON(options, pretty = TRUE, auto_unbox = TRUE)
 ```
 
-Therefore, one could construct this list server-side and use it in jBox straight-away. Doing so means the JavaScript code can be simplified to `new jBox('Notice', message);`.
+Therefore, one could construct this list server-side and use it in jBox straight-away. Doing so means the JavaScript code can be simplified to `new jBox('Notice', message);` and produce Figure \@ref(fig:jbox-custom).
 
 ```r
 library(shiny)
@@ -462,7 +462,7 @@ tags$script("Shiny.addCustomMessageHandler(
 });")
 ```
 
-That done it can be incorporated into the application built thus far. Something interesting could be done server-side, but to keep things brief and straightforward, we merely print the value of the input to the R console.
+That done it can be incorporated into the application (Figure \@ref(fig:jbox-end)) built thus far. Something interesting could be done server-side, but to keep things brief and straightforward, we merely print the value of the input to the R console.
 
 ```r
 library(shiny)

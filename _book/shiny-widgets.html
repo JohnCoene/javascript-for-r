@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2021-04-17" />
+<meta name="date" content="2021-04-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -504,7 +504,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb318-17" title="17">  <span class="va">controller</span>.<span class="at">init</span>()<span class="op">;</span></a>
 <a class="sourceLine" id="cb318-18" title="18"></a>
 <a class="sourceLine" id="cb318-19" title="19"><span class="op">}</span></a></code></pre></div>
-<p>The package can then be installed with <code>devtools::install</code> so we can test these inputs in a Shiny application.</p>
+<p>The package can then be installed with <code>devtools::install</code> so we can test these inputs in a Shiny application (Figure <a href="shiny-widgets.html#fig:gio-shiny-no-handler">17.1</a>).</p>
 <div class="sourceCode" id="cb319"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb319-1" title="1"><span class="kw">library</span>(gio)</a>
 <a class="sourceLine" id="cb319-2" title="2"><span class="kw">library</span>(shiny)</a>
 <a class="sourceLine" id="cb319-3" title="3"></a>
@@ -584,7 +584,7 @@ FIGURE 17.1: Gio with input data
 <a class="sourceLine" id="cb324-9" title="9">    related_countries_handler</a>
 <a class="sourceLine" id="cb324-10" title="10">  )</a>
 <a class="sourceLine" id="cb324-11" title="11">}</a></code></pre></div>
-<p>Finally, we can reinstall the package with <code>devtools::install</code> and create a Shiny application to observe the change. Below we use a large example dataset and, since the input now returns a data frame, we can display the input value in a table.</p>
+<p>Finally, we can reinstall the package with <code>devtools::install</code> and create a Shiny application to observe the change. In Figure <a href="shiny-widgets.html#fig:gio-input-handler">17.2</a> we use a large example dataset and, since the input now returns a data frame, we can display the input value in a table.</p>
 <div class="sourceCode" id="cb325"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb325-1" title="1"><span class="kw">library</span>(DT)</a>
 <a class="sourceLine" id="cb325-2" title="2"><span class="kw">library</span>(gio)</a>
 <a class="sourceLine" id="cb325-3" title="3"><span class="kw">library</span>(shiny)</a>
@@ -625,7 +625,7 @@ FIGURE 17.2: Gio input data transformed to a data frame
 <h2><span class="header-section-number">17.3</span> R to Widgets</h2>
 <p>This book previously explored how to send data from the Shiny server to the front end; this section applies this to htmlwidgets. Currently, using gio in Shiny consists of generating the globe with the <code>renderGio</code> and complimentary <code>gioOutput</code> functions. This generates the complete visualisation, it creates the HTML element where it places the globe, draws the arcs based on the data, sets the style, etc.</p>
 <p>Now imagine that only one of those aspects needs changing, say the data, or the style, given the functions currently at hand one would have to redraw the entire visualisation, only this time changing the data or the style. This is inelegant and not efficient, most JavaScript visualisation libraries, including gio.js, will enable changing only certain aspects of the output without having to redraw it all from scratch.</p>
-<p>Before we look into the implementation, let us create a Shiny application which would benefit from such a feature. The Shiny application below provides a drop-down menu to select between two datasets to draw on the globe, running it reveals an issue with gio though. Upon selecting a dataset with the drop down a second globe appears underneath the original one. This is because internally gio.js creates a new element (<code>&lt;canvas&gt;</code>) within the <code>&lt;div&gt;</code> created by <code>htmlwidgets</code> when running <code>init</code> regardless of whether one was already created. Therefore, every call to <code>init</code> creates a new <code>&lt;canvas&gt;</code> with a different globe. Note that most visualisation libraries <em>will not have that issue</em>, they will detect the existing output and override it instead.</p>
+<p>Before we look into the implementation, let us create a Shiny application which would benefit from such a feature. The Shiny application below (Figure <a href="shiny-widgets.html#fig:gio-shiny-error">17.3</a>) provides a drop-down menu to select between two datasets to draw on the globe, running it reveals an issue with gio though. Upon selecting a dataset with the drop down a second globe appears underneath the original one. This is because internally gio.js creates a new element (<code>&lt;canvas&gt;</code>) within the <code>&lt;div&gt;</code> created by <code>htmlwidgets</code> when running <code>init</code> regardless of whether one was already created. Therefore, every call to <code>init</code> creates a new <code>&lt;canvas&gt;</code> with a different globe. Note that most visualisation libraries <em>will not have that issue</em>, they will detect the existing output and override it instead.</p>
 <div class="sourceCode" id="cb326"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb326-1" title="1"><span class="kw">library</span>(gio)</a>
 <a class="sourceLine" id="cb326-2" title="2"><span class="kw">library</span>(shiny)</a>
 <a class="sourceLine" id="cb326-3" title="3"></a>
@@ -924,7 +924,7 @@ FIGURE 17.3: Gio issue in shiny
 <a class="sourceLine" id="cb339-5" title="5">    <span class="kw">var</span> controller <span class="op">=</span> <span class="at">get_gio</span>(<span class="va">message</span>.<span class="at">id</span>)<span class="op">;</span></a>
 <a class="sourceLine" id="cb339-6" title="6">    <span class="va">controller</span>.<span class="at">clearData</span>()<span class="op">;</span></a>
 <a class="sourceLine" id="cb339-7" title="7"><span class="op">}</span>)<span class="op">;</span></a></code></pre></div>
-<p>Then one can build an application to test that new function. We build a Shiny application with a button to add the data to the visualisation and another to clear data from it.</p>
+<p>Then one can build an application to test that new function. We build a Shiny application with a button to add the data to the visualisation and another to clear data from it, as shown in Figure <a href="shiny-widgets.html#fig:giod-shiny-clear-data">17.4</a>.</p>
 <div class="sourceCode" id="cb340"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb340-1" title="1"><span class="kw">library</span>(gio)</a>
 <a class="sourceLine" id="cb340-2" title="2"><span class="kw">library</span>(shiny)</a>
 <a class="sourceLine" id="cb340-3" title="3"></a>
@@ -989,7 +989,7 @@ FIGURE 17.4: Gio with clear data proxy
 <a class="sourceLine" id="cb343-4" title="4">    <span class="va">controller</span>.<span class="at">setStyle</span>(<span class="va">message</span>.<span class="at">style</span>)<span class="op">;</span></a>
 <a class="sourceLine" id="cb343-5" title="5">    <span class="va">controller</span>.<span class="at">update</span>()<span class="op">;</span> <span class="co">// force update the visualisation</span></a>
 <a class="sourceLine" id="cb343-6" title="6"><span class="op">}</span>)<span class="op">;</span></a></code></pre></div>
-<p>This forces the chart to update, applying the new style. Below we write an application that provides a dropdown to switch between two styles.</p>
+<p>This forces the chart to update, applying the new style. Below we write an application that provides a dropdown to switch between two styles (Figure <a href="shiny-widgets.html#fig:gio-shiny-style">17.5</a>).</p>
 <div class="sourceCode" id="cb344"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb344-1" title="1"><span class="kw">library</span>(gio)</a>
 <a class="sourceLine" id="cb344-2" title="2"><span class="kw">library</span>(shiny)</a>
 <a class="sourceLine" id="cb344-3" title="3"></a>

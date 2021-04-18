@@ -101,7 +101,7 @@ $(document).on('shiny:idle', function(event) {
 });
 ```
 
-The application will then display the gif when the server is busy running computations.
+The application will then display the gif when the server is busy running computations as in Figure \@ref(fig:shiny-events).
 
 <div class="figure" style="text-align: center">
 <img src="images/shiny-events.png" alt="Shiny with a busy indicator" width="100%" />
@@ -212,7 +212,7 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-We can then observe the `click` input and, to demonstrate, render it's value in the UI.
+We can then observe the `click` input and, to demonstrate, render it's value in the UI, see Figure \@ref(fig:dt-button) below.
 
 ```r
 library(DT)

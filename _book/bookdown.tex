@@ -203,7 +203,7 @@
 
 \title{JavaScript for R}
 \author{John Coene}
-\date{2021-04-17}
+\date{2021-04-18}
 
 \begin{document}
 \maketitle
@@ -4599,7 +4599,7 @@ Then again, the goal is not to write a lot of convoluted JavaScript. On the cont
 \hypertarget{shiny-intro-websocket}{%
 \section{WebSocket an Shiny}\label{shiny-intro-websocket}}
 
-Shiny\index{Shiny} applications have two components: the user interface (UI) and the server function. These two components communicate via a WebSocket\index{WebSocket}: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server, this connection is managed by Shiny using the httpuv \citep{R-httpuv} and WebSocket \citep{R-websocket} packages, while in clients connecting to the server this connection is managed with JavaScript.
+Shiny\index{Shiny} applications have two components: the user interface (UI) and the server function. These two components communicate via a WebSocket\index{WebSocket}: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server, this connection is managed by Shiny using the httpuv \citep{R-httpuv} and WebSocket \citep{R-websocket} packages, while in clients connecting to the server this connection is managed with JavaScript, as depicted in \ref{fig:websocket-diag}.
 
 \begin{figure}[H]
 
@@ -4607,7 +4607,7 @@ Shiny\index{Shiny} applications have two components: the user interface (UI) and
 
 }
 
-\caption{Websocket visualised}\label{fig:unnamed-chunk-2}
+\caption{Websocket visualised}\label{fig:websocket-diag}
 \end{figure}
 
 With that in mind, we can put together a Shiny application, which though simple. Exploits bi-directional communication. The application takes a text input, sends the value of the input to the R server, which sends it back to the UI.
@@ -4631,7 +4631,7 @@ With that in mind, we can put together a Shiny application, which though simple.
 \end{Highlighting}
 \end{Shaded}
 
-Drawing a diagram of the communication between the UI and the server reveals that though this is a simple application a lot is happening.
+Drawing a diagram of the communication between the UI and the server (Figure \ref{fig:shiny-websocket-diagram}) reveals that though this is a simple application a lot is happening.
 
 \begin{figure}[H]
 
@@ -4743,7 +4743,7 @@ The very first thing one should do is recreate this basic example in Shiny so th
 \caption{A basic jBox notice}\label{fig:jbox-init}
 \end{figure}
 
-The application above essentially reproduces the basic HTML example that was shared; the dependencies are imported, and a script displays a notification. Since all of that takes place in the front end, the body of the server function is empty.
+Figure \ref{fig:jbox-init}, and the application above essentially reproduce the basic HTML example that was shared; the dependencies are imported, and a script displays a notification. Since all of that takes place in the front end, the body of the server function is empty.
 
 \hypertarget{shiny-intro-r-to-js}{%
 \subsection{From R to JavaScript}\label{shiny-intro-r-to-js}}
@@ -4839,7 +4839,7 @@ This effectively enables passing a message that is taken from a database, for in
 \caption{A notice triggered by the server}\label{fig:jbox-r2js}
 \end{figure}
 
-In the application above, notice the path that the message follows: it goes from the client (user input) to the server (\texttt{observeEvent}), which sends (\texttt{sendCustomMessage}) it back to the client.
+In the previous application that produces Figure \ref{fig:shiny-alert-diagram}, notice the path that the message follows: it goes from the client (user input) to the server (\texttt{observeEvent}), which sends (\texttt{sendCustomMessage}) it back to the client.
 
 \begin{figure}[H]
 
@@ -4882,7 +4882,7 @@ The jBox notice is configured using a JSON object containing the options that de
 \end{Highlighting}
 \end{Shaded}
 
-Therefore, one could construct this list server-side and use it in jBox straight-away. Doing so means the JavaScript code can be simplified to \texttt{new\ jBox(\textquotesingle{}Notice\textquotesingle{},\ message);}.
+Therefore, one could construct this list server-side and use it in jBox straight-away. Doing so means the JavaScript code can be simplified to \texttt{new\ jBox(\textquotesingle{}Notice\textquotesingle{},\ message);} and produce Figure \ref{fig:jbox-custom}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5048,7 +5048,7 @@ One can opt-out of these optimisations using the \texttt{priority:\ "event"} opt
 \end{Highlighting}
 \end{Shaded}
 
-That done it can be incorporated into the application built thus far. Something interesting could be done server-side, but to keep things brief and straightforward, we merely print the value of the input to the R console.
+That done it can be incorporated into the application (Figure \ref{fig:jbox-end}) built thus far. Something interesting could be done server-side, but to keep things brief and straightforward, we merely print the value of the input to the R console.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5169,7 +5169,16 @@ Now we can jump to the next section to think about how this can be implemented i
 \hypertarget{shiny-complete-setup}{%
 \section{Setup}\label{shiny-complete-setup}}
 
-In Shiny, a dropdown menu could be provided to choose from pre-selected images, and upon selection, the server renders the selected image. At the click of a button the model then runs and sends the results to the R server, which prints them in the UI.
+In Shiny, a dropdown menu could be provided to choose from pre-selected images, and upon selection, the server renders the selected image. At the click of a button the model then runs and sends the results to the R server, which prints them in the UI (see Figure \ref{fig:shiny-complex-diagram}).
+
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/04-shiny-complex} 
+
+}
+
+\caption{Simple shiny app, complex communication}\label{fig:shiny-complex-diagram}
+\end{figure}
 
 This makes for what is probably a signature of Shiny: a considerable amount of bi-directional communication between the server and client as Shiny makes the most of the WebSocket\index{WebSocket}. Some readers with more advanced knowledge in JavaScript will find ways to avoid the use of the server in places to do more in the client; either way works.
 
@@ -5254,7 +5263,7 @@ These files will eventually need to be served (\texttt{addResourcePath}), so the
 \hypertarget{shiny-complete-skeleton}{%
 \section{Skeleton}\label{shiny-complete-skeleton}}
 
-At this stage, it's probably good to build a skeleton of the application.
+At this stage, it's probably good to build a skeleton of the application (Figure \ref{fig:shiny-complete-skeleton}).
 
 After loading the Shiny\index{Shiny} package, we use the \texttt{addResourcePath} function to serve the images so they can be made accessible by the Shiny UI to display. At this stage, the application itself only provides a dropdown to select one of the two images previously downloaded, and a button to trigger the classification, which currently does not do anything, we'll delve into this next. Since we placed the \texttt{classify.js} JavaScript file in the \texttt{assets} directory we can also import it in the UI with a \texttt{script} tag; importantly this is done \emph{after} the ml5.js dependency as it will depend on it. Another crucial thing that the app does is set the attribute \texttt{id} of the \texttt{\textless{}img\textgreater{}} to \texttt{bird} it is essential to have a convenient way to uniquely identify the image later on as ml5.js will need to read this image in order to classify it.
 
@@ -5372,7 +5381,7 @@ Finally, we can take care of the message handler. Remember the message sent from
 
 As mentioned at the start of the chapter, the results of the classification should be sent back to the R server, but for now, we shall content ourselves with logging it in the console.
 
-Running the application and opening the console already gives us encouraging results! The classifier gives ``flamingo'' the greatest confidence (albeit at \texttt{0.48}).
+Running the application and opening the console (Figure \ref{fig:shiny-complete-classify-console}) already gives us encouraging results! The classifier gives ``flamingo'' the greatest confidence (albeit at \texttt{0.48}).
 
 \begin{figure}[H]
 
@@ -5411,7 +5420,7 @@ As in the previous chapter, this can be done with the \texttt{setInputValue} fun
 \end{Highlighting}
 \end{Shaded}
 
-Now that the results are sent back to the R server, we can use them to display it back in the application so users of the application may know how the model performed. We shall eventually make this prettier, but for now, we'll limit it to displaying the results in \texttt{verbatimTextOutput}.
+Now that the results are sent back to the R server, we can use them to display it back in the application (Figure \ref{fig:shiny-complete-ml5-output}) so users of the application may know how the model performed. We shall eventually make this prettier, but for now, we'll limit it to displaying the results in \texttt{verbatimTextOutput}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5525,7 +5534,7 @@ Once the handler function is created and registered with Shiny, what is left to 
 \end{Highlighting}
 \end{Shaded}
 
-Now that the results of \texttt{input\$classification} is a data.frame we can display the results in a neat table instead.
+Now that the results of \texttt{input\$classification} is a data.frame we can display the results in a neat table instead, as shown in Figure \ref{fig:shiny-complete-table-output}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5944,7 +5953,7 @@ We then need to hide the gif when the server goes from busy to idle, using the \
 \end{Highlighting}
 \end{Shaded}
 
-The application will then display the gif when the server is busy running computations.
+The application will then display the gif when the server is busy running computations as in Figure \ref{fig:shiny-events}.
 
 \begin{figure}[H]
 
@@ -6066,7 +6075,7 @@ Next, we create the buttons for each row and set the JavaScript functions previo
 \end{Highlighting}
 \end{Shaded}
 
-We can then observe the \texttt{click} input and, to demonstrate, render it's value in the UI.
+We can then observe the \texttt{click} input and, to demonstrate, render it's value in the UI, see Figure \ref{fig:dt-button} below.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6212,6 +6221,8 @@ This is something where, again, R is leveraged in order to make it easier on the
 In this chapter, we create a custom Shiny output; in practical terms, this creates custom \texttt{render*} and \texttt{*Output} functions to use in Shiny. This will be demonstrated by creating something akin to the \texttt{valueBox} available in the shinydashboard \citep{R-shinydashboard} package. While similar to what shinydashboard provides, this box will 1) be fully customisable and 2) available in any Shiny application 3) have additional functionalities.
 
 The \texttt{valueBox} equivalent we shall build in this chapter is named ``boxxy,'' and allows creating simple but colourful value boxes with animated numbers (by counting up to it) using \href{https://github.com/inorganik/countUp.js}{countUp.js}.
+
+Figure \ref{fig:boxxy-example} demonstrates what will be built in this chapter.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6683,7 +6694,7 @@ Ensure that string uniquely identifies the binding to avoid future clash with ot
 \hypertarget{shiny-output-usage}{%
 \section{Boxxy Usage}\label{shiny-output-usage}}
 
-With all of this in place, one can use boxxy in a Shiny application.
+With all of this in place, one can use boxxy in a Shiny application (Figure \ref{fig:boxxy-custom}).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7190,7 +7201,7 @@ While the CSS which stylises the checkbox input into a switch is the following.
 \end{Highlighting}
 \end{Shaded}
 
-The above CSS should be placed in the previously created \texttt{assets/styles.css} file.
+The above CSS should be placed in the previously created \texttt{assets/styles.css} file. Figure \ref{fig:checkbox-switch} displays an unstyled checkbox and another styled with the above CSS.
 
 \begin{figure}[H]
 
@@ -7603,7 +7614,7 @@ Finally, like the custom output, the input can be registered with Shiny. It too 
 \end{Highlighting}
 \end{Shaded}
 
-This wraps up a custom input: it can now be used in a shiny application
+This wraps up a custom input: it can now be used in a shiny application (see Figure \ref{fig:switch-example}).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7687,7 +7698,7 @@ We can adapt the application to use this button.
 \end{Highlighting}
 \end{Shaded}
 
-The diagram below attempts to summarize the various elements that were put together and used in the last application.
+Figure \ref{fig:shiny-input-diagram} attempts to summarize the various elements that were put together and used in the last application.
 
 It all starts from the \texttt{switchInput} function, which generates the HTML\index{HTML} defining the switch input and its initial state. In the \texttt{subscribe} method, an event listener checks for changes on this HTML element (\texttt{\$(el).on(\textquotesingle{}change\textquotesingle{},\ ...)}). Every time it changes (check/uncheck) it fires the Shiny \texttt{callback}, which sends the value of the input obtained from \texttt{getValue} through the WebSocket\index{WebSocket}. When the value of the input is changed from the server this value travels through the WebSocket\index{WebSocket} to the front end, where \texttt{receiveMessage} uses \texttt{setValue} to programmatically change the check-box, which incidentally triggers the change event, and back we go.
 
@@ -7893,7 +7904,7 @@ Then it's a matter of completing the Shiny server which was left empty. We add a
 \caption{Shiny using cookies}\label{fig:shiny-cookies}
 \end{figure}
 
-Run the application and save your name. You can then refresh the application, and the welcome message will display your name. You can even kill the server entirely and re-run the app; the welcome message will still display!
+Run the application and save your name. You can then refresh the application, and the welcome message will display your name. You can even kill the server entirely and re-run the app; the welcome message will still display as in Figure \ref{fig:shiny-cookies}!
 
 \hypertarget{shiny-cookies-exercises}{%
 \section{Exercises}\label{shiny-cookies-exercises}}
@@ -7978,7 +7989,7 @@ However, this will generate an issue experienced in a previous chapter; multiple
 \end{Highlighting}
 \end{Shaded}
 
-The package can then be installed with \texttt{devtools::install} so we can test these inputs in a Shiny application.
+The package can then be installed with \texttt{devtools::install} so we can test these inputs in a Shiny application (Figure \ref{fig:gio-shiny-no-handler}).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8099,7 +8110,7 @@ Then the handler must be registered with Shiny since handlers can only be regist
 \end{Highlighting}
 \end{Shaded}
 
-Finally, we can reinstall the package with \texttt{devtools::install} and create a Shiny application to observe the change. Below we use a large example dataset and, since the input now returns a data frame, we can display the input value in a table.
+Finally, we can reinstall the package with \texttt{devtools::install} and create a Shiny application to observe the change. In Figure \ref{fig:gio-input-handler} we use a large example dataset and, since the input now returns a data frame, we can display the input value in a table.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8151,7 +8162,7 @@ This book previously explored how to send data from the Shiny server to the fron
 
 Now imagine that only one of those aspects needs changing, say the data, or the style, given the functions currently at hand one would have to redraw the entire visualisation, only this time changing the data or the style. This is inelegant and not efficient, most JavaScript visualisation libraries, including gio.js, will enable changing only certain aspects of the output without having to redraw it all from scratch.
 
-Before we look into the implementation, let us create a Shiny application which would benefit from such a feature. The Shiny application below provides a drop-down menu to select between two datasets to draw on the globe, running it reveals an issue with gio though. Upon selecting a dataset with the drop down a second globe appears underneath the original one. This is because internally gio.js creates a new element (\texttt{\textless{}canvas\textgreater{}}) within the \texttt{\textless{}div\textgreater{}} created by \texttt{htmlwidgets} when running \texttt{init} regardless of whether one was already created. Therefore, every call to \texttt{init} creates a new \texttt{\textless{}canvas\textgreater{}} with a different globe. Note that most visualisation libraries \emph{will not have that issue}, they will detect the existing output and override it instead.
+Before we look into the implementation, let us create a Shiny application which would benefit from such a feature. The Shiny application below (Figure \ref{fig:gio-shiny-error}) provides a drop-down menu to select between two datasets to draw on the globe, running it reveals an issue with gio though. Upon selecting a dataset with the drop down a second globe appears underneath the original one. This is because internally gio.js creates a new element (\texttt{\textless{}canvas\textgreater{}}) within the \texttt{\textless{}div\textgreater{}} created by \texttt{htmlwidgets} when running \texttt{init} regardless of whether one was already created. Therefore, every call to \texttt{init} creates a new \texttt{\textless{}canvas\textgreater{}} with a different globe. Note that most visualisation libraries \emph{will not have that issue}, they will detect the existing output and override it instead.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8544,7 +8555,7 @@ Now onto the JavaScript code to catch that message and actually clear the data f
 \end{Highlighting}
 \end{Shaded}
 
-Then one can build an application to test that new function. We build a Shiny application with a button to add the data to the visualisation and another to clear data from it.
+Then one can build an application to test that new function. We build a Shiny application with a button to add the data to the visualisation and another to clear data from it, as shown in Figure \ref{fig:giod-shiny-clear-data}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8636,7 +8647,7 @@ At this stage, one can try the function in a Shiny application, but it will not 
 \end{Highlighting}
 \end{Shaded}
 
-This forces the chart to update, applying the new style. Below we write an application that provides a dropdown to switch between two styles.
+This forces the chart to update, applying the new style. Below we write an application that provides a dropdown to switch between two styles (Figure \ref{fig:gio-shiny-style}).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -9836,7 +9847,7 @@ To demonstrate how webpack enables modularising code, we will not place all the 
 \end{Highlighting}
 \end{Shaded}
 
-Therefore, the entry point \texttt{index.js} needs to import the \texttt{input.js} file, which itself imports the pass-phrase from \texttt{secret.js}.
+Therefore, as shown in Figure \ref{fig:webpack-shiny}, the entry point \texttt{index.js} needs to import the \texttt{input.js} file, which itself imports the pass-phrase from \texttt{secret.js}.
 
 \begin{figure}[H]
 
@@ -9989,7 +10000,7 @@ This can be used in the Shiny application, which we modify so it listens to the 
 \end{Highlighting}
 \end{Shaded}
 
-Once the application is launched the user can type the phrase \texttt{secret} to see the content of the application.
+Once the application is launched the user can type the phrase \texttt{secret} to see the content of the application (see Figure \ref{fig:mousetrap}).
 
 \begin{figure}[H]
 
@@ -10794,7 +10805,7 @@ Below we make changes to the application, so it features a Boostrap 4 text input
 \end{Highlighting}
 \end{Shaded}
 
-Finally, we can bundle the JavaScript, and run the application.
+Finally, we can bundle the JavaScript, and run the application to obtain Figure \ref{fig:vue-bs4}.
 
 \begin{Shaded}
 \begin{Highlighting}[]

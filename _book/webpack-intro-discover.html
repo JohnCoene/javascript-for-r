@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2021-04-17" />
+<meta name="date" content="2021-04-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -673,7 +673,7 @@ This is by no means a safe way to secure an application!
 <p>To demonstrate how webpack enables modularising code, we will not place all the code in the <code>index.js</code> file. We create two other files: <code>secret.js</code> and <code>input.js</code>. The first will contain the pass-phrase and the second will have the code to handle the key strokes via mousetrap and set the Shiny input. This will enable using the pass-phrase in multiple places without duplicating code.</p>
 <div class="sourceCode" id="cb413"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb413-1" title="1"><span class="kw">file.create</span>(<span class="st">&quot;src/input.js&quot;</span>)</a>
 <a class="sourceLine" id="cb413-2" title="2"><span class="kw">file.create</span>(<span class="st">&quot;src/secret.js&quot;</span>)</a></code></pre></div>
-<p>Therefore, the entry point <code>index.js</code> needs to import the <code>input.js</code> file, which itself imports the pass-phrase from <code>secret.js</code>.</p>
+<p>Therefore, as shown in Figure <a href="webpack-intro-discover.html#fig:webpack-shiny">21.1</a>, the entry point <code>index.js</code> needs to import the <code>input.js</code> file, which itself imports the pass-phrase from <code>secret.js</code>.</p>
 <div class="figure" style="text-align: center"><span id="fig:webpack-shiny"></span>
 <div id="htmlwidget-1857417b339e6c54d99e" style="width:100%;height:250px;" class="grViz html-widget"></div>
 <script type="application/json" data-for="htmlwidget-1857417b339e6c54d99e">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR compound=true]\n  node [shape=box]\n\n  subgraph cluster0 {\n    shiny [label=\"import shiny\"]\n    label = \"input.js\"\n    color=gold\n  }\n\n  subgraph cluster1 {\n    passphrase [label=\"export var\"]\n    label = \"secret.js\"\n    color=gold\n  }\n\n  shiny -> \"index.js\" [label=\"import module\", ltail=cluster0]\n  passphrase -> shiny [label=\"import variable\", ltail=cluster1, lhead=cluster0]\n  \"externals\" -> shiny [label=\"import shiny\", lhead=cluster0]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
@@ -762,7 +762,7 @@ FIGURE 21.1: Webpack with Shiny
 <a class="sourceLine" id="cb422-27" title="27">}</a>
 <a class="sourceLine" id="cb422-28" title="28"></a>
 <a class="sourceLine" id="cb422-29" title="29"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
-<p>Once the application is launched the user can type the phrase <code>secret</code> to see the content of the application.</p>
+<p>Once the application is launched the user can type the phrase <code>secret</code> to see the content of the application (see Figure <a href="webpack-intro-discover.html#fig:mousetrap">21.2</a>).</p>
 <div class="figure" style="text-align: center"><span id="fig:mousetrap"></span>
 <img src="images/mousetrap.png" alt="Mousetrap example" width="100%" />
 <p class="caption">

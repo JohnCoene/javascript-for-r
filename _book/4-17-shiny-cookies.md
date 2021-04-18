@@ -157,7 +157,7 @@ shinyApp(ui, server)
 <p class="caption">(\#fig:shiny-cookies)Shiny using cookies</p>
 </div>
 
-Run the application and save your name. You can then refresh the application, and the welcome message will display your name. You can even kill the server entirely and re-run the app; the welcome message will still display!
+Run the application and save your name. You can then refresh the application, and the welcome message will display your name. You can even kill the server entirely and re-run the app; the welcome message will still display as in Figure \@ref(fig:shiny-cookies)!
 
 ## Exercises {#shiny-cookies-exercises}
 

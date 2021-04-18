@@ -10,16 +10,16 @@ Then again, the goal is not to write a lot of convoluted JavaScript. On the cont
 
 ## WebSocket an Shiny {#shiny-intro-websocket}
 
-Shiny\index{Shiny} applications have two components: the user interface (UI) and the server function. These two components communicate via a WebSocket\index{WebSocket}: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server, this connection is managed by Shiny using the httpuv [@R-httpuv] and WebSocket [@R-websocket] packages, while in clients connecting to the server this connection is managed with JavaScript.  
+Shiny\index{Shiny} applications have two components: the user interface (UI) and the server function. These two components communicate via a WebSocket\index{WebSocket}: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server, this connection is managed by Shiny using the httpuv [@R-httpuv] and WebSocket [@R-websocket] packages, while in clients connecting to the server this connection is managed with JavaScript, as depicted in \@ref(fig:websocket-diag).  
 
 <div class="figure" style="text-align: center">
 
 ```{=html}
-<div id="htmlwidget-81f877482b7b9336dfe8" style="width:100%;height:576px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-81f877482b7b9336dfe8">{"x":{"diagram":"\ndigraph{\n  node [shape=record fontsize=10];\n\n  w1 [label=Websocket];\n  w2 [label=Websocket];\n  w3 [label=Websocket];\n  w4 [label=Websocket];\n\n  b1 [label=\"Browser\" color=gold];\n  b2 [label=\"Browser\" color=gold];\n  b3 [label=\"Browser\" color=gold];\n  b4 [label=\"Browser\" color=gold];\n\n  s [label=\"R server\" color=royalBlue];\n\n  s -> w1 -> b1 [dir=both color=dimGray arrowsize=.3];\n  s -> w2 -> b2 [dir=both color=dimGray arrowsize=.3];\n  s -> w3 -> b3 [dir=both color=dimGray arrowsize=.3];\n  s -> w4 -> b4 [dir=both color=dimGray arrowsize=.3];\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-64f9d637f0427de01379" style="width:100%;height:576px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-64f9d637f0427de01379">{"x":{"diagram":"\ndigraph{\n  node [shape=record fontsize=10];\n\n  w1 [label=Websocket];\n  w2 [label=Websocket];\n  w3 [label=Websocket];\n  w4 [label=Websocket];\n\n  b1 [label=\"Browser\" color=gold];\n  b2 [label=\"Browser\" color=gold];\n  b3 [label=\"Browser\" color=gold];\n  b4 [label=\"Browser\" color=gold];\n\n  s [label=\"R server\" color=royalBlue];\n\n  s -> w1 -> b1 [dir=both color=dimGray arrowsize=.3];\n  s -> w2 -> b2 [dir=both color=dimGray arrowsize=.3];\n  s -> w3 -> b3 [dir=both color=dimGray arrowsize=.3];\n  s -> w4 -> b4 [dir=both color=dimGray arrowsize=.3];\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 ```
 
-<p class="caption">(\#fig:unnamed-chunk-2)Websocket visualised</p>
+<p class="caption">(\#fig:websocket-diag)Websocket visualised</p>
 </div>
 
 With that in mind, we can put together a Shiny application, which though simple. Exploits bi-directional communication. The application takes a text input, sends the value of the input to the R server, which sends it back to the UI.
@@ -41,7 +41,7 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-Drawing a diagram of the communication between the UI and the server reveals that though this is a simple application a lot is happening.
+Drawing a diagram of the communication between the UI and the server (Figure \@ref(fig:shiny-websocket-diagram)) reveals that though this is a simple application a lot is happening.
 
 <div class="figure" style="text-align: center">
 
@@ -143,7 +143,7 @@ shinyApp(ui, server)
 <p class="caption">(\#fig:jbox-init)A basic jBox notice</p>
 </div>
 
-The application above essentially reproduces the basic HTML example that was shared; the dependencies are imported, and a script displays a notification. Since all of that takes place in the front end, the body of the server function is empty.
+Figure \@ref(fig:jbox-init), and the application above essentially reproduce the basic HTML example that was shared; the dependencies are imported, and a script displays a notification. Since all of that takes place in the front end, the body of the server function is empty.
 
 ### From R to JavaScript {#shiny-intro-r-to-js}
 
@@ -228,7 +228,7 @@ shinyApp(ui, server)
 <p class="caption">(\#fig:jbox-r2js)A notice triggered by the server</p>
 </div>
 
-In the application above, notice the path that the message follows: it goes from the client (user input) to the server (`observeEvent`), which sends (`sendCustomMessage`) it back to the client. 
+In the previous application that produces Figure \@ref(fig:shiny-alert-diagram), notice the path that the message follows: it goes from the client (user input) to the server (`observeEvent`), which sends (`sendCustomMessage`) it back to the client. 
 
 <div class="figure" style="text-align: center">
 
@@ -268,7 +268,7 @@ jsonlite::toJSON(options, pretty = TRUE, auto_unbox = TRUE)
 #> }
 ```
 
-Therefore, one could construct this list server-side and use it in jBox straight-away. Doing so means the JavaScript code can be simplified to `new jBox('Notice', message);`.
+Therefore, one could construct this list server-side and use it in jBox straight-away. Doing so means the JavaScript code can be simplified to `new jBox('Notice', message);` and produce Figure \@ref(fig:jbox-custom).
 
 ```r
 library(shiny)
@@ -415,7 +415,7 @@ tags$script("Shiny.addCustomMessageHandler(
 });")
 ```
 
-That done it can be incorporated into the application built thus far. Something interesting could be done server-side, but to keep things brief and straightforward, we merely print the value of the input to the R console.
+That done it can be incorporated into the application (Figure \@ref(fig:jbox-end)) built thus far. Something interesting could be done server-side, but to keep things brief and straightforward, we merely print the value of the input to the R console.
 
 ```r
 library(shiny)

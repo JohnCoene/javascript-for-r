@@ -419,7 +419,7 @@ module.exports = {
 </script>
 ```
 
-Finally, we can bundle the JavaScript, and run the application.
+Finally, we can bundle the JavaScript, and run the application to obtain Figure \@ref(fig:vue-bs4).
 
 ```r
 packer::bundle()

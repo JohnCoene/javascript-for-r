@@ -311,7 +311,7 @@ file.create("src/input.js")
 file.create("src/secret.js")
 ```
 
-Therefore, the entry point `index.js` needs to import the `input.js` file, which itself imports the pass-phrase from `secret.js`.
+Therefore, as shown in Figure \@ref(fig:webpack-shiny), the entry point `index.js` needs to import the `input.js` file, which itself imports the pass-phrase from `secret.js`.
 
 <div class="figure" style="text-align: center">
 
@@ -444,7 +444,7 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-Once the application is launched the user can type the phrase `secret` to see the content of the application.
+Once the application is launched the user can type the phrase `secret` to see the content of the application (see Figure \@ref(fig:mousetrap)).
 
 <div class="figure" style="text-align: center">
 <img src="images/mousetrap.png" alt="Mousetrap example" width="100%" />

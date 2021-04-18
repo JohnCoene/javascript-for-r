@@ -24,7 +24,7 @@
 <meta name="author" content="John Coene" />
 
 
-<meta name="date" content="2021-04-17" />
+<meta name="date" content="2021-04-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -490,7 +490,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="shiny-complete-setup" class="section level2">
 <h2><span class="header-section-number">12.2</span> Setup</h2>
-<p>In Shiny, a dropdown menu could be provided to choose from pre-selected images, and upon selection, the server renders the selected image. At the click of a button the model then runs and sends the results to the R server, which prints them in the UI.</p>
+<p>In Shiny, a dropdown menu could be provided to choose from pre-selected images, and upon selection, the server renders the selected image. At the click of a button the model then runs and sends the results to the R server, which prints them in the UI (see Figure <a href="shiny-complete.html#fig:shiny-complex-diagram">12.1</a>).</p>
+<div class="figure" style="text-align: center"><span id="fig:shiny-complex-diagram"></span>
+<div id="htmlwidget-a26cb271260c49af3ac3" style="width:100%;height:450px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a26cb271260c49af3ac3">{"x":{"diagram":"\ndigraph {\n\n  graph [rankdir = LR]\n\n  subgraph cluster_0 {\n    node [shape=box]\n    select [label=\"selectInput(img)\"]\n    btn [label=\"actionButton(classify)\"]\n    img [label=\"<img>\"]\n    res[label=\"textOutput(results)\"]\n    model[label=\"classify()\"]\n    color=gold\n  }\n\n  subgraph cluster_1 {\n    node [shape=box]\n    renderImg[label=\"renderUI()\"]\n    renderResults[label=\"renderPrint()\"]\n    obs [label=\"observeEvent(classify)\"]\n    label = \"Server\"\n    color=royalBlue\n  }\n\n  select -> renderImg\n  renderImg -> img\n  btn -> obs\n  obs -> model\n  img -> model\n  model -> renderResults\n  renderResults -> res\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p class="caption">
+FIGURE 12.1: Simple shiny app, complex communication
+</p>
+</div>
 <p>This makes for what is probably a signature of Shiny: a considerable amount of bi-directional communication between the server and client as Shiny makes the most of the WebSocket. Some readers with more advanced knowledge in JavaScript will find ways to avoid the use of the server in places to do more in the client; either way works.</p>
 </div>
 <div id="shiny-complete-dependencies" class="section level2">
@@ -543,7 +550,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="shiny-complete-skeleton" class="section level2">
 <h2><span class="header-section-number">12.5</span> Skeleton</h2>
-<p>At this stage, it’s probably good to build a skeleton of the application.</p>
+<p>At this stage, it’s probably good to build a skeleton of the application (Figure <a href="shiny-complete.html#fig:shiny-complete-skeleton">12.2</a>).</p>
 <p>After loading the Shiny package, we use the <code>addResourcePath</code> function to serve the images so they can be made accessible by the Shiny UI to display. At this stage, the application itself only provides a dropdown to select one of the two images previously downloaded, and a button to trigger the classification, which currently does not do anything, we’ll delve into this next. Since we placed the <code>classify.js</code> JavaScript file in the <code>assets</code> directory we can also import it in the UI with a <code>script</code> tag; importantly this is done <em>after</em> the ml5.js dependency as it will depend on it. Another crucial thing that the app does is set the attribute <code>id</code> of the <code>&lt;img&gt;</code> to <code>bird</code> it is essential to have a convenient way to uniquely identify the image later on as ml5.js will need to read this image in order to classify it.</p>
 <div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb220-1" title="1"><span class="kw">library</span>(shiny)</a>
 <a class="sourceLine" id="cb220-2" title="2"></a>
@@ -585,7 +592,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="figure" style="text-align: center"><span id="fig:shiny-complete-skeleton"></span>
 <img src="images/shiny-complete-skeleton.png" alt="Shiny app skeleton" width="100%" />
 <p class="caption">
-FIGURE 12.1: Shiny app skeleton
+FIGURE 12.2: Shiny app skeleton
 </p>
 </div>
 </div>
@@ -629,11 +636,11 @@ There is no need to repeatedly initialise the classifier every time a user hits 
 <a class="sourceLine" id="cb223-15" title="15">  )<span class="op">;</span></a>
 <a class="sourceLine" id="cb223-16" title="16"><span class="op">}</span>)<span class="op">;</span></a></code></pre></div>
 <p>As mentioned at the start of the chapter, the results of the classification should be sent back to the R server, but for now, we shall content ourselves with logging it in the console.</p>
-<p>Running the application and opening the console already gives us encouraging results! The classifier gives “flamingo” the greatest confidence (albeit at <code>0.48</code>).</p>
+<p>Running the application and opening the console (Figure <a href="shiny-complete.html#fig:shiny-complete-classify-console">12.3</a>) already gives us encouraging results! The classifier gives “flamingo” the greatest confidence (albeit at <code>0.48</code>).</p>
 <div class="figure" style="text-align: center"><span id="fig:shiny-complete-classify-console"></span>
 <img src="images/shiny-complete-classify-console.png" alt="Results logged to the console" width="100%" />
 <p class="caption">
-FIGURE 12.2: Results logged to the console
+FIGURE 12.3: Results logged to the console
 </p>
 </div>
 </div>
@@ -657,7 +664,7 @@ FIGURE 12.2: Results logged to the console
 <a class="sourceLine" id="cb224-14" title="14">    <span class="op">}</span></a>
 <a class="sourceLine" id="cb224-15" title="15">  )<span class="op">;</span></a>
 <a class="sourceLine" id="cb224-16" title="16"><span class="op">}</span>)<span class="op">;</span></a></code></pre></div>
-<p>Now that the results are sent back to the R server, we can use them to display it back in the application so users of the application may know how the model performed. We shall eventually make this prettier, but for now, we’ll limit it to displaying the results in <code>verbatimTextOutput</code>.</p>
+<p>Now that the results are sent back to the R server, we can use them to display it back in the application (Figure <a href="shiny-complete.html#fig:shiny-complete-ml5-output">12.4</a>) so users of the application may know how the model performed. We shall eventually make this prettier, but for now, we’ll limit it to displaying the results in <code>verbatimTextOutput</code>.</p>
 <div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb225-1" title="1"><span class="kw">library</span>(shiny)</a>
 <a class="sourceLine" id="cb225-2" title="2"></a>
 <a class="sourceLine" id="cb225-3" title="3"><span class="co"># serve images</span></a>
@@ -706,7 +713,7 @@ FIGURE 12.2: Results logged to the console
 <div class="figure" style="text-align: center"><span id="fig:shiny-complete-ml5-output"></span>
 <img src="images/ml5-output.png" alt="Classifier basic output" width="100%" />
 <p class="caption">
-FIGURE 12.3: Classifier basic output
+FIGURE 12.4: Classifier basic output
 </p>
 </div>
 </div>
@@ -738,7 +745,7 @@ It is not advised to overwrite the registered handler.
 <a class="sourceLine" id="cb229-6" title="6">    <span class="op">}</span></a>
 <a class="sourceLine" id="cb229-7" title="7">  )<span class="op">;</span></a>
 <a class="sourceLine" id="cb229-8" title="8"><span class="op">}</span>)<span class="op">;</span></a></code></pre></div>
-<p>Now that the results of <code>input$classification</code> is a data.frame we can display the results in a neat table instead.</p>
+<p>Now that the results of <code>input$classification</code> is a data.frame we can display the results in a neat table instead, as shown in Figure <a href="shiny-complete.html#fig:shiny-complete-table-output">12.5</a>.</p>
 <div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb230-1" title="1"><span class="kw">library</span>(shiny)</a>
 <a class="sourceLine" id="cb230-2" title="2"></a>
 <a class="sourceLine" id="cb230-3" title="3"><span class="co"># serve images</span></a>
@@ -794,7 +801,7 @@ It is not advised to overwrite the registered handler.
 <div class="figure" style="text-align: center"><span id="fig:shiny-complete-table-output"></span>
 <img src="images/shiny-complete-table.png" alt="Classifier table output" width="100%" />
 <p class="caption">
-FIGURE 12.4: Classifier table output
+FIGURE 12.5: Classifier table output
 </p>
 </div>
 </div>

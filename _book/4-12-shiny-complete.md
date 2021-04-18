@@ -39,9 +39,17 @@ Now we can jump to the next section to think about how this can be implemented i
 
 ## Setup {#shiny-complete-setup}
 
-In Shiny, a dropdown menu could be provided to choose from pre-selected images, and upon selection, the server renders the selected image. At the click of a button the model then runs and sends the results to the R server, which prints them in the UI.
+In Shiny, a dropdown menu could be provided to choose from pre-selected images, and upon selection, the server renders the selected image. At the click of a button the model then runs and sends the results to the R server, which prints them in the UI (see Figure \@ref(fig:shiny-complex-diagram)).
 
+<div class="figure" style="text-align: center">
 
+```{=html}
+<div id="htmlwidget-a26cb271260c49af3ac3" style="width:100%;height:450px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a26cb271260c49af3ac3">{"x":{"diagram":"\ndigraph {\n\n  graph [rankdir = LR]\n\n  subgraph cluster_0 {\n    node [shape=box]\n    select [label=\"selectInput(img)\"]\n    btn [label=\"actionButton(classify)\"]\n    img [label=\"<img>\"]\n    res[label=\"textOutput(results)\"]\n    model[label=\"classify()\"]\n    color=gold\n  }\n\n  subgraph cluster_1 {\n    node [shape=box]\n    renderImg[label=\"renderUI()\"]\n    renderResults[label=\"renderPrint()\"]\n    obs [label=\"observeEvent(classify)\"]\n    label = \"Server\"\n    color=royalBlue\n  }\n\n  select -> renderImg\n  renderImg -> img\n  btn -> obs\n  obs -> model\n  img -> model\n  model -> renderResults\n  renderResults -> res\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+```
+
+<p class="caption">(\#fig:shiny-complex-diagram)Simple shiny app, complex communication</p>
+</div>
 
 This makes for what is probably a signature of Shiny: a considerable amount of bi-directional communication between the server and client as Shiny makes the most of the WebSocket\index{WebSocket}. Some readers with more advanced knowledge in JavaScript will find ways to avoid the use of the server in places to do more in the client; either way works.
 
@@ -116,7 +124,7 @@ These files will eventually need to be served (`addResourcePath`), so they are a
 
 ## Skeleton {#shiny-complete-skeleton}
 
-At this stage, it's probably good to build a skeleton of the application. 
+At this stage, it's probably good to build a skeleton of the application (Figure \@ref(fig:shiny-complete-skeleton)). 
 
 After loading the Shiny\index{Shiny} package, we use the `addResourcePath` function to serve the images so they can be made accessible by the Shiny UI to display. At this stage, the application itself only provides a dropdown to select one of the two images previously downloaded, and a button to trigger the classification, which currently does not do anything, we'll delve into this next. Since we placed the `classify.js` JavaScript file in the `assets` directory we can also import it in the UI with a `script` tag; importantly this is done _after_ the ml5.js dependency as it will depend on it. Another crucial thing that the app does is set the attribute `id` of the `<img>` to `bird` it is essential to have a convenient way to uniquely identify the image later on as ml5.js will need to read this image in order to classify it.
 
@@ -220,7 +228,7 @@ Shiny.addCustomMessageHandler('classify', function(data){
 
 As mentioned at the start of the chapter, the results of the classification should be sent back to the R server, but for now, we shall content ourselves with logging it in the console.
 
-Running the application and opening the console already gives us encouraging results! The classifier gives "flamingo" the greatest confidence (albeit at `0.48`).
+Running the application and opening the console (Figure \@ref(fig:shiny-complete-classify-console)) already gives us encouraging results! The classifier gives "flamingo" the greatest confidence (albeit at `0.48`).
 
 <div class="figure" style="text-align: center">
 <img src="images/shiny-complete-classify-console.png" alt="Results logged to the console" width="100%" />
@@ -252,7 +260,7 @@ Shiny.addCustomMessageHandler('classify', function(data){
 });
 ```
 
-Now that the results are sent back to the R server, we can use them to display it back in the application so users of the application may know how the model performed. We shall eventually make this prettier, but for now, we'll limit it to displaying the results in `verbatimTextOutput`.
+Now that the results are sent back to the R server, we can use them to display it back in the application (Figure \@ref(fig:shiny-complete-ml5-output)) so users of the application may know how the model performed. We shall eventually make this prettier, but for now, we'll limit it to displaying the results in `verbatimTextOutput`.
 
 ```r
 library(shiny)
@@ -351,7 +359,7 @@ Shiny.addCustomMessageHandler('classify', function(data){
 });
 ```
 
-Now that the results of `input$classification` is a data.frame we can display the results in a neat table instead.
+Now that the results of `input$classification` is a data.frame we can display the results in a neat table instead, as shown in Figure \@ref(fig:shiny-complete-table-output).
 
 ```r
 library(shiny)
