@@ -22,12 +22,7 @@ graphics: yes
 
 # Preface {-}
 
-_This is the online version of JavaScript for R, a book currently under development and intended for release as part of the [R series by CRC Press](https://www.routledge.com/Chapman--HallCRC-The-R-Series/book-series/CRCTHERSER)._
 
-  <div style = "float:left; width:400px; max-width:100%; margin-right:1em;">
-  <img src="images/cover.jpg" width = "100%">
-  <small><span>Photo by <a href="https://unsplash.com/@davisuko?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Cody Davis</a> on <a href="https://unsplash.com/s/photos/paint?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span></small>
-  </div>
 
 The R programming language has seen the integration of many languages; C, C++, Python, to name a few, can be seamlessly embedded into R so one can conveniently call code written in other languages from the R console. Little known to many, R works just as well with JavaScript---this book delves into the various ways both languages can work together.
 
@@ -65,3 +60,5 @@ Many people in the R community have inspired me and provided the knowledge to wr
 
 Early reviewers also shared precious feedback that helped make the book dramatically better, thanks to [Maya Gans,](@mayacelium) [
 Felipe Mattioni Maturana,](@felipe_mattioni) and [Wei Su](@Wei_Su) for thoroughly going through every line of the book.
+
+Thanks to [Cody Davis](https://www.davisuko.com/) for the cover image of the book.

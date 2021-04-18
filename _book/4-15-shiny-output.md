@@ -22,10 +22,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/boxxy-example.png" alt="Custom output example" width="100%" />
-<p class="caption">(\#fig:boxxy-example)Custom output example</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/boxxy-example} 
+
+}
+
+\caption{Custom output example}(\#fig:boxxy-example)
+\end{figure}
 
 ## Inner-workings {#shiny-output-inner-workings}
 
@@ -121,9 +125,10 @@ boxxyOutput <- function(id){
 }
 ```
 
-<div class="rmdnote">
-<p>Make sure you use unique class names so they are not accidentally overridden by the user.</p>
-</div>
+\begin{rmdnote}
+Make sure you use unique class names so they are not accidentally
+overridden by the user.
+\end{rmdnote}
 
 As shown, the box should include a title and an animated value. These could be generated entirely in JavaScript, but it's actually easier to create placeholders with htmltools tags. We generate dynamic ids for those so they can easily be referenced later on in JavaScript: `id-boxxy-value` for the value and `id-boxxy-title` for the title.
 
@@ -272,9 +277,11 @@ Since boxxy uses the element id, the default will work, and this can be skipped 
 
 Next, one needs to implement the `renderValue` function, which is the same function that generates the output based on data used in `boxxy` and sent to the front end with `renderBoxxy`. The `renderValue` method accepts two arguments: first `el`, the element where the output should be generated; this is effectively the output of `boxxyOutput`, which the binding found using `find`. The second argument is `data` which is the data, passed to `boxxy` and serialised via `renderBoxxy`. 
 
-<div class="rmdnote">
-<p>The <code>renderValue</code> is in effect very similar if not identical to the JavaScript function of the same name involved in creating htmlwidgets.</p>
-</div>
+\begin{rmdnote}
+The \texttt{renderValue} is in effect very similar if not identical to
+the JavaScript function of the same name involved in creating
+htmlwidgets.
+\end{rmdnote}
 
 ### Boxxy Title {#shiny-output-boxxy-title}
 
@@ -480,10 +487,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/custom-output-boxxy.png" alt="Shiny application with boxxy" width="100%" />
-<p class="caption">(\#fig:boxxy-custom)Shiny application with boxxy</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/custom-output-boxxy} 
+
+}
+
+\caption{Shiny application with boxxy}(\#fig:boxxy-custom)
+\end{figure}
 
 ## Injecting Dependencies {#shiny-output-inject}
 
@@ -575,9 +586,10 @@ renderBoxxy <- function(expr, env = parent.frame(),
 
 Within the `if` statement, the dependency can be created with the htmltools as done for the binding. Ensure the names of the dependencies are unique as shiny internally uses it to differentiate between them; if they bear the same name Shiny assumes they are the same and will only render one of them.
 
-<div class="rmdnote">
-<p>Make sure dependencies bear different names or Shiny thinks it’s the same and only renders one of them.</p>
-</div>
+\begin{rmdnote}
+Make sure dependencies bear different names or Shiny thinks it's the
+same and only renders one of them.
+\end{rmdnote}
 
 The dependency generated with htmltools is then passed to the `shiny::createWebDependency` function, which internally uses `shiny::addResourcePath` to serve the dependency. This is necessary here as, at this stage, the countup dependency is not actually rendered; below we merely add it to the list of options that serialised to JSON\index{JSON}. Indeed, this will actually be injected JavaScript-side. Therefore the front end needs to be able to access this file, hence it is served.
 

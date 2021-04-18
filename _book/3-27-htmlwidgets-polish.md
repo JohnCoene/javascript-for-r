@@ -148,10 +148,14 @@ gio(
 ) 
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/crosstalk-three-dots.png" alt="Gio and plenty of options" width="100%" />
-<p class="caption">(\#fig:crosstalk-three-dots)Gio and plenty of options</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/crosstalk-three-dots} 
+
+}
+
+\caption{Gio and plenty of options}(\#fig:crosstalk-three-dots)
+\end{figure}
 
 ## Interface Design {#widgets-final-interface}
 
@@ -159,9 +163,10 @@ As you develop a wrapper to an external visualisation library, you will have to 
 
 As observed, the gio.js library has a function named `setStyle` to change the theme of the visualisation, but it has numerous others, `setSurfaceColor`, `addHalo`, `setHaloColor`, `removeHalo`, and plenty more. We might want to wrap all or some of these in a single function to provide a more convenient API to the R user. 
 
-<div class="rmdnote">
-<p>Design for humans: always keep in mind the interface you make available to users as you develop the package.</p>
-</div>
+\begin{rmdnote}
+Design for humans: always keep in mind the interface you make available
+to users as you develop the package.
+\end{rmdnote}
 
 You can always go beyond what the underlying library provides. For instance, the country selected by default is always China, regardless of whether the data includes that country or not. This can lead to creating underwhelming visualisations as no arcs appear. One can consider adding simple heiristics to the `gio` function to ensure that is not the case, or have the function throw a warning when the initial country is not present in the dataset.
 

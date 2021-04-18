@@ -71,10 +71,14 @@ arcs <- jsonlite::fromJSON(
 gio(arcs)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-size-issue.png" alt="Gio with no sizing management" width="100%" />
-<p class="caption">(\#fig:gio-size-issue)Gio with no sizing management</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-size-issue} 
+
+}
+
+\caption{Gio with no sizing management}(\#fig:gio-size-issue)
+\end{figure}
 
 When this is not specified, htmlwidgets sets the width of the visualisation to 400 pixels (see Figure \@ref(fig:gio-size-issue)).
 
@@ -115,10 +119,14 @@ htmlwidgets::createWidget(
 )
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-fit.png" alt="Gio with sizing policy" width="100%" />
-<p class="caption">(\#fig:gio-fit)Gio with sizing policy</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-fit} 
+
+}
+
+\caption{Gio with sizing policy}(\#fig:gio-fit)
+\end{figure}
 
 Figure \@ref(fig:gio-fit) shows the modified `sizingPolicy` produces a visualisation that fills the browser.
 
@@ -134,10 +142,14 @@ resize: function(width, height) {
 ...
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-small.png" alt="Gio resized" width="100%" />
-<p class="caption">(\#fig:gio-small)Gio resized</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-small} 
+
+}
+
+\caption{Gio resized}(\#fig:gio-small)
+\end{figure}
 
 To give the reader a better idea of what these tend to look like below are the ways plotly, highcharts, and chart.js do it.
 
@@ -226,9 +238,9 @@ htmlwidgets::JS("var x = 3;")
 
 This can be useful where the library requires the use of callback functions, for instance.
 
-<div class="rmdnote">
-<p>Replacing the serialiser will break this feature.</p>
-</div>
+\begin{rmdnote}
+Replacing the serialiser will break this feature.
+\end{rmdnote}
 
 ## Prepend and Append Content {#widgets-adv-prepend-append}
 
@@ -247,16 +259,20 @@ gio(arcs) %>%
   gio_title("Gio.js htmlwidget!")
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-title.png" alt="Gio output with title" width="100%" />
-<p class="caption">(\#fig:gio-title)Gio output with title</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-title} 
+
+}
+
+\caption{Gio output with title}(\#fig:gio-title)
+\end{figure}
 
 While the `prependContent` function places the content above the visualisation, the `appendContent` function places it below, as they accept any valid htmltools or Shiny tag they can also be used for conditional CSS styling for instance. 
 
-<div class="rmdnote">
-<p><code>prependContent</code> and <code>appendContent</code> do not work in Shiny.</p>
-</div>
+\begin{rmdnote}
+\texttt{prependContent} and \texttt{appendContent} do not work in Shiny.
+\end{rmdnote}
 
 ## Dependencies {#widgets-adv-dependencies}
 
@@ -264,10 +280,14 @@ Thus far, this book has only covered one of two ways dependencies can be include
 
 The Google Chrome network tab (see Figure \@ref(fig:htmlwidgets-performances)) shows the information on resources downloaded by the browser (including dependencies) including how long it takes. It is advisable to take a look at it to ensure no dependency drags load time.
 
-<div class="figure" style="text-align: center">
-<img src="images/htmlwidgets-performances.png" alt="Google Chrome network tab" width="100%" />
-<p class="caption">(\#fig:htmlwidgets-performances)Google Chrome network tab</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/htmlwidgets-performances} 
+
+}
+
+\caption{Google Chrome network tab}(\#fig:htmlwidgets-performances)
+\end{figure}
 
 To demonstrate, we will add a function in gio to optionally include [stats.js](https://github.com/mrdoob/stats.js/), a JavaScript performance monitor which displays information such as the number of frames per second (FPS) rendered, or the number of milliseconds needed to render the visualisation\index{visualisation}. Gio.js natively supports stats.js, but the dependency needs to be imported, and that option needs to be enabled on the `controller` as shown in the [documentation](https://giojs.org/html/docs/interfaceStats.html).
 
@@ -403,10 +423,14 @@ arcs %>%
   gio_stats()
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/stats.png" alt="Gio with stats output" width="100%" />
-<p class="caption">(\#fig:gio-stats)Gio with stats output</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/stats} 
+
+}
+
+\caption{Gio with stats output}(\#fig:gio-stats)
+\end{figure}
 
 In brief, it is better to only place the hard dependencies in the `.yml` file; dependencies that are necessary to produce the visualisation and use dynamic dependencies where ever possible. Perhaps one can think of it as the difference between `Imports` and `Suggests` in an R package `DESCRIPTION` file.
 

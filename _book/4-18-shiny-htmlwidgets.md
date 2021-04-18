@@ -98,10 +98,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-shiny-input-no-handler.png" alt="Gio with input data" width="100%" />
-<p class="caption">(\#fig:gio-shiny-no-handler)Gio with input data</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-input-no-handler} 
+
+}
+
+\caption{Gio with input data}(\#fig:gio-shiny-no-handler)
+\end{figure}
 
 One thing to note before moving on, the data is sent from the client to the server whether the inputs are used or not, though this likely will not negatively impact gio it can reduce performances if the callback function is triggered too frequently. For instance, an input value set when the user hovers a scatter plot might lead to the event being fired very frequently and too much data being sent to the server, slowing things down and providing a poor experience.
 
@@ -196,10 +200,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-input-handler.png" alt="Gio input data transformed to a data frame" width="100%" />
-<p class="caption">(\#fig:gio-input-handler)Gio input data transformed to a data frame</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-input-handler} 
+
+}
+
+\caption{Gio input data transformed to a data frame}(\#fig:gio-input-handler)
+\end{figure}
 
 ## R to Widgets {#shiny-widgets-r-to-widgets}
 
@@ -251,10 +259,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-shiny-error.png" alt="Gio issue in shiny" width="100%" />
-<p class="caption">(\#fig:gio-shiny-error)Gio issue in shiny</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-error} 
+
+}
+
+\caption{Gio issue in shiny}(\#fig:gio-shiny-error)
+\end{figure}
 
 A solution to this is to ensure the container (`el`) is empty before generating the visualisation. Incidentally, this can be executed with a JavaScript method previously used in this book: `innerHTML`.
 
@@ -604,10 +616,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-shiny-clear.png" alt="Gio with clear data proxy" width="100%" />
-<p class="caption">(\#fig:giod-shiny-clear-data)Gio with clear data proxy</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-clear} 
+
+}
+
+\caption{Gio with clear data proxy}(\#fig:giod-shiny-clear-data)
+\end{figure}
 
 ## Update the Widget {#shiny-widgets-update}
 
@@ -679,7 +695,11 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-shiny-style.png" alt="Gio with dynamic style" width="100%" />
-<p class="caption">(\#fig:gio-shiny-style)Gio with dynamic style</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-style} 
+
+}
+
+\caption{Gio with dynamic style}(\#fig:gio-shiny-style)
+\end{figure}
