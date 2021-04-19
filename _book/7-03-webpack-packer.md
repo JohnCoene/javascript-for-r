@@ -30,9 +30,9 @@ Whilst htmlwidgets only allows creating scaffolds for widgets; packer allows cre
 
 This gives a few powerful functions that correctly set up webpack. These will build the necessary file structure and configuration depending on the scaffold and the context (whether it is a basic package, a golem application, a package with an existing scaffold, etc.)
 
-\begin{rmdnote}
-One can use multiple scaffolds in a single package or Shiny application.
-\end{rmdnote}
+<div class="rmdnote">
+<p>One can use multiple scaffolds in a single package or Shiny application.</p>
+</div>
 
 Packer goes beyond merely setting up webpack and NPM; it will also create the necessary R functions, roxygen documentation, and examples, so every scaffold is fully functional out-of-the-box.
 

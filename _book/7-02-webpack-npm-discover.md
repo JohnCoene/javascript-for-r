@@ -10,11 +10,9 @@ There is a lot of depth to NPM and webpack; we only touch upon the surface here 
 
 As Node's Package Manager, a working installation of Node.js, is required, NPM ships with it. A bit like R in a sense where the package manager also comes with the language, install R, and you can install packages from CRAN with `install.packages`. The same applies here, install Node and you can install NPM packages from the command line.
 
-\begin{rmdnote}
-We are only going to use Node.js \emph{indirectly}, some of its
-functionalities and its package manager. This is not about building Node
-applications.
-\end{rmdnote}
+<div class="rmdnote">
+<p>We are only going to use Node.js <em>indirectly</em>, some of its functionalities and its package manager. This is not about building Node applications.</p>
+</div>
 
 Below are some directions on how to install Node.js. In the event this does not work or you encounter issues please refer to the [official website](https://nodejs.org/en/).
 
@@ -119,10 +117,9 @@ Notice that this updated the `package.json` file and created the `package-lock.j
 
 The directory `node_modules` actually holds all the dependencies, and it will grow in size as you add more, it's important that this directory is not pushed to whatever version control system you happen use (GitHub, Bitbucket, Gitlab). 
 
-\begin{rmdnote}
-Exclude the \texttt{node\_modules} directory from your version control
-(Git or otherwise)
-\end{rmdnote}
+<div class="rmdnote">
+<p>Exclude the <code>node_modules</code> directory from your version control (Git or otherwise)</p>
+</div>
 
 The dependencies are anyway not needed as one can pull the project without the `node_modules` then from the root of the project run `npm install` to install the dependencies that are listed in the `package.json` file. We can indeed observe that this file was updated to include `webpack` and `webpack-cli` as `devDependencies`, at the bottom of the file.
 
@@ -274,9 +271,9 @@ Let's install a dependency and use it in our Shiny application.
 
 We'll install [mousetrap,](https://github.com/ccampbell/mousetrap) a library to handle key-strokes. We're going to use it to hide the UI of the Shiny application behind a secret pass-phrase; it will only be revealed after it has been typed. This can be done by observing a specific set of key-strokes with mousetrap and set a Shiny input value when that particular sequence is typed.
 
-\begin{rmdnote}
-This is by no means a safe way to secure an application!
-\end{rmdnote}
+<div class="rmdnote">
+<p>This is by no means a safe way to secure an application!</p>
+</div>
 
 Though it is certainly not a  real-world example, it is educational and quite a bit of fun.
 
@@ -316,14 +313,15 @@ file.create("src/secret.js")
 
 Therefore, as shown in Figure \@ref(fig:webpack-shiny), the entry point `index.js` needs to import the `input.js` file, which itself imports the pass-phrase from `secret.js`.
 
-\begin{figure}[H]
+<div class="figure" style="text-align: center">
 
-{\centering \includegraphics[width=1\linewidth]{images/07-webpack-shiny} 
+```{=html}
+<div id="htmlwidget-1857417b339e6c54d99e" style="width:100%;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1857417b339e6c54d99e">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR compound=true]\n  node [shape=box]\n\n  subgraph cluster0 {\n    shiny [label=\"import shiny\"]\n    label = \"input.js\"\n    color=gold\n  }\n\n  subgraph cluster1 {\n    passphrase [label=\"export var\"]\n    label = \"secret.js\"\n    color=gold\n  }\n\n  shiny -> \"index.js\" [label=\"import module\", ltail=cluster0]\n  passphrase -> shiny [label=\"import variable\", ltail=cluster1, lhead=cluster0]\n  \"externals\" -> shiny [label=\"import shiny\", lhead=cluster0]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+```
 
-}
-
-\caption{Webpack with Shiny}(\#fig:webpack-shiny)
-\end{figure}
+<p class="caption">(\#fig:webpack-shiny)Webpack with Shiny</p>
+</div>
 
 Again, there are multiple ways to import and export modules, functions, variables, etc. This book will use the ES6 syntax as [recommended by webpack.](https://webpack.js.org/api/module-methods/#es6-recommended) Though this mechanism is present in other languages, such as Python (where it somewhat resembles ES6), it will take some getting used to for R programmers as though this language features some form of import (`library()`) and export (`@export` roxygen2 tag), this differs significantly from how it works in webpack. This is, however, key to using webpack, as it is what ultimately enables the creation of modules that make code more robust.
 
@@ -448,13 +446,9 @@ shinyApp(ui, server)
 
 Once the application is launched the user can type the phrase `secret` to see the content of the application (see Figure \@ref(fig:mousetrap)).
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/mousetrap} 
-
-}
-
-\caption{Mousetrap example}(\#fig:mousetrap)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/mousetrap.png" alt="Mousetrap example" width="100%" />
+<p class="caption">(\#fig:mousetrap)Mousetrap example</p>
+</div>
 
 That is it for this chapter. As stated multiple times there is far more depth to webpack, but this is outside the scope of this book, instead in the next chapter we discover an easier way to set up such projects and make R and webpack work in a more seamless fashion.

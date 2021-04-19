@@ -427,13 +427,9 @@ devtools::load_all()
 run_app()
 ```
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth]{images/vue-bs4} 
-
-}
-
-\caption{Shiny application with Vue and Bootstrap 4}(\#fig:vue-bs4)
-\end{figure}
+<div class="figure" style="text-align: center">
+<img src="images/vue-bs4.png" alt="Shiny application with Vue and Bootstrap 4" width="100%" />
+<p class="caption">(\#fig:vue-bs4)Shiny application with Vue and Bootstrap 4</p>
+</div>
 
 Note how little code was written in order to provide these functionalities. It is one of the most powerful features of frameworks like Vue and React. They are not necessary; this could have been coded in vanilla JavaScript, but would admittedly require much more (difficult to read) code.
