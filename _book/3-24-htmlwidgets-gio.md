@@ -32,12 +32,16 @@ Then again, the first order of business when looking to integrate a library is t
 </html>
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-example.png" alt="Gio.js example" width="100%" />
-<p class="caption">(\#fig:gio-example)Gio.js example</p>
-</div>
+\begin{figure}[H]
 
-Gio.js has itself a dependency, [three.js](https://threejs.org/), which needs to be imported before gio.js, other than that not much differs from libraries previously explored in this chapter.
+{\centering \includegraphics[width=1\linewidth]{images/gio-example} 
+
+}
+
+\caption{Gio.js example}(\#fig:gio-example)
+\end{figure}
+
+Gio.js has itself a dependency\index{dependency}, [three.js](https://threejs.org/), which needs to be imported before gio.js, other than that not much differs from libraries previously explored in this chapter.
 
 ```r
 usethis::create_package("gio")
@@ -46,7 +50,7 @@ htmlwidgets::scaffoldWidget("gio")
 
 ## Dependencies {#widgets-full-deps}
 
-Handling the dependencies does not differ much, we create the directories within the `inst` path and download the dependencies within them.
+Handling the dependencies\index{dependency} does not differ much, we create the directories within the `inst` path and download the dependencies within them.
 
 ```r
 # create directories for JS dependencies
@@ -159,10 +163,14 @@ devtools::load_all()
 gio(message = "This required but not used")
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-init.png" alt="Gio output without data" width="100%" />
-<p class="caption">(\#fig:gio-init)Gio output without data</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-init} 
+
+}
+
+\caption{Gio output without data}(\#fig:gio-init)
+\end{figure}
 
 Not too shabby given how little work was put into this! Before we move on, let us optimise something. In the JavaScript code, we retrieve the `container` using `el.id`, but this in effect is very inefficient: `el` is identical to `container`.
 
@@ -281,7 +289,7 @@ Unfortunately, this breaks everything, and we are presented with a blank screen.
 }
 ```
 
-Htmlwidgets serialised the data frame column-wise (long), where each array is a column, whereas gio.js expect the data to be wide (row-wise serialisation), where each array is an arc (row).
+Htmlwidgets serialised\index{serialise} the data frame column-wise (long), where each array is a column, whereas gio.js expect the data to be wide (row-wise serialisation), where each array is an arc (row).
 
 
 ```r
@@ -293,11 +301,11 @@ jsonlite::toJSON(arcs, dataframe = "rows")
 #> [{"e":"CN","i":"US","v":3300000},{"e":"CN","i":"RU","v":10000}]
 ```
 
-As mentioned previously, the convention has it that rectangular data (data frames) are serialised row-wise. That is likely to be a recurring problem for many widgets.
+As mentioned previously, the convention has it that rectangular data (data frames) are serialised\index{serialise} row-wise. That is likely to be a recurring problem for many widgets.
 
 ## Transforming Data {#widgets-full-transform-data}
 
-There are multiple ways to transform the data and ensure the serialised JSON is as the JavaScript library expects it to be. The following sections explore those various methods before settling on a specific one for the gio package.
+There are multiple ways to transform the data and ensure the serialised\index{serialise} JSON is as the JavaScript library expects it to be. The following sections explore those various methods before settling on a specific one for the gio package.
 
 ### Using JavaScript {#widgets-full-transform-data-js}
 
@@ -319,7 +327,7 @@ renderValue: function(x) {
 
 ### Modify Serialiser {#widgets-full-transform-data-modify}
 
-Instead of serialising the data a certain way then correct it in JavaScript as demonstrated previously, one can also modify, or even replace the htmlwidgets default serialiser. Speaking of which, below is the default serializer used by htmlwidgets.
+Instead of serialising the data a certain way then correct it in JavaScript as demonstrated previously, one can also modify, or even replace the htmlwidgets default serialiser\index{serialise}. Speaking of which, below is the default serializer used by htmlwidgets.
 
 ```r
 function (x, ..., dataframe = "columns", null = "null", 
@@ -338,7 +346,7 @@ na = "null", auto_unbox = TRUE, use_signif = TRUE,
 }
 ```
 
-The problem at hand is caused by the `data.frame` argument, which is set to `columns` where it should be set `rows` (for row-wise). Arguments are passed to the serialiser indirectly, in the form of a list set as `TOJSON_ARGS` attribute to the object `x` that is serialised. We could thus change the `gio` function to reflect the aforementioned change. 
+The problem at hand is caused by the `data.frame` argument, which is set to `columns` where it should be set `rows` (for row-wise). Arguments are passed to the serialiser\index{serialise} indirectly, in the form of a list set as `TOJSON_ARGS` attribute to the object `x` that is serialised\index{serialise}. We could thus change the `gio` function to reflect the aforementioned change. 
 
 ```r
 gio <- function(data, width = NULL, height = NULL, 
@@ -377,7 +385,7 @@ Other arguments can be placed in the same list; they will ultimately reach the s
 
 ### Replace Serialiser {#widgets-full-transform-data-replace}
 
-Otherwise, the serialiser can also be replaced in its entirety, also by setting an attribute, `TOJSON_FUNC`, to the `x` object. Below the serialiser is changed to jsonify [@R-jsonify], which by default serialises data frames to wide, unlike htmlwidgets' serialiser, thereby also fixing the issue.
+Otherwise, the serialiser can also be replaced in its entirety, also by setting an attribute, `TOJSON_FUNC`, to the `x` object. Below the serialiser\index{serialise} is changed to jsonify [@R-jsonify], which by default serialises data frames to wide, unlike htmlwidgets' serialiser, thereby also fixing the issue.
 
 
 ```r
@@ -423,12 +431,16 @@ The above would make it such that the serialiser no longer has to interpret how 
 
 ### Pros and Cons {#widgets-full-transform-data-conclusion}
 
-There are pros and cons to each method. The preferable method is probably to alter the default serialiser __only where needed__; this is the method used in the remainder of the book. Replacing the serialiser in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Moreover, htmlwidgets' serialiser extends jsonlite to allow converting JavaScript code, which will come in handy later on. Transforming the data in JavaScript has one drawback, `HTMLWidgets.dataframeToD3` cannot be applied to the entire `x` object, it will only work on the subsets that hold the column-wise data (`x.data`), which tends to lead to clunky code as one uses said function in various places. 
+There are pros and cons to each method. The preferable method is probably to alter the default serialiser __only where needed__; this is the method used in the remainder of the book. Replacing the serialiser\index{serialise} in its entirety should not be necessary, only do this once you are very familiar with serialisation and truly see a need for it. Moreover, htmlwidgets' serialiser\index{serialise} extends jsonlite to allow converting JavaScript code, which will come in handy later on. Transforming the data in JavaScript has one drawback, `HTMLWidgets.dataframeToD3` cannot be applied to the entire `x` object, it will only work on the subsets that hold the column-wise data (`x.data`), which tends to lead to clunky code as one uses said function in various places. 
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-data.png" alt="Gio output with correct serialisation" width="100%" />
-<p class="caption">(\#fig:gio-data)Gio output with correct serialisation</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-data} 
+
+}
+
+\caption{Gio output with correct serialisation}(\#fig:gio-data)
+\end{figure}
 
 Figure \@ref(fig:gio-data) shows that the arcs correctly appear on the globe once the default serialiser has been modified. 
 
@@ -482,7 +494,7 @@ renderValue: function(x) {
 }
 ```
 
-We can now run `devtools::load_all` to export the newly written function and load the functions in the environment with `devtools::load_all` as shown in Figure \@ref(fig:gio-style).
+We can now run `devtools::load_all` to export the newly written function and load the functions in the environment\index{environment} with `devtools::load_all` as shown in Figure \@ref(fig:gio-style).
 
 ```r
 g1 <- gio(arcs)
@@ -491,12 +503,16 @@ g2 <- gio_style(g1, "juicyCake")
 g2
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-style.png" alt="Gio with a new theme" width="100%" />
-<p class="caption">(\#fig:gio-style)Gio with a new theme</p>
-</div>
+\begin{figure}[H]
 
-This is great but can be greatly improved upon with the magrittr pipe [@R-magrittr], it would allow effortlessly passing the output of each function to the next to obtain an API akin to that of plotly or highcharter.
+{\centering \includegraphics[width=1\linewidth]{images/gio-style} 
+
+}
+
+\caption{Gio with a new theme}(\#fig:gio-style)
+\end{figure}
+
+This is great but can be greatly improved upon with the magrittr pipe [@R-magrittr]\index{pipe}, it would allow effortlessly passing the output of each function to the next to obtain an API akin to that of plotly or highcharter.
 
 ```r
 library(magrittr)
@@ -505,7 +521,7 @@ gio(arcs) %>%
   gio_style("juicyCake")
 ```
 
-The pipe drastically improves the API that gio provides its users and thus probably should be exported by the package; the usethis package provides a function to do so easily.
+The pipe\index{pipe} drastically improves the API that gio provides its users and thus probably should be exported\index{export} by the package; the usethis package provides a function to do so easily.
 
 ```r
 # export the pipe

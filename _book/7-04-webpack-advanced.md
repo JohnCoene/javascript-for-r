@@ -1,14 +1,14 @@
 # Webpack Advanced {#packer-adv}
 
-We're about to cover slightly more advanced uses of NPM and webpack with R using packer. These involve using an NPM dependency to develop a widget and use [Vue.js](https://vuejs.org/) and Bootstrap 4 to power the front end of a Shiny application.
+We're about to cover slightly more advanced uses of NPM and webpack with R using packer. These involve using an NPM dependency to develop a widget and use [Vue.js](https://vuejs.org/)\index{Vue} and Bootstrap 4 to power the front end of a Shiny application.
 
 Those will make for more concrete cases to bring webpack into your workflow, and also enable explaining more advanced topics only thus far briefly touched upon, such as transpiling.
 
 ## Widgets {#packer-adv-widgets}
 
-The widget scaffold, like all other scaffolds, must be run from within the root of a package. To demonstrate we'll write a widget for the [countup](https://github.com/inorganik/countUp.js/) library that allows animating numbers.
+The widget scaffold\index{scaffold}, like all other scaffolds, must be run from within the root of a package. To demonstrate we'll write a widget for the [countup](https://github.com/inorganik/countUp.js/) library that allows animating numbers.
 
-First, we create a package which we name `counter`. You can name the package differently but avoid naming it `countup`. We will later have to install the external dependency also named `countup` and NPM does not allow a project named X to use a dependency also named X.
+First, we create a package which we name `counter`. You can name the package differently but avoid naming it `countup`. We will later have to install the external dependency\index{dependency} also named `countup` and NPM does not allow a project named X to use a dependency also named X.
 
 ```r
 usethis::create_package("counter")
@@ -56,7 +56,7 @@ packer::scaffold_widget("countup")
 ℹ Run `bundle` to build the JavaScript files
 ```
 
-Importantly, it runs `htmlwidgets::scaffoldWidget` internally, there is thus no need to run this function. About the widget itself, there is very little difference between what `htmlwidgets::scaffoldWidget` and `packer::scaffold_widget`. While, if you remember, the initial scaffold of htmlwidgets includes a simple function to display a message in HTML using `innerText`. The scaffold produced by packer differs only in that this message is displayed in `<h1>` HTML\index{HTML} tags. That is so it can, from the get-go, demonstrate how to modularise a widget. We'll cover that in just a minute, before we do so, bundle the JavaScript and run the `counter` function to observe the output it generates.
+Importantly, it runs `htmlwidgets::scaffoldWidget` internally, there is thus no need to run this function. About the widget itself, there is very little difference between what `htmlwidgets::scaffoldWidget` and `packer::scaffold_widget`. While, if you remember, the initial scaffold\index{scaffold} of htmlwidgets includes a simple function to display a message in HTML using `innerText`. The scaffold produced by packer differs only in that this message is displayed in `<h1>` HTML\index{HTML} tags. That is so it can, from the get-go, demonstrate how to modularise a widget. We'll cover that in just a minute, before we do so, bundle the JavaScript and run the `counter` function to observe the output it generates.
 
 ```r
 packer::bundle()
@@ -102,7 +102,7 @@ HTMLWidgets.widget({
 });
 ```
 
-The `header.js` file includes the `asHeader` function, which accepts an `x` argument that is used to create the `<h1>` message. This function is exported.
+The `header.js` file includes the `asHeader` function, which accepts an `x` argument that is used to create the `<h1>` message. This function is exported\index{export}.
 
 ```js
 const asHeader = (x) => {
@@ -118,7 +118,7 @@ We will make changes to the JavaScript so that instead of displaying the message
 packer::npm_install("countup", scope = "prod") 
 ```
 
-We will not need the `header.js` file. We can delete it and in its stead create another file called `count.js`. This file will include a function that uses countup to animate the numbers. It should accept 1) the id of the element where countup should be used, and 2) the value that countup should animate. This function called `counter` is, at the end of the file, exported.
+We will not need the `header.js` file. We can delete it and in its stead create another file called `count.js`. This file will include a function that uses countup to animate the numbers. It should accept 1) the id of the element where countup should be used, and 2) the value that countup should animate. This function called `counter` is, at the end of the file, exported\index{export}.
 
 ```js
 import { CountUp } from 'countup.js';
@@ -131,7 +131,7 @@ function counter(id, value){
 export { counter };
 ```
 
-We need to add the import statement to bring in the `counter` function and run it in the `renderValue` method. Packer also added the htmlwidgets external dependency, which is imported below with `import 'widgets'`.
+We need to add the import statement to bring in the `counter` function and run it in the `renderValue` method. Packer also added the htmlwidgets external dependency\index{dependency}, which is imported below with `import 'widgets'`.
 
 Because we left the _R function_ `countup` untouched, we have to use the default `message` variable it accepts. Ideally, this argument in the R function should be renamed to something more adequate. 
 
@@ -178,7 +178,7 @@ That hopefully is a compelling example to use NPM and webpack to build widgets. 
 
 ## Shiny with Vue and Bootstrap 4 {#packer-adv-shiny-vue}
 
-In this example, we create a Shiny application that uses [Vue.js](https://vuejs.org/) and Bootstrap 4 in the front end. As you may know, Shiny ships with Bootstrap version 3, not 4 (the latest at the time of writing this).
+In this example, we create a Shiny application that uses [Vue.js](https://vuejs.org/)\index{Vue} and Bootstrap 4 in the front end. As you may know, Shiny ships with Bootstrap version 3, not 4 (the latest at the time of writing this).
 
 ### Setup {#packer-adv-shiny-vue-setup}
 
@@ -190,23 +190,23 @@ Since packer only allows placing scaffolds in R packages, the way one can build 
 install.packages("golem")
 ```
 
-After installing golem from CRAN, we can create an application with the `golem::create_golem` function; it's very similar to `usethis::create_package`, only it prepares a package specifically to build Shiny applications.
+After installing golem from CRAN\index{CRAN}, we can create an application with the `golem::create_golem` function; it's very similar to `usethis::create_package`, only it prepares a package specifically to build Shiny applications.
 
 ```r
 golem::create_golem("vuer")
 ```
 
-From within a golem application, one uses a scaffold specifically designed for this with `scaffold_golem`. Note that this does not mean other scaffolds will not work, custom Shiny inputs and outputs can also be created with `scaffold_input` and `scaffold_output`, respectively. The `scaffold_golem` function takes two core arguments; `vue` and `react`. Setting either of these to `TRUE` will prepare a scaffold specifically designed to support either Vue or React.
+From within a golem application, one uses a scaffold specifically designed for this with `scaffold_golem`. Note that this does not mean other scaffolds will not work, custom Shiny inputs and outputs can also be created with `scaffold_input` and `scaffold_output`, respectively. The `scaffold_golem` function takes two core arguments; `vue` and `react`. Setting either of these to `TRUE` will prepare a scaffold\index{scaffold} specifically designed to support either Vue\index{Vue} or React.
 
 The reason these arguments exist is that webpack requires further configuration that can be tricky to set up manually. Moreover, Vue supports (but does not require) `.vue` files; these can hold HTML, JavaScript, and CSS. One can think of such files as similar to Shiny modules; they encapsulate a part of the logic of the application for easy modularisation.
 
-When the `vue` argument is set to `TRUE` in `scaffold_golem`, the function does follow the usual procedure or initialising NPM, creating the various files, and directories, but in addition configures two loaders and the vue plugin.
+When the `vue` argument is set to `TRUE` in `scaffold_golem`, the function does follow the usual procedure or initialising NPM, creating the various files, and directories, but in addition configures two loaders and the vue\index{Vue} plugin.
 
-Loaders are transformers, they scan files in the `srcjs` directory and pre-process them. That allows using, for instance, the Babel compiler that will transform the latest version of JavaScript into code that every browser can run. This compiler is very often used, including here, to compile Vue code. Since Vue allows placing CSS in `.vue` files, another loader is required; one that will look for CSS and bundle it within the JavaScript file.
+Loaders are transformers, they scan files in the `srcjs` directory and pre-process them. That allows using, for instance, the Babel compiler that will transform the latest version of JavaScript into code that every browser can run. This compiler is very often used, including here, to compile Vue\index{Vue} code. Since Vue allows placing CSS in `.vue` files, another loader is required; one that will look for CSS and bundle it within the JavaScript file.
 
-Plugins are a feature of webpack that allow extending its functionalities; there is one for Vue, which the function will install and configure for you.
+Plugins are a feature of webpack that allow extending its functionalities; there is one for Vue\index{Vue}, which the function will install and configure for you.
 
-Also, when creating a scaffold for `vue` or `react`, one can choose whether to rely on the CDN\index{CDN}, in which case they are installed as developer dependencies, or install them for production, in which case they are included in the bundle. It defaults to using the CDN; this is often advised as the CDN will serve the required files faster.
+Also, when creating a scaffold\index{scaffold} for `vue` or `react`, one can choose whether to rely on the CDN\index{CDN}, in which case they are installed as developer dependencies, or install them for production, in which case they are included in the bundle. It defaults to using the CDN; this is often advised as the CDN will serve the required files faster.
 
 The scaffold also sets up webpack with Babel, the transpiler that allows writing the latest JavaScript, and ensures it will run on (almost) any web browser. Hence, we can use ES6 notation in places.
 
@@ -268,7 +268,7 @@ tagList(
 ℹ Run `bundle` to build the JavaScript files
 ```
 
-Note the first instruction that was printed in the console; it states a `tagList` must be placed in the Shiny UI of the application. It imports the Vue dependency via the CDN with `vueCDN()`, which is a function created by packer, creates a `<DIV>` with an id attribute of `app` that will be used as root of the Vue application; where the application generated by Vue will be placed. It also imports the bundled JavaScript (`index.js`). So let us place that in the Shiny UI, which is in the `R/app_ui.R` file.
+Note the first instruction that was printed in the console; it states a `tagList` must be placed in the Shiny UI of the application. It imports the Vue\index{Vue} dependency via the CDN with `vueCDN()`, which is a function created by packer, creates a `<DIV>` with an id attribute of `app` that will be used as root of the Vue application; where the application generated by Vue will be placed. It also imports the bundled JavaScript (`index.js`). So let us place that in the Shiny UI, which is in the `R/app_ui.R` file.
 
 ```r
 app_ui <- function(request) {
@@ -295,7 +295,7 @@ run_app()
 
 ### Bootstrap 4 Installation {#packer-adv-shiny-vue-bs4}
 
-Next, we can install Bootstrap 4; we'll use [bootstrap-vue](https://bootstrap-vue.org/) which contains a lot of Bootstrap 4 components for Vue. We won't be using any CDN here, so we install those dependencies as production.
+Next, we can install Bootstrap 4; we'll use [bootstrap-vue](https://bootstrap-vue.org/) which contains a lot of Bootstrap 4 components for Vue\index{Vue}. We won't be using any CDN here, so we install those dependencies as production.
 
 ```r
 packer::npm_install("bootstrap-vue", "bootstrap", scope = "prod")
@@ -322,7 +322,7 @@ app_ui <- function(request) {
 
 ### Vue Code {#packer-adv-shiny-vue-code}
 
-Let us now explore the contents of `srcjs` and code a basic functionality. It's relatively straightforward; it consists of two files. The first, `index.js`, creates the Vue application and places it in the `div(id = "app")`. The code for the app itself is in a `.vue` file, which it imports with `import App from "./Home.vue";`.
+Let us now explore the contents of `srcjs` and code a basic functionality. It's relatively straightforward; it consists of two files. The first, `index.js`, creates the Vue\index{Vue} application and places it in the `div(id = "app")`. The code for the app itself is in a `.vue` file, which it imports with `import App from "./Home.vue";`.
 
 ```js
 import Vue from "vue";
@@ -335,7 +335,7 @@ new Vue({
 });
 ```
 
-The first order of business is to import the Bootstrap dependencies that were installed and "use" them in the application. We don't explain this in great detail here as much of it is specific to Vue and is thus outside the scope of this book.
+The first order of business is to import the Bootstrap dependencies\index{dependency} that were installed and "use" them in the application. We don't explain this in great detail here as much of it is specific to Vue and is thus outside the scope of this book.
 
 ```js
 import Vue from "vue";
@@ -427,9 +427,13 @@ devtools::load_all()
 run_app()
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/vue-bs4.png" alt="Shiny application with Vue and Bootstrap 4" width="100%" />
-<p class="caption">(\#fig:vue-bs4)Shiny application with Vue and Bootstrap 4</p>
-</div>
+\begin{figure}[H]
 
-Note how little code was written in order to provide these functionalities. It is one of the most powerful features of frameworks like Vue and React. They are not necessary; this could have been coded in vanilla JavaScript, but would admittedly require much more (difficult to read) code.
+{\centering \includegraphics[width=1\linewidth]{images/vue-bs4} 
+
+}
+
+\caption{Shiny application with Vue and Bootstrap 4}(\#fig:vue-bs4)
+\end{figure}
+
+Note how little code was written in order to provide these functionalities. It is one of the most powerful features of frameworks like Vue\index{Vue} and React. They are not necessary; this could have been coded in vanilla JavaScript, but would admittedly require much more (difficult to read) code.

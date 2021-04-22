@@ -38,9 +38,9 @@ Peity.js depends on jQuery. Hence the latter is imported first; the data for the
 
 ## Dependencies {#widgets-realistic-deps}
 
-Once the package is created and the widget scaffold laid down, we need to add the JavaScript dependencies without which nothing can move forward.
+Once the package is created and the widget scaffold\index{scaffold} laid down, we need to add the JavaScript dependencies\index{dependency} without which nothing can move forward.
 
-Two dependencies are required in order for peity.js to run: peity.js and jQuery. Instead of using the CDN\index{CDN} those are downloaded as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Each of the two libraries is placed in its own respective directory.
+Two dependencies\index{dependency} are required in order for peity.js to run: peity.js and jQuery. Instead of using the CDN\index{CDN} those are downloaded as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Each of the two libraries is placed in its own respective directory.
 
 ```r
 dir.create("./inst/htmlwidgets/jquery")
@@ -80,7 +80,7 @@ This produces a directory that looks like this:
             └── jquery.peity.min.js
 ```
 
-In htmlwidgets, dependencies are specified in the `.yaml` file located at `inst/htmlwidgets`, which at first contains a commented template.
+In htmlwidgets, dependencies\index{dependency} are specified in the `.yaml` file located at `inst/htmlwidgets`, which at first contains a commented template.
 
 ```yml
 # (uncomment to add a dependency)
@@ -106,11 +106,12 @@ dependencies:
     script: jquery.peity.min.js
 ```
 
-<div class="rmdnote">
-<p>The order of the dependencies matters. Peity.js depends on jQuery hence the latter comes first in the <code>.yaml</code>.</p>
-</div>
+\begin{rmdnote}
+The order of the dependencies matters. Peity.js depends on jQuery hence
+the latter comes first in the \texttt{.yaml}.
+\end{rmdnote}
 
-The order in which one specifies the dependencies matters, just like it does in an HTML file, therefore jQuery is listed first. The `stylesheet` entries were removed as none of these libraries require CSS files. The `src` path points to the directory containing the JavaScript files and stylesheets relative to the `inst` directory of the package; this is akin to using the `system.file` function to return the full path to a file or directory within the package.
+The order in which one specifies the dependencies\index{dependency} matters, just like it does in an HTML file, therefore jQuery is listed first. The `stylesheet` entries were removed as none of these libraries require CSS files. The `src` path points to the directory containing the JavaScript files and stylesheets relative to the `inst` directory of the package; this is akin to using the `system.file` function to return the full path to a file or directory within the package.
 
 ```r
 devtools::load_all()
@@ -118,7 +119,7 @@ system.file("htmlwidgets/peity", package = "peity")
 #> "/home/me/packages/peity/inst/htmlwidgets/peity"
 ```
 
-We should verify that this is correct by using the one R function the package features and check the source code of the output to verify that the dependencies are well present in the HTML output. We thus run `peity("test")`, open the output in the browser (![](images/open-in-browser.png)) and look at the source code of the page. At the top of the page, you should see `jquery.min.js` and `jquery.peity.min.js` imported, clicking those links will either present you with the content of the file or an error.
+We should verify that this is correct by using the one R function the package features and check the source code of the output to verify that the dependencies\index{dependency} are well present in the HTML output. We thus run `peity("test")`, open the output in the browser (![](images/open-in-browser.png)) and look at the source code of the page. At the top of the page, you should see `jquery.min.js` and `jquery.peity.min.js` imported, clicking those links will either present you with the content of the file or an error.
 
 ```html
 <!DOCTYPE html>
@@ -229,7 +230,7 @@ $(el).peity("bar", {
 
 This will now produce a working widget, albeit limited to creating charts of a predefined type and colour. Next, these options defining the chart type, fill colours, and others must be made available from R.
 
-Below we add a `type` argument to the `peity` function; this `type` argument is then forwarded to `x`, so it is serialised and accessible in the JavaScript file.
+Below we add a `type` argument to the `peity` function; this `type` argument is then forwarded to `x`, so it is serialised\index{serialise} and accessible in the JavaScript file.
 
 ```r
 peity <- function(data, type = c("bar", "line", "pie", "donut"), 
@@ -313,10 +314,14 @@ browsable(
 
 
 
-<div class="figure" style="text-align: center">
-<img src="images/peity-div.png" alt="Peity output with DIV" width="100%" />
-<p class="caption">(\#fig:peity-divs)Peity output with DIV</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/peity-div} 
+
+}
+
+\caption{Peity output with DIV}(\#fig:peity-divs)
+\end{figure}
 
 There is nonetheless one remaining issue in Figure \@ref(fig:peity-divs): peity.js is meant to create inline charts within `<span>` HTML tags but these are created within `<div>` hence each chart appears on a new line.
 
@@ -355,7 +360,11 @@ browsable(
 )
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/peity-span.png" alt="Peity output with SPAN" width="100%" />
-<p class="caption">(\#fig:peity-spans)Peity output with SPAN</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/peity-span} 
+
+}
+
+\caption{Peity output with SPAN}(\#fig:peity-spans)
+\end{figure}

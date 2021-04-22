@@ -22,30 +22,34 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/boxxy-example.png" alt="Custom output example" width="100%" />
-<p class="caption">(\#fig:boxxy-example)Custom output example</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/boxxy-example} 
+
+}
+
+\caption{Custom output example}(\#fig:boxxy-example)
+\end{figure}
 
 ## Inner-workings {#shiny-output-inner-workings}
 
 At the core, this consists in creating three functions: `boxxy`, `renderBoxxy`, and `boxxyOutput` (analogous to `plot`, `renderPlot`, `plotOutput`), which are linked by an "output binding" in JavaScript. 
 
-The first function, `boxxy` will accept arguments that help define what is in the box. This function is generally useful to preprocess any of the arguments that are meant to produce the custom output. The `boxxyOutput` function essentially creates the scaffold of the HTML output (e.g.: `<div>`), as well as the dependencies. The `render*` function is perhaps more peculiar: it should accept an expression and return a function.
+The first function, `boxxy` will accept arguments that help define what is in the box. This function is generally useful to preprocess any of the arguments that are meant to produce the custom output. The `boxxyOutput` function essentially creates the scaffold\index{scaffold} of the HTML output (e.g.: `<div>`), as well as the dependencies\index{dependency}. The `render*` function is perhaps more peculiar: it should accept an expression and return a function.
 
-Previous work with Shiny and JavaScript covered in this book had no dedicated "output" elements that were placed in the Shiny UI. Therefore, one had to use a function solely dedicated to importing the dependencies (e.g.: `usejBox`). However, since this is not the case here, the dependencies can be attached together with the output.
+Previous work with Shiny and JavaScript covered in this book had no dedicated "output" elements that were placed in the Shiny UI. Therefore, one had to use a function solely dedicated to importing the dependencies (e.g.: `usejBox`). However, since this is not the case here, the dependencies\index{dependency} can be attached together with the output.
 
 Finally, the two R functions are "bound" JavaScript-side with an "output binding" that renders the data from the `render*` function with its `*output`.
 
 ## Setup {#shiny-output-setup}
 
-The custom output will be part of a Shiny application, let us thus create the basic skeleton of an application and download the dependencies. Create a project in RStudio or an empty directory, then:
+The custom output will be part of a Shiny application, let us thus create the basic skeleton of an application and download the dependencies. Create a project in RStudio\index{RStudio} or an empty directory, then:
 
 1. Create an `app.R` file that will hold the code for the application and `boxxy`, `boxxyOutput`, and `renderBoxxy` functions.
-2. Create an `assets` directory that will contain the CSS and JavaScript files.
-3. Download the countUp.js dependency.
+2. Create an `assets`\index{asset} directory that will contain the CSS and JavaScript files.
+3. Download the countUp.js dependency\index{dependency}.
 4. Create a `binding.js` JavaScript file for the JavaScript binding within the previously created `assets` directory.
-5. Create a `styles.css` file in the `assets` directory.
+5. Create a `styles.css` file in the `assets`\index{asset} directory.
 
 ```r
 # application file
@@ -121,9 +125,10 @@ boxxyOutput <- function(id){
 }
 ```
 
-<div class="rmdnote">
-<p>Make sure you use unique class names so they are not accidentally overridden by the user.</p>
-</div>
+\begin{rmdnote}
+Make sure you use unique class names so they are not accidentally
+overridden by the user.
+\end{rmdnote}
 
 As shown, the box should include a title and an animated value. These could be generated entirely in JavaScript, but it's actually easier to create placeholders with htmltools tags. We generate dynamic ids for those so they can easily be referenced later on in JavaScript: `id-boxxy-value` for the value and `id-boxxy-title` for the title.
 
@@ -162,9 +167,9 @@ Finally, we also used classes in the output so every element it comprises can be
 }
 ```
 
-In some previous examples we created a function decicated to importing dependencies in the Shiny UI but in this case they can piggyback on the `boxxyOutput` function. This works using the htmltools package. The function `htmltools::htmlDependency` is used to create a dependency that is then attached with `htmltools::attachDependencies`. While the former creates an object that Shiny can understand and translate into `<script>` or `<style>` tags, the former attaches them to the output object and ensures dependencies are not imported multiple times (e.g.: when `boxxyOutput` is used more than once).
+In some previous examples we created a function decicated to importing dependencies in the Shiny UI but in this case they can piggyback on the `boxxyOutput` function. This works using the htmltools package. The function `htmltools::htmlDependency` is used to create a dependency\index{dependency} that is then attached with `htmltools::attachDependencies`. While the former creates an object that Shiny can understand and translate into `<script>` or `<style>` tags, the former attaches them to the output object and ensures dependencies are not imported multiple times (e.g.: when `boxxyOutput` is used more than once).
 
-Notice the use of `normalizePath` to retrieve the full path to the `assets` directory as this will not work with a relative path (e.g.: `./assets`). The dependencies consist of the three files previously created and necessary to generate the output: `countup.js`, the dependency that was downloaded, as well as `binding.js` and `styles.css`. 
+Notice the use of `normalizePath` to retrieve the full path to the `assets`\index{asset} directory as this will not work with a relative path (e.g.: `./assets`). The dependencies\index{dependency} consist of the three files previously created and necessary to generate the output: `countup.js`, the dependency that was downloaded, as well as `binding.js` and `styles.css`. 
 
 ```r
 boxxyOutput <- function(id){
@@ -197,7 +202,7 @@ boxxyOutput <- function(id){
 }
 ```
 
-Running the function reveals the HTML\index{HTML} it generates at the exception of the dependencies which htmltools does not print to the console.
+Running the function reveals the HTML\index{HTML} it generates at the exception of the dependencies\index{dependency} which htmltools does not print to the console.
 
 ```r
 boxxyOutput("myID")
@@ -270,11 +275,13 @@ this.getId = function(el) {
 
 Since boxxy uses the element id, the default will work, and this can be skipped entirely. 
 
-Next, one needs to implement the `renderValue` function, which is the same function that generates the output based on data used in `boxxy` and sent to the front end with `renderBoxxy`. The `renderValue` method accepts two arguments: first `el`, the element where the output should be generated; this is effectively the output of `boxxyOutput`, which the binding found using `find`. The second argument is `data` which is the data, passed to `boxxy` and serialised via `renderBoxxy`. 
+Next, one needs to implement the `renderValue` function, which is the same function that generates the output based on data used in `boxxy` and sent to the front end with `renderBoxxy`. The `renderValue` method accepts two arguments: first `el`, the element where the output should be generated; this is effectively the output of `boxxyOutput`, which the binding found using `find`. The second argument is `data` which is the data, passed to `boxxy` and serialised\index{serialise} via `renderBoxxy`. 
 
-<div class="rmdnote">
-<p>The <code>renderValue</code> is in effect very similar if not identical to the JavaScript function of the same name involved in creating htmlwidgets.</p>
-</div>
+\begin{rmdnote}
+The \texttt{renderValue} is in effect very similar if not identical to
+the JavaScript function of the same name involved in creating
+htmlwidgets.
+\end{rmdnote}
 
 ### Boxxy Title {#shiny-output-boxxy-title}
 
@@ -480,16 +487,20 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/custom-output-boxxy.png" alt="Shiny application with boxxy" width="100%" />
-<p class="caption">(\#fig:boxxy-custom)Shiny application with boxxy</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/custom-output-boxxy} 
+
+}
+
+\caption{Shiny application with boxxy}(\#fig:boxxy-custom)
+\end{figure}
 
 ## Injecting Dependencies {#shiny-output-inject}
 
-We could consider making the animation of the value rendered with `boxxy` optional; some users may not want to use it. You might already imagine how a new argument and a few if-statements could very quickly do the job, but how would one handle the dependency? Indeed if users do not want to make use of the animation, the CountUp.js dependency should also be excluded so as to keep the output as light as possible.
+We could consider making the animation of the value rendered with `boxxy` optional; some users may not want to use it. You might already imagine how a new argument and a few if-statements could very quickly do the job, but how would one handle the dependency\index{dependency}? Indeed if users do not want to make use of the animation, the CountUp.js dependency should also be excluded so as to keep the output as light as possible.
 
-The dependency is currently attached in the `boxxyOutput` function, which does not take any argument. It could, but it would make for the rather messy and confusing interface as whatever additional argument that indicates whether the numbers should be animated would have to be specified twice. Once in the `boxxyOutput` function, so it does not import the dependency, as well as in the `boxxy` function in order to serialise that parameter, so the JavaScript binding does not run the animation function.
+The dependency is currently attached in the `boxxyOutput` function, which does not take any argument. It could, but it would make for the rather messy and confusing interface as whatever additional argument that indicates whether the numbers should be animated would have to be specified twice. Once in the `boxxyOutput` function, so it does not import the dependency\index{dependency}, as well as in the `boxxy` function in order to serialise that parameter, so the JavaScript binding does not run the animation function.
 
 ```r
 # pseudo code
@@ -514,9 +525,9 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-Thankfully there is a better way, combining htmltools and Shiny to insert the dependency dynamically from JavaScript.
+Thankfully there is a better way, combining htmltools and Shiny to insert the dependency\index{dependency} dynamically from JavaScript.
 
-The `boxxy` function needs to take an additional argument `animate`, which is passed to the output list. This will be used in the `render` function (and JavaScript binding) to render the dependency dynamically.
+The `boxxy` function needs to take an additional argument `animate`, which is passed to the output list. This will be used in the `render` function (and JavaScript binding) to render the dependency\index{dependency} dynamically.
 
 ```r
 boxxy <- function(title, value, color = "black", animate = TRUE){
@@ -526,7 +537,7 @@ boxxy <- function(title, value, color = "black", animate = TRUE){
 }
 ```
 
-The `boxxyOutput` function can be slightly simplified. It currently attaches the `countup.js` dependency, which needs to be removed.
+The `boxxyOutput` function can be slightly simplified. It currently attaches the `countup.js` dependency\index{dependency}, which needs to be removed.
 
 ```r
 boxxyOutput <- function(id){
@@ -553,7 +564,7 @@ boxxyOutput <- function(id){
 }
 ```
 
-The `renderBoxxy` function sees some modifications, while before it was technically only returning a function that itself returned the output of `boxxy` (`func() == boxxy()`). Here we want to capture the output of `boxxy` to check whether the `animate` element is `TRUE` and, if so, add the dependency.
+The `renderBoxxy` function sees some modifications, while before it was technically only returning a function that itself returned the output of `boxxy` (`func() == boxxy()`). Here we want to capture the output of `boxxy` to check whether the `animate` element is `TRUE` and, if so, add the dependency\index{dependency}.
 
 ```r
 renderBoxxy <- function(expr, env = parent.frame(), 
@@ -573,13 +584,14 @@ renderBoxxy <- function(expr, env = parent.frame(),
 }
 ```
 
-Within the `if` statement, the dependency can be created with the htmltools as done for the binding. Ensure the names of the dependencies are unique as shiny internally uses it to differentiate between them; if they bear the same name Shiny assumes they are the same and will only render one of them.
+Within the `if` statement, the dependency can be created with the htmltools as done for the binding. Ensure the names of the dependencies\index{dependency} are unique as shiny internally uses it to differentiate between them; if they bear the same name Shiny assumes they are the same and will only render one of them.
 
-<div class="rmdnote">
-<p>Make sure dependencies bear different names or Shiny thinks it’s the same and only renders one of them.</p>
-</div>
+\begin{rmdnote}
+Make sure dependencies\index{dependency} bear different names or Shiny
+thinks it's the same and only renders one of them.
+\end{rmdnote}
 
-The dependency generated with htmltools is then passed to the `shiny::createWebDependency` function, which internally uses `shiny::addResourcePath` to serve the dependency. This is necessary here as, at this stage, the countup dependency is not actually rendered; below we merely add it to the list of options that serialised to JSON\index{JSON}. Indeed, this will actually be injected JavaScript-side. Therefore the front end needs to be able to access this file, hence it is served.
+The dependency generated with htmltools is then passed to the `shiny::createWebDependency` function, which internally uses `shiny::addResourcePath` to serve the dependency. This is necessary here as, at this stage, the countup dependency\index{dependency} is not actually rendered; below we merely add it to the list of options that serialised to JSON\index{JSON}. Indeed, this will actually be injected JavaScript-side. Therefore the front end needs to be able to access this file, hence it is served.
 
 ```r
 renderBoxxy <- function(expr, env = parent.frame(), 
@@ -611,7 +623,7 @@ renderBoxxy <- function(expr, env = parent.frame(),
 }
 ```
 
-Thus far, the dependency is dynamically included in the R object; that is serialised to JSON, but it is not yet actually imported in the document---this happens in the JavaScript binding.
+Thus far, the dependency\index{dependency} is dynamically included in the R object; that is serialised to JSON, but it is not yet actually imported in the document---this happens in the JavaScript binding.
 
 The first thing we ought to do is mirror the if-statement that was created in the `renderBoxxy` function. If the numbers should be animated, the function can use countup; if not, it must insert the text with `insertText` just like it does for the `title`.
 
@@ -646,7 +658,7 @@ $.extend(boxxyBinding, {
 Shiny.outputBindings.register(boxxyBinding, "john.boxxy");
 ```
 
-Finally, we can render the dependency. The JavaScript method aptly named `renderDependencies` will do just that from the list of dependency created in `renderBoxxy`.
+Finally, we can render the dependency. The JavaScript method aptly named `renderDependencies` will do just that from the list of dependency\index{dependency} created in `renderBoxxy`.
 
 ```js
 var boxxyBinding = new Shiny.OutputBinding();

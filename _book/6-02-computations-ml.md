@@ -11,7 +11,7 @@ const regression = new ml.SimpleLinearRegression(x, y);
 
 ## Dependency {#v8-ml-dependency}
 
-We start by creating a package and add the V8 package as dependency.
+We start by creating a package and add the V8 package as dependency\index{dependency}.
 
 ```r
 usethis::create_package("ml")
@@ -28,7 +28,7 @@ download.file(
 )
 ```
 
-With the dependency downloaded, one can start working on the R code. First, a new V8 context needs to be created and the ml.js file needs to be imported into it.
+With the dependency\index{dependency} downloaded, one can start working on the R code. First, a new V8 context needs to be created and the ml.js file needs to be imported into it.
 
 ```r
 # zzz.R
@@ -177,7 +177,7 @@ model_cars <- ml_simple_lm(cars$speed, cars$dist)
 model_random <- ml_simple_lm(1:10, runif(10))
 
 predict(model_random, 15)
-#> [1] -27.4949
+#> [1] -130.8514
 predict(model_cars, 15)
 #> [1] 10.76742
 ```

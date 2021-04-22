@@ -4,7 +4,7 @@
 
 
 
-Shiny is the web framework of choice for the R programming language. Since JavaScript and Shiny both run in web browsers it follows that they can run alongside one another as one can include JavaScript in such applications. However, often disregarded is the ability for Shiny's R server to communicate to the front end and vice versa. This collection of chapters aims to show precisely how this works. In this first part, we brush up on the essentials, so we understand how to include JavaScript in shiny applications.
+Shiny is the web framework of choice for the R programming language. Since JavaScript and Shiny both run in web browsers\index{web browser} it follows that they can run alongside one another as one can include JavaScript in such applications. However, often disregarded is the ability for Shiny's R server to communicate to the front end and vice versa. This collection of chapters aims to show precisely how this works. In this first part, we brush up on the essentials, so we understand how to include JavaScript in shiny applications.
 
 Then again, the goal is not to write a lot of convoluted JavaScript. On the contrary, with little knowledge of the language the aim is to write as little as possible but demonstrate to the reader that it is often enough to vastly improve the user experience of Shiny applications.
 
@@ -12,15 +12,14 @@ Then again, the goal is not to write a lot of convoluted JavaScript. On the cont
 
 Shiny\index{Shiny} applications have two components: the user interface (UI) and the server function. These two components communicate via a WebSocket\index{WebSocket}: a persistent connection that allows passing messages between the server and clients connecting to it. In the R server, this connection is managed by Shiny using the httpuv [@R-httpuv] and WebSocket [@R-websocket] packages, while in clients connecting to the server this connection is managed with JavaScript, as depicted in \@ref(fig:websocket-diag).  
 
-<div class="figure" style="text-align: center">
+\begin{figure}[H]
 
-```{=html}
-<div id="htmlwidget-64f9d637f0427de01379" style="width:100%;height:576px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-64f9d637f0427de01379">{"x":{"diagram":"\ndigraph{\n  node [shape=record fontsize=10];\n\n  w1 [label=Websocket];\n  w2 [label=Websocket];\n  w3 [label=Websocket];\n  w4 [label=Websocket];\n\n  b1 [label=\"Browser\" color=gold];\n  b2 [label=\"Browser\" color=gold];\n  b3 [label=\"Browser\" color=gold];\n  b4 [label=\"Browser\" color=gold];\n\n  s [label=\"R server\" color=royalBlue];\n\n  s -> w1 -> b1 [dir=both color=dimGray arrowsize=.3];\n  s -> w2 -> b2 [dir=both color=dimGray arrowsize=.3];\n  s -> w3 -> b3 [dir=both color=dimGray arrowsize=.3];\n  s -> w4 -> b4 [dir=both color=dimGray arrowsize=.3];\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
-```
+{\centering \includegraphics[width=1\linewidth]{images/04-websocket} 
 
-<p class="caption">(\#fig:websocket-diag)Websocket visualised</p>
-</div>
+}
+
+\caption{Websocket visualised}(\#fig:websocket-diag)
+\end{figure}
 
 With that in mind, we can put together a Shiny application, which though simple. Exploits bi-directional communication. The application takes a text input, sends the value of the input to the R server, which sends it back to the UI.
 
@@ -43,15 +42,14 @@ shinyApp(ui, server)
 
 Drawing a diagram of the communication between the UI and the server (Figure \@ref(fig:shiny-websocket-diagram)) reveals that though this is a simple application a lot is happening.
 
-<div class="figure" style="text-align: center">
+\begin{figure}[H]
 
-```{=html}
-<div id="htmlwidget-84ac76661e8f7ebce810" style="width:100%;height:576px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-84ac76661e8f7ebce810">{"x":{"diagram":"\ndigraph {\n  graph[rankdir=LR fontsize = 10]\n  node[shape=record fontsize = 9]\n\n  subgraph cluster_0 {\n    textInput\n    textOutput\n    label=\"User Interface\"\n    color=gold\n  }\n\n  subgraph cluster_1 {\n    \"input list\"\n    renderOutput\n    label=\"R server\"\n    color=royalBlue\n  }\n\n  textInput -> \"input list\" [xlabel=websocket fontsize = 8]\n  \"input list\" -> renderOutput\n  renderOutput -> textOutput [label=websocket fontsize = 8]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
-```
+{\centering \includegraphics[width=1\linewidth]{images/04-shiny-websocket} 
 
-<p class="caption">(\#fig:shiny-websocket-diagram)Shiny websocket visualised</p>
-</div>
+}
+
+\caption{Shiny websocket visualised}(\#fig:shiny-websocket-diagram)
+\end{figure}
 
 Communicating between the R server and the user interface requires JavaScript and thus makes a reasonable chunk of this part of the book on web development with Shiny.
 
@@ -138,10 +136,14 @@ server <- function(input, output) {}
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/jbox-init.png" alt="A basic jBox notice" width="100%" />
-<p class="caption">(\#fig:jbox-init)A basic jBox notice</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/jbox-init} 
+
+}
+
+\caption{A basic jBox notice}(\#fig:jbox-init)
+\end{figure}
 
 Figure \@ref(fig:jbox-init), and the application above essentially reproduce the basic HTML example that was shared; the dependencies are imported, and a script displays a notification. Since all of that takes place in the front end, the body of the server function is empty.
 
@@ -223,22 +225,25 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/jbox-r2js.png" alt="A notice triggered by the server" width="100%" />
-<p class="caption">(\#fig:jbox-r2js)A notice triggered by the server</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/jbox-r2js} 
+
+}
+
+\caption{A notice triggered by the server}(\#fig:jbox-r2js)
+\end{figure}
 
 In the previous application that produces Figure \@ref(fig:shiny-alert-diagram), notice the path that the message follows: it goes from the client (user input) to the server (`observeEvent`), which sends (`sendCustomMessage`) it back to the client. 
 
-<div class="figure" style="text-align: center">
+\begin{figure}[H]
 
-```{=html}
-<div id="htmlwidget-ffdb2aa7317dea16b988" style="width:100%;height:576px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ffdb2aa7317dea16b988">{"x":{"diagram":"\ndigraph{\n  graph [rankdir=LR]\n  node [shape=record fontsize=10];\n\n  subgraph cluster_0 {\n    textInput\n    handler [label=\"message handler\"]\n    notice [label = \"show notice\"]\n    label=\"Client\"\n    color=gold\n  }\n\n  subgraph cluster_1 {\n    send[label=\"sendCustomMessage\"]\n    label=\"Server\"\n    color=royalBlue\n  }\n\n  textInput -> send [label=\"value\"];\n  send -> handler [label=\"message\"];\n  handler -> notice;\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
-```
+{\centering \includegraphics[width=1\linewidth]{images/04-custom-msg} 
 
-<p class="caption">(\#fig:shiny-alert-diagram)Shiny alert with custom messages</p>
-</div>
+}
+
+\caption{Shiny alert with custom messages}(\#fig:shiny-alert-diagram)
+\end{figure}
 
 This might be considered suboptimal by some as it is not necessary to use the server as an intermediary (in this example at least). Though there is some truth to this, the above will work perfectly fine---and the aim here is to make JavaScript work with R---not alongside it. The WebSocket\index{WebSocket} is very efficient, and this will not have much overhead at all.
 
@@ -311,10 +316,14 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/jbox-custom.png" alt="Customised jBox notice" width="100%" />
-<p class="caption">(\#fig:jbox-custom)Customised jBox notice</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/jbox-custom} 
+
+}
+
+\caption{Customised jBox notice}(\#fig:jbox-custom)
+\end{figure}
 
 ### JavaScript to R {#shiny-intro-js2r}
 
@@ -347,7 +356,7 @@ In jBox, these callback functions are included in the JSON of options; below the
 }
 ```
 
-This raises one issue: one cannot truly serialise to executable code. The attempt below serialises the function to a string that _will not_ be evaluated in JavaScript, just like `"function(x){ x + 1 }"` is not evaluated in R: it is not a function, it is a string.
+This raises one issue: one cannot truly serialise\index{serialise} to executable code. The attempt below serialises the function to a string that _will not_ be evaluated in JavaScript, just like `"function(x){ x + 1 }"` is not evaluated in R: it is not a function, it is a string.
 
 
 ```r
@@ -479,9 +488,13 @@ shinyApp(ui, server)
 #> [1] TRUE
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/jbox-end.png" alt="jBox final application" width="100%" />
-<p class="caption">(\#fig:jbox-end)jBox final application</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/jbox-end} 
+
+}
+
+\caption{jBox final application}(\#fig:jbox-end)
+\end{figure}
 
 In the next chapter, we will build another application that makes use of bidirectional communication but also introduces a few more concepts to improve how such communication takes place and allows passing more complex messages from R to JavaScript and vice versa. 

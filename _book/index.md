@@ -1,7 +1,7 @@
 --- 
 title: "JavaScript for R"
 author: "John Coene"
-date: "2021-04-19"
+date: "2021-04-22"
 documentclass: krantz
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
@@ -22,12 +22,7 @@ graphics: yes
 
 # Preface {-}
 
-_This is the online version of JavaScript for R, a book currently under development and intended for release as part of the [R series by CRC Press](https://www.routledge.com/Chapman--HallCRC-The-R-Series/book-series/CRCTHERSER)._
 
-  <div style = "float:left; width:400px; max-width:100%; margin-right:1em;">
-  <img src="images/cover.jpg" width = "100%">
-  <small><span>Photo by <a href="https://unsplash.com/@davisuko?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Cody Davis</a> on <a href="https://unsplash.com/s/photos/paint?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span></small>
-  </div>
 
 The R programming language has seen the integration of many languages; C, C++, Python, to name a few, can be seamlessly embedded into R so one can conveniently call code written in other languages from the R console. Little known to many, R works just as well with JavaScript---this book delves into the various ways both languages can work together.
 
@@ -53,7 +48,7 @@ Notably, the focus of the book truly is the integration of JavaScript with R, wh
 
 5. Then the book delves into using JavaScript for computations, namely via the V8 engine and Node.js. After a short introduction, chapters will walk the reader through various examples: a fuzzy search, a time format converter, and some basic natural language operations.
 
-6. Finally, we look at how one can use some of the more modern JavaScript technologies such as Vue, React, and webpack with R---these can make the use of JavaScript more agile and robust.
+6. Finally, we look at how one can use some of the more modern JavaScript technologies such as Vue\index{Vue}, React, and webpack with R---these can make the use of JavaScript more agile and robust.
 
 7. Next the book closes with examples of all the integrations explored previously. This involves recreating (a part of) the plotly package, building an image classifier, adding progress bars to a Shiny application, building an app with HTTP cookies, and running basic machine learning operations in JavaScript.
 

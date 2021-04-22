@@ -30,15 +30,15 @@ These files are processed by Grunt which, using the `Gruntfile.js` configuration
 
 ## Transpiling {#webpack-browser}
 
-As new functionalities are made available in JavaScript, with every modern version web browsers have to keep pace and support running said functionalities. First, this is not always the case, major web browsers such as Google Chrome, Mozilla Firefox, and Safari generally do a decent job of keeping up, but one can never count on the individuals using those to do keep their browsers up to date.
+As new functionalities are made available in JavaScript, with every modern version web browsers\index{web browser} have to keep pace and support running said functionalities. First, this is not always the case, major web browsers such as Google Chrome, Mozilla Firefox, and Safari generally do a decent job of keeping up, but one can never count on the individuals using those to do keep their browsers up to date.
 
 Imagine building a large htmlwidgets for a client only to discover that for IT security reasons all their company laptops run a particular version of a web browser that does not support critical functionalities the widget relies upon.
 
-Ensuring that the JavaScript code can run on most browsers is no trivial task. The best way to do so _is not_ to write outdated JavaScript code that all browsers should support, the solution is actually to use a [Babel.](https://babeljs.io/) This transpiler will convert "ECMAScript 2015+ code into a backwards-compatible version of JavaScript." This way one can use the latest JavaScript, even before browsers officially support it, and transpile it with Babel to obtain a JavaScript file that will run on any browser that supports ECMAScript 2015 (JavaScript version released in 2015).
+Ensuring that the JavaScript code can run on most browsers is no trivial task. The best way to do so _is not_ to write outdated JavaScript code that all browsers should support, the solution is actually to use a [Babel.](https://babeljs.io/) This transpiler will convert "ECMAScript 2015+\index{ECMA} code into a backwards-compatible version of JavaScript." This way one can use the latest JavaScript, even before browsers officially support it, and transpile it with Babel to obtain a JavaScript file that will run on any browser that supports ECMAScript 2015\index{ECMA} (JavaScript version released in 2015).
 
 ## Minification {#webpack-minification}
 
-Web browsers always need to load the files necessary to render a webpage, be it a static website, a Shiny application, or a standalone widget. Loading those files can take critical time and make the loading of a web application slow. Therefore it is good practice to reduce the size of those files. This includes compressing images, so they are smaller in size and load faster but also "minifying" CSS and JavaScript code.
+Web browsers\index{web browser} always need to load the files necessary to render a webpage, be it a static website, a Shiny application, or a standalone widget. Loading those files can take critical time and make the loading of a web application slow. Therefore it is good practice to reduce the size of those files. This includes compressing images, so they are smaller in size and load faster but also "minifying" CSS and JavaScript code.
 
 When writing code, us humans like to use comprehensible variable names, line breaks, spaces, and other things that help make things clear and readable. Machines, however, do not need any of that; as long as the code is valid, it will run. 
 
@@ -65,7 +65,7 @@ The minified files of a library tend to end in `.min.js` though minified code ca
 
 Managing the structure of JavaScript projects can be tricky. One does not want to place 2,000 lines of code in a single file, but splitting JavaScript code into multiple files is complicated.
 
-While writing an R package, one is free to organise the functions in different files as their content (functions, data, etc.) is ultimately loaded into the global environment with `library` by the user of the package.
+While writing an R package, one is free to organise the functions in different files as their content (functions, data, etc.) is ultimately loaded into the global \index{environment} with `library` by the user of the package.
 
 In JavaScript, one does not have the luxury of writing code across different files to then call `library()` in the web browser, so all the functions, and variables are available. In this paradigm, individual files have to be loaded separately in the browser (as shown below).
 
@@ -76,7 +76,7 @@ In JavaScript, one does not have the luxury of writing code across different fil
 
 While this may be fine for two or three files, it quickly gets out of hand as one has to remember to import those in the correct order. In the above example, variables declared in `main.js` cannot be used in `utils.js`, unless we change the order of the import in which case something else will likely break.
 
-It's therefore essential to use tools that allow splitting JavaScript programs into modules (to write programs in different files), manage the dependencies between these files, then "bundle" those correctly into one or more files destined to be imported in the browser.
+It's therefore essential to use tools that allow splitting JavaScript programs into modules (to write programs in different files), manage the dependencies\index{dependency} between these files, then "bundle" those correctly into one or more files destined to be imported in the browser.
 
 ## Decoupling {#webpack-decouple}
 
@@ -88,13 +88,13 @@ Moreover, webpack does not limit itself to the previously-mentioned processes. I
 
 ## NPM {#webpack-npm}
 
-Another new piece of software that we need to be introduce is Node's Package Manager, hereafter referred to as NPM. As indicated by the name, it's a package manager for Node.js, or translated for the R user it's Node's loose equivalent of CRAN. One first significant difference is that while CRAN performs very rigorous checks on any package submitted, NPM does not; one can publish almost anything.
+Another new piece of software that we need to be introduce is Node's Package Manager, hereafter referred to as NPM. As indicated by the name, it's a package manager for Node.js, or translated for the R user it's Node's loose equivalent of CRAN\index{CRAN}. One first significant difference is that while CRAN\index{CRAN} performs very rigorous checks on any package submitted, NPM does not; one can publish almost anything.
 
-Notice how every dependency used in this book had to be either found through a CDN\index{CDN} or manually downloaded, only to be imported in the final document. Again, this is useful for the smaller projects but may become a hindrance when multiple dependencies have to be managed and updated, added and removed, etc.
+Notice how every dependency\index{dependency} used in this book had to be either found through a CDN\index{CDN} or manually downloaded, only to be imported in the final document. Again, this is useful for the smaller projects but may become a hindrance when multiple dependencies have to be managed and updated, added and removed, etc.
 
-NPM has wholly changed how dependencies can be managed and imported in JavaScript. It is designed for Node.js code, but many (if not all) libraries that are meant to run in web browsers are published on NPM: it's just too convenient.
+NPM has wholly changed how dependencies can be managed and imported in JavaScript. It is designed for Node.js code, but many (if not all) libraries that are meant to run in web browsers\index{web browser} are published on NPM: it's just too convenient.
 
-NPM, combined with the decoupling, and bundling covered in previous sections, enables managing dependencies much more sensibly, and efficiently. So one can, for instance, import only certain functions from an external library rather than the whole, thereby further reducing the size of the final bundle of JavaScript files.
+NPM, combined with the decoupling, and bundling covered in previous sections, enables managing dependencies\index{dependency} much more sensibly, and efficiently. So one can, for instance, import only certain functions from an external library rather than the whole, thereby further reducing the size of the final bundle of JavaScript files.
 
 ## With R {#webpack-conclude}
 

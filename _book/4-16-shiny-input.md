@@ -6,7 +6,7 @@ Shiny comes with a variety of inputs ranging from buttons to text fields; these 
 
 To explain and demonstrate how to build such a custom input, we shall build a switch input, which is essentially a fancy-looking checkbox that can be toggled on and off.
 
-Custom Shiny inputs very much resemble Shiny outputs though they consist of a single R function (e.g.: `selectInput`), which generates the HTML and attaches necessary dependencies. When run from the R console, such functions will reveal the HTML they generate.
+Custom Shiny\index{Shiny} inputs very much resemble Shiny\index{Shiny} outputs though they consist of a single R function (e.g.: `selectInput`), which generates the HTML and attaches necessary dependencies\index{dependency}. When run from the R console, such functions will reveal the HTML they generate.
 
 ```r
 shiny::textInput("theId", "The label")   
@@ -23,7 +23,7 @@ The R function is paired with a JavaScript input binding akin to the output bind
 
 ## Setup {#shiny-input-setup}
 
-Let us set up the necessary files and project structure. Below an asset directory is created. In it, we place a JavaScript file where the binding will be coded, as well as a CSS file that will style the switch input, an `app.R` file is also created to hold the R code and application. 
+Let us set up the necessary files and project structure. Below an asset\index{asset} directory is created. In it, we place a JavaScript file where the binding will be coded, as well as a CSS file that will style the switch input, an `app.R` file is also created to hold the R code and application. 
 
 ```r
 # create directory for application
@@ -115,10 +115,14 @@ input:checked + .slider:before {
 
 The above CSS should be placed in the previously created `assets/styles.css` file. Figure \@ref(fig:checkbox-switch) displays an unstyled checkbox and another styled with the above CSS.
 
-<div class="figure" style="text-align: center">
-<img src="images/checkbox-switch.png" alt="Checkbox and styled switch input" width="100%" />
-<p class="caption">(\#fig:checkbox-switch)Checkbox and styled switch input</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/checkbox-switch} 
+
+}
+
+\caption{Checkbox and styled switch input}(\#fig:checkbox-switch)
+\end{figure}
 
 ## Generate Input HTML {#shiny-input-html}
 
@@ -165,7 +169,7 @@ switchInput <- function(id, label, checked = TRUE) {
 }
 ```
 
-As for the custom outputs, the dependencies (CSS and JavaScript binding) can piggy back on the generated HTML.
+As for the custom outputs, the dependencies\index{dependency} (CSS and JavaScript binding) can piggy back on the generated HTML.
 
 ```r
 # app.R
@@ -270,9 +274,9 @@ $.extend(switchInput, {
 
 The value of the `checked` prop is boolean, `true` if checked and `false` if unchecked.
 
-<div class="rmdnote">
-<p>Ensure the <code>getValue</code> method actually <code>return</code>s the value.</p>
-</div>
+\begin{rmdnote}
+Ensure the \texttt{getValue} method actually \texttt{return}s the value.
+\end{rmdnote}
 
 ### Set Input Value {#shiny-input-set-value}
 
@@ -299,7 +303,7 @@ Note the use of the `change` method, which ensures the event is fired. Otherwise
 
 ### Receive Input Messages {#shiny-input-receive-msg}
 
-The `setValue` method previously defined is only beneficial when combined with `receiveMessage`; the latter handles messages sent to the input, and these are generally sent from the server via functions the likes of `updateSelectInput`. Internally it uses the `setValue` method to define the value of the input received from the server. Note that the `value` is, therefore, a serialised JSON\index{JSON} input coming from the R server and can be of any complexity you desire. Below we use it such that it expects a simple boolean as the checkbox (switch) can be either on (`true`) or off (`false`).
+The `setValue` method previously defined is only beneficial when combined with `receiveMessage`; the latter handles messages sent to the input, and these are generally sent from the server via functions the likes of `updateSelectInput`. Internally it uses the `setValue` method to define the value of the input received from the server. Note that the `value` is, therefore, a serialised\index{serialise} JSON\index{JSON} input coming from the R server and can be of any complexity you desire. Below we use it such that it expects a simple boolean as the checkbox (switch) can be either on (`true`) or off (`false`).
 
 ```js
 var switchInput = new Shiny.InputBinding();
@@ -356,9 +360,10 @@ $.extend(switchInput, {
 
 Note that in the `subscribe` method we listen for `change`s on the input; hence the `setValue` also uses jQuery's `change` method; it ensures this event is fired and that Shiny will subsequently pick it up. 
 
-<div class="rmdnote">
-<p>Make sure the <code>setValue</code> method triggers the event observed in <code>subscribe</code></p>
-</div>
+\begin{rmdnote}
+Make sure the \texttt{setValue} method triggers the event observed in
+\texttt{subscribe}
+\end{rmdnote}
 
 ### Input Rate Policy {#shiny-input-rate-policy}
 
@@ -496,10 +501,14 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/switch-example.png" alt="Switch input example" width="100%" />
-<p class="caption">(\#fig:switch-example)Switch input example</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/switch-example} 
+
+}
+
+\caption{Switch input example}(\#fig:switch-example)
+\end{figure}
 
 ## Update Input {#shiny-input-update}
 
@@ -548,15 +557,14 @@ Figure \@ref(fig:shiny-input-diagram) attempts to summarize the various elements
 
 It all starts from the `switchInput` function, which generates the HTML\index{HTML} defining the switch input and its initial state. In the `subscribe` method, an event listener checks for changes on this HTML element (`$(el).on('change', ...)`). Every time it changes (check/uncheck) it fires the Shiny `callback`, which sends the value of the input obtained from `getValue` through the WebSocket\index{WebSocket}. When the value of the input is changed from the server this value travels through the WebSocket\index{WebSocket} to the front end, where `receiveMessage` uses `setValue` to programmatically change the check-box, which incidentally triggers the change event, and back we go.
 
-<div class="figure" style="text-align: center">
+\begin{figure}[H]
 
-```{=html}
-<div id="htmlwidget-076b26e381da596b9e89" style="width:100%;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-076b26e381da596b9e89">{"x":{"diagram":"\ndigraph {\n  graph [rankdir = LR]\n  node [shape=record fontsize=12];\n\n  subgraph cluster_r {\n    node [color=royalBlue];\n    \"update_switch_input\"\n    \"switchInput\"\n    \"Input list\"\n\n    label = \"R server\"\n  }\n\n  subgraph cluster_js {\n    node [color=gold];\n    \"receiveMessage\"\n    \"setValue\"\n    \"HTML input\"\n    \"subscribe\"\n    \"getValue\"\n\n    label = \"Front-end\"\n  }\n\n  edge [fontsize=10]\n  \"update_switch_input\" -> \"receiveMessage\" [xlabel=\"websocket\"]\n  \"receiveMessage\" -> \"setValue\" [label=\"value\"]\n  \"switchInput\" -> \"HTML input\" \n  \"setValue\" -> \"HTML input\" [label=\"value\"]\n  \"HTML input\" -> \"subscribe\" [label=\"event listener\"]\n  \"subscribe\" -> \"getValue\" [label=\"callback\"]\n  \"getValue\" -> \"Input list\" [label=\"websocket\"]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
-```
+{\centering \includegraphics[width=1\linewidth]{images/04-shiny-input} 
 
-<p class="caption">(\#fig:shiny-input-diagram)Shiny input visualised</p>
-</div>
+}
+
+\caption{Shiny input visualised}(\#fig:shiny-input-diagram)
+\end{figure}
 
 ## Exercise {#shiny-input-excercise}
 

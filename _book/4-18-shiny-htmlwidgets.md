@@ -98,14 +98,18 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-shiny-input-no-handler.png" alt="Gio with input data" width="100%" />
-<p class="caption">(\#fig:gio-shiny-no-handler)Gio with input data</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-input-no-handler} 
+
+}
+
+\caption{Gio with input data}(\#fig:gio-shiny-no-handler)
+\end{figure}
 
 One thing to note before moving on, the data is sent from the client to the server whether the inputs are used or not, though this likely will not negatively impact gio it can reduce performances if the callback function is triggered too frequently. For instance, an input value set when the user hovers a scatter plot might lead to the event being fired very frequently and too much data being sent to the server, slowing things down and providing a poor experience.
 
-Therefore one might consider making the capture of such event optional, so the web browser is not strained unless explicitly asked by the developer of the application. This could be implemented with a simple function that sets a simple logical variable in the `x` object that is used in JavaScript to check whether to implement the callback function.
+Therefore one might consider making the capture of such event optional, so the web browser\index{web browser} is not strained unless explicitly asked by the developer of the application. This could be implemented with a simple function that sets a simple logical variable in the `x` object that is used in JavaScript to check whether to implement the callback function.
 
 ```r
 #' @export
@@ -196,10 +200,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-input-handler.png" alt="Gio input data transformed to a data frame" width="100%" />
-<p class="caption">(\#fig:gio-input-handler)Gio input data transformed to a data frame</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-input-handler} 
+
+}
+
+\caption{Gio input data transformed to a data frame}(\#fig:gio-input-handler)
+\end{figure}
 
 ## R to Widgets {#shiny-widgets-r-to-widgets}
 
@@ -251,10 +259,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-shiny-error.png" alt="Gio issue in shiny" width="100%" />
-<p class="caption">(\#fig:gio-shiny-error)Gio issue in shiny</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-error} 
+
+}
+
+\caption{Gio issue in shiny}(\#fig:gio-shiny-error)
+\end{figure}
 
 A solution to this is to ensure the container (`el`) is empty before generating the visualisation. Incidentally, this can be executed with a JavaScript method previously used in this book: `innerHTML`.
 
@@ -292,7 +304,7 @@ gio_send_data <- function(id, data, source, target, value,
 
 The function takes the id of the visualisation the data is destined for, the data object itself, and a Shiny session used to send the data. The id of the visualisation is sent as part of the message and will be used to retrieve the instance of the visualisation and subsequently apply the new dataset. Note that we give this message the `send-data` identifier, this will be needed when we write its handler.
 
-There is one caveat that will make it such that the above will not work. To have gio.js work with data changes had to be made to the serialiser (using the `TOJSON_ARGS` attribute), this cannot be used here. The data being sent with Shiny via the session object the problem reoccurs: Shiny, like htmlwidgets, serialises data frames column-wise and not row-wise. One can preview the way Shiny serialises with `shiny:::toJSON` (three-colon).
+There is one caveat that will make it such that the above will not work. To have gio.js work with data changes had to be made to the serialiser\index{serialise} (using the `TOJSON_ARGS` attribute), this cannot be used here. The data being sent with Shiny via the session object the problem reoccurs: Shiny, like htmlwidgets, serialises data frames column-wise and not row-wise. One can preview the way Shiny serialises\index{serialise} with `shiny:::toJSON` (three-colon).
 
 
 ```r
@@ -514,7 +526,7 @@ Switching dataset with the dropdown only changes the data; it makes for a much s
 
 Before we add other similar functions, we ought to pause and consider the API this provides the user. There are two points, every function such as `gio_send_data`, will need to accept the `id` and `session` arguments. It will be tedious to so every time, following the old "don't repeat yourself" adage we ought to abstract this further. 
 
-This can be remedied to by introducing what is often referred to as a "proxy." A proxy is just a representation of the graph, or pragmatically, an object that contains the id of the visualisation\index{visualisation} and a Shiny session. This object can subsequently be piped to other functions, thereby providing not only a cleaner but also a more consistent API. 
+This can be remedied to by introducing what is often referred to as a "proxy." A proxy is just a representation of the graph, or pragmatically, an object that contains the id of the visualisation\index{visualisation} and a Shiny session. This object can subsequently be piped\index{pipe} to other functions, thereby providing not only a cleaner but also a more consistent API. 
 
 ```r
 #' @export
@@ -604,10 +616,14 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-shiny-clear.png" alt="Gio with clear data proxy" width="100%" />
-<p class="caption">(\#fig:giod-shiny-clear-data)Gio with clear data proxy</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-clear} 
+
+}
+
+\caption{Gio with clear data proxy}(\#fig:giod-shiny-clear-data)
+\end{figure}
 
 ## Update the Widget {#shiny-widgets-update}
 
@@ -679,7 +695,11 @@ server <- function(input, output){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/gio-shiny-style.png" alt="Gio with dynamic style" width="100%" />
-<p class="caption">(\#fig:gio-shiny-style)Gio with dynamic style</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/gio-shiny-style} 
+
+}
+
+\caption{Gio with dynamic style}(\#fig:gio-shiny-style)
+\end{figure}

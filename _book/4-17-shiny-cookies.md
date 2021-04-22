@@ -1,12 +1,12 @@
 # Cookies {#shiny-cookies}
 
-In this chapter, we scout yet another excellent example of how JavaScript can enhance Shiny applications. We use an HTTP cookie, a small piece of data sent from an application and stored in the user's web browser, to track users returning to a Shiny application.
+In this chapter, we scout yet another excellent example of how JavaScript can enhance Shiny applications. We use an HTTP cookie, a small piece of data sent from an application and stored in the user's web browser\index{web browser}, to track users returning to a Shiny application.
 
 The application will prompt users to input their name; this will be stored in a cookie so that on their next visit, they are welcomed to the app with a personalised message. Cookies are natively supported by web browsers and JavaScript, though we will use a library which greatly eases their handling: [js-cookie](https://github.com/js-cookie/js-cookie).
 
 ## Discover js-cookie {#shiny-cookies-discover}
 
-The library is at its core very straightforward; it exports a `Cookie` object from which one can access the `set`, `get`, and `remove` methods. 
+The library is at its core very straightforward; it exports\index{export} a `Cookie` object from which one can access the `set`, `get`, and `remove` methods. 
 
 ```js
 // set a cookie
@@ -23,7 +23,7 @@ There is also the possibility to pass additional options when defining the cooki
 
 ## Setup Project {#shiny-cookies-setup}
 
-Then again, it starts with the creation of a directory where we'll place a JavaScript file containing the message handlers; we won't download the dependency and use the CDN\index{CDN} instead but feel free to do differently.
+Then again, it starts with the creation of a directory where we'll place a JavaScript file containing the message handlers; we won't download the dependency\index{dependency} and use the CDN\index{CDN} instead but feel free to do differently.
 
 ```r
 dir.create("www")
@@ -152,10 +152,14 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-<div class="figure" style="text-align: center">
-<img src="images/shiny-cookies-2.png" alt="Shiny using cookies" width="100%" />
-<p class="caption">(\#fig:shiny-cookies)Shiny using cookies</p>
-</div>
+\begin{figure}[H]
+
+{\centering \includegraphics[width=1\linewidth]{images/shiny-cookies-2} 
+
+}
+
+\caption{Shiny using cookies}(\#fig:shiny-cookies)
+\end{figure}
 
 Run the application and save your name. You can then refresh the application, and the welcome message will display your name. You can even kill the server entirely and re-run the app; the welcome message will still display as in Figure \@ref(fig:shiny-cookies)!
 
