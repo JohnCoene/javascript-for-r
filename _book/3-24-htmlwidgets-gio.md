@@ -204,7 +204,7 @@ An exciting start, now onto adding data. Let us take a look at the [documentatio
 ]
 ```
 
-The JSON data should constitute arrays that denote arcs to draw on the globe where each arc is defined by an exporting country (`e`), an importing country (`i`), and is given a value (`v`). The importing and exporting country, the source and target of the arc, are indicated by ISO alpha-2 country codes. We can read this JSON into R.
+The JSON\index{JSON} data should constitute arrays that denote arcs to draw on the globe where each arc is defined by an exporting country (`e`), an importing country (`i`), and is given a value (`v`). The importing and exporting country, the source and target of the arc, are indicated by ISO alpha-2 country codes. We can read this JSON into R.
 
 
 ```r
@@ -385,7 +385,7 @@ Other arguments can be placed in the same list; they will ultimately reach the s
 
 ### Replace Serialiser {#widgets-full-transform-data-replace}
 
-Otherwise, the serialiser can also be replaced in its entirety, also by setting an attribute, `TOJSON_FUNC`, to the `x` object. Below the serialiser\index{serialise} is changed to jsonify [@R-jsonify], which by default serialises data frames to wide, unlike htmlwidgets' serialiser, thereby also fixing the issue.
+Otherwise, the serialiser\index{serialise} can also be replaced in its entirety, also by setting an attribute, `TOJSON_FUNC`, to the `x` object. Below the serialiser\index{serialise} is changed to jsonify [@R-jsonify], which by default serialises data frames to wide, unlike htmlwidgets' serialiser, thereby also fixing the issue.
 
 
 ```r

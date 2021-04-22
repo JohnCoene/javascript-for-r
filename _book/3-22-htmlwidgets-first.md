@@ -6,7 +6,7 @@ The previous chapter gave some indication as to how widgets work, but this is ov
 
 ## The Scaffold {#widgets-first-scaffold}
 
-Though one could probably create widgets outside of an R package, it would only make things more complicated. Htmlwidgets naturally take the form of R packages and are stunningly simple to create. Below we create a package named "playground," which will be used to mess around and explore.
+Though one could probably create widgets outside of an R package, it would only make things more complicated. Htmlwidgets\index{htmlwidgets} naturally take the form of R packages and are stunningly simple to create. Below we create a package named "playground," which will be used to mess around and explore.
 
 ```r
 usethis::create_package("playground")
@@ -46,11 +46,11 @@ play(message = "This is a widget!")
 \caption{First widget}(\#fig:playground-1)
 \end{figure}
 
-Figure \@ref(fig:playground-1) displays the message in the RStudio\index{RStudio} "Viewer," or your default browser; indicating the function does indeed create an HTML output. One can use the ![](images/open-in-browser.png) button located in the top right of the RStudio "Viewer" to open the message in the web browser\index{web browser}, which can prove very useful to look under the hood of the widgets for debugging.
+Figure \@ref(fig:playground-1) displays the message in the RStudio\index{RStudio} "Viewer," or your default browser; indicating the function does indeed create an HTML\index{HTML} output. One can use the ![](images/open-in-browser.png) button located in the top right of the RStudio\index{RStudio} "Viewer" to open the message in the web browser\index{web browser}, which can prove very useful to look under the hood of the widgets for debugging.
 
 ## The HTML Output {#widgets-first-htmloutput}
 
-With an out-of-the-box htmlwidget package, one can start exploring the internals to understand how it works. Let us start by retracing the path taken by the message written in R to its seemingly magical appearance in HTML\index{HTML}. The `play` function previously used, takes the `message` wraps it into a list which is then used in `htmlwidgets::createWidget`.
+With an out-of-the-box htmlwidgets package, one can start exploring the internals to understand how it works. Let us start by retracing the path taken by the message written in R to its seemingly magical appearance in HTML\index{HTML}. The `play` function previously used, takes the `message` wraps it into a list which is then used in `htmlwidgets::createWidget`.
 
 ```r
 # forward options using x
@@ -226,13 +226,13 @@ el.innerText = x.message;
 
 Making the modifications above and reloading the package, one can create a widget given a specific id and see it displayed in the console, e.g.: `play("hello", elementId = "see-you-in-the-console")`.
 
-In an attempt to become more at ease with this setup, let us change something and play with the widget. Out-of-the-box htmlwidgets uses `innerText`, which does very much what it says on the tin, it places text inside an element. JavaScript comes with another function akin to `innerText`, `innerHTML`. While the former only allows inserting text, the latter lets one insert any HTML.
+In an attempt to become more at ease with this setup, let us change something and play with the widget. Out-of-the-box htmlwidgets\index{htmlwidgets} uses `innerText`, which does very much what it says on the tin, it places text inside an element. JavaScript comes with another function akin to `innerText`, `innerHTML`. While the former only allows inserting text, the latter lets one insert any HTML\index{HTML}.
 
 ```js
 el.innerHTML = x.message;
 ```
 
-After changing the `play.js` file as above, and re-loading the package, one can use arbitrary HTML as messages as shown in Figure \@ref(fig:playground-h1).
+After changing the `play.js` file as above, and re-loading the package, one can use arbitrary HTML\index{HTML} as messages as shown in Figure \@ref(fig:playground-h1).
 
 ```r
 play("<h1>Using HTML!</h1>")
@@ -287,4 +287,4 @@ play(
 \caption{First widget using Shiny tags}(\#fig:playground-tags)
 \end{figure}
 
-This hopefully provides some understanding of how htmlwidgets work internally and thereby helps to build such packages. To recapitulate, an HTML document is created in which div is placed and given a specific id; this id is also used in a script tag that contains JSON data passed from R so that a JavaScript function we define can read that data in and use it to generate a visual output in a div. However, as much as this section covered, the topic of JavaScript dependencies\index{dependency} was not touched, this is approached in the following section where we build another, more exciting widget, which uses an external dependency.
+This hopefully provides some understanding of how htmlwidgets work internally and thereby helps to build such packages. To recapitulate, an HTML\index{HTML} document is created in which div is placed and given a specific id; this id is also used in a script tag that contains JSON data passed from R so that a JavaScript function we define can read that data in and use it to generate a visual output in a div. However, as much as this section covered, the topic of JavaScript dependencies\index{dependency} was not touched, this is approached in the following section where we build another, more exciting widget, which uses an external dependency.

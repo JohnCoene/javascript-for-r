@@ -256,7 +256,7 @@ Since the default works, there is no need to use it for the switch input.
 
 ### Get Input Value {#shiny-input-get-value}
 
-That retrieves the value of the input; this is often the attribute of the same name (`value="something"`), which can be obtained with the jQuery `val()` method. The switch is an input of type `checkbox` and therefore uses the `checked` prop. 
+That retrieves the value of the input; this is often the attribute of the same name (`value="something"`), which can be obtained with the jQuery\index{jQuery} `val()` method. The switch is an input of type `checkbox` and therefore uses the `checked` prop. 
 
 ```js
 var switchInput = new Shiny.InputBinding();
@@ -280,7 +280,7 @@ Ensure the \texttt{getValue} method actually \texttt{return}s the value.
 
 ### Set Input Value {#shiny-input-set-value}
 
-The `setValue` method sets the value of the input; hence it also accepts the `value` object: the actual value to which the input should be set. Then again, most inputs will likely use the `value` attribute, which can be set in jQuery with `val(newValue)`, but the checkbox uses the `checked` prop.
+The `setValue` method sets the value of the input; hence it also accepts the `value` object: the actual value to which the input should be set. Then again, most inputs will likely use the `value` attribute, which can be set in jQuery\index{jQuery} with `val(newValue)`, but the checkbox uses the `checked` prop.
 
 ```js
 var switchInput = new Shiny.InputBinding();
@@ -565,6 +565,8 @@ It all starts from the `switchInput` function, which generates the HTML\index{HT
 
 \caption{Shiny input visualised}(\#fig:shiny-input-diagram)
 \end{figure}
+
+If you wish to explore Shiny inputs in more depth I suggests reading David Granjon's book: *[Outstanding Shiny UI.](https://unleash-shiny.rinterface.com/)*
 
 ## Exercise {#shiny-input-excercise}
 

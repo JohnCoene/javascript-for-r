@@ -251,7 +251,7 @@ Here we create an "output binding." It tells Shiny how to find the component and
 var boxxyBinding = new Shiny.OutputBinding();
 ```
 
-Then, this must be "extended" by specifying a number of methods, an essential one being `find`. It is used to look for the output HTML element in the document (`scope`), and to return them as an array (`HTMLcollection`). Other methods all take an `el` argument; that value will always be an element that was returned from `find`. A very straightforward way to accomplish this is to use jQuery’s find method to identify elements with the `boxxy` class used in `boxxyOutput`. You are by no means forced to use a CSS class to identify the elements, but there is no reason not to.
+Then, this must be "extended" by specifying a number of methods, an essential one being `find`. It is used to look for the output HTML element in the document (`scope`), and to return them as an array (`HTMLcollection`). Other methods all take an `el` argument; that value will always be an element that was returned from `find`. A very straightforward way to accomplish this is to use jQuery’s\index{jQuery} find method to identify elements with the `boxxy` class used in `boxxyOutput`. You are by no means forced to use a CSS class to identify the elements, but there is no reason not to.
 
 ```js
 // custom.js

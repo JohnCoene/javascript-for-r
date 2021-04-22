@@ -275,7 +275,7 @@ shinyApp(ui, server)
 
 ## jQuery {#shiny-tips-jQuery}
 
-The Shiny framework itself makes use of and thus imports the [jQuery](https://jquery.com/) JavaScript library, a library that provides a convenient API to make many things easier, including animations.
+The Shiny framework itself makes use of and thus imports the [jQuery](https://jquery.com/)\index{jQuery} JavaScript library, a library that provides a convenient API to make many things easier, including animations.
 
 As an example, we could use jQuery's `show`, `hide`, or `toggle` functions to show or hide an HTML element at the press of a button.
 
@@ -284,7 +284,7 @@ As an example, we could use jQuery's `show`, `hide`, or `toggle` functions to sh
 $('#id').toggle();
 ```
 
-Because jQuery is already imported, there is no need to do so, on the contrary, importing it again will impact load time and might clash with the pre-existing version. Below we create a Shiny application containing a message handler to toggle (show or hide element depending on its state) at the click of a button.
+Because jQuery\index{jQuery} is already imported, there is no need to do so, on the contrary, importing it again will impact load time and might clash with the pre-existing version. Below we create a Shiny application containing a message handler to toggle (show or hide element depending on its state) at the click of a button.
 
 ```r
 library(shiny)
@@ -313,7 +313,7 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-Note that jQuery takes a selector so one could very well use a class to hide and show multiple elements (with said class) at once.
+Note that jQuery\index{jQuery} takes a selector so one could very well use a class to hide and show multiple elements (with said class) at once.
 
 ```r
 library(shiny)

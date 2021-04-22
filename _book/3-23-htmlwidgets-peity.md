@@ -34,13 +34,13 @@ As done with candidate libraries, as explained in an earlier chapter, there is n
 </html>
 ```
 
-Peity.js depends on jQuery. Hence the latter is imported first; the data for the chart is placed in a `<span>`, and the `peity` method is then used on the element containing the data. Peity.js uses `<span>` HTML\index{HTML} tags as these work inline, using a `<div>` the chart will still display, but the purpose of using peity.js would be defeated.
+Peity.js depends on jQuery\index{jQuery}. Hence the latter is imported first; the data for the chart is placed in a `<span>`, and the `peity` method is then used on the element containing the data. Peity.js uses `<span>` HTML\index{HTML} tags as these work inline, using a `<div>` the chart will still display, but the purpose of using peity.js would be defeated.
 
 ## Dependencies {#widgets-realistic-deps}
 
 Once the package is created and the widget scaffold\index{scaffold} laid down, we need to add the JavaScript dependencies\index{dependency} without which nothing can move forward.
 
-Two dependencies\index{dependency} are required in order for peity.js to run: peity.js and jQuery. Instead of using the CDN\index{CDN} those are downloaded as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Each of the two libraries is placed in its own respective directory.
+Two dependencies\index{dependency} are required in order for peity.js to run: peity.js and jQuery\index{jQuery}. Instead of using the CDN\index{CDN} those are downloaded as this ultimately makes the package more robust (more easily reproducible outputs and no requirement for internet connection). Each of the two libraries is placed in its own respective directory.
 
 ```r
 dir.create("./inst/htmlwidgets/jquery")
@@ -107,11 +107,11 @@ dependencies:
 ```
 
 \begin{rmdnote}
-The order of the dependencies matters. Peity.js depends on jQuery hence
-the latter comes first in the \texttt{.yaml}.
+The order of the dependencies matters. Peity.js depends on
+jQuery\index{jQuery} hence the latter comes first in the \texttt{.yaml}.
 \end{rmdnote}
 
-The order in which one specifies the dependencies\index{dependency} matters, just like it does in an HTML file, therefore jQuery is listed first. The `stylesheet` entries were removed as none of these libraries require CSS files. The `src` path points to the directory containing the JavaScript files and stylesheets relative to the `inst` directory of the package; this is akin to using the `system.file` function to return the full path to a file or directory within the package.
+The order in which one specifies the dependencies\index{dependency} matters, just like it does in an HTML file, therefore jQuery\index{jQuery} is listed first. The `stylesheet` entries were removed as none of these libraries require CSS files. The `src` path points to the directory containing the JavaScript files and stylesheets relative to the `inst` directory of the package; this is akin to using the `system.file` function to return the full path to a file or directory within the package.
 
 ```r
 devtools::load_all()
@@ -220,7 +220,7 @@ $("#" + el.id).peity("bar", {
 })
 ```
 
-This will work but can be further simplified; there is no need to recreate a selector using the `id` of the `el` element; the latter can be used in the jQuery selector directly.
+This will work but can be further simplified; there is no need to recreate a selector using the `id` of the `el` element; the latter can be used in the jQuery\index{jQuery} selector directly.
 
 ```js
 $(el).peity("bar", {
@@ -297,7 +297,7 @@ These can then be easily accessed from JavaScript.
 $(el).peity(x.type, x.options)
 ```
 
-This makes (nearly) all of the functionalities of peity.js available from R. Below we use `htmltools::browsable` to create multiple widgets at once, the function only accepts a single value, so the charts are wrapped in an `htmltools::tagList`. Let us explain those in reverse order, `tagList` accepts a group of tags or valid HTML outputs like htmlwidgets and wraps them into one, it is necessary here because the function `browsable` only accepts one value. Typically htmltools tags are just printed in the console; here we need them to be opened in the browser instead. Remember to run `devtools::load_all` so you can run the `peity` function we just wrote.
+This makes (nearly) all of the functionalities of peity.js available from R. Below we use `htmltools::browsable` to create multiple widgets at once, the function only accepts a single value, so the charts are wrapped in an `htmltools::tagList`. Let us explain those in reverse order, `tagList` accepts a group of tags or valid HTML\index{HTML} outputs like htmlwidgets\index{htmlwidgets} and wraps them into one, it is necessary here because the function `browsable` only accepts one value. Typically htmltools tags are just printed in the console; here we need them to be opened in the browser instead. Remember to run `devtools::load_all` so you can run the `peity` function we just wrote.
 
 ```r
 library(htmltools)
@@ -323,13 +323,13 @@ browsable(
 \caption{Peity output with DIV}(\#fig:peity-divs)
 \end{figure}
 
-There is nonetheless one remaining issue in Figure \@ref(fig:peity-divs): peity.js is meant to create inline charts within `<span>` HTML tags but these are created within `<div>` hence each chart appears on a new line.
+There is nonetheless one remaining issue in Figure \@ref(fig:peity-divs): peity.js is meant to create inline charts within `<span>` HTML\index{HTML} tags but these are created within `<div>` hence each chart appears on a new line.
 
 ## HTML Element {#widgets-realistic-html-element}
 
 As pointed out multiple times, the widget is generated in a `<div>`, which is working fine for most visualisation libraries. However, we saw that peity.js works best when placed in a `<span>` as this allows placing the charts inline. 
 
-This can be changed by placing a function named `widgetname_html`, which is looked up by htmlwidgets and used if found. This is probably the first such function one encounters and is relatively uncommon, but it is literally how the htmlwidgets package does it: it scans the namespace of the package looking for a function that starts with the name of the widget and ends in `_html` and if found uses it. Otherwise, it uses the default `div`. This function takes the three-dot construct (`...`) and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets need to be able to pass the `id`, `class`, and `style` attributes to the tag.
+This can be changed by placing a function named `widgetname_html`, which is looked up by htmlwidgets and used if found. This is probably the first such function one encounters and is relatively uncommon, but it is literally how the htmlwidgets\index{htmlwidgets} package does it: it scans the namespace of the package looking for a function that starts with the name of the widget and ends in `_html` and if found uses it. Otherwise, it uses the default `div`. This function takes the three-dot construct (`...`) and uses them in an htmltools tag. The three-dots are necessary because internally htmlwidgets need to be able to pass the `id`, `class`, and `style` attributes to the tag.
 
 ```r
 peity_html <- function(...){
